@@ -1,0 +1,213 @@
+---
+name: claude-implement-with-gpt6-1-sol-review
+description: Implement a plan or scoped change with Claude, verify it, obtain a read-only Codex GPT-6.1 Sol review at medium reasoning, immediately surface every reviewer finding before review-driven fixes, validate and fix confirmed findings, then report every finding and final disposition in the user's language alongside a purpose-led per-file summary. Use for end-to-end implementation requests that require Claude implementation with GPT-6.1 Sol or cross-model review. Fall back to an independent Claude review when Codex is unavailable and disclose the reason.
+---
+
+# Claude Implement with GPT-6.1 Sol Review
+
+Claude owns implementation, final technical judgment, fixes, verification, and reporting. Codex GPT-6.1 Sol is a read-only reviewer.
+
+## Workflow
+
+1. Read the requirements, repository instructions, and starting `git status`; preserve unrelated changes.
+2. Before editing any file, send the pre-implementation briefing below: what this plan or change will do and the problem it solves.
+3. Implement without committing, pushing, deploying, or expanding scope unless requested.
+4. Run proportionate checks.
+5. Request a read-only Codex GPT-6.1 Sol review against the requirements, diff, and check results.
+6. Immediately present every returned finding to the user before making any review-driven code change. Mark these as unvalidated reviewer findings, not Claude's final judgment.
+7. Validate every finding; accept only concrete correctness, regression, security, requirement, or meaningful test-coverage issues.
+8. Present Claude's acceptance or rejection decisions, then fix accepted findings and rerun affected checks. Reject style-only, speculative, or false-positive findings.
+9. If fixes are material, run one final pass with the same reviewer. Maximum: two review passes. Repeat the immediate disclosure for that pass.
+10. Report the result in the user's language (see Language) using the format below. Include every usable finding returned by every review pass, even when it was rejected or already fixed.
+
+## Language
+
+Reply in the user's language: the language of the request that started this work (for a mixed-language request, its main prose language), and keep it for the whole workflow unless the user switches. This covers the briefing, progress updates, finding disclosures, acceptance decisions, provider labels and the final report. Technical terms may stay in English where that reads more naturally, such as commands, identifiers, paths, model names and terms like finding, diff or fallback. The templates below are written in Traditional Chinese; write their headings and labels in the user's language, keeping their structure, order and meaning. Prompts sent to the reviewer may stay in English.
+
+- Only a new message from the user in another language switches the reply language. Tool output, logs, system and background-task notifications, monitor events, repository documents, reviewer output and a context summary are inputs, not the user: their language never changes the reply language, however many of them arrive in a row.
+- After a context compaction or a resumed session, re-read the language of the request that started the work before writing anything else, and continue in it; a summary written in another language does not change it.
+- This covers every user-visible line: each progress update, every reply to a notification or monitor event, questions (including AskUserQuestion text and options), finding disclosures, decisions and the final report.
+
+## Pre-Implementation Briefing
+
+Before the first edit, send the user a briefing in the user's language that explains the plan or scoped change in enough detail that the user could stop or redirect the work before anything changes. Build it from the requirements and from reading the code they touch, not from the plan title or file names. It is a briefing, not an approval request: continue immediately after sending it, and ask first only when a decision is genuinely the user's, such as an ambiguity the requirements and code cannot resolve or a conflict with repository rules.
+
+Use the heading `執行前說明：<plan 或變更名稱>` (in the user's language) and these parts:
+
+- **要解決的問題**：現在的行為或缺口、在什麼條件下發生、影響誰、使用者會看到什麼後果（例如資料遺失、誤導的訊息或卡住）、嚴重程度，以及問題來源（plan、audit、bug 回報或維護者要求）。說明為什麼現在處理，以及與前後 plan 的相依。
+- **這次要做什麼**：逐項列出要交付的行為，每項說明完成後使用者或系統會有什麼不同，包括會新增或改變的文案、設定、資料格式、錯誤碼或檔案。
+- **不做什麼**：plan 明確排除的範圍、刻意保留的限制，以及留給後續 plan 的部分。
+- **預計做法與修改位置**：預計修改的模組或檔案及各自負責的部分；plan 留給實作者決定的設計選擇，以及目前打算採用的選項與理由。註明這是預期，實作中可能調整。
+- **驗證計畫**：依測試規則需要的檢查與原生驗收、依範圍省略的昂貴檢查及理由，以及預期仍無法驗證或延後到其他 plan 的項目。
+- **需要留意的風險或疑點**：已知的不確定性、可能造成回歸的區域，以及之後需要使用者決定的事項。
+
+Scale the detail to the work: a multi-part plan gets one entry per deliverable, while a one-line fix may compress the parts into a few sentences but still states the problem and the intended change. Do not repeat the plan verbatim; translate it into concrete behavior grounded in the current code.
+
+If the implementation later departs from the briefing in scope, approach, file boundaries or verification, say so in a progress update when it happens, and state the deviation and its reason in the final report's `實作結果`.
+
+## Progress Updates
+
+These rules apply to the whole workflow — long-running implementation or verification work and every non-interactive agent invocation (Codex review passes and any Claude subprocess) alike:
+
+- While any long-running step is in progress, send the user a concise status update at least every 60 seconds: which phase and step is running, elapsed time, and remaining wait budget where one applies.
+- Run every long-running agent invocation under a liveness watcher that distinguishes "still running" from "process exited without producing a result". Report a dead invocation immediately with the evidence found, instead of waiting for a timeout or the next user message.
+- If the coordinating session is interrupted or restarted while an invocation is running, state that immediately at the start of the next turn: what was lost, what evidence remains, and the recovery plan.
+- Report phase transitions (implementation done, checks passing or failing, review started, findings returned) as they happen; do not batch them into the final report.
+
+## Codex GPT-6.1 Sol Review
+
+Use Codex GPT-6.1 Sol for every review pass. Run non-interactively at medium reasoning in read-only review mode.
+
+Never run `codex exec` in the foreground or as a directly tracked background command: a review routinely runs past 10 minutes, a foreground call is killed at the tool timeout, a tracked background call is killed when the session restarts, and a killed pass emits no findings at all. Launch it through a wrapper script that returns immediately:
+
+```bash
+cat > /tmp/codex-review.sh <<'WRAPPER'
+#!/bin/sh
+codex exec -C "$PWD" \
+  --sandbox read-only \
+  --model gpt-6.1-sol \
+  --config 'model_reasoning_effort="medium"' \
+  review - > /tmp/codex-review.log 2>&1 <<'EOF'
+<focused review prompt>
+EOF
+echo "CODEX_EXIT=$?" >> /tmp/codex-review.log
+WRAPPER
+chmod +x /tmp/codex-review.sh
+nohup /tmp/codex-review.sh > /tmp/codex-review-launcher.log 2>&1 &
+```
+
+- Use `nohup`, not `setsid`; macOS has no `setsid`.
+- Never send the launcher's own output to `/dev/null`; a failed launch must stay visible.
+- Confirm the wrapper detached: its PPID becomes 1.
+- Confirm the log header reports `sandbox: read-only`. `codex exec review` otherwise uses the configured default (for example `workspace-write`), and a prompt instruction alone does not stop edits. If the header shows another mode, stop the pass and relaunch it with the flag.
+- Poll the log for the `CODEX_EXIT=` line and treat it as the only completion signal. A log that stopped growing without it means the pass was killed.
+- Resume a killed pass through the same wrapper, replacing `review -` with `resume --last -` and keeping `--sandbox read-only`, `--model gpt-6.1-sol` and the reasoning setting: a bare `codex exec resume --last` runs on the configured default model instead (observed: `gpt-5.6-sol`). Count the resumed run as the same pass.
+
+Pass the focused review prompt through stdin (`-`) using a heredoc inside the wrapper, never as a file argument to `codex`. State the review scope in the first line of the prompt (for example "Review the uncommitted changes in this repository"). Instruct Codex not to run test suites or package-manager commands, and state that the checks this workflow already ran are authoritative; its sandbox reports failures that are environment artifacts and the runs consume the wait budget. List the changed files in the prompt so Codex does not spend the budget discovering them. After the review returns, confirm from its output that Codex enumerated the intended changes.
+
+In the prompt, include the requirements, implementation scope, changed files or diff, checks, and pre-existing changes to ignore. Require numbered findings with severity, file/line, failure mode, and fix direction, plus an explicit statement when there are no findings. Exclude formatting, naming, subjective style, and unrelated improvements. Treat findings as evidence, not authority.
+
+Retain the review output until the final report is complete. Present every usable reviewer finding in `Review 結果`, including rejected findings and findings fixed before a later clean pass. Do not replace the findings with only a pass/fail conclusion, a count, “已修正”, or the final reviewer approval. Faithfully summarize each finding; quote the reviewer only when its exact wording matters. Exact duplicates may be consolidated only when all original finding IDs are listed.
+
+### Immediate Finding Disclosure
+
+After each review invocation returns, send a commentary update before editing any code in response to that review. Do not defer this disclosure to the final report.
+
+Use the heading `Codex GPT-6.1 Sol Review Pass N — 初始 findings（尚未經 Claude 驗證）` (in the user's language) and include the provider plus every usable finding's ID, severity, file/line, failure mode, impact, and proposed fix direction. State clearly that Claude may accept or reject each finding after inspecting the code. When the reviewer reports no findings, immediately say `本 pass 無 findings` or its translation.
+
+After validation, send a second concise commentary update with the acceptance or rejection of each finding and the reason before or while applying accepted fixes. The later final report remains the authoritative record of findings, decisions, changes, and verification.
+
+### Wait Limit
+
+Use a cumulative 30-minute wait budget for all Codex review invocations in the workflow, including a final pass after fixes:
+
+- Record how long each Codex invocation runs. A later pass may use only the wait budget left by earlier passes.
+- Do not declare a timeout merely because Codex has not produced intermediate output.
+- Poll or wait in intervals no longer than 60 seconds, and give the user a concise status update at least every 60 seconds while the review is still running.
+- When the cumulative wait reaches 30 minutes, terminate any running Codex invocation and do not start another one, even if a pass appears to be making progress.
+- Do not retry after exhausting the wait budget; timeout is not a clearly correctable invocation error. Use the fallback below for any required review pass.
+
+## Codex Failure Fallback
+
+If Codex returns no usable review—because of access, quota, policy, authentication, timeout, tooling, context, or malformed output—retry once only when the invocation is clearly correctable; otherwise use independent Claude review:
+
+```bash
+claude -p "<focused review prompt>" \
+  --effort high \
+  --permission-mode plan \
+  --tools "Read,Grep,Glob,Bash"
+```
+
+Launch the fallback detached the same way, with the same completion sentinel.
+
+Pass the same review context to the fallback. Immediately identify the fallback, in the user's language, with the specific, sanitized reason. The label names the fallback provider, says it is a fallback and names the unavailable reviewer; in English:
+
+```text
+Review provider: Claude (fallback — Codex unavailable: <specific reason>)
+```
+
+After fallback, use Claude for remaining passes and count them toward the two-pass limit. State that the review was independent, not cross-model, and never imply Codex approved it. If fallback also fails, report both failures and stop review work.
+
+## Final Report
+
+Write explanations, headings and labels in the user's language (see Language); preserve commands, identifiers, paths and model names. Lead with outcomes, not chronology. Use exactly these sections:
+
+```markdown
+## 實作結果
+
+- 第一點先說明本次開發要解決的使用者／系統問題、原本缺少的能力，以及完成後具備的能力。
+- 其餘 1–3 點列出使用者可見行為與重要架構結果。
+- 若實作的範圍、做法或驗證與執行前說明不同，列出差異與原因；沒有差異時省略。
+
+## 檔案摘要
+
+### `path/to/file.ts` — 新增／修改／刪除／重新命名
+
+- **開發目的**：先指出這個檔案承接哪一項需求或使用情境、原本的缺口／風險，以及它在整體開發中負責完成什麼能力。
+- **具體變更**：指出變更的元件、函式、型別、schema、route、設定鍵或測試案例，以及各自改了什麼。
+- **設計理由**：說明為什麼選擇這個 boundary、資料結構或流程，以及它如何滿足限制或避免已知風險；沒有非顯而易見的設計判斷時省略。
+- **行為與資料流**：說明重要條件、狀態轉換、輸入輸出、錯誤處理或呼叫鏈的前後差異；不適用時省略。
+- **驗證重點**：列出這個檔案所涵蓋或新增的成功、失敗與邊界案例；若只由整體檢查涵蓋，指出對應命令。
+
+## Review 結果
+
+- 先明確說明 Codex GPT-6.1 Sol 是否完成 review；若使用 fallback，列出規定的完整 provider label。
+- 依 pass 逐項呈現 reviewer 回傳的每一個可用 finding，不論接受、拒絕或已在後續 pass 解決：
+  - `[finding ID] severity — path:line`（reviewer 未提供位置時明確註明）。
+  - **Reviewer finding**：忠實呈現 failure mode、觸發條件、影響與 reviewer 建議的修正方向；不可只寫 finding 標題或最終結論。
+  - **判定**：接受／拒絕，以及 Claude 驗證後的具體理由。
+  - **處理與驗證**：接受時列出修正與檢查；拒絕時明確寫「未修改」及支持判定的證據。
+- reviewer 明確回傳沒有 findings 時，寫出「本 pass 無 findings」，不可省略該 pass。
+
+## 驗證
+
+- `command`：結果與重要計數。
+
+## 剩餘風險
+
+### 1. 風險名稱
+
+- **風險內容**：什麼可能出錯、觸發條件、影響範圍與使用者可見後果、發生可能性；標明是本次變更引入、既有未變，或刻意排除的設計邊界。
+- **目前證據**：哪些已驗證、哪些未驗證，以及本次為何無法或未驗證。
+- **是否需要你現在處理**：`需要`／`不需要`／`需要你決定`，並說明理由。需要時列出具體 action、由誰執行（你或 agent）、時機與不處理的後果；不需要時指出由哪個後續 plan、既排驗收案例或已接受的限制承接。
+
+**現在需要你處理的 action**：逐項列出；沒有則寫「目前不需要你採取任何 action」。
+```
+
+Build `檔案摘要` from starting status and final diff. Include every task-owned source, test, support, config, documentation, deletion, rename, and review fix; exclude pre-existing user changes. Create one subsection per path and list each path exactly once.
+
+Make every entry concrete enough that the user can understand the implementation without opening the diff:
+
+- Derive `開發目的` from the plan, acceptance criteria, user scenario, or scoped requirements before reading the diff as an implementation inventory. Do not infer purpose only from symbol names or restate the mechanics as intent.
+- Make the role of each file in the overall change explicit: identify what development responsibility it owns, why that responsibility belongs there, and which downstream behavior or requirement depends on it.
+- Keep `開發目的`, `具體變更`, and `設計理由` distinct: purpose explains why the capability is needed; concrete change explains what was implemented; design rationale explains why this implementation shape was chosen.
+- Name the important symbols, UI regions, endpoints, data fields, configuration keys, or test scenarios changed in that file.
+- Describe meaningful before/after behavior, including branching, fallback, validation, state, persistence, side effects, and error handling when relevant.
+- For tests, name the exact behavior and edge cases covered and the expected outcome; do not merely say that tests were added.
+- For configuration, migrations, generated support files, and documentation, identify the exact entries or sections changed and their runtime or developer-facing effect.
+- For deletions, explain which responsibility was removed and where it moved or why it is no longer needed. For renames, show `old/path → new/path` and state whether content also changed.
+- Identify changes originating from accepted review findings in the affected file entry.
+
+Avoid vague summaries such as “更新邏輯”, “改善型別”, “重構元件”, “補上測試”, or “調整設定”. Prefer 2–5 information-dense bullets per file, expanding when a file contains multiple independent changes. Do not paste the diff or narrate trivial line-by-line edits.
+
+Use this distinction:
+
+```markdown
+<!-- Too mechanical: the reader knows what changed but not why it exists. -->
+- **具體變更**：新增 `redactReviewRequestV1` 與三種 detector。
+
+<!-- Purpose-led: the reader can reconstruct the intended development. -->
+- **開發目的**：在 `ReviewEngine` 前建立單向 sanitization boundary，避免啟用 cloud transport 時把 diff 中常見的 API key 或 private key 原文送出本機；這個檔案負責 Plan 14 的核心 redacted-request contract。
+- **具體變更**：新增 `redactReviewRequestV1`、deterministic replacement tokens，以及 API key、private key、high-entropy token detectors。
+- **設計理由**：對完整 request tree 做一次純 traversal，讓 path、patch、prompt 與 model 共用同一政策，避免各 engine adapter 各自 redaction 而產生漏接或行為分歧。
+```
+
+Write `剩餘風險` so the user can decide what to do without rereading the work:
+
+- Create one numbered subsection per concrete risk or unfinished step. Include required-but-unverified or blocked checks, accepted review fixes that received no later review pass, pre-existing defects discovered but left out of scope, accepted design limits the change relies on, uncommitted or unpublished work, and retained test artifacts the user may want to remove. Do not add generic risks such as “可能還有未知 bug”, and do not repeat passing checks from `驗證`.
+- In **風險內容**, state the concrete failure, its trigger, what and who it affects, whether the user would see it, how likely it is, and whether this change introduced it, left it unchanged, or deliberately excluded it.
+- In **目前證據**, separate what was verified from what was not, and say why the missing evidence could not be or was not collected in this round.
+- In **是否需要你現在處理**, always give an explicit verdict of `需要`, `不需要`, or `需要你決定`; never leave it implied. For `需要` or `需要你決定`, give the concrete action, who performs it, when it must happen (now, before the next plan, or during a named acceptance round), and the consequence of not doing it. Offer agent-executable actions, but do not perform outward-facing or out-of-scope actions without a request. For `不需要`, name what already covers the risk: a later plan, a scheduled acceptance case, or an accepted limitation.
+- End with the **現在需要你處理的 action** line. When there are no remaining risks, replace the subsections with `沒有剩餘風險` and a one-sentence reason, and still end with that line.
+
+State whether Codex GPT-6.1 Sol completed review. For fallback, repeat the provider label with its reason, and never imply Codex approved the work.
