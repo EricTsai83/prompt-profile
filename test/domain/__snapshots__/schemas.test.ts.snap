@@ -1,0 +1,198 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LLM schemas > LlmChunkObservations produces a subset-compliant JSON Schema 1`] = `
+{
+  "additionalProperties": false,
+  "properties": {
+    "observations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim": {
+            "type": "string",
+          },
+          "dimension": {
+            "enum": [
+              "work_style",
+              "communication",
+              "tech_profile",
+              "interests",
+              "growth",
+            ],
+            "type": "string",
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+        },
+        "required": [
+          "dimension",
+          "claim",
+          "evidence",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+  },
+  "required": [
+    "observations",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1`] = `
+{
+  "additionalProperties": false,
+  "properties": {
+    "archetype": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+        },
+        "name": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "name",
+        "description",
+      ],
+      "type": "object",
+    },
+    "dimensions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "key": {
+            "enum": [
+              "work_style",
+              "communication",
+              "tech_profile",
+              "interests",
+              "growth",
+            ],
+            "type": "string",
+          },
+          "summary": {
+            "type": "string",
+          },
+          "title": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "key",
+          "title",
+          "summary",
+          "evidence",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+    "funFacts": {
+      "items": {
+        "type": "string",
+      },
+      "type": "array",
+    },
+    "headline": {
+      "type": "string",
+    },
+    "traits": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low",
+            ],
+            "type": "string",
+          },
+          "description": {
+            "type": "string",
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "name": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "name",
+          "description",
+          "confidence",
+          "evidence",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+  },
+  "required": [
+    "headline",
+    "archetype",
+    "dimensions",
+    "traits",
+    "funFacts",
+  ],
+  "type": "object",
+}
+`;

@@ -9,12 +9,7 @@
     "no-unused-vars": "error",
     "typescript/consistent-type-imports": "error",
     "vitest/no-standalone-expect": "off",
-    "no-underscore-dangle": [
-      "warn",
-      {
-        "allow": ["__PKG_VERSION__"]
-      }
-    ]
+    "no-underscore-dangle": "off"
   },
   "ignorePatterns": ["dist", "node_modules", "coverage", "test/fixtures"]
 }
