@@ -195,8 +195,15 @@ export const renderDefect = (lang: Language): Rendered => ({
 export const defectDetail = (defect: unknown): string =>
   defect instanceof Error ? (defect.stack ?? `${defect.name}: ${defect.message}`) : String(defect)
 
+/** Own fields plus `cause`, which Error keeps non-enumerable (JSON.stringify would drop it). */
+const withCause = (value: unknown): unknown => {
+  if (typeof value !== "object" || value === null) return value
+  const cause = (value as { cause?: unknown }).cause
+  return cause === undefined ? value : { ...value, cause: withCause(cause) }
+}
+
 /** Full error for --verbose (never includes prompt text: LlmErrors only carry CLI output tails). */
 export const verboseDetail = (error: AppError): string => {
-  const { _tag, ...rest } = error as AppError & Record<string, unknown>
+  const { _tag, ...rest } = withCause(error) as AppError & Record<string, unknown>
   return `[${_tag}] ${JSON.stringify(rest, (k, v) => (k === "stack" ? undefined : v), 2)}`
 }
