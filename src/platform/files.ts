@@ -1,8 +1,12 @@
 import { Effect, type FileSystem, type Path } from "effect"
+import { randomUUID } from "node:crypto"
 
 /**
- * Write `data` to `file` privately: directory 0700, file 0600, via a temp file + rename so
- * an interrupted write never leaves a broken file.
+ * Write `data` to `file` privately: missing folders are created 0700, the file is 0600.
+ * Written to a uniquely named temp file first, then renamed, so an interrupted write never
+ * leaves a broken file; a failed write removes its temp file.
+ *
+ * An existing folder keeps its permissions: it may be the user's own (`--out .`).
  */
 export const writePrivateFile = (
   fs: FileSystem.FileSystem,
@@ -11,12 +15,14 @@ export const writePrivateFile = (
   data: string | Uint8Array,
 ) =>
   Effect.gen(function* () {
-    const dir = path.dirname(file)
-    yield* fs.makeDirectory(dir, { recursive: true, mode: 0o700 })
-    yield* fs.chmod(dir, 0o700)
-    const tmp = `${file}.${process.pid}.${Date.now()}.tmp`
-    if (typeof data === "string") yield* fs.writeFileString(tmp, data, { mode: 0o600 })
-    else yield* fs.writeFile(tmp, data, { mode: 0o600 })
-    yield* fs.chmod(tmp, 0o600)
-    yield* fs.rename(tmp, file)
+    // recursive mkdir applies `mode` to every folder it creates, and only to those
+    yield* fs.makeDirectory(path.dirname(file), { recursive: true, mode: 0o700 })
+    const tmp = `${file}.${randomUUID()}.tmp`
+    yield* Effect.gen(function* () {
+      if (typeof data === "string") yield* fs.writeFileString(tmp, data, { mode: 0o600 })
+      else yield* fs.writeFile(tmp, data, { mode: 0o600 })
+      // `mode` above is masked by the umask; make sure the file is exactly 0600
+      yield* fs.chmod(tmp, 0o600)
+      yield* fs.rename(tmp, file)
+    }).pipe(Effect.onError(() => fs.remove(tmp).pipe(Effect.ignore)))
   })
