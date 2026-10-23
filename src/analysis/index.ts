@@ -40,6 +40,8 @@ export interface AnalyzeOptions {
   readonly noCache: boolean
   /** `--model` passed to the runner; part of the cache key. */
   readonly model: string | null
+  /** Observations above this many characters are merged first (default REDUCE_INPUT_LIMIT). */
+  readonly reduceInputLimit?: number
 }
 
 /** Observations above this many characters are merged in groups before the final reduce. */
@@ -237,31 +239,47 @@ export const analyze = (input: {
     let observations: ReadonlyArray<Observation> = verified.flatMap((v) => v.observations)
 
     // ---- intermediate merges when the reduce input is too large -----------------------
+    /** Fatal errors stop everything as-is; anything else means the reduce stage failed. */
+    const reduceError = (cause: LlmError): AnalyzeError =>
+      FATAL.has(cause._tag)
+        ? cause
+        : new AnalysisFailed({
+            reason: "reduce-failed",
+            chunksFailed: failed.length,
+            chunksTotal: total,
+            cause,
+          })
+    const limit = options.reduceInputLimit ?? REDUCE_INPUT_LIMIT
     const merge = (group: ReadonlyArray<Observation>) =>
       Effect.gen(function* () {
         const text = observationsText(group)
         const parts = keyParts("merge", sha256(text), runner.id, options)
         const cached = options.noCache ? Option.none() : yield* cache.get(parts)
-        if (Option.isSome(cached)) return cached.value.value.observations
-        const result = yield* runner.generate({
-          system: loadPrompt("merge", options.language),
-          prompt: text,
-          schema: OBSERVATIONS_SCHEMA,
-        })
-        const value = fromLlmChunkObservations(result.value, parts.inputId)
-        yield* cache.set({ ...parts, producedBy: result.model, value })
+        // The cache stores raw LLM output: verify on every path, cached or not.
+        const value = Option.isSome(cached)
+          ? cached.value.value
+          : yield* runner
+              .generate({
+                system: loadPrompt("merge", options.language),
+                prompt: text,
+                schema: OBSERVATIONS_SCHEMA,
+              })
+              .pipe(
+                Effect.flatMap((result) => {
+                  const fresh = fromLlmChunkObservations(result.value, parts.inputId)
+                  return cache
+                    .set({ ...parts, producedBy: result.model, value: fresh })
+                    .pipe(Effect.as(fresh))
+                }),
+              )
         return verifyObservations(value, texts).observations
       })
-    for (
-      let round = 0;
-      round < 3 && observationsText(observations).length > REDUCE_INPUT_LIMIT;
-      round++
-    ) {
+    for (let round = 0; round < 3 && observationsText(observations).length > limit; round++) {
       const groups: Array<Array<Observation>> = [[]]
       let size = 0
       for (const o of observations) {
         const len = observationsText([o]).length
-        if (size + len > REDUCE_INPUT_LIMIT / 2 && groups.at(-1)!.length > 0) {
+        if (size + len > limit / 2 && groups.at(-1)!.length > 0) {
           groups.push([])
           size = 0
         }
@@ -271,17 +289,7 @@ export const analyze = (input: {
       yield* progress.onMergeStart(groups.length)
       const merged = yield* Effect.forEach(groups, merge, {
         concurrency: options.concurrency ?? 3,
-      }).pipe(
-        Effect.mapError(
-          (cause) =>
-            new AnalysisFailed({
-              reason: "reduce-failed",
-              chunksFailed: failed.length,
-              chunksTotal: total,
-              cause,
-            }),
-        ),
-      )
+      }).pipe(Effect.mapError(reduceError))
       observations = merged.flat()
     }
 
@@ -294,18 +302,7 @@ export const analyze = (input: {
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
       })
-      .pipe(
-        Effect.mapError((cause) =>
-          FATAL.has(cause._tag)
-            ? cause
-            : new AnalysisFailed({
-                reason: "reduce-failed",
-                chunksFailed: failed.length,
-                chunksTotal: total,
-                cause,
-              }),
-        ),
-      )
+      .pipe(Effect.mapError(reduceError))
     yield* progress.onReduceDone(draft.durationMs)
 
     // ---- verify (reduce) ------------------------------------------------------------

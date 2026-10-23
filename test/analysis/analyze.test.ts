@@ -248,6 +248,51 @@ describe("analyze", () => {
     }),
   )
 
+  describe("intermediate merges", () => {
+    const small = { ...options, reduceInputLimit: 300 }
+    /** Merge calls return an extra observation whose quote was never said. */
+    const fabricatingMerge: FakeOptions["respond"] = (input) =>
+      input.schemaName === "LlmChunkObservations" && input.prompt.startsWith("[")
+        ? {
+            observations: [
+              ...(JSON.parse(input.prompt) as Array<unknown>),
+              {
+                dimension: "growth",
+                claim: "捏造的合併觀察",
+                evidence: [{ promptId: prompts[0]!.id, quote: "merge made this up" }],
+              },
+            ],
+          }
+        : respond(input)
+
+    it.effect("merge output is verified, also when it comes from the cache", () =>
+      Effect.gen(function* () {
+        const cache = makeMemoryCache()
+        const first = makeFakeLlmRunner({ respond: fabricatingMerge })
+        yield* run(first, cache, small)
+        expect(first.log.some((c) => c.prompt.startsWith("["))).toBe(true)
+        const second = makeFakeLlmRunner({ respond: fabricatingMerge })
+        yield* run(second, cache, small)
+        expect(second.calls()).toBe(1) // reduce only: map and merge from the cache
+        expect(second.log[0]!.prompt).not.toContain("merge made this up")
+      }),
+    )
+
+    it.effect("a fatal error during a merge is not wrapped", () =>
+      Effect.gen(function* () {
+        const mapCalls = makeFakeLlmRunner({ respond })
+        yield* run(mapCalls, makeMemoryCache(), small)
+        const chunks = mapCalls.log.filter((c) => !c.prompt.startsWith("[")).length - 1
+        const fake = makeFakeLlmRunner({
+          respond,
+          failures: new Map([[chunks + 1, new NotLoggedIn({ runner: "claude-code", detail: "" })]]),
+        })
+        const error = yield* Effect.flip(run(fake, makeMemoryCache(), { ...small, concurrency: 1 }))
+        expect(error._tag).toBe("NotLoggedIn")
+      }),
+    )
+  })
+
   it.effect("no prompts → AnalysisFailed", () =>
     Effect.gen(function* () {
       const error = yield* Effect.flip(
