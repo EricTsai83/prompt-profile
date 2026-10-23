@@ -85,13 +85,22 @@ export const makeClaudeCodeAdapter = (
       return files
     })
 
-    const fromProjectLine = (value: unknown, seenUuids: Set<string>): PromptRecord | undefined => {
+    const fromProjectLine = (
+      value: unknown,
+      seenUuids: Set<string>,
+      knownSessions: Set<string>,
+    ): PromptRecord | undefined => {
       const decoded = decodeLine(value)
       if (Option.isNone(decoded)) {
         diag.badLines++
         return undefined
       }
       const line = decoded.value
+      // A session's transcript may live in another session's file (e.g. after a resume);
+      // its history.jsonl entries are then already covered. Only lines that pass the
+      // `"user"` prefilter get here, on purpose: a session with no user lines in any
+      // transcript still needs history.jsonl to recover its prompts.
+      if (line.sessionId !== undefined) knownSessions.add(line.sessionId)
       if (line.type !== "user") return undefined
       const { text, hasImage, toolResultOnly } = extractContent(line.message?.content)
       const candidate: ClaudeCandidate = { line, text, hasImage, toolResultOnly }
@@ -189,23 +198,21 @@ export const makeClaudeCodeAdapter = (
             { concurrency: READ_CONCURRENCY },
           ),
           Stream.flatMap((lines) => Stream.fromIterable(lines)),
-          Stream.map((l) => fromProjectLine(l.value, seenUuids)),
+          Stream.map((l) => fromProjectLine(l.value, seenUuids, knownSessions)),
         )
-        const history = Stream.suspend(() => {
-          // Sessions that appeared inside files (e.g. resumed into another file) also count.
-          return Stream.unwrap(
-            fs.exists(historyFile).pipe(
-              Effect.orElseSucceed(() => false),
-              Effect.map((exists) => {
-                if (!exists) return Stream.empty
-                diag.filesRead++
-                return readJsonl(fs, historyFile, { onBadLine }).pipe(
-                  Stream.map((l) => fromHistoryLine(l.value, knownSessions)),
-                )
-              }),
-            ),
-          )
-        })
+        // Read after `projects` (Stream.concat), so `knownSessions` is complete by then.
+        const history = Stream.unwrap(
+          fs.exists(historyFile).pipe(
+            Effect.orElseSucceed(() => false),
+            Effect.map((exists) => {
+              if (!exists) return Stream.empty
+              diag.filesRead++
+              return readJsonl(fs, historyFile, { onBadLine }).pipe(
+                Stream.map((l) => fromHistoryLine(l.value, knownSessions)),
+              )
+            }),
+          ),
+        )
         return Stream.concat(projects, history).pipe(
           Stream.filter((r): r is PromptRecord => r !== undefined),
         )

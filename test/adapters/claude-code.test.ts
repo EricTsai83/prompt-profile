@@ -1,6 +1,9 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Path } from "effect"
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import {
   extractContent,
   makeClaudeCodeAdapter,
@@ -105,6 +108,26 @@ describe("Claude Code adapter (fixture)", () => {
       // duplicate uuid (same file and across files) kept once
       expect(records.filter((r) => r.id.endsWith(":u01"))).toHaveLength(1)
       expect(diagnostics.slashCommands).toEqual({ "/clear": 2, "/model": 1 })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("history of a session resumed into another file is not double counted", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-claude-"))
+      mkdirSync(join(root, "projects", "p"), { recursive: true })
+      const line = {
+        type: "user",
+        sessionId: "sess-old",
+        uuid: "u1",
+        timestamp: "2026-09-03T15:01:00.000Z",
+        entrypoint: "cli",
+        message: { content: "resumed prompt" },
+      }
+      writeFileSync(join(root, "projects", "p", "sess-new.jsonl"), `${JSON.stringify(line)}\n`)
+      const history = { display: "resumed prompt", timestamp: 1788447660000, sessionId: "sess-old" }
+      writeFileSync(join(root, "history.jsonl"), `${JSON.stringify(history)}\n`)
+      const records = yield* readAllSorted(yield* makeClaudeCodeAdapter(root))
+      expect(records.map((r) => r.text)).toEqual(["resumed prompt"])
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
