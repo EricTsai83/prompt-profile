@@ -10,6 +10,8 @@ const texts = new Map([
   ["p1", "先不要寫 code，幫我把計畫拆成小步驟。"],
   ["p2", "fix  the <Button>\n component   please"],
   ["p3", "no, that's wrong. use a Map instead of an object"],
+  ["p4", "render &lt;Button&gt; as text"],
+  ["p5", "replace <Button> with &lt;Button&gt;"],
 ])
 
 describe("quoteMatches", () => {
@@ -18,6 +20,10 @@ describe("quoteMatches", () => {
     ["full-width vs half-width punctuation", "先不要寫 code,幫我", "p1", true],
     ["whitespace differences", "fix the <Button> component", "p2", true],
     ["escaped brackets", "fix the &lt;Button&gt; component", "p2", true],
+    ["literal entities in the prompt", "render &lt;Button&gt;", "p4", true],
+    ["literal entities next to brackets", "replace &lt;Button&gt; with &lt;Button&gt;", "p5", true],
+    ["brackets unescaped by the LLM", "fix the <Button> component", "p2", true],
+    ["entity unescaped by the LLM", "render <Button>", "p4", false],
     ["elided middle", "no, that's wrong… instead of an object", "p3", true],
     ["truncated with ellipsis", "use a Map instead…", "p3", true],
     ["case-insensitive", "No, That's Wrong", "p3", true],
@@ -30,6 +36,40 @@ describe("quoteMatches", () => {
 })
 
 describe("verify", () => {
+  it("stores quotes copied from the escaped chunk text unescaped", () => {
+    const counts = { kept: 0, dropped: 0 }
+    const traits = verifyTraits(
+      [
+        {
+          name: "t",
+          description: "d",
+          confidence: "high",
+          evidence: [{ promptId: "p2", quote: "fix  the &lt;Button&gt;" }],
+        },
+      ],
+      texts,
+      counts,
+    )
+    expect(traits[0]!.evidence).toEqual([{ promptId: "p2", quote: "fix  the <Button>" }])
+  })
+
+  it("keeps entities that are literally in the prompt", () => {
+    const counts = { kept: 0, dropped: 0 }
+    const evidence = verifyDimensions(
+      [
+        {
+          key: "growth",
+          title: "t",
+          summary: "s",
+          evidence: [{ promptId: "p4", quote: "render &lt;Button&gt; as text" }],
+        },
+      ],
+      texts,
+      counts,
+    )[0]!.evidence
+    expect(evidence).toEqual([{ promptId: "p4", quote: "render &lt;Button&gt; as text" }])
+  })
+
   it("drops fake quotes, unknown ids and empty observations", () => {
     const counts = { kept: 0, dropped: 0 }
     const result = verifyObservations(

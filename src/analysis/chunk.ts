@@ -22,7 +22,10 @@ export interface Chunk {
 // ---------------------------------------------------------------------------------------
 // Formatting
 
-const escapeText = (s: string): string => s.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+/** `<` / `>` in prompt text are escaped in the chunk sent to the LLM (see `formatPrompt`). */
+export const escapeText = (s: string): string => s.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+/** Inverse of `escapeText`, for quotes the LLM copied from a chunk. */
+export const unescapeText = (s: string): string => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
 const escapeAttr = (s: string): string => escapeText(s).replace(/"/g, "&quot;")
 
 const localFormatter = (timeZone: string) => {

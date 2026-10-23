@@ -1,15 +1,13 @@
 import type { ChunkObservations } from "../domain/ChunkObservations.ts"
 import type { Confidence, Dimension, Evidence, Trait } from "../domain/Profile.ts"
+import { escapeText, unescapeText } from "./chunk.ts"
 
 /**
- * Normalise text before comparing quotes: unescape &lt; &gt;, unify full-width / CJK
- * punctuation with ASCII, collapse whitespace, lower-case.
+ * Normalise text before comparing quotes: unify full-width / CJK punctuation with ASCII,
+ * collapse whitespace, lower-case. (`&lt;` / `&gt;` are handled by `matchQuote`.)
  */
 export const normalizeForMatch = (s: string): string =>
   s
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
     .normalize("NFKC")
     .replace(/[。]/g, ".")
     .replace(/[、]/g, ",")
@@ -26,11 +24,10 @@ const quoteSegments = (quote: string): ReadonlyArray<string> =>
     .map((s) => s.trim())
     .filter((s) => s.length > 0)
 
-/** Every segment of the quote must appear, in order, in the prompt text. */
-export const quoteMatches = (quote: string, promptText: string): boolean => {
+/** Every segment of the quote must appear, in order, in the (normalised) prompt text. */
+const segmentsMatch = (quote: string, haystack: string): boolean => {
   const segments = quoteSegments(quote)
   if (segments.length === 0) return false
-  const haystack = normalizeForMatch(promptText)
   let from = 0
   for (const seg of segments) {
     const idx = haystack.indexOf(seg, from)
@@ -40,23 +37,46 @@ export const quoteMatches = (quote: string, promptText: string): boolean => {
   return true
 }
 
+/**
+ * The quote to store, or null when it is not in the prompt. The LLM copies quotes from the
+ * chunk text, where `<` / `>` are escaped (`escapeText`), so the quote is matched against
+ * the escaped prompt. It is stored unescaped — unless the prompt itself contains a literal
+ * `&lt;` / `&gt;`, where unescaping would be ambiguous and the quote is kept as written.
+ * A quote the LLM unescaped itself is matched against the original prompt.
+ */
+export const matchQuote = (quote: string, promptText: string): string | null => {
+  if (segmentsMatch(quote, normalizeForMatch(escapeText(promptText)))) {
+    return /&lt;|&gt;/.test(promptText) ? quote : unescapeText(quote)
+  }
+  return segmentsMatch(quote, normalizeForMatch(promptText)) ? quote : null
+}
+
+export const quoteMatches = (quote: string, promptText: string): boolean =>
+  matchQuote(quote, promptText) !== null
+
 export interface EvidenceCounts {
   kept: number
   dropped: number
 }
 
-/** Keep only evidence whose prompt id exists and whose quote is in that prompt's text. */
+/**
+ * Keep only evidence whose prompt id exists and whose quote is in that prompt's text.
+ * Kept quotes are stored as they appear in the prompt (see `matchQuote`).
+ */
 export const verifyEvidence = (
   evidence: ReadonlyArray<Evidence>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
 ): ReadonlyArray<Evidence> =>
-  evidence.filter((e) => {
+  evidence.flatMap((e) => {
     const text = texts.get(e.promptId)
-    const ok = text !== undefined && quoteMatches(e.quote, text)
-    if (ok) counts.kept++
-    else counts.dropped++
-    return ok
+    const quote = text === undefined ? null : matchQuote(e.quote, text)
+    if (quote === null) {
+      counts.dropped++
+      return []
+    }
+    counts.kept++
+    return [{ ...e, quote }]
   })
 
 /** After map: drop invalid evidence, then observations with no evidence left. */
