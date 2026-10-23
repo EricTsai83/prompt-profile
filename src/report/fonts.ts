@@ -48,10 +48,11 @@ export const embeddedLatinFonts = (): ReadonlyArray<FontData> =>
     data: new Uint8Array(readFileSync(new URL(`./fonts/${file}`, import.meta.url))),
   }))
 
-export type Fetcher = (url: string) => Promise<Uint8Array>
+/** `signal` aborts when the download is no longer needed (e.g. the other font failed). */
+export type Fetcher = (url: string, signal: AbortSignal) => Promise<Uint8Array>
 
-const defaultFetch: Fetcher = async (url) => {
-  const res = await fetch(url, { signal: AbortSignal.timeout(60_000) })
+const defaultFetch: Fetcher = async (url, signal) => {
+  const res = await fetch(url, { signal: AbortSignal.any([signal, AbortSignal.timeout(60_000)]) })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return new Uint8Array(await res.arrayBuffer())
 }
@@ -64,22 +65,26 @@ export const loadCjkFonts = (
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
-    return yield* Effect.forEach(CJK_FONTS, (font) =>
-      Effect.gen(function* () {
-        const file = path.join(cacheDir, "fonts", font.file)
-        const cached = yield* fs.readFile(file).pipe(Effect.orElseSucceed(() => null))
-        if (cached !== null && sha256(cached) === font.sha256) {
-          return { name: "Noto Sans TC", weight: font.weight, data: cached }
-        }
-        const data = yield* Effect.tryPromise({
-          try: () => fetcher(font.url),
-          catch: (e) => new FontUnavailable({ reason: `download failed: ${String(e)}` }),
-        })
-        if (sha256(data) !== font.sha256) {
-          return yield* new FontUnavailable({ reason: `checksum mismatch for ${font.file}` })
-        }
-        yield* writePrivateFile(fs, path, file, data).pipe(Effect.ignore)
-        return { name: "Noto Sans TC", weight: font.weight, data }
-      }),
+    // ≈ 5.7 MB each: download in parallel on the first card render
+    return yield* Effect.forEach(
+      CJK_FONTS,
+      (font) =>
+        Effect.gen(function* () {
+          const file = path.join(cacheDir, "fonts", font.file)
+          const cached = yield* fs.readFile(file).pipe(Effect.orElseSucceed(() => null))
+          if (cached !== null && sha256(cached) === font.sha256) {
+            return { name: "Noto Sans TC", weight: font.weight, data: cached }
+          }
+          const data = yield* Effect.tryPromise({
+            try: (signal) => fetcher(font.url, signal),
+            catch: (e) => new FontUnavailable({ reason: `download failed: ${String(e)}` }),
+          })
+          if (sha256(data) !== font.sha256) {
+            return yield* new FontUnavailable({ reason: `checksum mismatch for ${font.file}` })
+          }
+          yield* writePrivateFile(fs, path, file, data).pipe(Effect.ignore)
+          return { name: "Noto Sans TC", weight: font.weight, data }
+        }),
+      { concurrency: CJK_FONTS.length },
     )
   })

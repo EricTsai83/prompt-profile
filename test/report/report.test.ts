@@ -89,7 +89,10 @@ describe("card", () => {
 })
 
 describe("writeReport", () => {
-  const run = (profile: Profile, fetcher: (url: string) => Promise<Uint8Array>) => {
+  const run = (
+    profile: Profile,
+    fetcher: (url: string, signal: AbortSignal) => Promise<Uint8Array>,
+  ) => {
     const outDir = join(mkdtempSync(join(tmpdir(), "pp-report-")), "out")
     const cacheDir = mkdtempSync(join(tmpdir(), "pp-cache-"))
     return writeReport(profile, { outDir, cacheDir, fetcher }).pipe(
@@ -125,6 +128,40 @@ describe("writeReport", () => {
       expect(files.card).toBeNull()
       expect(files.cardError).toMatch(/checksum mismatch/)
       expect(existsSync(files.html)).toBe(true)
+    }),
+  )
+
+  it.effect("downloads the CJK fonts concurrently", () =>
+    Effect.gen(function* () {
+      let inFlight = 0
+      let maxInFlight = 0
+      yield* run(yield* sample("zh-TW"), async () => {
+        inFlight++
+        maxInFlight = Math.max(maxInFlight, inFlight)
+        await new Promise((resolve) => setTimeout(resolve, 20))
+        inFlight--
+        return new TextEncoder().encode("not a font")
+      })
+      expect(maxInFlight).toBe(2)
+    }),
+  )
+
+  it.effect("a failed download aborts the other one", () =>
+    Effect.gen(function* () {
+      let aborted = false
+      const files = yield* run(yield* sample("zh-TW"), (url, signal) =>
+        url.includes("Regular")
+          ? // fail once the other download is in flight
+            new Promise((_resolve, reject) => setTimeout(() => reject(new Error("offline")), 20))
+          : new Promise((_resolve, reject) => {
+              signal.addEventListener("abort", () => {
+                aborted = true
+                reject(new Error("aborted"))
+              })
+            }),
+      )
+      expect(files.cardError).toMatch(/download failed/)
+      expect(aborted).toBe(true)
     }),
   )
 

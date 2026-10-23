@@ -19,7 +19,7 @@ export interface EnvironmentShape {
   readonly isTTY: boolean
   readonly platform: NodeJS.Platform
   /** Download used for the card font; undefined → global fetch. */
-  readonly fetchFont?: ((url: string) => Promise<Uint8Array>) | undefined
+  readonly fetchFont?: ((url: string, signal: AbortSignal) => Promise<Uint8Array>) | undefined
 }
 
 export class Environment extends Context.Service<Environment, EnvironmentShape>()(
