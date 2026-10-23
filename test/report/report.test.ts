@@ -5,7 +5,7 @@ import { existsSync, mkdtempSync, readFileSync, statSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
-import { cardNeedsCjk, cardTree, renderCard } from "../../src/report/card.ts"
+import { cardNeedsCjk, cardTree, clip, renderCard } from "../../src/report/card.ts"
 import { embeddedLatinFonts } from "../../src/report/fonts.ts"
 import { escapeHtml, html, raw } from "../../src/report/html-template.ts"
 import { renderHtml, writeReport } from "../../src/report/index.ts"
@@ -173,4 +173,24 @@ describe("writeReport", () => {
       expect(files.cardError).toMatch(/download failed/)
     }),
   )
+})
+
+describe("clip (card text)", () => {
+  it.each([
+    ["fits", "short headline", 20, "short headline"],
+    [
+      "cuts English at a word boundary",
+      "you keep asking about every result",
+      30,
+      "you keep asking about every…",
+    ],
+    ["cuts CJK anywhere", "你習慣在深夜把一長串計畫交給 AI 執行", 10, "你習慣在深夜把一長…"],
+    ["a single long word is cut hard", "supercalifragilisticexpialidocious", 12, "supercalifr…"],
+    ["accented letters are part of a word", "try caféine today", 8, "try…"],
+    ["accented letter right after the cut", "try cafée today", 8, "try…"],
+  ] as const)("%s", (_name, text, max, expected) => {
+    const out = clip(text, max)
+    expect(out).toBe(expected)
+    expect(Array.from(out).length).toBeLessThanOrEqual(max)
+  })
 })

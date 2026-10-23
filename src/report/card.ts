@@ -21,12 +21,25 @@ const h = (type: string, style: Record<string, unknown>, children?: unknown): No
   props: { style, children },
 })
 
-const clip = (s: string, max: number) =>
-  Array.from(s).length > max
-    ? `${Array.from(s)
-        .slice(0, max - 1)
-        .join("")}…`
-    : s
+/** How far back a cut may move to end at a word boundary (longer words are cut hard). */
+const MAX_WORD_BACKOFF = 20
+/** Part of a space-separated word: Latin letters (accented too), digits, underscore. */
+const WORD_CHAR = /[\p{Script=Latin}\p{N}_]/u
+
+/**
+ * At most `max` characters, ending with "…" when shortened. A cut inside a Latin word moves
+ * back to the previous space; CJK text has no spaces and is cut anywhere.
+ */
+export const clip = (s: string, max: number): string => {
+  const chars = Array.from(s)
+  if (chars.length <= max) return s
+  let end = max - 1
+  if (WORD_CHAR.test(chars[end - 1] ?? "") && WORD_CHAR.test(chars[end] ?? "")) {
+    const space = chars.lastIndexOf(" ", end - 1)
+    if (space > 0 && end - space <= MAX_WORD_BACKOFF) end = space
+  }
+  return `${chars.slice(0, end).join("").trimEnd()}…`
+}
 
 /**
  * Card content: archetype, headline, up to 3 trait names and a few numbers.
