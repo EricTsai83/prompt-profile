@@ -1,6 +1,4 @@
 import { createHash } from "node:crypto"
-import { readdirSync, readFileSync } from "node:fs"
-import { join } from "node:path"
 import { Effect } from "effect"
 import { decodeValue } from "./common.ts"
 import {
@@ -14,14 +12,6 @@ import {
 
 export const fakeHash = (system: string, prompt: string): string =>
   createHash("sha256").update(system).update("\u0000").update(prompt).digest("hex").slice(0, 16)
-
-/** Load `<hash>.json` files from a fixture directory. */
-export const loadFakeResponses = (dir: string): Record<string, unknown> =>
-  Object.fromEntries(
-    readdirSync(dir)
-      .filter((f) => f.endsWith(".json"))
-      .map((f) => [f.replace(/\.json$/, ""), JSON.parse(readFileSync(join(dir, f), "utf8"))]),
-  )
 
 export interface FakeOptions {
   readonly id?: RunnerId

@@ -1,5 +1,5 @@
-import { Effect, FileSystem, Path, Schema } from "effect"
-import { Profile, type Profile as ProfileType } from "../domain/Profile.ts"
+import { Effect, FileSystem, Path } from "effect"
+import { encodeProfile, type Profile } from "../domain/Profile.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { cardNeedsCjk, renderCard } from "./card.ts"
 import { embeddedLatinFonts, loadCjkFonts, type Fetcher } from "./fonts.ts"
@@ -28,7 +28,7 @@ export interface WriteReportOptions {
  * files only). A card failure never fails the report.
  */
 export const writeReport = (
-  profile: ProfileType,
+  profile: Profile,
   options: WriteReportOptions,
 ): Effect.Effect<ReportFiles, Error, FileSystem.FileSystem | Path.Path> =>
   Effect.gen(function* () {
@@ -42,7 +42,7 @@ export const writeReport = (
         Effect.mapError((e) => new Error(`cannot write ${file}: ${e.message}`)),
       )
 
-    yield* write(profileJson, `${JSON.stringify(Schema.encodeSync(Profile)(profile), null, 2)}\n`)
+    yield* write(profileJson, `${JSON.stringify(encodeProfile(profile), null, 2)}\n`)
     yield* write(html, renderHtml(profile))
 
     const card = yield* Effect.gen(function* () {

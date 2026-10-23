@@ -7,7 +7,7 @@ import { join } from "node:path"
 import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { cardNeedsCjk, cardTree, renderCard } from "../../src/report/card.ts"
 import { embeddedLatinFonts } from "../../src/report/fonts.ts"
-import { escapeHtml, html, jsonForScript, raw } from "../../src/report/html-template.ts"
+import { escapeHtml, html, raw } from "../../src/report/html-template.ts"
 import { renderHtml, writeReport } from "../../src/report/index.ts"
 
 const sample = (lang: "zh-TW" | "en") =>
@@ -31,7 +31,6 @@ describe("html template", () => {
     expect(html`<a title="${'"x"'}"></a>`.value).toBe('<a title="&quot;x&quot;"></a>')
     expect(html`${["<a>", html`<b></b>`]}`.value).toBe("&lt;a&gt;<b></b>")
     expect(escapeHtml("'&")).toBe("&#39;&amp;")
-    expect(jsonForScript({ a: "</script>" }).value).toBe('{"a":"\\u003c/script>"}')
   })
 })
 

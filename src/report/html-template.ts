@@ -28,12 +28,3 @@ const render = (v: Value): string => {
  */
 export const html = (strings: TemplateStringsArray, ...values: ReadonlyArray<Value>): Raw =>
   raw(strings.reduce((out, s, i) => out + s + (i < values.length ? render(values[i]!) : ""), ""))
-
-/** JSON for embedding inside <script>: `<` is escaped so `</script>` can't end the tag. */
-export const jsonForScript = (value: unknown): Raw =>
-  raw(
-    JSON.stringify(value)
-      .replace(/</g, "\\u003c")
-      .replace(/\u2028/g, "\\u2028")
-      .replace(/\u2029/g, "\\u2029"),
-  )

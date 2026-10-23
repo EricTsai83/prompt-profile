@@ -12,13 +12,6 @@ export interface AdapterDiagnostics {
   readonly slashCommands: Readonly<Record<string, number>>
 }
 
-export const emptyDiagnostics = (): AdapterDiagnostics => ({
-  filesRead: 0,
-  badLines: 0,
-  excluded: {},
-  slashCommands: {},
-})
-
 export interface SourceAdapter {
   readonly id: SourceId
   readonly displayName: string
