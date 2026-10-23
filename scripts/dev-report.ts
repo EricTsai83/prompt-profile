@@ -6,11 +6,12 @@ import { NodeServices } from "@effect/platform-node"
 import { Effect } from "effect"
 import { readFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join } from "node:path"
+import path, { join } from "node:path"
 import { decodeProfile } from "../src/domain/Profile.ts"
+import { resolveCacheDir } from "../src/platform/paths.ts"
 import { writeReport } from "../src/report/index.ts"
 
-const cacheDir = join(process.env["XDG_CACHE_HOME"] || join(homedir(), ".cache"), "prompt-profile")
+const cacheDir = resolveCacheDir(process.env, homedir(), path)
 
 const program = Effect.forEach(["zh-TW", "en"] as const, (lang) =>
   Effect.gen(function* () {

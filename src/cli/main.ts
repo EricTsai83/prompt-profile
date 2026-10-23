@@ -1,14 +1,22 @@
-import { Effect, Option, Path } from "effect"
+import { Effect, Option } from "effect"
 import { Argument, Command, Flag } from "effect/cli"
 import { CliError } from "effect/cli"
-import { fileCacheLayer, resolveCacheDir } from "../analysis/cache.ts"
+import { fileCacheLayer } from "../analysis/cache.ts"
 import type { Language } from "../domain/Profile.ts"
 import type { RunnerId } from "../llm/LlmRunner.ts"
 import { Environment } from "../platform/Environment.ts"
 import { VERSION } from "../version.ts"
 import { Exit } from "./errors.ts"
 import { renderError, verboseDetail, type AppError } from "./render-error.ts"
-import { DEFAULT_OUT, resolveLanguage, runCacheClear, runMain, runRender, runStats } from "./run.ts"
+import {
+  cacheDirOf,
+  DEFAULT_OUT,
+  resolveLanguage,
+  runCacheClear,
+  runMain,
+  runRender,
+  runStats,
+} from "./run.ts"
 import { makeOutput, Output } from "./services.ts"
 
 const since = Flag.String("since").pipe(
@@ -55,9 +63,7 @@ const handle = <R>(
 /** The analysis cache lives in the user's cache dir (resolved from Environment). */
 const withCache = <A, E, R>(eff: Effect.Effect<A, E, R>) =>
   Effect.gen(function* () {
-    const env = yield* Environment
-    const path = yield* Path.Path
-    return yield* eff.pipe(Effect.provide(fileCacheLayer(resolveCacheDir(env.env, env.home, path))))
+    return yield* eff.pipe(Effect.provide(fileCacheLayer(yield* cacheDirOf)))
   })
 
 const statsCommand = Command.make("stats", { since, out, lang, verbose }, (f) =>

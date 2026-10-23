@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect, Option, Path } from "effect"
+import { Effect, Option } from "effect"
 import { mkdtempSync, readdirSync, statSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -8,7 +8,6 @@ import {
   AnalysisCache,
   cacheKey,
   fileCacheLayer,
-  resolveCacheDir,
   type CacheKeyParts,
 } from "../../src/analysis/cache.ts"
 
@@ -56,13 +55,5 @@ describe("file cache", () => {
       yield* cache.clear
       expect(() => statSync(dir)).toThrow(/ENOENT/)
     }).pipe(Effect.provide(fileCacheLayer(dir)), Effect.provide(NodeServices.layer)),
-  )
-
-  it.effect("resolves XDG_CACHE_HOME or ~/.cache", () =>
-    Effect.gen(function* () {
-      const path = yield* Path.Path
-      expect(resolveCacheDir({ XDG_CACHE_HOME: "/x" }, "/home/u", path)).toBe("/x/prompt-profile")
-      expect(resolveCacheDir({}, "/home/u", path)).toBe("/home/u/.cache/prompt-profile")
-    }).pipe(Effect.provide(NodeServices.layer)),
   )
 })

@@ -13,6 +13,7 @@ import { withRetry } from "../llm/retry.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
 import { Environment } from "../platform/Environment.ts"
 import { writePrivateFile } from "../platform/files.ts"
+import { resolveCacheDir } from "../platform/paths.ts"
 import { writeReport } from "../report/index.ts"
 import { VERSION } from "../version.ts"
 import { FileError, InvalidArgument, NeedsConfirmation, NoData } from "./errors.ts"
@@ -151,10 +152,10 @@ const resolveOut = (outFlag: string) =>
     return path.resolve(env.cwd, outFlag)
   })
 
-const cacheDirOf = Effect.gen(function* () {
+/** Analysis results and downloaded fonts. */
+export const cacheDirOf = Effect.gen(function* () {
   const env = yield* Environment
-  const path = yield* Path.Path
-  return path.join(env.env["XDG_CACHE_HOME"] || path.join(env.home, ".cache"), "prompt-profile")
+  return resolveCacheDir(env.env, env.home, yield* Path.Path)
 })
 
 const writeFileOrFail = (file: string, data: string) =>

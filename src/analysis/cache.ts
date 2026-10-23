@@ -61,13 +61,6 @@ const sameParts = (e: CacheEntry, p: CacheKeyParts) =>
   e.model === p.model &&
   e.language === p.language
 
-/** `$XDG_CACHE_HOME/prompt-profile`, else `~/.cache/prompt-profile` (macOS too). */
-export const resolveCacheDir = (
-  env: Readonly<Record<string, string | undefined>>,
-  home: string,
-  path: Path.Path,
-): string => path.join(env["XDG_CACHE_HOME"] || path.join(home, ".cache"), "prompt-profile")
-
 const decodeEntry = Schema.decodeUnknownOption(Schema.fromJsonString(CacheEntry))
 const encodeEntry = Schema.encodeSync(Schema.fromJsonString(CacheEntry))
 
