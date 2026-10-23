@@ -1,4 +1,5 @@
 import { Context, Layer } from "effect"
+import { readlinkSync } from "node:fs"
 import { homedir, userInfo } from "node:os"
 
 /**
@@ -33,6 +34,37 @@ const safeUsername = (): string | null => {
   }
 }
 
+const isTimezone = (zone: string): boolean => {
+  try {
+    return new Intl.DateTimeFormat("en-US", { timeZone: zone }).resolvedOptions().timeZone !== ""
+  } catch {
+    return false
+  }
+}
+
+/**
+ * IANA time zone for stats and chunking. `TZ` may use POSIX forms Intl rejects:
+ * `:Asia/Taipei`, `:/etc/localtime` (a link into zoneinfo) or a rule like `CST-8`.
+ * Falls back to the system zone, then UTC — never an invalid zone (Intl would throw).
+ */
+export const resolveTimezone = (
+  tz: string | undefined,
+  systemZone: string | undefined,
+  readLink: (path: string) => string | undefined,
+): string => {
+  const name = tz?.replace(/^:/, "")
+  const fromFile = name?.startsWith("/") ? /zoneinfo\/(.+)$/.exec(readLink(name) ?? "")?.[1] : name
+  return [fromFile, systemZone].find((z) => z !== undefined && z !== "" && isTimezone(z)) ?? "UTC"
+}
+
+const safeReadLink = (path: string): string | undefined => {
+  try {
+    return readlinkSync(path)
+  } catch {
+    return undefined
+  }
+}
+
 export const liveEnvironment = (): EnvironmentShape => {
   const resolved = Intl.DateTimeFormat().resolvedOptions()
   const envLocale = process.env["LC_ALL"] || process.env["LC_MESSAGES"] || process.env["LANG"]
@@ -40,7 +72,7 @@ export const liveEnvironment = (): EnvironmentShape => {
     home: homedir(),
     env: process.env,
     cwd: process.cwd(),
-    timezone: process.env["TZ"] || resolved.timeZone || "UTC",
+    timezone: resolveTimezone(process.env["TZ"], resolved.timeZone, safeReadLink),
     locale: envLocale ? envLocale.replace(/[.@].*$/, "").replace("_", "-") : resolved.locale,
     username: safeUsername(),
     isTTY: Boolean(process.stdin.isTTY && process.stdout.isTTY),
