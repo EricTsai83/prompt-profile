@@ -77,8 +77,8 @@ Exit code：`0` 成功（含部分段落失敗）、`1` 一般錯誤、`2` 參�
 
 ## 實作要求
 
-- `src/cli/main.ts`：定義指令；`src/cli/run.ts`：串接 adapters → pipeline → llm → analysis → report。
-- `run.ts` 只做串接，不放業務邏輯；任何判斷（要不要抽樣、要不要重試）都屬於前面的模組。
+- `src/cli/main.ts`：定義指令；`src/cli/commands/*.ts`：每個指令一個檔案，串接 adapters → pipeline → llm → analysis → report；`src/cli/steps.ts`：指令共用的步驟；`src/cli/options.ts`：flag 值的解析。
+- commands 與 steps 只做串接，不放業務邏輯；任何判斷（要不要抽樣、要不要重試）都屬於前面的模組。
 - 用 Layer 組合所有 service；所有環境相關的東西（家目錄、環境變數、時區、現在時間、是否為 TTY、`PATH`）都透過 service 取得，測試時可以替換。
 - 測試時換成 fixture adapter + `FakeLlmRunner` + 記憶體快取。
 - 不要把 Effect 的 stack trace 直接丟給使用者。

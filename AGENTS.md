@@ -10,7 +10,8 @@
 ```
 src/
   bin.ts          唯一進入點，只呼叫 cli/main.ts
-  cli/            effect/cli 指令定義與 UX（main.ts、run.ts、render-error.ts）
+  cli/            effect/cli 指令定義與 UX：main.ts（flags）、commands/（各指令流程）、
+                  steps.ts（指令共用步驟）、options.ts（flag 解析）、render-error.ts
   domain/         Schema 與純函式（PromptRecord、Stats、Profile…），不 import 其他目錄
   adapters/       讀取各來源的本機資料 → PromptRecord（common/、claude-code/、codex/、registry.ts）
   pipeline/       filter → clean → redact → stats

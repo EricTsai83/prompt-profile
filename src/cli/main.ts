@@ -8,15 +8,12 @@ import { Environment } from "../platform/Environment.ts"
 import { VERSION } from "../version.ts"
 import { Exit } from "./errors.ts"
 import { renderError, verboseDetail, type AppError } from "./render-error.ts"
-import {
-  cacheDirOf,
-  DEFAULT_OUT,
-  resolveLanguage,
-  runCacheClear,
-  runMain,
-  runRender,
-  runStats,
-} from "./run.ts"
+import { runMain } from "./commands/analyze.ts"
+import { runCacheClear } from "./commands/cache.ts"
+import { runRender } from "./commands/render.ts"
+import { runStats } from "./commands/stats.ts"
+import { DEFAULT_OUT, resolveLanguage } from "./options.ts"
+import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
 
 const since = Flag.String("since").pipe(
@@ -140,7 +137,6 @@ export const command = Command.make(
                 optional(f.engine),
               ) as RunnerId | undefined,
               model: optional(f.model),
-              lang: optional(f.lang),
               out: f.out,
               full: f.full,
               cache: f.cache,

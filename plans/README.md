@@ -51,7 +51,7 @@ prompt-profile
 ```
 src/
   bin.ts          # 唯一的進入點（tsdown entry），只呼叫 cli/main.ts
-  cli/            # effect/cli 指令定義與 UX（main.ts、run.ts、render-error.ts）
+  cli/            # effect/cli 指令定義與 UX（main.ts、commands/、steps.ts、options.ts、render-error.ts）
   domain/         # PromptRecord、Stats、Profile 等 Schema（不依賴任何其他目錄）
   adapters/
     common/       # 共用：SourceAdapter 介面、JSONL 串流讀取、去重

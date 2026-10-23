@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect } from "effect"
-import { parseSince } from "../../src/cli/run.ts"
+import { parseSince } from "../../src/cli/options.ts"
 
 const now = DateTime.makeUnsafe("2026-10-24T00:00:00Z")
 const iso = (value: string) =>
