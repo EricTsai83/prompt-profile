@@ -2,7 +2,24 @@
   "name": "prompt-profile",
   "version": "0.1.0",
   "description": "Analyze your past prompts from AI coding agents (Claude Code, Codex) locally and generate a personal profile.",
+  "keywords": [
+    "ai",
+    "claude-code",
+    "cli",
+    "codex",
+    "profile",
+    "prompt"
+  ],
+  "homepage": "https://github.com/EricTsai83/prompt-profile#readme",
+  "bugs": {
+    "url": "https://github.com/EricTsai83/prompt-profile/issues"
+  },
   "license": "MIT",
+  "author": "Eric Tsai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EricTsai83/prompt-profile.git"
+  },
   "bin": {
     "prompt-profile": "./dist/bin.js"
   },
