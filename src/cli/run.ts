@@ -205,13 +205,17 @@ export const runMain = (options: MainOptions, language: Language) =>
       model: options.model ?? null,
     }
 
+    const provider = yield* LlmProvider
+
     // --dry-run: write what would be sent, never call an LLM.
     if (options.dryRun) {
-      const p = yield* plan({
-        prompts,
-        options: analyzeOptions,
-        runner: options.engine ?? "claude-code",
-      })
+      // Estimate with the engine a real run would pick (detection sends no prompt): cache
+      // keys depend on it. Without a usable CLI, fall back so a dry run still works.
+      const runnerId = yield* chooseRunner(yield* provider.detect, options.engine ?? null).pipe(
+        Effect.map((s) => s.id),
+        Effect.orElseSucceed(() => options.engine ?? "claude-code"),
+      )
+      const p = yield* plan({ prompts, options: analyzeOptions, runner: runnerId })
       const path = yield* Path.Path
       for (const [i, c] of p.chunks.entries()) {
         yield* writeFileOrFail(
@@ -247,7 +251,6 @@ export const runMain = (options: MainOptions, language: Language) =>
     }
 
     // Pick the engine (no prompt is sent to check login).
-    const provider = yield* LlmProvider
     const status = yield* chooseRunner(yield* provider.detect, options.engine ?? null)
     const runner = withRetry(yield* provider.make(status.id, { model: options.model }))
 

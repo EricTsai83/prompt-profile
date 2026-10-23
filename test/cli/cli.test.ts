@@ -98,6 +98,21 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("--dry-run estimates with the engine a real run would pick", () =>
+    Effect.gen(function* () {
+      const h = makeHarness({ statuses: [ok("codex")] })
+      expect((yield* h.run(["--yes", "--since", "all"])).code).toBe(0)
+      expect(h.fakes.map((f) => f.id)).toEqual(["codex"])
+      const out = join(h.root, "dry")
+      expect((yield* h.run(["--dry-run", "--out", out, "--since", "all"])).code).toBe(0)
+      const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
+      // everything is cached for codex: only the final reduce call is left
+      expect(plan.cacheHits).toBe(plan.chunksSelected)
+      expect(plan.llmCalls).toBe(1)
+      expect(h.fakes).toHaveLength(1)
+    }),
+  )
+
   it.effect("stats writes stats.json without an LLM", () =>
     Effect.gen(function* () {
       const h = makeHarness({ statuses: [] })
