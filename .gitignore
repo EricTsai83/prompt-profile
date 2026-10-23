@@ -1,0 +1,9 @@
+node_modules
+dist
+.prompt-profile/
+coverage
+eval-output/
+tmp/
+prompt-profile-report/
+*.log
+.DS_Store
