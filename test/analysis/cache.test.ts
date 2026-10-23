@@ -1,7 +1,7 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Option } from "effect"
-import { mkdtempSync, readdirSync, statSync, writeFileSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readdirSync, statSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import {
@@ -52,8 +52,11 @@ describe("file cache", () => {
       yield* cache.set(entry)
       writeFileSync(join(dir, "map", `${cacheKey(parts)}.json`), "{not json")
       expect(Option.isNone(yield* cache.get(parts))).toBe(true)
+      // fonts share the cache folder: they hold no prompt data and survive a clear
+      mkdirSync(join(dir, "fonts"))
+      writeFileSync(join(dir, "fonts", "font.otf"), "font")
       yield* cache.clear
-      expect(() => statSync(dir)).toThrow(/ENOENT/)
+      expect(readdirSync(dir)).toEqual(["fonts"])
     }).pipe(Effect.provide(fileCacheLayer(dir)), Effect.provide(NodeServices.layer)),
   )
 })

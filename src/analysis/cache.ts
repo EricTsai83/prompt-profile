@@ -4,8 +4,11 @@ import { Language } from "../domain/Profile.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { sha256 } from "./hash.ts"
 
+/** One sub-folder per kind. These hold prompt excerpts; the cache folder also holds fonts. */
+export const CACHE_KINDS = ["map", "merge"] as const
+
 export interface CacheKeyParts {
-  readonly kind: "map" | "merge"
+  readonly kind: (typeof CACHE_KINDS)[number]
   /** chunkId for map, hash of the input observations for merge. */
   readonly inputId: string
   readonly analysisVersion: string
@@ -28,7 +31,7 @@ export const cacheKey = (p: CacheKeyParts): string =>
 
 /** The cache file stores the key parts so a mismatch (hash collision, tampering) is a miss. */
 export const CacheEntry = Schema.Struct({
-  kind: Schema.Literals(["map", "merge"]),
+  kind: Schema.Literals(CACHE_KINDS),
   inputId: Schema.String,
   analysisVersion: Schema.String,
   pipelineVersion: Schema.String,
@@ -44,6 +47,7 @@ export type CacheEntry = typeof CacheEntry.Type
 export interface AnalysisCacheShape {
   readonly get: (parts: CacheKeyParts) => Effect.Effect<Option.Option<CacheEntry>>
   readonly set: (entry: CacheEntry) => Effect.Effect<void>
+  /** Delete every analysis entry (they contain prompt excerpts). */
   readonly clear: Effect.Effect<void>
   readonly location: string
 }
@@ -82,7 +86,10 @@ export const fileCacheLayer = (dir: string) =>
           ),
         set: (entry) =>
           writePrivateFile(fs, path, fileFor(entry), encodeEntry(entry)).pipe(Effect.ignore),
-        clear: fs.remove(dir, { recursive: true }).pipe(Effect.ignore),
+        // only the analysis entries: downloaded fonts in the same folder are kept
+        clear: Effect.forEach(CACHE_KINDS, (kind) =>
+          fs.remove(path.join(dir, kind), { recursive: true }).pipe(Effect.ignore),
+        ).pipe(Effect.asVoid),
       }
     }),
   )

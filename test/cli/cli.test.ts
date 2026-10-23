@@ -156,15 +156,19 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("cache clear deletes the cache folder", () =>
+  it.effect("cache clear deletes the analysis cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()
       yield* h.run(["--yes", "--since", "all"])
       const dir = join(h.root, "cache", "prompt-profile")
-      expect(existsSync(dir)).toBe(true)
+      expect(readdirSync(join(dir, "map")).length).toBeGreaterThan(0)
       const r = yield* h.run(["cache", "clear"])
       expect(r.code).toBe(0)
-      expect(existsSync(dir)).toBe(false)
+      expect(existsSync(join(dir, "map"))).toBe(false)
+      // the second run has to analyse everything again
+      const fakesBefore = h.fakes.length
+      yield* h.run(["--yes", "--since", "all"])
+      expect(h.fakes[fakesBefore]!.calls()).toBe(h.fakes[0]!.calls())
     }),
   )
 
