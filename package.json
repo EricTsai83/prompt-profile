@@ -18,11 +18,14 @@
     "format": "oxfmt",
     "test": "vitest run",
     "test:smoke": "vitest run --config vitest.smoke.config.ts",
-    "eval": "tsx scripts/eval.ts"
+    "eval": "tsx scripts/eval.ts",
+    "dev:report": "tsx scripts/dev-report.ts"
   },
   "dependencies": {
     "@effect/platform-node": "catalog:",
-    "effect": "catalog:"
+    "@resvg/resvg-wasm": "catalog:",
+    "effect": "catalog:",
+    "satori": "catalog:"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",

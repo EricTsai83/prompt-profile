@@ -1,12 +1,18 @@
+# esbuild (via tsx / tsdown) ships its binary through optionalDependencies; its postinstall
+# is only a sanity check, so we explicitly deny it. New entries need a justification in the PR.
+allowBuilds:
+  esbuild: false
 blockExoticSubdeps: true
 
 catalog:
   "@effect/platform-node": 4.0.6
   "@effect/vitest": 4.0.6
+  "@resvg/resvg-wasm": 2.6.2
   "@types/node": ^24.19.2
   effect: 4.0.6
   oxfmt: ^0.74.0
   oxlint: ^1.89.0
+  satori: 0.63.2
   tsdown: ^0.23.1
   tsx: ^4.23.15
   typescript: ^7.0.2
@@ -22,8 +28,3 @@ minimumReleaseAgeExclude:
   - "@effect/vitest@4.0.6"
 strictDepBuilds: true
 trustPolicy: no-downgrade
-
-# esbuild (via tsx / tsdown) ships its binary through optionalDependencies; its postinstall
-# is only a sanity check, so we explicitly deny it. New entries need a justification in the PR.
-allowBuilds:
-  esbuild: false

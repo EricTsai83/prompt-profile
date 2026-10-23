@@ -140,6 +140,7 @@ export const computeStats = (input: StatsInput): Stats => {
   >
   const hourHistogram = Array.from({ length: 24 }, () => 0)
   const weekdayHistogram = Array.from({ length: 7 }, () => 0)
+  const activityGrid = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0))
   const sessions = new Set<string>()
   const days = new Set<number>()
   const projects = new Map<string, number>()
@@ -151,6 +152,7 @@ export const computeStats = (input: StatsInput): Stats => {
     const p = local(r.timestamp)
     hourHistogram[p.hour]!++
     weekdayHistogram[p.weekday]!++
+    activityGrid[p.weekday]![p.hour]!++
     days.add(logicalDay(p))
     const late = lateness(p)
     if (late !== null && (latest === null || late > latest.minutes)) {
@@ -199,6 +201,7 @@ export const computeStats = (input: StatsInput): Stats => {
     activeDays: days.size,
     hourHistogram,
     weekdayHistogram,
+    activityGrid,
     promptLength: {
       median: round(percentile(lengths, 0.5), 1),
       p90: round(percentile(lengths, 0.9), 1),

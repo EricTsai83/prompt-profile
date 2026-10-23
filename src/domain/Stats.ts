@@ -31,6 +31,8 @@ export const Stats = Schema.Struct({
   hourHistogram: fixedLength(24),
   /** 7 buckets, 0 = Monday. */
   weekdayHistogram: fixedLength(7),
+  /** 7 × 24 grid (weekday × hour, 0 = Monday) for the activity heatmap. */
+  activityGrid: Schema.Array(fixedLength(24)).check(Schema.isBetweenLength(7, 7)),
   /** Characters, after cleaning. */
   promptLength: Schema.Struct({ median: Schema.Finite, p90: Schema.Finite }),
   languageMix: Schema.Struct({ zh: Ratio, en: Ratio, mixed: Ratio }),
