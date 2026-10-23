@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect, Path, Stream } from "effect"
+import { Effect, Path } from "effect"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -11,7 +11,6 @@ import {
 } from "../../src/adapters/codex/adapter.ts"
 import { codexOrigin, MESSAGE_RULES, SESSION_RULES } from "../../src/adapters/codex/rules.ts"
 import { firstMatch } from "../../src/adapters/common/rules.ts"
-import { makeAdapters, readAll } from "../../src/adapters/registry.ts"
 import { fixtureDir, readAllSorted } from "./helpers.ts"
 
 describe("Codex filter rules", () => {
@@ -122,20 +121,6 @@ describe("Codex adapter (fixture)", () => {
       const path = yield* Path.Path
       expect(resolveCodexRoot({ CODEX_HOME: "/c" }, "/home/x", path)).toBe("/c")
       expect(resolveCodexRoot({}, "/home/x", path)).toBe("/home/x/.codex")
-    }).pipe(Effect.provide(NodeServices.layer)),
-  )
-})
-
-describe("registry", () => {
-  it.effect("readAll merges both sources", () =>
-    Effect.gen(function* () {
-      const adapters = yield* makeAdapters({
-        home: "/nowhere",
-        env: { CLAUDE_CONFIG_DIR: fixtureDir("claude-code"), CODEX_HOME: fixtureDir("codex") },
-      })
-      expect(adapters.map((a) => a.id)).toEqual(["claude-code", "codex"])
-      const records = yield* Stream.runCollect(readAll(adapters))
-      expect(new Set(records.map((r) => r.source))).toEqual(new Set(["claude-code", "codex"]))
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 })

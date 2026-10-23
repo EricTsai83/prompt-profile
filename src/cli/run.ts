@@ -1,6 +1,6 @@
-import { Clock, DateTime, Effect, FileSystem, Path, Stream } from "effect"
+import { Clock, DateTime, Effect, FileSystem, Path } from "effect"
 import { Prompt } from "effect/cli"
-import { makeAdapters } from "../adapters/registry.ts"
+import { makeAdapters, readSources as readAdapters } from "../adapters/registry.ts"
 import { AnalysisCache } from "../analysis/cache.ts"
 import { analyze, plan, type AnalyzeOptions } from "../analysis/index.ts"
 import { Progress } from "../analysis/progress.ts"
@@ -96,15 +96,14 @@ const readSources = (t: CliMessages) =>
     const records: Array<PromptRecord> = []
     const locations: Array<string> = []
     const slashCommands: Record<string, number> = {}
-    for (const adapter of adapters) {
-      const list = yield* Stream.runCollect(adapter.read)
-      const diag = yield* adapter.diagnostics
-      locations.push(...(yield* adapter.locations))
+    for (const source of yield* readAdapters(adapters)) {
+      const { adapter, diagnostics: diag } = source
+      locations.push(...source.locations)
       for (const [k, v] of Object.entries(diag.slashCommands))
         slashCommands[k] = (slashCommands[k] ?? 0) + v
-      records.push(...list)
-      const sessions = new Set(list.map((r) => r.sessionId)).size
-      yield* out.line(t.sourceLine(adapter.displayName, list.length, sessions))
+      for (const r of source.records) records.push(r)
+      const sessions = new Set(source.records.map((r) => r.sessionId)).size
+      yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
       yield* out.debug(
         `  [${adapter.id}] excluded ${JSON.stringify(diag.excluded)} badLines=${diag.badLines}`,
       )

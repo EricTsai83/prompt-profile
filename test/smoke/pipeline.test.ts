@@ -1,11 +1,11 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { DateTime, Effect, Schema, Stream } from "effect"
+import { DateTime, Effect, Schema } from "effect"
 import { createHash } from "node:crypto"
 import { existsSync } from "node:fs"
 import { homedir, userInfo } from "node:os"
 import { join } from "node:path"
-import { makeAdapters, readAll } from "../../src/adapters/registry.ts"
+import { makeAdapters, readSources } from "../../src/adapters/registry.ts"
 import { Stats } from "../../src/domain/Stats.ts"
 import { processRecords } from "../../src/pipeline/index.ts"
 import { claudeHome, codexHome } from "./helpers.ts"
@@ -17,7 +17,7 @@ describe.skipIf(!hasData)("pipeline (real data)", () => {
   it.effect("runs end to end (prints stats and counts only, never prompt text)", () =>
     Effect.gen(function* () {
       const adapters = yield* makeAdapters({ home: homedir(), env: process.env })
-      const records = yield* Stream.runCollect(readAll(adapters))
+      const records = (yield* readSources(adapters)).flatMap((s) => s.records)
       const now = DateTime.makeUnsafe(Date.now())
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const result = processRecords(records, {

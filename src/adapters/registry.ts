@@ -1,6 +1,6 @@
 import { Effect, type FileSystem, Path, Stream } from "effect"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
-import type { SourceAdapter } from "../domain/SourceAdapter.ts"
+import type { AdapterDiagnostics, SourceAdapter } from "../domain/SourceAdapter.ts"
 import { makeClaudeCodeAdapter, resolveClaudeRoot } from "./claude-code/adapter.ts"
 import { makeCodexAdapter, resolveCodexRoot } from "./codex/adapter.ts"
 
@@ -21,9 +21,29 @@ export const makeAdapters = (
     ]
   })
 
-/** Merge all adapters' streams. Not sorted: sorting needs the whole batch (pipeline). */
-export const readAll = (adapters: ReadonlyArray<SourceAdapter>): Stream.Stream<PromptRecord> =>
-  Stream.mergeAll(
-    adapters.map((a) => a.read),
+/** What one source produced. Records are not sorted: sorting needs the whole batch (pipeline). */
+export interface SourceResult {
+  readonly adapter: SourceAdapter
+  readonly records: ReadonlyArray<PromptRecord>
+  readonly diagnostics: AdapterDiagnostics
+  readonly locations: ReadonlyArray<string>
+}
+
+/** Read every source concurrently (they are independent); results keep the adapters' order. */
+export const readSources = (
+  adapters: ReadonlyArray<SourceAdapter>,
+): Effect.Effect<ReadonlyArray<SourceResult>> =>
+  Effect.forEach(
+    adapters,
+    (adapter) =>
+      Effect.gen(function* () {
+        const records = yield* Stream.runCollect(adapter.read)
+        return {
+          adapter,
+          records,
+          diagnostics: yield* adapter.diagnostics,
+          locations: yield* adapter.locations,
+        }
+      }),
     { concurrency: "unbounded" },
   )
