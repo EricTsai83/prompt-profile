@@ -1,72 +1,92 @@
 # AGENTS.md
 
-`prompt-profile` 是一個 CLI：讀取使用者本機的 Claude Code / Codex prompt 歷史，借用使用者已登入的
-`claude` / `codex` CLI 當 LLM，在本機產出個人側寫報告（`profile.json` → HTML + PNG）。
+`prompt-profile` is a CLI: it reads the user's local Claude Code / Codex prompt history,
+borrows the user's logged-in `claude` / `codex` CLI as the LLM, and writes a personal profile
+report locally (`profile.json` → HTML + PNG).
 
-完整的產品決策、架構與開發計畫見 [`plans/README.md`](./plans/README.md)。
+Product decisions, architecture and the development plan: [`plans/README.md`](./plans/README.md).
 
-## 目錄結構
+## Layout
 
 ```
 src/
-  bin.ts          唯一進入點，只呼叫 cli/main.ts
-  cli/            effect/cli 指令定義與 UX：main.ts（flags）、commands/（各指令流程）、
-                  steps.ts（指令共用步驟）、options.ts（flag 解析）、render-error.ts
-  domain/         Schema 與純函式（PromptRecord、Stats、Profile…），不 import 其他目錄
-  adapters/       讀取各來源的本機資料 → PromptRecord（common/、claude-code/、codex/、registry.ts）
-  pipeline/       filter → clean → redact → truncate，加上 stats
-  llm/            LlmRunner 介面 + claude / codex / fake 實作 + detect.ts（NOTES.md 記錄 CLI 行為）
-  analysis/       chunk → map → verify → reduce，快取與 prompts/*.md
-  report/         profile.json → HTML 報告 + PNG 圖卡
-  platform/       環境（Environment service）、私有檔案寫入、快取路徑
+  bin.ts          the only entry point; just calls cli/main.ts
+  cli/            effect/cli commands and UX: main.ts (flags), commands/ (one flow per command),
+                  steps.ts (steps shared by commands), options.ts (flag parsing),
+                  messages.ts (every printed line), render-error.ts
+  domain/         schemas and pure functions (PromptRecord, Stats, Profile…); imports no other folder
+  adapters/       read each source's local data → PromptRecord (common/, claude-code/, codex/, registry.ts)
+  pipeline/       filter → clean → redact → truncate, plus stats
+  llm/            LlmRunner interface + claude / codex / fake runners + detect.ts (NOTES.md: CLI behaviour)
+  analysis/       chunk → map → verify → merge → reduce, the cache and prompts/*.md
+  report/         Profile → HTML report + PNG card (messages.ts: every text)
+  platform/       environment (Environment service), private file writes, cache folder
 test/
-  fixtures/       手寫假資料（不可含真實個資）
-  smoke/          讀真實本機資料 / 呼叫真的 CLI，找不到時自動 skip
+  <module>/       unit tests per src/ module
+  fixtures/       hand-written fake data (never real personal data)
+  smoke/          real local data / real CLIs; skipped when missing
 ```
 
-依賴方向：`cli → analysis → llm → domain`；`cli → pipeline / adapters / report → domain`。
-`domain/` 不依賴任何其他目錄；`analysis/` 只依賴 `LlmRunner` 介面；`report/` 只吃 `Profile`。
+Dependencies: `cli → analysis → llm → domain`; `cli → pipeline / adapters / report → domain`.
+`domain/` depends on nothing else; `analysis/` only on the `LlmRunner` interface; `report/` only
+consumes `Profile`.
 
-## 指令
+## Commands
 
 ```bash
 pnpm install
-pnpm build        # tsdown → dist/bin.js
-pnpm dev          # tsx src/bin.ts
+pnpm build          # tsdown → dist/bin.js
+pnpm dev            # tsx src/bin.ts
 pnpm typecheck
-pnpm lint         # oxlint，warning 也算失敗
-pnpm format       # oxfmt 改寫；format:check 只檢查（CI）
-pnpm test         # 單元測試（CI）
-pnpm test:changed # 只跑受未 commit 變更影響的測試
-pnpm test:smoke   # 讀真實本機資料（免費、幾秒；本機才跑）
-pnpm test:smoke:llm # 呼叫真的 claude、codex（會用到訂閱額度、要幾分鐘；只在 CLI 或其輸出格式變了時跑）
+pnpm lint           # oxlint; warnings fail too
+pnpm format         # oxfmt rewrites; format:check only checks (CI)
+pnpm test           # unit tests (CI)
+pnpm test:changed   # only tests affected by uncommitted changes
+pnpm test:smoke     # real local data (free, seconds; local only)
+pnpm test:smoke:llm # calls the real claude / codex (uses subscription quota, minutes;
+                    # only when a CLI or its output format changed)
 ```
 
-### 依模組選測試
+### Choosing tests by module
 
-`test/<模組>/` 對應 `src/<模組>/`，每個資料夾是一個 vitest project（`vitest.config.ts` 自動掃描）。
-開發中只跑相關的部分，commit 前再跑全部：
+`test/<module>/` mirrors `src/<module>/`; each folder is a vitest project (scanned by
+`vitest.config.ts`). While developing run only what is relevant, then everything before a
+commit:
 
-| 情境                          | 指令                                                                  |
-| ----------------------------- | --------------------------------------------------------------------- |
-| 只改了一個模組                | `pnpm test --project <模組>`（例：`analysis`）                        |
-| 改了幾個模組 / 不確定影響範圍 | `pnpm test:changed`（依 import graph 只跑受未 commit 變更影響的測試） |
-| commit 前 / CI                | `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test`       |
-| 改到 adapter 或 pipeline 規則 | 另外跑 `pnpm test:smoke`（真實資料，不印內容）                        |
-| 改到 `llm/` 的 CLI 呼叫方式   | 另外跑 `pnpm test:smoke:llm`（會用到訂閱額度）                        |
+| Situation                             | Command                                                         |
+| ------------------------------------- | --------------------------------------------------------------- |
+| Changed one module                    | `pnpm test --project <module>` (e.g. `analysis`)                |
+| Changed several modules / unsure      | `pnpm test:changed` (import graph of uncommitted changes)       |
+| Before a commit / CI                  | `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` |
+| Changed an adapter or a pipeline rule | also `pnpm test:smoke` (real data, prints no content)           |
+| Changed how `llm/` calls a CLI        | also `pnpm test:smoke:llm` (uses subscription quota)            |
 
-`domain/` 被所有模組依賴，改到它時直接跑全部。新增模組時在 `test/` 建同名資料夾即可。
+`domain/` is used by every module: when it changes, run everything. A new module only needs a
+folder of the same name in `test/`.
 
-每個階段完成前：`pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` 必須全過。
+Before finishing any step, `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` must
+pass. Judge a test run by its exit code and the `Test Files` count, not only `Tests`: a file
+that fails to load is not counted in `Tests`.
 
-## 規範
+## Rules
 
-- **TDD**：先寫測試；測試只驗證行為，不驗證內部結構。
-- **fixture 不放真實個資**：一律手寫假資料，但欄位結構照真實格式。smoke test 不印出、不 snapshot 真實內容。
-- **Effect 4**：`effect@4.0.x`（精確版本）。寫 Effect 程式碼前先查 `node_modules/effect/dist/**/*.d.ts`
-  的 JSDoc 範例，不要憑記憶寫 Effect 3 的 API（例如 `Context.Service`、`effect/cli`、`effect/process`）。
-- 外部資料格式（Claude Code / Codex JSONL、CLI stdout）一律視為不可信：寬鬆 Schema，壞資料略過並計數。
-- 寫到使用者磁碟的衍生資料（快取、報告）：資料夾 `0700`、檔案 `0600`，先寫暫存檔再 rename。
-- 「可擴充的清單」（adapter、遮蔽規則、糾正語、注入前綴）都寫成資料陣列。
-- 改到 profile 格式 / 分析 prompt / 清理規則時，bump 對應的版本號（見 `plans/README.md`「版本號」）。
-- Commit 使用 Conventional Commits。
+- **TDD**: write the test first; tests check behaviour, not internal structure. A new test must
+  fail without the change it covers — check it.
+- **No real personal data in fixtures**: hand-written fake data with the real field layout.
+  Smoke tests never print or snapshot real content.
+- **Effect 4**: `effect@4.0.x` (exact version). Before writing Effect code, read the JSDoc
+  examples in `node_modules/effect/dist/**/*.d.ts`; do not write Effect 3 APIs from memory
+  (e.g. `Context.Service`, `effect/cli`, `effect/process`).
+- External formats (Claude Code / Codex JSONL, CLI stdout, a user's `profile.json`) are
+  untrusted: lenient schemas; bad data is skipped **and counted**.
+- Derived data written to the user's disk (cache, report): folders we create `0700`, files
+  `0600`, written to a temp file then renamed. Never change permissions of existing folders.
+- "Extensible lists" (adapters, redaction rules, correction phrases, injected prefixes, generic
+  usernames) are data arrays.
+- When the profile format, an analysis prompt or a clean / redact rule changes, bump the
+  matching version (see "Versions" in `plans/README.md`).
+- **Language**: everything in the repository and everything the product outputs is English.
+  Chinese appears only where it is input data: rules that handle Chinese prompts
+  (acknowledgements, correction phrases, CJK detection) and test data built from such prompts.
+  Exception: `.claude/skills/` holds the owner's personal workflow files, kept as written.
+- Commits use Conventional Commits.

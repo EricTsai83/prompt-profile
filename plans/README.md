@@ -1,75 +1,75 @@
-# prompt-profile 開發計畫
+# prompt-profile development plan
 
-## 產品一句話
+## The product in one sentence
 
-一個 CLI 工具：讀取使用者本機的 Claude Code / Codex prompt 歷史，**借用使用者已登入的 `claude` 或 `codex` CLI 當 LLM**（不需要 API key），在本機產出「你是什麼樣的人」的側寫報告（HTML + PNG 圖卡）。
+A CLI tool that reads the user's local Claude Code / Codex prompt history, **borrows the user's already-logged-in `claude` or `codex` CLI as the LLM** (no API key needed), and produces a "what kind of person are you" profile report locally (HTML + PNG card).
 
 ```bash
-npm i -g prompt-profile   # 或 npx prompt-profile
+npm i -g prompt-profile   # or npx prompt-profile
 prompt-profile
 ```
 
-## 已確定的產品決策
+## Settled product decisions
 
-| 項目 | 決定 |
+| Item | Decision |
 |---|---|
-| 形式 | 單純的 CLI 工具，發佈到 npm；之後再加獨立執行檔 / Homebrew（不改程式碼） |
-| LLM | 不用 API key。在背景執行使用者本機的 `claude -p` 或 `codex exec` |
-| 資料來源（MVP） | Claude Code、Codex |
-| 隱私 | 全部在本機處理；送給 LLM 前先遮蔽敏感資訊；分析用的呼叫不寫入使用者歷史 |
-| 輸出 | `profile.json`（核心格式）→ HTML 報告 + PNG 分享圖卡 |
-| 客製化 | 盡量少，只留必要選項 |
-| 不做（目前） | skill / plugin、網頁分享連結、帳號、API key 模式 |
+| Form | A plain CLI tool published to npm; standalone binaries / Homebrew later (no code changes) |
+| LLM | No API key. Runs the user's local `claude -p` or `codex exec` in the background |
+| Data sources (MVP) | Claude Code, Codex |
+| Privacy | Everything is processed locally; sensitive information is redacted before being sent to the LLM; analysis calls are not written to the user's history |
+| Output | `profile.json` (the core format) → HTML report + PNG share card |
+| Customization | As little as possible; only the necessary options |
+| Not doing (for now) | skills / plugins, web share links, accounts, API-key mode |
 
 ## Tech Stack
 
-| 部分 | 選擇 |
+| Part | Choice |
 |---|---|
-| 語言 / 執行環境 | TypeScript、Node.js ≥ 22（ESM） |
-| 套件管理 | pnpm（啟用 catalogs 與供應鏈安全設定，參考 ccusage） |
-| 核心框架 | **Effect 4**（`effect@4.0.x`）：`effect/cli`、Schema、Stream、FileSystem、`effect/process` |
-| Node 平台層 | `@effect/platform-node` |
-| 打包 | tsdown |
-| 測試 | vitest + `@effect/vitest`，fixture + snapshot（參考 ccusage） |
+| Language / runtime | TypeScript, Node.js ≥ 22 (ESM) |
+| Package management | pnpm (with catalogs and supply-chain security settings enabled, modelled on ccusage) |
+| Core framework | **Effect 4** (`effect@4.0.x`): `effect/cli`, Schema, Stream, FileSystem, `effect/process` |
+| Node platform layer | `@effect/platform-node` |
+| Bundling | tsdown |
+| Testing | vitest + `@effect/vitest`, fixtures + snapshots (modelled on ccusage) |
 | Lint / Format | oxlint + oxfmt |
-| 圖卡 | satori + @resvg/resvg-wasm |
+| Card | satori + @resvg/resvg-wasm |
 
-> `effect/cli` 在 Effect 4 標示為 `@stability unstable`：**鎖定精確版本**，升級時一起處理。
-> 寫 Effect 程式碼前，先查 `node_modules/effect/dist/**/*.d.ts` 裡的 JSDoc 範例，不要憑記憶寫 Effect 3 的 API。
+> `effect/cli` is marked `@stability unstable` in Effect 4: **pin the exact version** and handle upgrades deliberately.
+> Before writing Effect code, check the JSDoc examples in `node_modules/effect/dist/**/*.d.ts`; do not write Effect 3 APIs from memory.
 
-## 架構
+## Architecture
 
 ```
-本機資料 ──► adapters ──► pipeline ──────────► analysis ──────► report
-            (claude-code,  (clean → redact →    (chunk → map →   (profile.json →
-             codex)         stats)               reduce, cache)    HTML + PNG)
-                                                     │
-                                                 LlmRunner
-                                           (ClaudeCodeRunner | CodexRunner)
+local data ──► adapters ──► pipeline ──────────► analysis ──────► report
+              (claude-code,  (clean → redact →    (chunk → map →   (profile.json →
+               codex)         stats)               reduce, cache)    HTML + PNG)
+                                                       │
+                                                   LlmRunner
+                                             (ClaudeCodeRunner | CodexRunner)
 ```
 
 ```
 src/
-  bin.ts          # 唯一的進入點（tsdown entry），只呼叫 cli/main.ts
-  cli/            # effect/cli 指令定義與 UX（main.ts、commands/、steps.ts、options.ts、render-error.ts）
-  domain/         # PromptRecord、Stats、Profile 等 Schema（不依賴任何其他目錄）
+  bin.ts          # the single entry point (tsdown entry); only calls cli/main.ts
+  cli/            # effect/cli command definitions and UX (main.ts, commands/, steps.ts, options.ts, render-error.ts)
+  domain/         # PromptRecord, Stats, Profile and other Schemas (depends on no other directory)
   adapters/
-    common/       # 共用：SourceAdapter 介面、JSONL 串流讀取、去重
+    common/       # shared: SourceAdapter interface, JSONL streaming reader, dedup
     claude-code/
     codex/
-    registry.ts   # 所有 adapter 的清單；新增來源只要改這裡
-  pipeline/       # filter.ts、clean.ts、redact.ts、stats.ts
-  llm/            # LlmRunner 介面 + claude / codex / fake 實作 + detect.ts
-  analysis/       # chunk.ts、map.ts、reduce.ts、verify.ts、cache.ts、prompts/
-  report/         # html.ts、card.tsx、i18n.ts、fonts/
+    registry.ts   # the list of all adapters; adding a source only touches this file
+  pipeline/       # filter.ts, clean.ts, redact.ts, stats.ts
+  llm/            # LlmRunner interface + claude / codex / fake implementations + detect.ts
+  analysis/       # chunk.ts, map.ts, reduce.ts, verify.ts, cache.ts, prompts/
+  report/         # html.ts, card.tsx, i18n.ts, fonts/
 test/
-  fixtures/       # 每個 adapter 的假資料（不可含真實個資）
-  smoke/          # 讀真實本機資料 / 呼叫真的 CLI，CI 上自動 skip
+  fixtures/       # fake data for each adapter (must not contain real personal data)
+  smoke/          # reads real local data / calls the real CLIs; skipped automatically on CI
 ```
 
-### 模組邊界（長期維護的關鍵）
+### Module boundaries (the key to long-term maintenance)
 
-依賴方向只能往右，不能反過來：
+Dependencies may only point to the right, never back:
 
 ```
 cli ──► analysis ──► llm ──► domain
@@ -79,52 +79,52 @@ cli ──► analysis ──► llm ──► domain
   └──► report ─────────────────┘
 ```
 
-- `domain/` 只放 Schema 與純函式，不 import 任何其他目錄。
-- `adapters/` 不知道 LLM 的存在；`analysis/` 只依賴 `LlmRunner` **介面**，不知道是 claude 還是 codex。
-- `report/` 只吃 `Profile`，所以 `render` 子指令可以不跑任何分析。
-- 「可擴充的清單」（adapter、runner、遮蔽規則、糾正語、注入內容的前綴）都是**資料**（陣列），新增項目不需要改流程程式碼。
+- `domain/` holds only Schemas and pure functions and imports no other directory.
+- `adapters/` does not know the LLM exists; `analysis/` depends only on the `LlmRunner` **interface** and does not know whether it is claude or codex.
+- `report/` only consumes `Profile`, so the `render` subcommand can run without any analysis.
+- "Extensible lists" (adapters, runners, redaction rules, correction phrases, injected-content prefixes) are all **data** (arrays); adding an item does not require changing flow code.
 
-### 版本號
+### Version numbers
 
-有三個獨立的版本號，改了就要 bump，快取與 `render` 依賴它們：
+There are three independent version numbers. Bump them whenever the corresponding thing changes; the cache and `render` depend on them:
 
-| 版本號 | 位置 | 何時 bump |
+| Version | Location | When to bump |
 |---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | `profile.json` 的格式改變（`render` 要能拒絕看不懂的版本） |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | `map.md` / `reduce.md`、chunk 格式、LLM Schema 改變（作為快取 key 的一部分） |
-| `PIPELINE_VERSION` | `pipeline/version.ts` | clean / redact 規則改變（作為快取 key 的一部分） |
+| `Profile.schemaVersion` | `domain/Profile.ts` | The `profile.json` format changes (`render` must be able to reject versions it does not understand) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | `map.md` / `reduce.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `PIPELINE_VERSION` | `pipeline/version.ts` | clean / redact rules change (part of the cache key) |
 
-## 執行順序
+## Execution order
 
-每份 plan 都可以獨立交給 Claude Code / Codex 執行，例如：「執行 `plans/01-project-setup.md`，完成後跑驗收標準」。
+Each plan can be handed to Claude Code / Codex independently, e.g. "Execute `plans/01-project-setup.md` and run the acceptance criteria when done."
 
-| # | Plan | 產出 | 依賴 |
+| # | Plan | Output | Depends on |
 |---|---|---|---|
-| 01 | [專案初始化](./01-project-setup.md) | 可 build、test、lint 的空專案 + AGENTS.md | – |
-| 02 | [Domain 與 Schema](./02-domain-schemas.md) | `PromptRecord`、`Profile` 等格式 | 01 |
-| 06 | [LlmRunner](./06-llm-runner.md) | 透過 `claude` / `codex` 取得結構化 JSON | 02 |
-| 03 | [Claude Code adapter](./03-adapter-claude-code.md) | 讀出乾淨的 Claude Code prompt | 02 |
-| 04 | [Codex adapter](./04-adapter-codex.md) | 讀出乾淨的 Codex prompt | 02 |
-| 05 | [Pipeline：篩選、清理、遮蔽、統計](./05-pipeline.md) | `Stats` + 可安全送出的 prompt | 03（04 完成後再接上） |
-| 07 | [分析流程](./07-analysis.md) | `profile.json` | 05, 06 |
-| 08 | [報告輸出](./08-report.md) | HTML 報告 + PNG 圖卡 | 02 |
-| 09 | [CLI 整合與 UX](./09-cli.md) | 完整的 `prompt-profile` 指令 | 05, 07, 08 |
-| 10 | [發佈](./10-release.md) | npm 套件 + CI | 09 |
+| 01 | [Project setup](./01-project-setup.md) | An empty project that builds, tests and lints + AGENTS.md | – |
+| 02 | [Domain and Schemas](./02-domain-schemas.md) | `PromptRecord`, `Profile` and other formats | 01 |
+| 06 | [LlmRunner](./06-llm-runner.md) | Structured JSON via `claude` / `codex` | 02 |
+| 03 | [Claude Code adapter](./03-adapter-claude-code.md) | Clean Claude Code prompts | 02 |
+| 04 | [Codex adapter](./04-adapter-codex.md) | Clean Codex prompts | 02 |
+| 05 | [Pipeline: filter, clean, redact, stats](./05-pipeline.md) | `Stats` + prompts that are safe to send | 03 (hook up 04 once it is done) |
+| 07 | [Analysis flow](./07-analysis.md) | `profile.json` | 05, 06 |
+| 08 | [Report output](./08-report.md) | HTML report + PNG card | 02 |
+| 09 | [CLI integration and UX](./09-cli.md) | The complete `prompt-profile` command | 05, 07, 08 |
+| 10 | [Release](./10-release.md) | npm package + CI | 09 |
 
-**06 排在最前面**：「借用使用者的 `claude` / `codex` 產生結構化 JSON」是整個產品最大的技術風險（Schema 相容性、hooks / MCP 干擾、歷史汙染）。先做完 06 的 smoke test，確認兩個 CLI 都能吃下 plan 02 產生的 JSON Schema，再投入其他 plan。若 06 證明某個 CLI 不可行，回頭調整 02 的 LLM Schema。
+**06 goes first**: "borrowing the user's `claude` / `codex` to produce structured JSON" is the biggest technical risk of the whole product (Schema compatibility, hooks / MCP interference, history pollution). Finish the 06 smoke test first and confirm both CLIs accept the JSON Schema produced by plan 02 before investing in other plans. If 06 shows that one of the CLIs is not viable, go back and adjust the LLM Schema in 02.
 
-02 之後，03 / 04 / 06 / 08 彼此獨立，可以平行進行。
+After 02, plans 03 / 04 / 06 / 08 are independent of each other and can proceed in parallel.
 
-### 第一個里程碑：walking skeleton
+### First milestone: walking skeleton
 
-03 + 05 + 07 完成時（還沒做 04、08），先用 `pnpm dev --out tmp` 從真實的 Claude Code 資料跑出一份 `profile.json`，由你本人閱讀。**側寫品質不好時先調 `map.md` / `reduce.md`，不要急著做報告的版面。**
+When 03 + 05 + 07 are done (before 04 and 08), first run `pnpm dev --out tmp` on real Claude Code data to produce a `profile.json` and read it yourself. **If the profile quality is poor, tune `map.md` / `reduce.md` first; do not rush into the report layout.**
 
-## 每份 plan 的共同規範
+## Shared rules for every plan
 
-- 先寫測試（TDD），測試只驗證行為，不驗證內部結構。
-- **fixture 不可以放真實的 prompt 內容**，一律用手寫的假資料，但欄位結構要照真實格式。
-- 讀真實本機資料的 smoke test 放在 `test/smoke/`，找不到資料時自動 skip（CI 上一定會 skip）。
-- 每份 plan 完成時：`pnpm typecheck && pnpm lint && pnpm test` 必須全過。
-- 外部資料格式（Claude Code / Codex 的 JSONL、CLI 的 stdout）一律視為**不可信、會改版**：用寬鬆 Schema 解析，失敗時略過並計數，不要讓整個流程失敗。
-- 任何會寫到使用者磁碟的衍生資料（快取、報告）都含有個人資訊：資料夾權限 `0700`、檔案 `0600`，寫入時先寫暫存檔再 rename（避免中斷時留下壞檔）。
-- Commit 使用 Conventional Commits，一份 plan 可以拆成多個小 commit。
+- Write tests first (TDD); tests verify behaviour only, not internal structure.
+- **Fixtures must not contain real prompt content**: always use hand-written fake data, but follow the real format's field structure.
+- Smoke tests that read real local data go in `test/smoke/` and skip automatically when no data is found (they always skip on CI).
+- When each plan is done: `pnpm typecheck && pnpm lint && pnpm test` must all pass.
+- External data formats (Claude Code / Codex JSONL, CLI stdout) are always treated as **untrusted and subject to change**: parse them with lenient Schemas, skip and count failures, and never let the whole flow fail.
+- Any derived data written to the user's disk (cache, reports) contains personal information: directories `0700`, files `0600`; write to a temporary file first and then rename (to avoid leaving a broken file if interrupted).
+- Commits use Conventional Commits; a plan can be split into several small commits.

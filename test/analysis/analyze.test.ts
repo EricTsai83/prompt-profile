@@ -31,12 +31,12 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       observations: [
         {
           dimension: "work_style",
-          claim: "工作很規律",
+          claim: "works steadily",
           evidence: [{ promptId: m[1], quote: m[2] }],
         },
         {
           dimension: "growth",
-          claim: "捏造的觀察",
+          claim: "a made-up observation",
           evidence: [{ promptId: m[1], quote: "this was never said" }],
         },
       ],
@@ -47,27 +47,32 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
   }>
   const evidence = obs.flatMap((o) => o.evidence)
   return {
-    headline: "規律的開發者",
-    archetype: { name: "穩定輸出者", description: "每天都在寫。" },
+    headline: "A steady developer",
+    archetype: { name: "The Steady Shipper", description: "Writes every day." },
     dimensions: ["work_style", "communication", "tech_profile", "interests", "growth"].map(
       (key) => ({
         key,
         title: key,
-        summary: "摘要",
+        summary: "summary",
         evidence: key === "work_style" ? evidence.slice(0, 2) : [],
       }),
     ),
     traits: [
-      { name: "規律", description: "d", confidence: "high", evidence: evidence.slice(0, 3) },
-      { name: "孤證", description: "d", confidence: "high", evidence: evidence.slice(0, 1) },
+      { name: "steady", description: "d", confidence: "high", evidence: evidence.slice(0, 3) },
       {
-        name: "捏造",
+        name: "single source",
+        description: "d",
+        confidence: "high",
+        evidence: evidence.slice(0, 1),
+      },
+      {
+        name: "made up",
         description: "d",
         confidence: "medium",
         evidence: [{ promptId: "x", quote: "y" }],
       },
     ],
-    funFacts: ["最長連續 3 天"],
+    funFacts: ["longest streak: 3 days"],
   }
 }
 
@@ -106,8 +111,8 @@ describe("analyze", () => {
       const profile = yield* run(fake)
       expect(Schema.is(Profile)(profile)).toBe(true)
       expect(profile.traits.map((t) => [t.name, t.confidence])).toEqual([
-        ["規律", "high"],
-        ["孤證", "medium"],
+        ["steady", "high"],
+        ["single source", "medium"],
       ])
       expect(profile.coverage).toMatchObject({
         chunksFailed: 0,
@@ -258,7 +263,7 @@ describe("analyze", () => {
               ...(JSON.parse(input.prompt) as Array<unknown>),
               {
                 dimension: "growth",
-                claim: "捏造的合併觀察",
+                claim: "a made-up merged observation",
                 evidence: [{ promptId: prompts[0]!.id, quote: "merge made this up" }],
               },
             ],

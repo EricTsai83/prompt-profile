@@ -3,8 +3,8 @@
 exports[`analyze > produces a valid, verified Profile 1`] = `
 {
   "archetype": {
-    "description": "每天都在寫。",
-    "name": "穩定輸出者",
+    "description": "Writes every day.",
+    "name": "The Steady Shipper",
   },
   "coverage": {
     "chunksAnalyzed": 12,
@@ -30,31 +30,31 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
         },
       ],
       "key": "work_style",
-      "summary": "摘要",
+      "summary": "summary",
       "title": "work_style",
     },
     {
       "evidence": [],
       "key": "communication",
-      "summary": "摘要",
+      "summary": "summary",
       "title": "communication",
     },
     {
       "evidence": [],
       "key": "tech_profile",
-      "summary": "摘要",
+      "summary": "summary",
       "title": "tech_profile",
     },
     {
       "evidence": [],
       "key": "interests",
-      "summary": "摘要",
+      "summary": "summary",
       "title": "interests",
     },
     {
       "evidence": [],
       "key": "growth",
-      "summary": "摘要",
+      "summary": "summary",
       "title": "growth",
     },
   ],
@@ -64,10 +64,10 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "runner": "claude-code",
   },
   "funFacts": [
-    "最長連續 3 天",
+    "longest streak: 3 days",
   ],
   "generatedAt": "1970-01-01T00:00:00.000Z",
-  "headline": "規律的開發者",
+  "headline": "A steady developer",
   "schemaVersion": 2,
   "stats": {
     "activeDays": 0,
@@ -343,7 +343,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
           "quote": "prompt d8s0/0 xxxxxxxxxxxxxxxx",
         },
       ],
-      "name": "規律",
+      "name": "steady",
     },
     {
       "confidence": "medium",
@@ -354,7 +354,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
           "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
         },
       ],
-      "name": "孤證",
+      "name": "single source",
     },
   ],
 }

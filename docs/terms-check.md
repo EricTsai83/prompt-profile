@@ -1,49 +1,49 @@
-# 服務條款檢查（發佈前）
+# Terms of service check (pre-release)
 
-> 檢查日期：2026-10-24。**這不是法律意見**，是開發時的初步整理，正式發佈前請本人再讀一次原文。
+> Checked on: 2026-10-24. **This is not legal advice**; it is a preliminary summary made during development. Please read the originals yourself again before the official release.
 
-## 問題
+## Question
 
-prompt-profile 在使用者本機，以子程序執行使用者**自己安裝、自己登入**的 `claude -p` / `codex exec`，
-把遮蔽後的 prompt 送去分析。工具本身不讀取、不儲存、不轉送任何憑證或 token，也不提供登入流程。
-這樣的使用方式是否被允許？
+prompt-profile runs the user's **self-installed, self-logged-in** `claude -p` / `codex exec` as a subprocess on the user's machine,
+sending redacted prompts to be analyzed. The tool itself does not read, store or forward any credentials or tokens, and provides no login flow.
+Is this kind of usage allowed?
 
-## Anthropic（Claude Code）
+## Anthropic (Claude Code)
 
-來源：[Claude Code — Legal and compliance](https://code.claude.com/docs/en/legal-and-compliance)（2026-10-24 讀取）
+Source: [Claude Code — Legal and compliance](https://code.claude.com/docs/en/legal-and-compliance) (read 2026-10-24)
 
-- 支持允許的段落（Authentication and credential use）：
+- Supporting passage (Authentication and credential use):
   > "Nor does it prevent an end user from signing in to the unmodified Claude Code binary with their own Claude subscription …"
-- 本工具符合的條件：
-  - 執行的是**未經修改的** Claude Code binary，不移除或限制任何登入方式（我們也刻意不用 `--bare`）。
-  - 不「offer Claude.ai login」、不 collect / store / intermediate 憑證或 session token。
-  - 用量計在使用者自己的方案上，工具不付費、不轉售、不代理。
-- 需要注意 / 不確定的地方：
-  - "OAuth authentication … is designed to support **ordinary use** of Claude Code"；
-    "Advertised usage limits for Pro and Max plans assume **ordinary, individual usage**"。
-    一次分析約 10–30 次呼叫，屬於個人使用，但「自動化地大量呼叫」是否算 ordinary use 沒有明確定義。
-  - 新聞報導（非官方原文）指出 2026 年起 Anthropic 開始封鎖第三方 harness 使用訂閱 OAuth，
-    並在 2026-04 起讓訂閱額度不再涵蓋部分第三方自動化工具（例如 OpenClaw）。那些工具多半是**自己拿
-    OAuth token 呼叫 API**，與本工具「呼叫原版 CLI」不同，但執行面上的界線可能會再變動。
+- Conditions this tool meets:
+  - It runs the **unmodified** Claude Code binary and does not remove or restrict any login method (we also deliberately avoid `--bare`).
+  - It does not "offer Claude.ai login", and does not collect / store / intermediate credentials or session tokens.
+  - Usage is billed to the user's own plan; the tool does not pay for, resell or proxy it.
+- Points to watch / uncertainties:
+  - "OAuth authentication … is designed to support **ordinary use** of Claude Code";
+    "Advertised usage limits for Pro and Max plans assume **ordinary, individual usage**".
+    One analysis run makes about 10–30 calls, which is individual use, but whether "automated bulk calls" count as ordinary use is not clearly defined.
+  - News reports (not official texts) say that from 2026 Anthropic began blocking third-party harnesses from using subscription OAuth,
+    and from 2026-04 subscription quota no longer covers some third-party automation tools (e.g. OpenClaw). Most of those tools **obtain
+    the OAuth token themselves and call the API**, unlike this tool, which "calls the original CLI", but where the line is drawn in practice may change again.
     - https://winbuzzer.com/2026/02/19/anthropic-bans-claude-subscription-oauth-in-third-party-apps-xcxwbn/
     - https://roboin.io/article/en/2026/04/04/claude-bans-third-party-tools-requires-api-keys/
-  - 名稱與商標：README 只能以純文字說明「會呼叫你本機的 Claude Code」，不可暗示 Anthropic 背書。
+  - Names and trademarks: the README may only state in plain text that it "calls your local Claude Code", and must not imply endorsement by Anthropic.
 
-**初步結論**：目前的設計落在條款明文允許的範圍內（使用者以自己的訂閱使用未修改的 CLI），但
-「ordinary use」的解釋有風險。README 要誠實說明會使用訂閱額度、預設會先請使用者確認。
+**Preliminary conclusion**: the current design falls within what the terms explicitly allow (users using the unmodified CLI with their own subscription), but
+the interpretation of "ordinary use" is a risk. The README must be honest that subscription quota is used, and by default the user is asked to confirm first.
 
-## OpenAI（Codex）
+## OpenAI (Codex)
 
-來源：[Codex 與 ChatGPT 帳號](https://help.openai.com/articles/11369540)
+Source: [Codex and ChatGPT accounts](https://help.openai.com/articles/11369540)
 
-- 以 ChatGPT 帳號登入 Codex 時，適用 ChatGPT Terms of Use（企業版適用對應的服務合約）。
-- 沒有找到明文禁止「本機工具呼叫使用者自己的 `codex exec`」的條款，也沒有找到明文允許的說明。
-- `codex exec` 是官方提供的非互動模式；本工具以 `--ephemeral` 執行、不讀取 `~/.codex/auth.json`。
+- When signing in to Codex with a ChatGPT account, the ChatGPT Terms of Use apply (enterprise plans are covered by the corresponding service agreement).
+- No terms were found that explicitly forbid "a local tool calling the user's own `codex exec`", nor any explicit statement allowing it.
+- `codex exec` is the officially provided non-interactive mode; this tool runs it with `--ephemeral` and does not read `~/.codex/auth.json`.
 
-**初步結論**：未發現禁止條款，但沒有官方明確背書；同樣需要在 README 說明會使用 ChatGPT 方案額度。
+**Preliminary conclusion**: no prohibiting terms were found, but there is no explicit official endorsement either; the README likewise needs to explain that ChatGPT plan quota is used.
 
-## 發佈前待辦
+## Pre-release to-dos
 
-- [ ] 本人閱讀 Anthropic Consumer Terms / Commercial Terms、Usage Policy 與 OpenAI Terms of Use 的最新版本原文。
-- [ ] 若條款有疑義，考慮聯絡 Anthropic sales（條款頁提供的管道）確認。
-- [ ] 若未來條款禁止，備案是提供「使用者自己的 API key」模式（目前產品決策是不做）。
+- [ ] Read the latest original texts of Anthropic's Consumer Terms / Commercial Terms, Usage Policy, and OpenAI's Terms of Use yourself.
+- [ ] If the terms are unclear, consider contacting Anthropic sales (the channel provided on the terms page) to confirm.
+- [ ] If the terms forbid this in the future, the fallback is a "user's own API key" mode (the current product decision is not to build it).

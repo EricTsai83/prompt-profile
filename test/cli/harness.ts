@@ -18,7 +18,11 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
     const m = /<prompt id="([^"]+)"[^>]*>\n(.{1,20})/.exec(prompt)!
     return {
       observations: [
-        { dimension: "communication", claim: "直接", evidence: [{ promptId: m[1], quote: m[2] }] },
+        {
+          dimension: "communication",
+          claim: "direct",
+          evidence: [{ promptId: m[1], quote: m[2] }],
+        },
       ],
     }
   }
