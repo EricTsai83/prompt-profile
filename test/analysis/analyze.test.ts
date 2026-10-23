@@ -118,7 +118,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "2",
+        analysisVersion: "3",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

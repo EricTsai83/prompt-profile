@@ -19,7 +19,7 @@ Each element looks like:
 
 `time` is the developer's local time. `&lt;` and `&gt;` stand for `<` and `>`.
 Placeholders such as `[SECRET]`, `[EMAIL]`, `[PHONE]`, `[ID]`, `[USER]`, `[UUID]`, `[HASH]`,
-`[INTERNAL_URL]` and `[貼上的程式碼 N 行]` (pasted code, N lines) mark removed content.
+`[INTERNAL_URL]`, `[pasted code: N lines]` and `[… N characters omitted …]` mark removed content.
 Do not guess what they replaced. A `~` path means the user's home directory.
 
 ## What to observe

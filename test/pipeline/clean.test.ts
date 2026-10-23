@@ -46,7 +46,7 @@ describe("code collapsing", () => {
   it("collapses code fences", () => {
     const text = "why does this fail?\n```ts\nconst a = 1\nconst b = 2\n```\nthanks"
     expect(collapseCode(text)).toEqual({
-      text: "why does this fail?\n[貼上的程式碼 2 行]\nthanks",
+      text: "why does this fail?\n[pasted code: 2 lines]\nthanks",
       blocks: 1,
     })
   })
@@ -60,12 +60,12 @@ describe("code collapsing", () => {
       "    at node:internal/main:1:1",
       "any idea?",
     ].join("\n")
-    expect(collapseCode(text).text).toBe("the app crashes:\n[貼上的程式碼 4 行]\nany idea?")
+    expect(collapseCode(text).text).toBe("the app crashes:\n[pasted code: 4 lines]\nany idea?")
   })
 
   it("collapses pasted JSON", () => {
     const text = 'response looks like\n{\n  "id": 1,\n  "name": "x",\n  "tags": []\n}\nparse it'
-    expect(collapseCode(text).text).toBe("response looks like\n[貼上的程式碼 5 行]\nparse it")
+    expect(collapseCode(text).text).toBe("response looks like\n[pasted code: 5 lines]\nparse it")
   })
 
   it("does not collapse a multi-line Chinese paragraph", () => {
@@ -87,7 +87,7 @@ describe("code collapsing", () => {
     expect(Array.from(out.text).length).toBeLessThanOrEqual(4000)
     expect(out.text.startsWith("aaa")).toBe(true)
     expect(out.text.endsWith("bbb")).toBe(true)
-    expect(out.text).toMatch(/\[…省略 \d+ 字…\]/)
+    expect(out.text).toMatch(/\[… \d+ characters omitted …\]/)
     expect(truncateMiddle("short").truncated).toBe(false)
   })
 })

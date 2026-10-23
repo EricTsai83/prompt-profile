@@ -95,7 +95,7 @@ export const looksLikeCode = (line: string): boolean => {
 /** A run of at least this many code-like lines (blank lines allowed inside) is collapsed. */
 export const MIN_CODE_RUN = 3
 
-export const codePlaceholder = (lines: number): string => `[貼上的程式碼 ${lines} 行]`
+export const codePlaceholder = (lines: number): string => `[pasted code: ${lines} lines]`
 
 /**
  * Replace fenced code blocks and runs of code-like lines with a placeholder. Returns the
@@ -153,7 +153,7 @@ export const truncateMiddle = (
   const tail = keep - head
   const omitted = chars.length - head - tail
   return {
-    text: `${chars.slice(0, head).join("")}\n[…省略 ${omitted} 字…]\n${chars.slice(chars.length - tail).join("")}`,
+    text: `${chars.slice(0, head).join("")}\n[… ${omitted} characters omitted …]\n${chars.slice(chars.length - tail).join("")}`,
     truncated: true,
   }
 }
