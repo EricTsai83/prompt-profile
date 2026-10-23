@@ -1,9 +1,9 @@
 import { DateTime, Effect, FileSystem, Option, Path, Schema, Stream } from "effect"
 import type { Origin } from "../../domain/Source.ts"
 import type { PromptRecord } from "../../domain/PromptRecord.ts"
-import type { SourceAdapter } from "../../domain/SourceAdapter.ts"
+import type { SourceAdapter, SourceRead } from "../../domain/SourceAdapter.ts"
 import { isAnalysisPrompt } from "../../domain/markers.ts"
-import { DiagnosticsCollector } from "../common/diagnostics.ts"
+import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { listDir } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
 import { firstMatch, slashCommandName } from "../common/rules.ts"
@@ -63,6 +63,14 @@ export const restorePasted = (
   return { text, hasImage }
 }
 
+/** Mutable state of one `read` (each read gets its own: reads may run concurrently). */
+interface ReadState {
+  readonly diag: DiagnosticsCollector
+  /** Sessions with a transcript: their history.jsonl entries are skipped. */
+  readonly knownSessions: Set<string>
+  readonly seenUuids: Set<string>
+}
+
 export const makeClaudeCodeAdapter = (
   root: string,
 ): Effect.Effect<SourceAdapter, never, FileSystem.FileSystem | Path.Path> =>
@@ -71,7 +79,6 @@ export const makeClaudeCodeAdapter = (
     const path = yield* Path.Path
     const projectsDir = path.join(root, "projects")
     const historyFile = path.join(root, "history.jsonl")
-    let diag = new DiagnosticsCollector()
 
     /** Top-level session files only: `projects/<project>/<session>.jsonl`. Subagent
      * transcripts live in `<session>/subagents/` and are sidechains by definition. */
@@ -85,11 +92,8 @@ export const makeClaudeCodeAdapter = (
       return files
     })
 
-    const fromProjectLine = (
-      value: unknown,
-      seenUuids: Set<string>,
-      knownSessions: Set<string>,
-    ): PromptRecord | undefined => {
+    const fromProjectLine = (value: unknown, state: ReadState): PromptRecord | undefined => {
+      const { diag, seenUuids, knownSessions } = state
       const decoded = decodeLine(value)
       if (Option.isNone(decoded)) {
         diag.badLines++
@@ -135,10 +139,8 @@ export const makeClaudeCodeAdapter = (
       }
     }
 
-    const fromHistoryLine = (
-      value: unknown,
-      knownSessions: ReadonlySet<string>,
-    ): PromptRecord | undefined => {
+    const fromHistoryLine = (value: unknown, state: ReadState): PromptRecord | undefined => {
+      const { diag, knownSessions } = state
       const decoded = decodeHistory(value)
       if (Option.isNone(decoded)) {
         diag.badLines++
@@ -180,53 +182,54 @@ export const makeClaudeCodeAdapter = (
       }
     }
 
-    const read: Stream.Stream<PromptRecord> = Stream.unwrap(
-      Effect.gen(function* () {
-        diag = new DiagnosticsCollector()
-        const files = yield* sessionFiles
-        const knownSessions = new Set(files.map((f) => path.basename(f, ".jsonl")))
-        const seenUuids = new Set<string>()
-        const onBadLine = () => void diag.badLines++
-        const onUnreadable = () => void diag.unreadableFiles++
-        // Files are read concurrently but processed in path order, so cross-file uuid
-        // dedup is deterministic.
-        const projects = Stream.fromIterable(files).pipe(
-          Stream.mapEffect(
-            (file) => {
-              diag.filesRead++
-              return Stream.runCollect(
-                readJsonl(fs, file, { onBadLine, onUnreadable, prefilter: '"user"' }),
-              )
-            },
-            { concurrency: READ_CONCURRENCY },
-          ),
-          Stream.flatMap((lines) => Stream.fromIterable(lines)),
-          Stream.map((l) => fromProjectLine(l.value, seenUuids, knownSessions)),
-        )
-        // Read after `projects` (Stream.concat), so `knownSessions` is complete by then.
-        const history = Stream.unwrap(
-          fs.exists(historyFile).pipe(
-            Effect.orElseSucceed(() => false),
-            Effect.map((exists) => {
-              if (!exists) return Stream.empty
-              diag.filesRead++
-              return readJsonl(fs, historyFile, { onBadLine, onUnreadable }).pipe(
-                Stream.map((l) => fromHistoryLine(l.value, knownSessions)),
-              )
-            }),
-          ),
-        )
-        return Stream.concat(projects, history).pipe(
+    const read: Effect.Effect<SourceRead> = Effect.gen(function* () {
+      const files = yield* sessionFiles
+      const state: ReadState = {
+        diag: new DiagnosticsCollector(),
+        knownSessions: new Set(files.map((f) => path.basename(f, ".jsonl"))),
+        seenUuids: new Set(),
+      }
+      const { diag } = state
+      // Files are read concurrently but processed in path order, so cross-file uuid
+      // dedup is deterministic.
+      const projects = Stream.fromIterable(files).pipe(
+        Stream.mapEffect(
+          (file) => {
+            diag.filesRead++
+            return Stream.runCollect(
+              readJsonl(fs, file, { ...jsonlCallbacks(diag), prefilter: '"user"' }),
+            )
+          },
+          { concurrency: READ_CONCURRENCY },
+        ),
+        Stream.flatMap((lines) => Stream.fromIterable(lines)),
+        Stream.map((l) => fromProjectLine(l.value, state)),
+      )
+      // Read after `projects` (Stream.concat), so `knownSessions` is complete by then.
+      const history = Stream.unwrap(
+        fs.exists(historyFile).pipe(
+          Effect.orElseSucceed(() => false),
+          Effect.map((exists) => {
+            if (!exists) return Stream.empty
+            diag.filesRead++
+            return readJsonl(fs, historyFile, jsonlCallbacks(diag)).pipe(
+              Stream.map((l) => fromHistoryLine(l.value, state)),
+            )
+          }),
+        ),
+      )
+      const records = yield* Stream.runCollect(
+        Stream.concat(projects, history).pipe(
           Stream.filter((r): r is PromptRecord => r !== undefined),
-        )
-      }),
-    )
+        ),
+      )
+      return { records, diagnostics: diag.snapshot() }
+    })
 
     return {
       id: SOURCE,
       displayName: "Claude Code",
-      locations: Effect.succeed([projectsDir, historyFile]),
+      locations: [projectsDir, historyFile],
       read,
-      diagnostics: Effect.sync(() => diag.snapshot()),
     }
   })

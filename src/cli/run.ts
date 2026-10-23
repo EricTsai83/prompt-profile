@@ -102,7 +102,7 @@ const readSources = (t: CliMessages) =>
     const slashCommands: Record<string, number> = {}
     for (const source of yield* readAdapters(adapters)) {
       const { adapter, diagnostics: diag } = source
-      locations.push(...source.locations)
+      locations.push(...adapter.locations)
       for (const [k, v] of Object.entries(diag.slashCommands))
         slashCommands[k] = (slashCommands[k] ?? 0) + v
       for (const r of source.records) records.push(r)

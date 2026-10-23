@@ -1,6 +1,5 @@
-import { Effect, type FileSystem, Path, Stream } from "effect"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
-import type { AdapterDiagnostics, SourceAdapter } from "../domain/SourceAdapter.ts"
+import { Effect, type FileSystem, Path } from "effect"
+import type { SourceAdapter, SourceRead } from "../domain/SourceAdapter.ts"
 import { makeClaudeCodeAdapter, resolveClaudeRoot } from "./claude-code/adapter.ts"
 import { makeCodexAdapter, resolveCodexRoot } from "./codex/adapter.ts"
 
@@ -22,11 +21,8 @@ export const makeAdapters = (
   })
 
 /** What one source produced. Records are not sorted: sorting needs the whole batch (pipeline). */
-export interface SourceResult {
+export interface SourceResult extends SourceRead {
   readonly adapter: SourceAdapter
-  readonly records: ReadonlyArray<PromptRecord>
-  readonly diagnostics: AdapterDiagnostics
-  readonly locations: ReadonlyArray<string>
 }
 
 /** Read every source concurrently (they are independent); results keep the adapters' order. */
@@ -35,15 +31,6 @@ export const readSources = (
 ): Effect.Effect<ReadonlyArray<SourceResult>> =>
   Effect.forEach(
     adapters,
-    (adapter) =>
-      Effect.gen(function* () {
-        const records = yield* Stream.runCollect(adapter.read)
-        return {
-          adapter,
-          records,
-          diagnostics: yield* adapter.diagnostics,
-          locations: yield* adapter.locations,
-        }
-      }),
+    (adapter) => adapter.read.pipe(Effect.map((result) => ({ adapter, ...result }))),
     { concurrency: "unbounded" },
   )

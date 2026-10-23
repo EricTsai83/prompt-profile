@@ -1,8 +1,8 @@
 import { DateTime, Effect, FileSystem, Option, Path, Schema, Stream } from "effect"
 import type { PromptRecord } from "../../domain/PromptRecord.ts"
-import type { SourceAdapter } from "../../domain/SourceAdapter.ts"
+import type { SourceAdapter, SourceRead } from "../../domain/SourceAdapter.ts"
 import { isAnalysisPrompt } from "../../domain/markers.ts"
-import { DiagnosticsCollector } from "../common/diagnostics.ts"
+import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { findFiles } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
 import { firstMatch } from "../common/rules.ts"
@@ -55,20 +55,18 @@ export const makeCodexAdapter = (
     const path = yield* Path.Path
     const sessionsDir = path.join(root, "sessions")
     const historyFile = path.join(root, "history.jsonl")
-    let diag = new DiagnosticsCollector()
-    const onBadLine = () => void diag.badLines++
-    const onUnreadable = () => void diag.unreadableFiles++
 
     /** `dedupKey` identifies a message across files: a resume / fork copies old messages. */
     const readRollout = (
       file: string,
+      diag: DiagnosticsCollector,
     ): Effect.Effect<{
       ids: ReadonlyArray<string>
       records: ReadonlyArray<{ readonly dedupKey: string; readonly record: PromptRecord }>
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
-        const lines = yield* Stream.runCollect(readJsonl(fs, file, { onBadLine, onUnreadable }))
+        const lines = yield* Stream.runCollect(readJsonl(fs, file, jsonlCallbacks(diag)))
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
         const records: Array<{ dedupKey: string; record: PromptRecord }> = []
@@ -128,7 +126,11 @@ export const makeCodexAdapter = (
         return { ids, records }
       })
 
-    const fromHistory = (value: unknown, known: ReadonlySet<string>): PromptRecord | undefined => {
+    const fromHistory = (
+      value: unknown,
+      known: ReadonlySet<string>,
+      diag: DiagnosticsCollector,
+    ): PromptRecord | undefined => {
       const decoded = decodeHistory(value)
       if (Option.isNone(decoded)) {
         diag.badLines++
@@ -164,61 +166,60 @@ export const makeCodexAdapter = (
       }
     }
 
-    const read: Stream.Stream<PromptRecord> = Stream.unwrap(
-      Effect.gen(function* () {
-        diag = new DiagnosticsCollector()
-        const files = yield* findFiles(
-          fs,
-          path,
-          sessionsDir,
-          (n) => n.startsWith("rollout-") && n.endsWith(".jsonl"),
-        )
-        const known = new Set<string>()
-        for (const f of files) {
-          const id = idFromFileName(path.basename(f))
-          if (id) known.add(id)
-        }
-        // Files are read concurrently but processed in path order, so the copy kept by the
-        // cross-file dedup is deterministic (the oldest file's).
-        const seen = new Set<string>()
-        const rollouts = Stream.fromIterable(files).pipe(
-          Stream.mapEffect(readRollout, { concurrency: READ_CONCURRENCY }),
-          Stream.flatMap(({ ids, records }) => {
-            for (const id of ids) known.add(id)
-            const fresh: Array<PromptRecord> = []
-            for (const { dedupKey, record } of records) {
-              if (seen.has(dedupKey)) {
-                diag.exclude("duplicate-message")
-                continue
-              }
-              seen.add(dedupKey)
-              fresh.push(record)
+    const read: Effect.Effect<SourceRead> = Effect.gen(function* () {
+      const diag = new DiagnosticsCollector()
+      const files = yield* findFiles(
+        fs,
+        path,
+        sessionsDir,
+        (n) => n.startsWith("rollout-") && n.endsWith(".jsonl"),
+      )
+      const known = new Set<string>()
+      for (const f of files) {
+        const id = idFromFileName(path.basename(f))
+        if (id) known.add(id)
+      }
+      // Files are read concurrently but processed in path order, so the copy kept by the
+      // cross-file dedup is deterministic (the oldest file's).
+      const seen = new Set<string>()
+      const rollouts = Stream.fromIterable(files).pipe(
+        Stream.mapEffect((file) => readRollout(file, diag), { concurrency: READ_CONCURRENCY }),
+        Stream.flatMap(({ ids, records }) => {
+          for (const id of ids) known.add(id)
+          const fresh: Array<PromptRecord> = []
+          for (const { dedupKey, record } of records) {
+            if (seen.has(dedupKey)) {
+              diag.exclude("duplicate-message")
+              continue
             }
-            return Stream.fromIterable(fresh)
+            seen.add(dedupKey)
+            fresh.push(record)
+          }
+          return Stream.fromIterable(fresh)
+        }),
+      )
+      // Read after `rollouts` (Stream.concat), so `known` is complete by then.
+      const history = Stream.unwrap(
+        fs.exists(historyFile).pipe(
+          Effect.orElseSucceed(() => false),
+          Effect.map((exists) => {
+            if (!exists) return Stream.empty
+            diag.filesRead++
+            return readJsonl(fs, historyFile, jsonlCallbacks(diag)).pipe(
+              Stream.map((l) => fromHistory(l.value, known, diag)),
+              Stream.filter((r): r is PromptRecord => r !== undefined),
+            )
           }),
-        )
-        const history = Stream.unwrap(
-          fs.exists(historyFile).pipe(
-            Effect.orElseSucceed(() => false),
-            Effect.map((exists) => {
-              if (!exists) return Stream.empty
-              diag.filesRead++
-              return readJsonl(fs, historyFile, { onBadLine, onUnreadable }).pipe(
-                Stream.map((l) => fromHistory(l.value, known)),
-                Stream.filter((r): r is PromptRecord => r !== undefined),
-              )
-            }),
-          ),
-        )
-        return Stream.concat(rollouts, history)
-      }),
-    )
+        ),
+      )
+      const records = yield* Stream.runCollect(Stream.concat(rollouts, history))
+      return { records, diagnostics: diag.snapshot() }
+    })
 
     return {
       id: SOURCE,
       displayName: "Codex",
-      locations: Effect.succeed([sessionsDir, historyFile]),
+      locations: [sessionsDir, historyFile],
       read,
-      diagnostics: Effect.sync(() => diag.snapshot()),
     }
   })

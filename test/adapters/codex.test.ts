@@ -11,7 +11,7 @@ import {
 } from "../../src/adapters/codex/adapter.ts"
 import { codexOrigin, MESSAGE_RULES, SESSION_RULES } from "../../src/adapters/codex/rules.ts"
 import { firstMatch } from "../../src/adapters/common/rules.ts"
-import { fixtureDir, readAllSorted } from "./helpers.ts"
+import { fixtureDir, readSorted } from "./helpers.ts"
 
 describe("Codex filter rules", () => {
   it.each([
@@ -60,9 +60,8 @@ describe("Codex adapter (fixture)", () => {
   it.effect("parses the fixture directory", () =>
     Effect.gen(function* () {
       const adapter = yield* makeCodexAdapter(fixtureDir("codex"))
-      const records = yield* readAllSorted(adapter)
+      const { records, diagnostics } = yield* readSorted(adapter)
       expect(records).toMatchSnapshot("records")
-      const diagnostics = yield* adapter.diagnostics
       expect(diagnostics).toMatchSnapshot("diagnostics")
       const texts = records.map((r) => r.text)
       expect(texts.filter((t) => t.startsWith("幫我重構"))).toHaveLength(1)
@@ -105,19 +104,19 @@ describe("Codex adapter (fixture)", () => {
         user("2026-09-03T16:00:00.000Z", "new after resume", 2),
       ])
       const adapter = yield* makeCodexAdapter(root)
-      const records = yield* readAllSorted(adapter)
+      const { records, diagnostics } = yield* readSorted(adapter)
       expect(records.map((r) => [r.sessionId.slice(0, 1), r.text])).toEqual([
         ["a", "original"],
         ["b", "new after resume"],
       ])
-      expect((yield* adapter.diagnostics).excluded).toEqual({ "duplicate-message": 1 })
+      expect(diagnostics.excluded).toEqual({ "duplicate-message": 1 })
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
   it.effect("missing directory → empty stream; CODEX_HOME override", () =>
     Effect.gen(function* () {
       const adapter = yield* makeCodexAdapter("/definitely/not/here")
-      expect(yield* readAllSorted(adapter)).toEqual([])
+      expect((yield* readSorted(adapter)).records).toEqual([])
       const path = yield* Path.Path
       expect(resolveCodexRoot({ CODEX_HOME: "/c" }, "/home/x", path)).toBe("/c")
       expect(resolveCodexRoot({}, "/home/x", path)).toBe("/home/x/.codex")

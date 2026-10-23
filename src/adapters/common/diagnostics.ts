@@ -26,3 +26,9 @@ export class DiagnosticsCollector {
     }
   }
 }
+
+/** `readJsonl` callbacks that count into `diag`. */
+export const jsonlCallbacks = (diag: DiagnosticsCollector) => ({
+  onBadLine: () => void diag.badLines++,
+  onUnreadable: () => void diag.unreadableFiles++,
+})

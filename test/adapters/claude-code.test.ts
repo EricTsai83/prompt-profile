@@ -12,7 +12,7 @@ import {
 } from "../../src/adapters/claude-code/adapter.ts"
 import { CLAUDE_RULES, type ClaudeCandidate } from "../../src/adapters/claude-code/rules.ts"
 import { firstMatch, slashCommandName } from "../../src/adapters/common/rules.ts"
-import { fixtureDir, readAllSorted } from "./helpers.ts"
+import { fixtureDir, readSorted } from "./helpers.ts"
 
 const candidate = (line: Record<string, unknown>, text = "hello"): ClaudeCandidate => ({
   line: { type: "user", ...line },
@@ -91,9 +91,8 @@ describe("Claude Code adapter (fixture)", () => {
   it.effect("parses the fixture directory", () =>
     Effect.gen(function* () {
       const adapter = yield* makeClaudeCodeAdapter(fixtureDir("claude-code"))
-      const records = yield* readAllSorted(adapter)
+      const { records, diagnostics } = yield* readSorted(adapter)
       expect(records).toMatchSnapshot("records")
-      const diagnostics = yield* adapter.diagnostics
       expect(diagnostics).toMatchSnapshot("diagnostics")
 
       const texts = records.map((r) => r.text)
@@ -126,7 +125,7 @@ describe("Claude Code adapter (fixture)", () => {
       writeFileSync(join(root, "projects", "p", "sess-new.jsonl"), `${JSON.stringify(line)}\n`)
       const history = { display: "resumed prompt", timestamp: 1788447660000, sessionId: "sess-old" }
       writeFileSync(join(root, "history.jsonl"), `${JSON.stringify(history)}\n`)
-      const records = yield* readAllSorted(yield* makeClaudeCodeAdapter(root))
+      const { records } = yield* readSorted(yield* makeClaudeCodeAdapter(root))
       expect(records.map((r) => r.text)).toEqual(["resumed prompt"])
     }).pipe(Effect.provide(NodeServices.layer)),
   )
@@ -134,8 +133,9 @@ describe("Claude Code adapter (fixture)", () => {
   it.effect("missing directory → empty stream", () =>
     Effect.gen(function* () {
       const adapter = yield* makeClaudeCodeAdapter("/definitely/not/here")
-      expect(yield* readAllSorted(adapter)).toEqual([])
-      expect((yield* adapter.diagnostics).filesRead).toBe(0)
+      const { records, diagnostics } = yield* readSorted(adapter)
+      expect(records).toEqual([])
+      expect(diagnostics.filesRead).toBe(0)
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 })

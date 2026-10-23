@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect, Schema, Stream } from "effect"
+import { Effect, Schema } from "effect"
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 import { makeCodexAdapter } from "../../src/adapters/codex/adapter.ts"
@@ -14,9 +14,8 @@ describe.skipIf(!existsSync(join(root, "sessions")))("Codex adapter (real data)"
     Effect.gen(function* () {
       const start = Date.now()
       const adapter = yield* makeCodexAdapter(root)
-      const records = yield* Stream.runCollect(adapter.read)
+      const { records, diagnostics } = yield* adapter.read
       const elapsed = Date.now() - start
-      const diagnostics = yield* adapter.diagnostics
       const byOrigin: Record<string, number> = {}
       for (const r of records) byOrigin[r.origin] = (byOrigin[r.origin] ?? 0) + 1
       console.log(`[smoke] codex: ${records.length} records in ${elapsed}ms`, byOrigin)

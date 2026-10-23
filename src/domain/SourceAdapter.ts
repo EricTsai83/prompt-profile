@@ -1,4 +1,4 @@
-import type { Effect, Stream } from "effect"
+import type { Effect } from "effect"
 import type { PromptRecord } from "./PromptRecord.ts"
 import type { SourceId } from "./Source.ts"
 
@@ -14,13 +14,20 @@ export interface AdapterDiagnostics {
   readonly slashCommands: Readonly<Record<string, number>>
 }
 
+/** One read of a source: its records (unsorted) and what happened while reading them. */
+export interface SourceRead {
+  readonly records: ReadonlyArray<PromptRecord>
+  readonly diagnostics: AdapterDiagnostics
+}
+
 export interface SourceAdapter {
   readonly id: SourceId
   readonly displayName: string
   /** Paths this adapter looks at (shown in "no data found" errors). */
-  readonly locations: Effect.Effect<ReadonlyArray<string>>
-  /** Missing data → empty stream; bad data → skipped and counted. */
-  readonly read: Stream.Stream<PromptRecord>
-  /** Diagnostics of the most recent `read`. */
-  readonly diagnostics: Effect.Effect<AdapterDiagnostics>
+  readonly locations: ReadonlyArray<string>
+  /**
+   * Missing data → no records; bad data → skipped and counted in this read's diagnostics.
+   * Every run is independent (reads may run concurrently).
+   */
+  readonly read: Effect.Effect<SourceRead>
 }
