@@ -4,6 +4,8 @@ import type { SourceId } from "./Source.ts"
 
 export interface AdapterDiagnostics {
   readonly filesRead: number
+  /** Files that could not be read, or failed part-way (their remaining lines are lost). */
+  readonly unreadableFiles: number
   /** Lines that failed to parse as JSON or failed the (lenient) input schema. */
   readonly badLines: number
   /** Number of records excluded, keyed by filter rule name. */

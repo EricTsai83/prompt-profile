@@ -11,6 +11,7 @@ exports[`Codex adapter (fixture) > parses the fixture directory > diagnostics 1`
   },
   "filesRead": 6,
   "slashCommands": {},
+  "unreadableFiles": 0,
 }
 `;
 

@@ -187,13 +187,16 @@ export const makeClaudeCodeAdapter = (
         const knownSessions = new Set(files.map((f) => path.basename(f, ".jsonl")))
         const seenUuids = new Set<string>()
         const onBadLine = () => void diag.badLines++
+        const onUnreadable = () => void diag.unreadableFiles++
         // Files are read concurrently but processed in path order, so cross-file uuid
         // dedup is deterministic.
         const projects = Stream.fromIterable(files).pipe(
           Stream.mapEffect(
             (file) => {
               diag.filesRead++
-              return Stream.runCollect(readJsonl(fs, file, { onBadLine, prefilter: '"user"' }))
+              return Stream.runCollect(
+                readJsonl(fs, file, { onBadLine, onUnreadable, prefilter: '"user"' }),
+              )
             },
             { concurrency: READ_CONCURRENCY },
           ),
@@ -207,7 +210,7 @@ export const makeClaudeCodeAdapter = (
             Effect.map((exists) => {
               if (!exists) return Stream.empty
               diag.filesRead++
-              return readJsonl(fs, historyFile, { onBadLine }).pipe(
+              return readJsonl(fs, historyFile, { onBadLine, onUnreadable }).pipe(
                 Stream.map((l) => fromHistoryLine(l.value, knownSessions)),
               )
             }),

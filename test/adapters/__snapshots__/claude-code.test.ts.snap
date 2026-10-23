@@ -21,6 +21,7 @@ exports[`Claude Code adapter (fixture) > parses the fixture directory > diagnost
     "/clear": 2,
     "/model": 1,
   },
+  "unreadableFiles": 0,
 }
 `;
 

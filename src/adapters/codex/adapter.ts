@@ -56,6 +56,8 @@ export const makeCodexAdapter = (
     const sessionsDir = path.join(root, "sessions")
     const historyFile = path.join(root, "history.jsonl")
     let diag = new DiagnosticsCollector()
+    const onBadLine = () => void diag.badLines++
+    const onUnreadable = () => void diag.unreadableFiles++
 
     /** `dedupKey` identifies a message across files: a resume / fork copies old messages. */
     const readRollout = (
@@ -66,9 +68,7 @@ export const makeCodexAdapter = (
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
-        const lines = yield* Stream.runCollect(
-          readJsonl(fs, file, { onBadLine: () => void diag.badLines++ }),
-        )
+        const lines = yield* Stream.runCollect(readJsonl(fs, file, { onBadLine, onUnreadable }))
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
         const records: Array<{ dedupKey: string; record: PromptRecord }> = []
@@ -203,7 +203,7 @@ export const makeCodexAdapter = (
             Effect.map((exists) => {
               if (!exists) return Stream.empty
               diag.filesRead++
-              return readJsonl(fs, historyFile, { onBadLine: () => void diag.badLines++ }).pipe(
+              return readJsonl(fs, historyFile, { onBadLine, onUnreadable }).pipe(
                 Stream.map((l) => fromHistory(l.value, known)),
                 Stream.filter((r): r is PromptRecord => r !== undefined),
               )

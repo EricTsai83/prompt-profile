@@ -109,7 +109,7 @@ const readSources = (t: CliMessages) =>
       const sessions = new Set(source.records.map((r) => r.sessionId)).size
       yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
       yield* out.debug(
-        `  [${adapter.id}] excluded ${JSON.stringify(diag.excluded)} badLines=${diag.badLines}`,
+        `  [${adapter.id}] excluded ${JSON.stringify(diag.excluded)} badLines=${diag.badLines} unreadableFiles=${diag.unreadableFiles}`,
       )
     }
     if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
