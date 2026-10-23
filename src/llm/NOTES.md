@@ -55,7 +55,8 @@ Command: see `codexArgs` in `codex.ts`. System text + prompt on stdin (no system
 4. The final message is written to the `-o` file and also printed to stdout without `--json`.
    Without `--json`, Codex echoes the prompt to **stderr** — we always use `--json` and also
    strip prompt lines from the stderr tail (`sanitizeStderr`).
-5. `codex login status` prints `Logged in using ChatGPT` (exit 0).
+5. `codex login status` prints `Logged in using ChatGPT` (exit 0) **on stderr** (stdout is
+   empty), so detection reads both streams.
 6. `--ephemeral`: verified no new rollout file / history line (nonce grep).
 7. We do not pass `--ignore-user-config` (would drop the user's model provider settings).
 

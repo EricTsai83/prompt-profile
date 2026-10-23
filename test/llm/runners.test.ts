@@ -16,7 +16,12 @@ import {
   type LlmError,
 } from "../../src/llm/LlmRunner.ts"
 import { retryDelay, withRetry } from "../../src/llm/retry.ts"
-import { chooseRunner, parseClaudeAuth, parseCodexLogin } from "../../src/llm/detect.ts"
+import {
+  chooseRunner,
+  detectRunner,
+  parseClaudeAuth,
+  parseCodexLogin,
+} from "../../src/llm/detect.ts"
 import { makeFakeSpawner, type Respond } from "./fakeSpawner.ts"
 
 const fixture = (name: string) =>
@@ -278,9 +283,59 @@ describe("detect", () => {
     expect(parseClaudeAuth("garbage")).toBeNull()
   })
   it("parses codex login status", () => {
-    expect(parseCodexLogin({ exitCode: 0, stdout: "Logged in using ChatGPT" })).toBe(true)
-    expect(parseCodexLogin({ exitCode: 1, stdout: "Not logged in" })).toBe(false)
+    expect(parseCodexLogin({ exitCode: 0, stdout: "Logged in using ChatGPT", stderr: "" })).toBe(
+      true,
+    )
+    // codex 0.164 writes the status to stderr
+    expect(parseCodexLogin({ exitCode: 0, stdout: "", stderr: "Logged in using ChatGPT" })).toBe(
+      true,
+    )
+    expect(parseCodexLogin({ exitCode: 1, stdout: "", stderr: "Not logged in" })).toBe(false)
   })
+  describe("detectRunner", () => {
+    const detect = (respond: Respond) => {
+      const spawner = makeFakeSpawner(respond)
+      return detectRunner("claude-code").pipe(Effect.provide(spawner.layer))
+    }
+
+    it.effect("reads the version and the login state", () =>
+      Effect.gen(function* () {
+        const status = yield* detect((r) =>
+          r.args[0] === "--version"
+            ? { exitCode: 0, stdout: "2.1.309 (Claude Code)" }
+            : { exitCode: 0, stdout: '{"loggedIn": true}' },
+        )
+        expect(status).toEqual({
+          id: "claude-code",
+          installed: true,
+          version: "2.1.309",
+          loggedIn: true,
+        })
+      }),
+    )
+
+    it.effect("command not found → not installed", () =>
+      Effect.gen(function* () {
+        const status = yield* detect(() => "enoent")
+        expect(status.installed).toBe(false)
+      }),
+    )
+
+    it.effect("a CLI too slow to answer is installed, state unknown (the first call decides)", () =>
+      Effect.gen(function* () {
+        const fiber = yield* Effect.forkChild(detect(() => "hang"))
+        yield* TestClock.adjust("1 minute")
+        const status = yield* Fiber.join(fiber)
+        expect(status).toEqual({
+          id: "claude-code",
+          installed: true,
+          version: null,
+          loggedIn: null,
+        })
+      }),
+    )
+  })
+
   it.effect("prefers Claude Code, honours --engine, reports why nothing is usable", () =>
     Effect.gen(function* () {
       const claude = { id: "claude-code" as const, installed: true, version: "2", loggedIn: true }

@@ -17,7 +17,7 @@ export interface ProcessOutput {
   readonly stderr: string
 }
 
-const isNotFound = (error: unknown): boolean =>
+export const isNotFound = (error: unknown): boolean =>
   (PlatformError.isPlatformError(error) && error.reason._tag === "NotFound") ||
   /ENOENT/.test(String(error))
 
