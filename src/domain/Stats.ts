@@ -1,5 +1,6 @@
 import { Schema } from "effect"
 import { ORIGINS, SOURCE_IDS } from "./Source.ts"
+import { isTimeZone } from "./timezone.ts"
 
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
 const Ratio = Schema.Finite.check(Schema.isBetween({ minimum: 0, maximum: 1 }))
@@ -17,7 +18,9 @@ export const Stats = Schema.Struct({
     since: Schema.NullOr(Schema.DateTimeUtcFromString),
     until: Schema.DateTimeUtcFromString,
   }),
-  timezone: Schema.String,
+  timezone: Schema.String.check(
+    Schema.makeFilter((zone: string) => isTimeZone(zone) || "expected an IANA time zone"),
+  ),
   totalPrompts: Count,
   analyzedPrompts: Count,
   totalSessions: Count,

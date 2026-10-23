@@ -99,6 +99,16 @@ describe("Profile", () => {
     }),
   )
 
+  it.effect("an invalid time zone → InvalidProfile (the report would crash on it)", () =>
+    Effect.gen(function* () {
+      const sample = loadSample("en") as { stats: Record<string, unknown> }
+      const error = yield* Effect.flip(
+        decodeProfile({ ...sample, stats: { ...sample.stats, timezone: ":/etc/localtime" } }),
+      )
+      expect(error._tag).toBe("InvalidProfile")
+    }),
+  )
+
   it("rejects quotes longer than 200 characters", () => {
     const sample = loadSample("en") as { traits: Array<{ evidence: Array<{ quote: string }> }> }
     const t = sample.traits[0]!

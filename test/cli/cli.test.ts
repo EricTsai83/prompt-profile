@@ -153,6 +153,16 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const r2 = yield* h.run(["render", bad])
       expect(r2.code).toBe(1)
       expect(r2.stderr).toContain("format version 99")
+
+      const badZone = join(h.root, "zone.json")
+      const sample = JSON.parse(readFileSync(good, "utf8"))
+      writeFileSync(
+        badZone,
+        JSON.stringify({ ...sample, stats: { ...sample.stats, timezone: "Mars/Olympus" } }),
+      )
+      const r3 = yield* h.run(["render", badZone])
+      expect(r3.code).toBe(1)
+      expect(r3.stderr).toContain("profile.json is invalid")
     }),
   )
 
