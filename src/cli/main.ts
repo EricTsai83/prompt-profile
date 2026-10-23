@@ -7,7 +7,13 @@ import type { RunnerId } from "../llm/LlmRunner.ts"
 import { Environment } from "../platform/Environment.ts"
 import { VERSION } from "../version.ts"
 import { Exit } from "./errors.ts"
-import { renderError, verboseDetail, type AppError } from "./render-error.ts"
+import {
+  defectDetail,
+  renderDefect,
+  renderError,
+  verboseDetail,
+  type AppError,
+} from "./render-error.ts"
 import { runMain } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
@@ -35,7 +41,10 @@ const verbose = Flag.Boolean("verbose").pipe(
 
 const optional = <A>(o: Option.Option<A>): A | undefined => Option.getOrUndefined(o)
 
-/** Run a command body: render any AppError, then fail with the right exit code. */
+/**
+ * Run a command body: render any AppError — or, for a bug (defect), a short message with
+ * the stack only under --verbose — then fail with the right exit code.
+ */
 const handle = <R>(
   body: (language: Language) => Effect.Effect<void, AppError, R>,
   flags: { readonly lang: Option.Option<Language>; readonly verbose: boolean },
@@ -51,6 +60,14 @@ const handle = <R>(
           const { message, code } = renderError(error, language)
           yield* output.error(`\n✖ ${message}`)
           yield* output.debug(verboseDetail(error))
+          return yield* new Exit({ code })
+        }),
+      ),
+      Effect.catchDefect((defect) =>
+        Effect.gen(function* () {
+          const { message, code } = renderDefect(language)
+          yield* output.error(`\n✖ ${message}`)
+          yield* output.debug(defectDetail(defect))
           return yield* new Exit({ code })
         }),
       ),

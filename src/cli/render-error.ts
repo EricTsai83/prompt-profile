@@ -179,6 +179,22 @@ const RENDERERS: Renderers = {
 export const renderError = (error: AppError, lang: Language): Rendered =>
   (RENDERERS[error._tag] as (e: AppError, l: Language) => Rendered)(error, lang)
 
+const ISSUES = "https://github.com/EricTsai83/prompt-profile/issues"
+
+/** A defect is a bug in prompt-profile, not something the user did. */
+export const renderDefect = (lang: Language): Rendered => ({
+  code: EXIT.error,
+  message: zhOrEn(
+    lang,
+    `發生未預期的錯誤（這是 prompt-profile 的 bug）。加上 --verbose 重跑可以看到細節，歡迎回報：${ISSUES}`,
+    `An unexpected error occurred (a bug in prompt-profile). Re-run with --verbose for details, and please report it: ${ISSUES}`,
+  ),
+})
+
+/** The defect's stack for --verbose. */
+export const defectDetail = (defect: unknown): string =>
+  defect instanceof Error ? (defect.stack ?? `${defect.name}: ${defect.message}`) : String(defect)
+
 /** Full error for --verbose (never includes prompt text: LlmErrors only carry CLI output tails). */
 export const verboseDetail = (error: AppError): string => {
   const { _tag, ...rest } = error as AppError & Record<string, unknown>

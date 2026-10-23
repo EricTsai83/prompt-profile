@@ -196,6 +196,27 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("an unexpected error (a bug) gets a short message; the stack only with --verbose", () =>
+    Effect.gen(function* () {
+      const boom = {
+        fake: {
+          respond: () => {
+            throw new Error("boom inside the analysis")
+          },
+        },
+      }
+      const h = makeHarness(boom)
+      const r = yield* h.run(["--yes", "--since", "all"])
+      expect(r.code).toBe(1)
+      expect(r.stderr).toContain("unexpected error")
+      expect(r.stderr).toContain("--verbose")
+      expect(r.stderr).not.toContain("boom inside the analysis")
+      const v = yield* makeHarness(boom).run(["--yes", "--since", "all", "--verbose"])
+      expect(v.code).toBe(1)
+      expect(v.stderr).toContain("boom inside the analysis")
+    }),
+  )
+
   describe("errors", () => {
     it.effect.each([
       [
