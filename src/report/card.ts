@@ -62,13 +62,13 @@ export const cardTree = (profile: Profile): Node => {
         h("div", { fontSize: 22, color: "#b9b9ff", letterSpacing: 2 }, t.title),
         h(
           "div",
-          { fontSize: 64, fontWeight: 700, marginTop: 14, lineHeight: 1.15 },
-          clip(profile.archetype.name, 24),
+          { fontSize: 56, fontWeight: 700, marginTop: 14, lineHeight: 1.15 },
+          clip(profile.archetype.name, 56),
         ),
         h(
           "div",
-          { fontSize: 28, marginTop: 18, lineHeight: 1.45, color: "#dcdcf5" },
-          clip(profile.headline, 70),
+          { fontSize: 26, marginTop: 16, lineHeight: 1.4, color: "#dcdcf5" },
+          clip(profile.headline, 150),
         ),
       ]),
       h(
@@ -84,7 +84,7 @@ export const cardTree = (profile: Profile): Node => {
               borderRadius: 999,
               backgroundColor: "rgba(255,255,255,0.14)",
             },
-            clip(tr.name, 16),
+            clip(tr.name, 32),
           ),
         ),
       ),

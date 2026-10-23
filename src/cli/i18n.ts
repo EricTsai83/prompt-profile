@@ -67,7 +67,7 @@ const en: typeof zh = {
   sampledNote: (selected, total) =>
     `  Large history: sampling ${selected} / ${total} chunks (--full analyses everything)`,
   engineLine: (name, calls, hits) =>
-    `  Using ${name} (logged in): about ${calls} calls${hits > 0 ? ` (${hits} chunks cached)` : ""}, billed to your subscription`,
+    `  Using ${name} (logged in): about ${calls} call${calls === 1 ? "" : "s"}${hits > 0 ? ` (${hits} chunks cached)` : ""}, billed to your subscription`,
   confirm: "Continue?",
   cancelled: "Cancelled. No LLM was called.",
   analysing: (done, total, cached) =>
