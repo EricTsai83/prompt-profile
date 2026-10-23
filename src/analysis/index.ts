@@ -1,7 +1,7 @@
 import { Clock, DateTime, Effect, Option, Ref } from "effect"
 import type { ChunkObservations, Observation } from "../domain/ChunkObservations.ts"
 import { encodeStats } from "../domain/Stats.ts"
-import type { Language, Profile } from "../domain/Profile.ts"
+import type { Profile } from "../domain/Profile.ts"
 import type { SafePrompt } from "../domain/SafePrompt.ts"
 import type { Stats } from "../domain/Stats.ts"
 import {
@@ -11,12 +11,13 @@ import {
   LlmProfileDraft,
 } from "../domain/llm/LlmSchemas.ts"
 import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
-import { PIPELINE_VERSION } from "../pipeline/version.ts"
-import { AnalysisCache, type CacheKeyParts } from "./cache.ts"
-import { buildChunks, DEFAULT_MAX_CHUNKS, sampleChunks, type Chunk } from "./chunk.ts"
+import { AnalysisCache } from "./cache.ts"
+import type { Chunk } from "./chunk.ts"
 import { AnalysisFailed, type AnalyzeError } from "./errors.ts"
 import { sha256 } from "./hash.ts"
 import { Progress } from "./progress.ts"
+import { groupForMerge, observationsText, REDUCE_INPUT_LIMIT } from "./merge.ts"
+import { DEFAULT_CONCURRENCY, keyParts, selectChunks, type AnalyzeOptions } from "./plan.ts"
 import { loadPrompt } from "./prompts.ts"
 import {
   verifyDimensions,
@@ -27,101 +28,20 @@ import {
 import { ANALYSIS_VERSION } from "./version.ts"
 
 export { AnalysisFailed, type AnalyzeError } from "./errors.ts"
-
-export interface AnalyzeOptions {
-  readonly language: Language
-  readonly timezone: string
-  /** `--full`: no chunk limit. */
-  readonly full: boolean
-  readonly maxChunks?: number
-  /** Map calls in flight (default 3, to stay clear of subscription rate limits). */
-  readonly concurrency?: number
-  /** `--no-cache`: skip cache reads (results are still written). */
-  readonly noCache: boolean
-  /** `--model` passed to the runner; part of the cache key. */
-  readonly model: string | null
-  /** Observations above this many characters are merged first (default REDUCE_INPUT_LIMIT). */
-  readonly reduceInputLimit?: number
-}
-
-/** Observations above this many characters are merged in groups before the final reduce. */
-export const REDUCE_INPUT_LIMIT = 100_000
+export { REDUCE_INPUT_LIMIT } from "./merge.ts"
+export {
+  DEFAULT_CONCURRENCY,
+  plan,
+  selectChunks,
+  type AnalysisPlan,
+  type AnalyzeOptions,
+} from "./plan.ts"
 
 const OBSERVATIONS_SCHEMA = makeLlmSchema("LlmChunkObservations", LlmChunkObservations)
 const DRAFT_SCHEMA = makeLlmSchema("LlmProfileDraft", LlmProfileDraft)
 
 /** LLM errors that will not succeed on a retry: stop everything immediately. */
 const FATAL: ReadonlySet<LlmError["_tag"]> = new Set(["NotInstalled", "NotLoggedIn", "Interrupted"])
-
-// ---------------------------------------------------------------------------------------
-// Plan
-
-export interface AnalysisPlan {
-  readonly chunksTotal: number
-  readonly chunks: ReadonlyArray<Chunk>
-  readonly sampled: boolean
-  readonly cacheHits: number
-  /** Map calls for uncached chunks + at least one reduce call. */
-  readonly llmCalls: number
-  /** Characters that will be sent (uncached chunks only). */
-  readonly charsToSend: number
-  readonly promptsAnalyzed: number
-  readonly sessionsAnalyzed: number
-}
-
-const keyParts = (
-  kind: CacheKeyParts["kind"],
-  inputId: string,
-  runner: string,
-  options: AnalyzeOptions,
-): CacheKeyParts => ({
-  kind,
-  inputId,
-  analysisVersion: ANALYSIS_VERSION,
-  pipelineVersion: PIPELINE_VERSION,
-  runner,
-  model: options.model,
-  language: options.language,
-})
-
-export const selectChunks = (prompts: ReadonlyArray<SafePrompt>, options: AnalyzeOptions) => {
-  const all = buildChunks(prompts, options.timezone)
-  const { chunks, sampled } = options.full
-    ? { chunks: all, sampled: false }
-    : sampleChunks(all, options.maxChunks ?? DEFAULT_MAX_CHUNKS)
-  return { all, chunks, sampled }
-}
-
-/** What `analyze` would do — shown before asking "continue?" and used by --dry-run. */
-export const plan = (input: {
-  readonly prompts: ReadonlyArray<SafePrompt>
-  readonly options: AnalyzeOptions
-  readonly runner: string
-}): Effect.Effect<AnalysisPlan, never, AnalysisCache> =>
-  Effect.gen(function* () {
-    const cache = yield* AnalysisCache
-    const { all, chunks, sampled } = selectChunks(input.prompts, input.options)
-    let cacheHits = 0
-    let charsToSend = 0
-    for (const c of chunks) {
-      const hit = input.options.noCache
-        ? false
-        : Option.isSome(yield* cache.get(keyParts("map", c.id, input.runner, input.options)))
-      if (hit) cacheHits++
-      else charsToSend += c.text.length
-    }
-    const prompts = chunks.flatMap((c) => c.prompts)
-    return {
-      chunksTotal: all.length,
-      chunks,
-      sampled,
-      cacheHits,
-      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 1 : 0),
-      charsToSend,
-      promptsAnalyzed: prompts.length,
-      sessionsAnalyzed: new Set(prompts.map((p) => `${p.source}:${p.sessionId}`)).size,
-    }
-  })
 
 // ---------------------------------------------------------------------------------------
 // Analyze
@@ -133,13 +53,6 @@ interface MapOutcome {
   readonly model: string | null
   readonly error: LlmError | null
 }
-
-const observationsText = (obs: ReadonlyArray<Observation>): string =>
-  JSON.stringify(
-    obs.map((o) => ({ dimension: o.dimension, claim: o.claim, evidence: o.evidence })),
-    null,
-    0,
-  )
 
 export const analyze = (input: {
   readonly prompts: ReadonlyArray<SafePrompt>
@@ -215,7 +128,7 @@ export const analyze = (input: {
       })
 
     const outcomes = yield* Effect.forEach(chunks, mapChunk, {
-      concurrency: options.concurrency ?? 3,
+      concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
     })
 
     const limited = yield* Ref.get(rateLimited)
@@ -275,20 +188,10 @@ export const analyze = (input: {
         return verifyObservations(value, texts).observations
       })
     for (let round = 0; round < 3 && observationsText(observations).length > limit; round++) {
-      const groups: Array<Array<Observation>> = [[]]
-      let size = 0
-      for (const o of observations) {
-        const len = observationsText([o]).length
-        if (size + len > limit / 2 && groups.at(-1)!.length > 0) {
-          groups.push([])
-          size = 0
-        }
-        groups.at(-1)!.push(o)
-        size += len
-      }
+      const groups = groupForMerge(observations, limit)
       yield* progress.onMergeStart(groups.length)
       const merged = yield* Effect.forEach(groups, merge, {
-        concurrency: options.concurrency ?? 3,
+        concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
       }).pipe(Effect.mapError(reduceError))
       observations = merged.flat()
     }
@@ -308,9 +211,10 @@ export const analyze = (input: {
     // ---- verify (reduce) ------------------------------------------------------------
     const counts: EvidenceCounts = { kept: 0, dropped: 0 }
     const generatedAt = DateTime.makeUnsafe(yield* Clock.currentTimeMillis)
-    const analyzedPrompts = chunks
-      .filter((c) => outcomes.some((o) => o.chunk === c && o.observations !== null))
-      .flatMap((c) => c.prompts)
+    // outcomes are in chunk order
+    const analyzedPrompts = outcomes
+      .filter((o) => o.observations !== null)
+      .flatMap((o) => o.chunk.prompts)
     const profile = fromLlmProfileDraft(draft.value, {
       generatedAt,
       engine: {
