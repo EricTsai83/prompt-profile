@@ -24,10 +24,10 @@ const out = Flag.String("out").pipe(
   Flag.withDescription("Output folder"),
   Flag.withDefault(DEFAULT_OUT),
 )
-const lang = Flag.Literals("lang", ["zh-TW", "en"]).pipe(
-  Flag.withDescription("Report language (default: from your system locale)"),
-  Flag.optional,
-)
+const langFlag = (description: string) =>
+  Flag.Literals("lang", ["zh-TW", "en"]).pipe(Flag.withDescription(description), Flag.optional)
+const lang = langFlag("Language of the report and messages (default: from your system locale)")
+const messageLang = langFlag("Language of messages (default: from your system locale)")
 const verbose = Flag.Boolean("verbose").pipe(
   Flag.withDescription("Show full errors and LLM call timings"),
   Flag.withDefault(false),
@@ -63,7 +63,7 @@ const withCache = <A, E, R>(eff: Effect.Effect<A, E, R>) =>
     return yield* eff.pipe(Effect.provide(fileCacheLayer(yield* cacheDirOf)))
   })
 
-const statsCommand = Command.make("stats", { since, out, lang, verbose }, (f) =>
+const statsCommand = Command.make("stats", { since, out, lang: messageLang, verbose }, (f) =>
   handle((language) => runStats({ since: f.since, out: f.out }, language), f),
 ).pipe(Command.withDescription("Show statistics only (no LLM, free and fast); writes stats.json"))
 
@@ -77,13 +77,15 @@ const renderCommand = Command.make(
       Flag.withDescription("Output folder (default: next to profile.json)"),
       Flag.optional,
     ),
-    lang,
+    lang: langFlag(
+      "Language of messages; the report keeps the language of profile.json (default: system locale)",
+    ),
     verbose,
   },
   (f) => handle((language) => runRender({ file: f.file, out: optional(f.out) }, language), f),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
 
-const cacheClearCommand = Command.make("clear", { lang, verbose }, (f) =>
+const cacheClearCommand = Command.make("clear", { lang: messageLang, verbose }, (f) =>
   handle((language) => withCache(runCacheClear(language)), f),
 ).pipe(Command.withDescription("Delete the analysis cache (it contains prompt excerpts)"))
 

@@ -156,6 +156,20 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("render: --lang sets the messages, the report keeps the profile's language", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const file = join(h.root, "profile.json")
+      writeFileSync(file, readFileSync(fixture("profile.sample.en.json")))
+      const r = yield* h.run(["render", "--lang", "zh-TW", file])
+      expect(r.code).toBe(0)
+      expect(r.stdout).toContain("已重新產生報告")
+      expect(readFileSync(join(h.root, "report.html"), "utf8")).toContain('<html lang="en">')
+      const help = yield* h.run(["render", "--help"])
+      expect(help.stdout).toMatch(/keeps the language of profile\.json/)
+    }),
+  )
+
   it.effect("cache clear deletes the analysis cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()
