@@ -51,7 +51,8 @@ export const processRecords = (
   const projectNames = new Map<string, string | null>()
   for (const r of filtered.records) {
     if (r.project !== null && !projectNames.has(r.project)) {
-      projectNames.set(r.project, projectName(r.project, rules))
+      // counted once per project: project names are sent to the LLM too
+      projectNames.set(r.project, projectName(r.project, rules, redactions))
     }
   }
   const prompts: Array<SafePrompt> = cleaned.prompts.map(({ record, text }) => ({

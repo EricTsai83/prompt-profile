@@ -88,6 +88,15 @@ describe("stats", () => {
 })
 
 describe("runPipeline", () => {
+  it("counts redactions in project names (they are sent to the LLM)", () => {
+    const { prompts, report } = processRecords(
+      [rec("rename the folder please", "2026-09-01T02:00:00Z", { project: "/work/alice" })],
+      options,
+    )
+    expect(prompts[0]!.project).toBe("[USER]")
+    expect(report.redactions).toEqual({ username: 1 })
+  })
+
   it.effect("produces safe prompts with redacted text and project names", () =>
     Effect.gen(function* () {
       const result = yield* runPipeline(Stream.fromIterable(records), options)
