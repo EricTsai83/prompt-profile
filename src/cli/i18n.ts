@@ -2,6 +2,23 @@ import type { Language } from "../domain/Profile.ts"
 
 const n = (x: number, lang: Language) => x.toLocaleString(lang)
 
+/** Numbers for the `stats` summary, already formatted where needed. */
+export interface StatsSummary {
+  readonly prompts: number
+  readonly sessions: number
+  readonly activeDays: number
+  /** "21:00", or "-" without data. */
+  readonly peak: string
+  readonly latest: string
+  readonly streakDays: number
+  /** Percentages 0–100. */
+  readonly zh: number
+  readonly en: number
+  readonly mixed: number
+}
+
+const ZH_UNITS: Record<string, string> = { d: " 天", w: " 週", m: " 個月", y: " 年" }
+
 const zh = {
   header: (v: string) => `◆ prompt-profile v${v}`,
   reading: "● 讀取資料",
@@ -37,11 +54,17 @@ const zh = {
   interrupted: "已中斷，重跑會從快取繼續。",
   dryRun: (dir: string, chunks: number, chars: number) =>
     `✔ dry run：${chunks} 段、約 ${n(chars, "zh-TW")} 字元會送出。內容已寫到 ${dir}（chunks/*.txt、plan.json），沒有呼叫任何 LLM。`,
+  statsSummary: (s: StatsSummary) =>
+    [
+      `  prompt ${n(s.prompts, "zh-TW")} 筆 · session ${n(s.sessions, "zh-TW")} 個 · 活躍 ${s.activeDays} 天`,
+      `  最活躍時段 ${s.peak} · 最晚 ${s.latest} · 最長連續 ${s.streakDays} 天`,
+      `  中文 ${s.zh}% · 英文 ${s.en}% · 混合 ${s.mixed}%`,
+    ].join("\n"),
   statsWritten: (p: string) => `✔ 統計已寫到 ${p}`,
   rendered: (p: string) => `✔ 已重新產生報告：${p}`,
   cacheCleared: (p: string) => `✔ 已刪除分析快取：${p}`,
   sinceLabel: (since: string) =>
-    since === "all" ? "全部" : `最近 ${since.replace("m", " 個月").replace("y", " 年")}`,
+    since === "all" ? "全部" : `最近 ${since.replace(/[dwmy]$/, (unit) => ZH_UNITS[unit]!)}`,
   ruleNames: {
     "too-short": "太短",
     acknowledgement: "確認語",
@@ -85,6 +108,12 @@ const en: typeof zh = {
   interrupted: "Interrupted. Run again to resume from the cache.",
   dryRun: (dir, chunks, chars) =>
     `✔ Dry run: ${chunks} chunks, ~${n(chars, "en")} characters would be sent. Written to ${dir} (chunks/*.txt, plan.json). No LLM was called.`,
+  statsSummary: (s) =>
+    [
+      `  prompts ${s.prompts} · sessions ${s.sessions} · active days ${s.activeDays}`,
+      `  peak hour ${s.peak} · latest ${s.latest} · longest streak ${s.streakDays}d`,
+      `  zh ${s.zh}% · en ${s.en}% · mixed ${s.mixed}%`,
+    ].join("\n"),
   statsWritten: (p) => `✔ Stats written to ${p}`,
   rendered: (p) => `✔ Report re-rendered: ${p}`,
   cacheCleared: (p) => `✔ Analysis cache deleted: ${p}`,

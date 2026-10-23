@@ -1,6 +1,6 @@
 import { DateTime } from "effect"
 import type { Dimension, Evidence, Profile, Trait } from "../domain/Profile.ts"
-import type { Stats } from "../domain/Stats.ts"
+import { peakHour, type Stats } from "../domain/Stats.ts"
 import { html, raw, type Raw } from "./html-template.ts"
 import { messages, type Messages } from "./i18n.ts"
 
@@ -25,11 +25,6 @@ const formatDateTime = (t: DateTime.Utc, timeZone: string, language: string): st
   }).format(DateTime.toEpochMillis(t))
 
 const percent = (x: number) => `${Math.round(x * 100)}%`
-
-export const peakHour = (stats: Stats): number | null => {
-  const max = Math.max(...stats.hourHistogram)
-  return max > 0 ? stats.hourHistogram.indexOf(max) : null
-}
 
 /** Weekday × hour heatmap as inline SVG (no chart library). */
 export const heatmapSvg = (grid: Stats["activityGrid"], t: Messages): Raw => {

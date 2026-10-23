@@ -6,7 +6,7 @@ import { analyze, plan, type AnalyzeOptions } from "../analysis/index.ts"
 import { Progress } from "../analysis/progress.ts"
 import { decodeProfile, type Language } from "../domain/Profile.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
-import { encodeStats } from "../domain/Stats.ts"
+import { encodeStats, peakHour } from "../domain/Stats.ts"
 import { chooseRunner } from "../llm/detect.ts"
 import { LlmRunner, type RunnerId } from "../llm/LlmRunner.ts"
 import { withRetry } from "../llm/retry.ts"
@@ -330,14 +330,21 @@ export const runStats = (
     const { stats } = yield* runPipelineStep(collected, options.since, t)
     const file = path.join(yield* resolveOut(options.out), "stats.json")
     yield* writeFileOrFail(file, `${JSON.stringify(encodeStats(stats), null, 2)}\n`)
-    const peak = stats.hourHistogram.indexOf(Math.max(...stats.hourHistogram))
+    const peak = peakHour(stats)
+    const percent = (x: number) => Math.round(x * 100)
     yield* out.line("")
     yield* out.line(
-      [
-        `  prompts ${stats.totalPrompts} · sessions ${stats.totalSessions} · active days ${stats.activeDays}`,
-        `  peak hour ${String(peak).padStart(2, "0")}:00 · latest ${stats.latestTime ?? "-"} · longest streak ${stats.longestStreakDays}d`,
-        `  zh ${Math.round(stats.languageMix.zh * 100)}% · en ${Math.round(stats.languageMix.en * 100)}% · mixed ${Math.round(stats.languageMix.mixed * 100)}%`,
-      ].join("\n"),
+      t.statsSummary({
+        prompts: stats.totalPrompts,
+        sessions: stats.totalSessions,
+        activeDays: stats.activeDays,
+        peak: peak === null ? "-" : `${String(peak).padStart(2, "0")}:00`,
+        latest: stats.latestTime ?? "-",
+        streakDays: stats.longestStreakDays,
+        zh: percent(stats.languageMix.zh),
+        en: percent(stats.languageMix.en),
+        mixed: percent(stats.languageMix.mixed),
+      }),
     )
     yield* out.line(t.statsWritten(file))
   })

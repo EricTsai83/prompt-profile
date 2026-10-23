@@ -47,3 +47,9 @@ export const Stats = Schema.Struct({
 export type Stats = typeof Stats.Type
 
 export const encodeStats = (stats: Stats): typeof Stats.Encoded => Schema.encodeSync(Stats)(stats)
+
+/** The busiest hour (the earliest on ties); null when there is no prompt at all. */
+export const peakHour = (stats: Pick<Stats, "hourHistogram">): number | null => {
+  const max = Math.max(...stats.hourHistogram)
+  return max > 0 ? stats.hourHistogram.indexOf(max) : null
+}

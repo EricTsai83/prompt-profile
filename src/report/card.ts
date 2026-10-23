@@ -5,7 +5,7 @@ import { createRequire } from "node:module"
 import { readFileSync } from "node:fs"
 import type { Profile } from "../domain/Profile.ts"
 import type { FontData } from "./fonts.ts"
-import { peakHour } from "./html.ts"
+import { peakHour } from "../domain/Stats.ts"
 import { messages } from "./i18n.ts"
 
 export const CARD_WIDTH = 1200

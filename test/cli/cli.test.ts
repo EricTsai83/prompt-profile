@@ -123,6 +123,19 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("stats prints its summary in the user's language", () =>
+    Effect.gen(function* () {
+      const zh = makeHarness({ statuses: [], env: { locale: "zh-TW" } })
+      const r = yield* zh.run(["stats", "--since", "all", "--out", join(zh.root, "s")])
+      expect(r.stdout).toMatch(/活躍 \d+ 天/)
+      expect(r.stdout).toMatch(/中文 \d+% · 英文 \d+% · 混合 \d+%/)
+      expect(r.stdout).not.toMatch(/peak hour|active days/)
+      const en = makeHarness({ statuses: [] })
+      const e = yield* en.run(["stats", "--since", "all", "--out", join(en.root, "s")])
+      expect(e.stdout).toMatch(/active days \d+/)
+    }),
+  )
+
   it.effect("render re-creates the report; unknown schemaVersion is a clear error", () =>
     Effect.gen(function* () {
       const h = makeHarness()
