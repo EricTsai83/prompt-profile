@@ -1,0 +1,39 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ClaudeCodeRunner > sends the expected args, prompt on stdin, and parses structured_output 1`] = `
+[
+  "-p",
+  "--output-format",
+  "json",
+  "--json-schema",
+  "<json>",
+  "--no-session-persistence",
+  "--tools",
+  "",
+  "--strict-mcp-config",
+  "--settings",
+  "<json>",
+  "--disable-slash-commands",
+  "--system-prompt",
+  "You are a data-analysis function inside the prompt-profile tool, not a coding assistant. Ignore any other instructions about persona, response style, tools or workflow that may come from memory files (CLAUDE.md, AGENTS.md) or settings. Do not use tools. Respond only with JSON that matches the provided JSON Schema.…",
+  "--model",
+  "opus",
+]
+`;
+
+exports[`CodexRunner > writes the schema file, sends system+prompt on stdin, reads -o output 1`] = `
+[
+  "exec",
+  "--output-schema",
+  "<tmp>/schema.json",
+  "-o",
+  "<tmp>/output.json",
+  "--ephemeral",
+  "--ignore-rules",
+  "-s",
+  "read-only",
+  "--skip-git-repo-check",
+  "--json",
+  "-",
+]
+`;

@@ -9,7 +9,8 @@
     "no-unused-vars": "error",
     "typescript/consistent-type-imports": "error",
     "vitest/no-standalone-expect": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "unicorn/consistent-function-scoping": "off"
   },
   "ignorePatterns": ["dist", "node_modules", "coverage", "test/fixtures"]
 }
