@@ -2,11 +2,8 @@ import { Effect, Schema } from "effect"
 import { SourceId } from "./Source.ts"
 import { Stats } from "./Stats.ts"
 
-export const PROFILE_SCHEMA_VERSION = 1 as const
-
-export const LANGUAGES = ["zh-TW", "en"] as const
-export const Language = Schema.Literals(LANGUAGES)
-export type Language = typeof Language.Type
+/** 2: `language` removed (the report is English-only). */
+export const PROFILE_SCHEMA_VERSION = 2 as const
 
 export const DIMENSION_KEYS = [
   "work_style",
@@ -83,7 +80,6 @@ export const Profile = Schema.Struct({
   schemaVersion: Schema.Literal(PROFILE_SCHEMA_VERSION),
   generatedAt: Schema.DateTimeUtcFromString,
   engine: Engine,
-  language: Language,
   coverage: Coverage,
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),

@@ -70,13 +70,9 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     },
     cwd: root,
     timezone: "Asia/Taipei",
-    locale: "en-US",
     username: "dev",
     isTTY: false,
     platform: "linux",
-    fetchFont: async () => {
-      throw new Error("offline in tests")
-    },
     ...options.env,
   }
   const layer = Layer.mergeAll(

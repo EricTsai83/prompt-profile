@@ -1,24 +1,20 @@
 import { Effect, Path } from "effect"
-import type { Language } from "../../domain/Profile.ts"
 import { encodeStats, peakHour } from "../../domain/Stats.ts"
 import { VERSION } from "../../version.ts"
-import { cliMessages } from "../i18n.ts"
+import { messages } from "../messages.ts"
 import { Output } from "../services.ts"
 import { readSources, resolveOut, runPipelineStep, writeFileOrFail } from "../steps.ts"
 
 /** `stats`: statistics only (no LLM); writes stats.json. */
-export const runStats = (
-  options: { readonly since: string; readonly out: string },
-  language: Language,
-) =>
+export const runStats = (options: { readonly since: string; readonly out: string }) =>
   Effect.gen(function* () {
-    const t = cliMessages[language]
+    const t = messages
     const out = yield* Output
     const path = yield* Path.Path
     yield* out.line(t.header(VERSION))
     yield* out.line("")
-    const collected = yield* readSources(t)
-    const { stats } = yield* runPipelineStep(collected, options.since, t)
+    const collected = yield* readSources
+    const { stats } = yield* runPipelineStep(collected, options.since)
     const file = path.join(yield* resolveOut(options.out), "stats.json")
     yield* writeFileOrFail(file, `${JSON.stringify(encodeStats(stats), null, 2)}\n`)
     const peak = peakHour(stats)

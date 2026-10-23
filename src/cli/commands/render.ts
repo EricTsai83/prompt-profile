@@ -1,19 +1,13 @@
 import { Effect, FileSystem, Path } from "effect"
-import { decodeProfile, type Language } from "../../domain/Profile.ts"
+import { decodeProfile } from "../../domain/Profile.ts"
 import { Environment } from "../../platform/Environment.ts"
 import { FileError } from "../errors.ts"
-import { cliMessages } from "../i18n.ts"
+import { messages } from "../messages.ts"
 import { Output } from "../services.ts"
 import { resolveOut, writeReportFiles } from "../steps.ts"
 
-/**
- * `render`: re-create report.html and card.png from an existing profile.json. The report
- * keeps the profile's language (its text was written in it); messages follow `language`.
- */
-export const runRender = (
-  options: { readonly file: string; readonly out: string | undefined },
-  language: Language,
-) =>
+/** `render`: re-create report.html and card.png from an existing profile.json. */
+export const runRender = (options: { readonly file: string; readonly out: string | undefined }) =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
@@ -30,7 +24,7 @@ export const runRender = (
     const profile = yield* decodeProfile(json)
     const outDir = options.out ? yield* resolveOut(options.out) : path.dirname(input)
     const files = yield* writeReportFiles(profile, outDir)
-    const t = cliMessages[language]
+    const t = messages
     yield* out.line(t.rendered(files.html))
     yield* out.line(files.card ? t.cardLine(files.card) : t.cardSkipped(files.cardError ?? "?"))
   })

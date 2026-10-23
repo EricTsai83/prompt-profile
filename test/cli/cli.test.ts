@@ -31,7 +31,6 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       // non-TTY: do not open a browser
       expect(h.opened).toEqual([])
       const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
-      expect(profile.language).toBe("en")
       expect(profile.engine.runner).toBe("claude-code")
     }),
   )
@@ -46,28 +45,23 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("--engine codex selects Codex; --lang zh-TW switches language", () =>
+  it.effect("--engine codex selects Codex", () =>
     Effect.gen(function* () {
       const h = makeHarness()
       const out = join(h.root, "out")
-      const r = yield* h.run([
-        "--yes",
-        "--engine",
-        "codex",
-        "--lang",
-        "zh-TW",
-        "--out",
-        out,
-        "--since",
-        "all",
-      ])
+      const r = yield* h.run(["--yes", "--engine", "codex", "--out", out, "--since", "all"])
       expect(r.code).toBe(0)
-      expect(r.stdout).toContain("使用 Codex")
+      expect(r.stdout).toContain("Using Codex")
       const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
       expect(profile.engine.runner).toBe("codex")
-      expect(profile.language).toBe("zh-TW")
-      // the CJK font download failed (offline): report still written, card skipped
-      expect(r.stdout).toContain("圖卡   未產生")
+      expect(existsSync(join(out, "card.png"))).toBe(true)
+    }),
+  )
+
+  it.effect("there is no --lang flag any more (English only)", () =>
+    Effect.gen(function* () {
+      const r = yield* makeHarness().run(["--yes", "--lang", "en", "--since", "all"])
+      expect(r.code).toBe(2)
     }),
   )
 
@@ -123,16 +117,12 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("stats prints its summary in the user's language", () =>
+  it.effect("stats prints its summary", () =>
     Effect.gen(function* () {
-      const zh = makeHarness({ statuses: [], env: { locale: "zh-TW" } })
-      const r = yield* zh.run(["stats", "--since", "all", "--out", join(zh.root, "s")])
-      expect(r.stdout).toMatch(/活躍 \d+ 天/)
-      expect(r.stdout).toMatch(/中文 \d+% · 英文 \d+% · 混合 \d+%/)
-      expect(r.stdout).not.toMatch(/peak hour|active days/)
-      const en = makeHarness({ statuses: [] })
-      const e = yield* en.run(["stats", "--since", "all", "--out", join(en.root, "s")])
-      expect(e.stdout).toMatch(/active days \d+/)
+      const h = makeHarness({ statuses: [] })
+      const r = yield* h.run(["stats", "--since", "all", "--out", join(h.root, "s")])
+      expect(r.stdout).toMatch(/active days \d+/)
+      expect(r.stdout).toMatch(/zh \d+% · en \d+% · mixed \d+%/)
     }),
   )
 
@@ -140,7 +130,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     Effect.gen(function* () {
       const h = makeHarness()
       const good = join(h.root, "profile.json")
-      writeFileSync(good, readFileSync(fixture("profile.sample.en.json")))
+      writeFileSync(good, readFileSync(fixture("profile.sample.json")))
       const r1 = yield* h.run(["render", good])
       expect(r1.code).toBe(0)
       expect(existsSync(join(h.root, "report.html"))).toBe(true)
@@ -163,20 +153,6 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const r3 = yield* h.run(["render", badZone])
       expect(r3.code).toBe(1)
       expect(r3.stderr).toContain("profile.json is invalid")
-    }),
-  )
-
-  it.effect("render: --lang sets the messages, the report keeps the profile's language", () =>
-    Effect.gen(function* () {
-      const h = makeHarness()
-      const file = join(h.root, "profile.json")
-      writeFileSync(file, readFileSync(fixture("profile.sample.en.json")))
-      const r = yield* h.run(["render", "--lang", "zh-TW", file])
-      expect(r.code).toBe(0)
-      expect(r.stdout).toContain("已重新產生報告")
-      expect(readFileSync(join(h.root, "report.html"), "utf8")).toContain('<html lang="en">')
-      const help = yield* h.run(["render", "--help"])
-      expect(help.stdout).toMatch(/keeps the language of profile\.json/)
     }),
   )
 

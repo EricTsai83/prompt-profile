@@ -2,7 +2,6 @@ import { Effect, Option } from "effect"
 import { Argument, Command, Flag } from "effect/cli"
 import { CliError } from "effect/cli"
 import { fileCacheLayer } from "../analysis/cache.ts"
-import type { Language } from "../domain/Profile.ts"
 import type { RunnerId } from "../llm/LlmRunner.ts"
 import { Environment } from "../platform/Environment.ts"
 import { VERSION } from "../version.ts"
@@ -18,7 +17,7 @@ import { runMain } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
-import { DEFAULT_OUT, resolveLanguage } from "./options.ts"
+import { DEFAULT_OUT } from "./options.ts"
 import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
 
@@ -30,10 +29,6 @@ const out = Flag.String("out").pipe(
   Flag.withDescription("Output folder"),
   Flag.withDefault(DEFAULT_OUT),
 )
-const langFlag = (description: string) =>
-  Flag.Literals("lang", ["zh-TW", "en"]).pipe(Flag.withDescription(description), Flag.optional)
-const lang = langFlag("Language of the report and messages (default: from your system locale)")
-const messageLang = langFlag("Language of messages (default: from your system locale)")
 const verbose = Flag.Boolean("verbose").pipe(
   Flag.withDescription("Show full errors and LLM call timings"),
   Flag.withDefault(false),
@@ -45,19 +40,15 @@ const optional = <A>(o: Option.Option<A>): A | undefined => Option.getOrUndefine
  * Run a command body: render any AppError — or, for a bug (defect), a short message with
  * the stack only under --verbose — then fail with the right exit code.
  */
-const handle = <R>(
-  body: (language: Language) => Effect.Effect<void, AppError, R>,
-  flags: { readonly lang: Option.Option<Language>; readonly verbose: boolean },
-) =>
+const handle = <R>(body: Effect.Effect<void, AppError, R>, flags: { readonly verbose: boolean }) =>
   Effect.gen(function* () {
     const env = yield* Environment
-    const language = resolveLanguage(optional(flags.lang), env.locale)
     const output = makeOutput({ isTTY: env.isTTY, verbose: flags.verbose })
-    return yield* body(language).pipe(
+    return yield* body.pipe(
       Effect.provideService(Output, output),
       Effect.catch((error: AppError) =>
         Effect.gen(function* () {
-          const { message, code } = renderError(error, language)
+          const { message, code } = renderError(error)
           yield* output.error(`\n✖ ${message}`)
           yield* output.debug(verboseDetail(error))
           return yield* new Exit({ code })
@@ -65,7 +56,7 @@ const handle = <R>(
       ),
       Effect.catchDefect((defect) =>
         Effect.gen(function* () {
-          const { message, code } = renderDefect(language)
+          const { message, code } = renderDefect()
           yield* output.error(`\n✖ ${message}`)
           yield* output.debug(defectDetail(defect))
           return yield* new Exit({ code })
@@ -80,8 +71,8 @@ const withCache = <A, E, R>(eff: Effect.Effect<A, E, R>) =>
     return yield* eff.pipe(Effect.provide(fileCacheLayer(yield* cacheDirOf)))
   })
 
-const statsCommand = Command.make("stats", { since, out, lang: messageLang, verbose }, (f) =>
-  handle((language) => runStats({ since: f.since, out: f.out }, language), f),
+const statsCommand = Command.make("stats", { since, out, verbose }, (f) =>
+  handle(runStats({ since: f.since, out: f.out }), f),
 ).pipe(Command.withDescription("Show statistics only (no LLM, free and fast); writes stats.json"))
 
 const renderCommand = Command.make(
@@ -94,16 +85,13 @@ const renderCommand = Command.make(
       Flag.withDescription("Output folder (default: next to profile.json)"),
       Flag.optional,
     ),
-    lang: langFlag(
-      "Language of messages; the report keeps the language of profile.json (default: system locale)",
-    ),
     verbose,
   },
-  (f) => handle((language) => runRender({ file: f.file, out: optional(f.out) }, language), f),
+  (f) => handle(runRender({ file: f.file, out: optional(f.out) }), f),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
 
-const cacheClearCommand = Command.make("clear", { lang: messageLang, verbose }, (f) =>
-  handle((language) => withCache(runCacheClear(language)), f),
+const cacheClearCommand = Command.make("clear", { verbose }, (f) =>
+  handle(withCache(runCacheClear), f),
 ).pipe(Command.withDescription("Delete the analysis cache (it contains prompt excerpts)"))
 
 const cacheCommand = Command.make("cache").pipe(
@@ -123,7 +111,6 @@ export const command = Command.make(
       Flag.withDescription("Model passed to claude / codex"),
       Flag.optional,
     ),
-    lang,
     out,
     full: Flag.Boolean("full").pipe(
       Flag.withDescription("Analyse everything, no sampling (slower, uses more quota)"),
@@ -146,25 +133,20 @@ export const command = Command.make(
   },
   (f) =>
     handle(
-      (language) =>
-        withCache(
-          runMain(
-            {
-              since: f.since,
-              engine: ((e) =>
-                e === undefined ? undefined : e === "claude" ? "claude-code" : "codex")(
-                optional(f.engine),
-              ) as RunnerId | undefined,
-              model: optional(f.model),
-              out: f.out,
-              full: f.full,
-              cache: f.cache,
-              yes: f.yes,
-              dryRun: f.dryRun,
-            },
-            language,
-          ),
-        ),
+      withCache(
+        runMain({
+          since: f.since,
+          engine: ((e) => (e === undefined ? undefined : e === "claude" ? "claude-code" : "codex"))(
+            optional(f.engine),
+          ) as RunnerId | undefined,
+          model: optional(f.model),
+          out: f.out,
+          full: f.full,
+          cache: f.cache,
+          yes: f.yes,
+          dryRun: f.dryRun,
+        }),
+      ),
       f,
     ),
 ).pipe(

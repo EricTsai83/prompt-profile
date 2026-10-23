@@ -19,10 +19,8 @@ import {
 } from "../../src/domain/llm/LlmSchemas.ts"
 import { toLlmJsonSchema, validateLlmJsonSchema } from "../../src/domain/llm/toLlmJsonSchema.ts"
 
-const loadSample = (lang: "zh-TW" | "en"): unknown =>
-  JSON.parse(
-    readFileSync(new URL(`../fixtures/profile.sample.${lang}.json`, import.meta.url), "utf8"),
-  )
+const loadSample = (): unknown =>
+  JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8"))
 
 const validRecord = {
   id: "claude-code:s1:u1",
@@ -56,7 +54,7 @@ describe("PromptRecord", () => {
 })
 
 describe("Stats", () => {
-  const stats = (loadSample("en") as { stats: Record<string, unknown> }).stats
+  const stats = (loadSample() as { stats: Record<string, unknown> }).stats
   it("decodes valid data", () => expect(decodes(Stats, stats)).toBe(true))
   it.each([
     ["hourHistogram with 23 buckets", { ...stats, hourHistogram: Array(23).fill(0) }],
@@ -67,31 +65,34 @@ describe("Stats", () => {
 })
 
 describe("Profile", () => {
-  it.each(["zh-TW", "en"] as const)("sample %s decodes", (lang) => {
-    expect(decodes(Profile, loadSample(lang))).toBe(true)
+  it("the sample decodes", () => {
+    expect(decodes(Profile, loadSample())).toBe(true)
   })
 
   it.effect("round-trips encode → JSON → decode", () =>
     Effect.gen(function* () {
-      const profile = yield* decodeProfile(loadSample("zh-TW"))
+      const profile = yield* decodeProfile(loadSample())
       const json = JSON.stringify(encodeProfile(profile))
       const again = yield* decodeProfile(JSON.parse(json))
       expect(encodeProfile(again)).toEqual(encodeProfile(profile))
-      expect(JSON.parse(json)).toEqual(loadSample("zh-TW"))
+      expect(JSON.parse(json)).toEqual(loadSample())
     }),
   )
 
-  it.effect.each([2, "1", undefined])("unknown schemaVersion %s → UnsupportedProfileVersion", (v) =>
-    Effect.gen(function* () {
-      const input = { ...(loadSample("en") as object), schemaVersion: v }
-      const error = yield* Effect.flip(decodeProfile(input))
-      expect(error).toBeInstanceOf(UnsupportedProfileVersion)
-    }),
+  // 1: before the report became English-only (it had a `language` field)
+  it.effect.each([1, "2", 3, undefined])(
+    "unknown schemaVersion %s → UnsupportedProfileVersion",
+    (v) =>
+      Effect.gen(function* () {
+        const input = { ...(loadSample() as object), schemaVersion: v }
+        const error = yield* Effect.flip(decodeProfile(input))
+        expect(error).toBeInstanceOf(UnsupportedProfileVersion)
+      }),
   )
 
   it.effect("invalid content → InvalidProfile", () =>
     Effect.gen(function* () {
-      const sample = loadSample("en") as { dimensions: Array<unknown> }
+      const sample = loadSample() as { dimensions: Array<unknown> }
       const error = yield* Effect.flip(
         decodeProfile({ ...sample, dimensions: sample.dimensions.slice(1) }),
       )
@@ -101,7 +102,7 @@ describe("Profile", () => {
 
   it.effect("an invalid time zone → InvalidProfile (the report would crash on it)", () =>
     Effect.gen(function* () {
-      const sample = loadSample("en") as { stats: Record<string, unknown> }
+      const sample = loadSample() as { stats: Record<string, unknown> }
       const error = yield* Effect.flip(
         decodeProfile({ ...sample, stats: { ...sample.stats, timezone: ":/etc/localtime" } }),
       )
@@ -110,7 +111,7 @@ describe("Profile", () => {
   )
 
   it("rejects quotes longer than 200 characters", () => {
-    const sample = loadSample("en") as { traits: Array<{ evidence: Array<{ quote: string }> }> }
+    const sample = loadSample() as { traits: Array<{ evidence: Array<{ quote: string }> }> }
     const t = sample.traits[0]!
     const bad = {
       ...sample,
@@ -192,7 +193,7 @@ describe("LLM schemas", () => {
 
   it.effect("fromLlmProfileDraft fills program-owned fields and normalises dimensions", () =>
     Effect.gen(function* () {
-      const sample = yield* decodeProfile(loadSample("en"))
+      const sample = yield* decodeProfile(loadSample())
       const draft: LlmProfileDraft = {
         headline: "h",
         archetype: { name: "n", description: "d" },

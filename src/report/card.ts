@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs"
 import type { Profile } from "../domain/Profile.ts"
 import type { FontData } from "./fonts.ts"
 import { peakHour } from "../domain/Stats.ts"
-import { messages } from "./i18n.ts"
+import { messages } from "./messages.ts"
 
 export const CARD_WIDTH = 1200
 export const CARD_HEIGHT = 630
@@ -46,11 +46,11 @@ export const clip = (s: string, max: number): string => {
  * **Never any prompt text** — the card is meant to be shared publicly.
  */
 export const cardTree = (profile: Profile): Node => {
-  const t = messages[profile.language]
+  const t = messages
   const s = profile.stats
   const peak = peakHour(s)
   const numbers: Array<[string, string]> = [
-    [t.totalPrompts, s.totalPrompts.toLocaleString(profile.language)],
+    [t.totalPrompts, s.totalPrompts.toLocaleString("en")],
     [t.longestStreak, t.days(s.longestStreakDays)],
     s.latestTime
       ? [t.latestTime, s.latestTime]
@@ -68,7 +68,7 @@ export const cardTree = (profile: Profile): Node => {
       padding: "56px 64px",
       backgroundImage: "linear-gradient(135deg, #17172b 0%, #2b2b6b 60%, #5b5bd6 100%)",
       color: "#f4f4ff",
-      fontFamily: "Inter, Noto Sans TC",
+      fontFamily: "Inter",
     },
     [
       h("div", { display: "flex", flexDirection: "column" }, [
@@ -126,19 +126,6 @@ const ensureWasm = (): Promise<void> => {
   }
   return wasmReady
 }
-
-const CJK = /[⺀-鿿豈-﫿＀-￯　-〿]/
-
-/** Text on the card that needs the CJK font. */
-export const cardNeedsCjk = (profile: Profile): boolean =>
-  profile.language === "zh-TW" ||
-  CJK.test(
-    [
-      profile.archetype.name,
-      profile.headline,
-      ...profile.traits.slice(0, 3).map((t) => t.name),
-    ].join(""),
-  )
 
 /** Render the card to PNG bytes. */
 export const renderCard = (

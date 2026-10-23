@@ -2,20 +2,23 @@ import { DateTime } from "effect"
 import type { Dimension, Evidence, Profile, Trait } from "../domain/Profile.ts"
 import { peakHour, type Stats } from "../domain/Stats.ts"
 import { html, raw, type Raw } from "./html-template.ts"
-import { messages, type Messages } from "./i18n.ts"
+import { messages, type Messages } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
-const formatDate = (t: DateTime.Utc, timeZone: string, language: string): string =>
-  new Intl.DateTimeFormat(language, {
+/** The report's language (Intl formatting and `<html lang>`). */
+const LANG = "en"
+
+const formatDate = (t: DateTime.Utc, timeZone: string): string =>
+  new Intl.DateTimeFormat(LANG, {
     timeZone,
     year: "numeric",
     month: "short",
     day: "numeric",
   }).format(DateTime.toEpochMillis(t))
 
-const formatDateTime = (t: DateTime.Utc, timeZone: string, language: string): string =>
-  new Intl.DateTimeFormat(language, {
+const formatDateTime = (t: DateTime.Utc, timeZone: string): string =>
+  new Intl.DateTimeFormat(LANG, {
     timeZone,
     year: "numeric",
     month: "short",
@@ -156,17 +159,16 @@ footer p{margin:4px 0}
 
 /** Render a self-contained, offline HTML report (no external requests, no JavaScript). */
 export const renderHtml = (profile: Profile): string => {
-  const t = messages[profile.language]
-  const lang = profile.language
+  const t = messages
   const s = profile.stats
   const tz = s.timezone
   const c = profile.coverage
   const peak = peakHour(s)
   const period = s.dateRange
-    ? t.period(formatDate(s.dateRange.from, tz, lang), formatDate(s.dateRange.to, tz, lang))
+    ? t.period(formatDate(s.dateRange.from, tz), formatDate(s.dateRange.to, tz))
     : null
   const page = html`<!doctype html>
-    <html lang="${lang}">
+    <html lang="${LANG}">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -196,7 +198,7 @@ export const renderHtml = (profile: Profile): string => {
 
           <h2>${t.numbers}</h2>
           <section class="stats">
-            ${statTile(t.totalPrompts, s.totalPrompts.toLocaleString(lang))}
+            ${statTile(t.totalPrompts, s.totalPrompts.toLocaleString(LANG))}
             ${statTile(t.peakHour, peak === null ? t.none : `${String(peak).padStart(2, "0")}:00`)}
             ${statTile(t.languageMix, `${percent(s.languageMix.zh)} / ${percent(s.languageMix.en)} / ${percent(s.languageMix.mixed)}`)}
             ${statTile(t.longestStreak, t.days(s.longestStreakDays))}
@@ -226,7 +228,7 @@ export const renderHtml = (profile: Profile): string => {
           <footer>
             <p>
               ${t.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} ·
-              ${t.generatedAt(formatDateTime(profile.generatedAt, tz, lang))}
+              ${t.generatedAt(formatDateTime(profile.generatedAt, tz))}
             </p>
             <p>
               ${t.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? html` · ${t.chunksSkipped(c.chunksFailed)}` : ""}

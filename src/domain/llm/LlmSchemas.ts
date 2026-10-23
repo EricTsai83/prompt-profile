@@ -7,7 +7,6 @@ import {
   type Coverage,
   type Engine,
   type Evidence,
-  type Language,
   PROFILE_SCHEMA_VERSION,
   type Profile,
 } from "../Profile.ts"
@@ -88,7 +87,6 @@ export const fromLlmChunkObservations = (
 export interface ProfileExtras {
   readonly generatedAt: DateTime.Utc
   readonly engine: Engine
-  readonly language: Language
   readonly coverage: Coverage
   readonly stats: Stats
 }
@@ -101,7 +99,6 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
   schemaVersion: PROFILE_SCHEMA_VERSION,
   generatedAt: extras.generatedAt,
   engine: extras.engine,
-  language: extras.language,
   coverage: extras.coverage,
   headline: draft.headline,
   archetype: draft.archetype,

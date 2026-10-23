@@ -32,6 +32,6 @@ The user message contains two JSON documents: `observations` (each with `dimensi
 - Address the developer directly in the second person ("you" / 「你」); never assume their
   gender.
 - Tone: honest, specific and a little playful — never mean, never flattering.
-- Write all text in {{LANGUAGE}}. Quotes stay in their original language.
+- Write all text in English. Quotes stay in their original language.
 
 Respond with JSON matching the schema.

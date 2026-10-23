@@ -2,14 +2,13 @@ import { Effect, Path } from "effect"
 import { Prompt } from "effect/cli"
 import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../analysis/index.ts"
 import { Progress, type ProgressShape } from "../../analysis/progress.ts"
-import type { Language } from "../../domain/Profile.ts"
 import { chooseRunner } from "../../llm/detect.ts"
 import { LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
 import { withRetry } from "../../llm/retry.ts"
 import { Environment } from "../../platform/Environment.ts"
 import { VERSION } from "../../version.ts"
 import { NeedsConfirmation } from "../errors.ts"
-import { cliMessages, type CliMessages } from "../i18n.ts"
+import { messages, type Messages } from "../messages.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
   readSources,
@@ -62,7 +61,7 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
   })
 
 /** Progress bar on the status line; timings only with --verbose. */
-const makeProgress = (out: OutputShape, t: CliMessages, total: number): ProgressShape => {
+const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressShape => {
   let done = 0
   let cached = 0
   return {
@@ -81,20 +80,19 @@ const makeProgress = (out: OutputShape, t: CliMessages, total: number): Progress
   }
 }
 
-export const runMain = (options: MainOptions, language: Language) =>
+export const runMain = (options: MainOptions) =>
   Effect.gen(function* () {
-    const t = cliMessages[language]
+    const t = messages
     const env = yield* Environment
     const out = yield* Output
     const outDir = yield* resolveOut(options.out)
     yield* out.line(t.header(VERSION))
     yield* out.line("")
 
-    const collected = yield* readSources(t)
-    const { prompts, stats } = yield* runPipelineStep(collected, options.since, t)
+    const collected = yield* readSources
+    const { prompts, stats } = yield* runPipelineStep(collected, options.since)
 
     const analyzeOptions: AnalyzeOptions = {
-      language,
       timezone: env.timezone,
       full: options.full,
       noCache: !options.cache,

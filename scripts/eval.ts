@@ -1,5 +1,5 @@
 /**
- * Prompt-quality evaluation (`pnpm eval --engine claude|codex [--lang zh-TW|en] [--persona name]`).
+ * Prompt-quality evaluation (`pnpm eval --engine claude|codex [--persona name]`).
  * Runs the full analysis with a real LLM on hand-written personas in test/eval/personas/ and
  * writes eval-output/<engine>/<persona>/profile.json for side-by-side reading.
  * Not part of CI: it spends the user's subscription quota.
@@ -31,12 +31,10 @@ interface Persona {
 const { values } = parseArgs({
   options: {
     engine: { type: "string", default: "claude" },
-    lang: { type: "string", default: "zh-TW" },
     persona: { type: "string" },
   },
 })
 const engine = values.engine === "codex" ? "codex" : "claude-code"
-const language = values.lang === "en" ? "en" : "zh-TW"
 const root = new URL("../test/eval/personas/", import.meta.url).pathname
 const personas = readdirSync(root).filter(
   (p) => values.persona === undefined || p === values.persona,
@@ -73,7 +71,7 @@ const program = Effect.gen(function* () {
     const result = yield* analyze({
       prompts,
       stats,
-      options: { language, timezone: persona.timezone, full: true, noCache: true, model: null },
+      options: { timezone: persona.timezone, full: true, noCache: true, model: null },
     }).pipe(
       Effect.provide(
         Layer.mergeAll(Layer.succeed(LlmRunner, runner), memoryCacheLayer(), silentProgressLayer),

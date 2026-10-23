@@ -1,13 +1,9 @@
 import { DateTime, Effect } from "effect"
-import type { Language } from "../domain/Profile.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */
 
 export const DEFAULT_OUT = "prompt-profile-report"
-
-export const resolveLanguage = (flag: Language | undefined, locale: string): Language =>
-  flag ?? (/^zh/i.test(locale) ? "zh-TW" : "en")
 
 /**
  * `1m` / `3m` / `6m` / `1y` / `all` (also `<n>d`, `<n>w`, `<n>m`, `<n>y`). A range reaching

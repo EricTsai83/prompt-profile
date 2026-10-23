@@ -76,7 +76,7 @@ export const analyze = (input: {
     const texts = new Map(input.prompts.map((p) => [p.id, p.text]))
     const { all, chunks, sampled } = selectChunks(input.prompts, options)
     const total = chunks.length
-    const mapSystem = loadPrompt("map", options.language)
+    const mapSystem = loadPrompt("map")
     const rateLimited = yield* Ref.make<LlmError | null>(null)
 
     // ---- map ------------------------------------------------------------------------
@@ -181,7 +181,7 @@ export const analyze = (input: {
           ? cached.value.value
           : yield* runner
               .generate({
-                system: loadPrompt("merge", options.language),
+                system: loadPrompt("merge"),
                 prompt: text,
                 schema: OBSERVATIONS_SCHEMA,
               })
@@ -213,7 +213,7 @@ export const analyze = (input: {
     const reducePrompt = `observations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(encodeStats(input.stats))}`
     const draft = yield* runner
       .generate({
-        system: loadPrompt("reduce", options.language),
+        system: loadPrompt("reduce"),
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
       })
@@ -234,7 +234,6 @@ export const analyze = (input: {
         model: draft.model ?? outcomes.find((o) => o.model !== null)?.model ?? options.model,
         analysisVersion: ANALYSIS_VERSION,
       },
-      language: options.language,
       stats: input.stats,
       coverage: {
         chunksTotal: all.length,

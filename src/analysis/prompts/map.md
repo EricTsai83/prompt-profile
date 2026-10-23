@@ -47,6 +47,6 @@ Write observations for these five dimensions (key in parentheses):
   ethnicity, family or financial situation, or anything similar — even if hinted at.
 - Prefer patterns seen in several prompts over one-off events. 3–12 observations are typical;
   skip a dimension if there is nothing solid to say.
-- Write `claim` in {{LANGUAGE}}. Quotes stay in their original language.
+- Write `claim` in English. Quotes stay in their original language.
 
 Respond with JSON matching the schema.

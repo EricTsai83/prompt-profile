@@ -8,7 +8,7 @@ import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
 import { writeReport } from "../report/index.ts"
 import { FileError, NoData } from "./errors.ts"
-import type { CliMessages } from "./i18n.ts"
+import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
 import { Output } from "./services.ts"
 
@@ -59,33 +59,32 @@ export interface Collected {
 }
 
 /** Read every source and print one line per source. No records at all → `NoData`. */
-export const readSources = (t: CliMessages) =>
-  Effect.gen(function* () {
-    const env = yield* Environment
-    const out = yield* Output
-    const adapters = yield* makeAdapters({ home: env.home, env: env.env })
-    yield* out.line(t.reading)
-    const records: Array<PromptRecord> = []
-    const locations: Array<string> = []
-    const slashCommands: Record<string, number> = {}
-    for (const source of yield* readAdapters(adapters)) {
-      const { adapter, diagnostics: diag } = source
-      locations.push(...adapter.locations)
-      for (const [k, v] of Object.entries(diag.slashCommands))
-        slashCommands[k] = (slashCommands[k] ?? 0) + v
-      for (const r of source.records) records.push(r)
-      const sessions = new Set(source.records.map((r) => r.sessionId)).size
-      yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
-      yield* out.debug(
-        `  [${adapter.id}] excluded ${JSON.stringify(diag.excluded)} badLines=${diag.badLines} unreadableFiles=${diag.unreadableFiles}`,
-      )
-    }
-    if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
-    return { records, locations, slashCommands } satisfies Collected
-  })
+export const readSources = Effect.gen(function* () {
+  const env = yield* Environment
+  const out = yield* Output
+  const adapters = yield* makeAdapters({ home: env.home, env: env.env })
+  yield* out.line(t.reading)
+  const records: Array<PromptRecord> = []
+  const locations: Array<string> = []
+  const slashCommands: Record<string, number> = {}
+  for (const source of yield* readAdapters(adapters)) {
+    const { adapter, diagnostics: diag } = source
+    locations.push(...adapter.locations)
+    for (const [k, v] of Object.entries(diag.slashCommands))
+      slashCommands[k] = (slashCommands[k] ?? 0) + v
+    for (const r of source.records) records.push(r)
+    const sessions = new Set(source.records.map((r) => r.sessionId)).size
+    yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
+    yield* out.debug(
+      `  [${adapter.id}] excluded ${JSON.stringify(diag.excluded)} badLines=${diag.badLines} unreadableFiles=${diag.unreadableFiles}`,
+    )
+  }
+  if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
+  return { records, locations, slashCommands } satisfies Collected
+})
 
 /** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
-export const runPipelineStep = (collected: Collected, since: string, t: CliMessages) =>
+export const runPipelineStep = (collected: Collected, since: string) =>
   Effect.gen(function* () {
     const env = yield* Environment
     const out = yield* Output
@@ -125,7 +124,7 @@ export const resolveOut = (outFlag: string) =>
     return path.resolve(env.cwd, outFlag)
   })
 
-/** Analysis results and downloaded fonts. */
+/** The analysis cache folder. */
 export const cacheDirOf = Effect.gen(function* () {
   const env = yield* Environment
   return resolveCacheDir(env.env, env.home, yield* Path.Path)
@@ -142,11 +141,6 @@ export const writeFileOrFail = (file: string, data: string) =>
 
 /** report.html, profile.json and card.png in `outDir` (a card failure is not an error). */
 export const writeReportFiles = (profile: Profile, outDir: string) =>
-  Effect.gen(function* () {
-    const env = yield* Environment
-    return yield* writeReport(profile, {
-      outDir,
-      cacheDir: yield* cacheDirOf,
-      ...(env.fetchFont ? { fetcher: env.fetchFont } : {}),
-    }).pipe(Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })))
-  })
+  writeReport(profile, outDir).pipe(
+    Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
+  )

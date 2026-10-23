@@ -1,5 +1,4 @@
 import { Effect, Option } from "effect"
-import type { Language } from "../domain/Profile.ts"
 import type { SafePrompt } from "../domain/SafePrompt.ts"
 import { PIPELINE_VERSION } from "../pipeline/version.ts"
 import { AnalysisCache, type CacheKeyParts } from "./cache.ts"
@@ -10,7 +9,6 @@ import { ANALYSIS_VERSION } from "./version.ts"
 export const DEFAULT_CONCURRENCY = 3
 
 export interface AnalyzeOptions {
-  readonly language: Language
   readonly timezone: string
   /** `--full`: no chunk limit. */
   readonly full: boolean
@@ -50,7 +48,6 @@ export const keyParts = (
   pipelineVersion: PIPELINE_VERSION,
   runner,
   model: options.model,
-  language: options.language,
 })
 
 export const selectChunks = (prompts: ReadonlyArray<SafePrompt>, options: AnalyzeOptions) => {

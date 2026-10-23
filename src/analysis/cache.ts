@@ -1,6 +1,5 @@
 import { Context, Effect, FileSystem, Layer, Option, Path, Schema } from "effect"
 import { ChunkObservations } from "../domain/ChunkObservations.ts"
-import { Language } from "../domain/Profile.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { sha256 } from "./hash.ts"
 
@@ -15,19 +14,10 @@ export interface CacheKeyParts {
   readonly pipelineVersion: string
   readonly runner: string
   readonly model: string | null
-  readonly language: Language
 }
 
 export const cacheKey = (p: CacheKeyParts): string =>
-  sha256(
-    p.kind,
-    p.inputId,
-    p.analysisVersion,
-    p.pipelineVersion,
-    p.runner,
-    p.model ?? "",
-    p.language,
-  )
+  sha256(p.kind, p.inputId, p.analysisVersion, p.pipelineVersion, p.runner, p.model ?? "")
 
 /** The cache file stores the key parts so a mismatch (hash collision, tampering) is a miss. */
 export const CacheEntry = Schema.Struct({
@@ -37,7 +27,6 @@ export const CacheEntry = Schema.Struct({
   pipelineVersion: Schema.String,
   runner: Schema.String,
   model: Schema.NullOr(Schema.String),
-  language: Language,
   /** Model reported by the CLI when the entry was produced. */
   producedBy: Schema.NullOr(Schema.String),
   value: ChunkObservations,
@@ -62,8 +51,7 @@ const sameParts = (e: CacheEntry, p: CacheKeyParts) =>
   e.analysisVersion === p.analysisVersion &&
   e.pipelineVersion === p.pipelineVersion &&
   e.runner === p.runner &&
-  e.model === p.model &&
-  e.language === p.language
+  e.model === p.model
 
 const decodeEntry = Schema.decodeUnknownOption(Schema.fromJsonString(CacheEntry))
 const encodeEntry = Schema.encodeSync(Schema.fromJsonString(CacheEntry))

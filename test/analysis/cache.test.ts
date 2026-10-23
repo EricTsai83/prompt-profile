@@ -18,7 +18,6 @@ const parts: CacheKeyParts = {
   pipelineVersion: "1",
   runner: "claude-code",
   model: null,
-  language: "en",
 }
 const entry = { ...parts, producedBy: "m", value: { chunkId: "chunk-1", observations: [] } }
 

@@ -13,7 +13,6 @@ import { LlmRunner, NotLoggedIn, ProcessFailed, RateLimited } from "../../src/ll
 import { makePrompts } from "./fixtures.ts"
 
 const options: AnalyzeOptions = {
-  language: "zh-TW",
   timezone: "Asia/Taipei",
   full: false,
   noCache: false,
@@ -119,10 +118,10 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "1",
+        analysisVersion: "2",
       })
-      // the map instructions are in Traditional Chinese mode
-      expect(fake.log[0]!.system).toContain("繁體中文")
+      // the profile is written in English
+      expect(fake.log[0]!.system).toContain("in English")
       // chunk text is what's sent
       expect(fake.log[0]!.prompt).toMatch(/^<prompt id="/)
       expect(
@@ -150,12 +149,12 @@ describe("analyze", () => {
     }),
   )
 
-  it.effect("cache keys include model and language", () =>
+  it.effect("cache keys include the model", () =>
     Effect.gen(function* () {
       const cache = makeMemoryCache()
       yield* run(makeFakeLlmRunner({ respond }), cache)
       const other = makeFakeLlmRunner({ respond })
-      yield* run(other, cache, { ...options, language: "en" })
+      yield* run(other, cache, { ...options, model: "another-model" })
       expect(other.calls()).toBeGreaterThan(1)
     }),
   )
