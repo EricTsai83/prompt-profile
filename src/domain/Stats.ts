@@ -43,3 +43,5 @@ export const Stats = Schema.Struct({
   latestTime: Schema.NullOr(Schema.String),
 })
 export type Stats = typeof Stats.Type
+
+export const encodeStats = (stats: Stats): typeof Stats.Encoded => Schema.encodeSync(Stats)(stats)

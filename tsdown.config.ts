@@ -14,6 +14,8 @@ export default defineConfig({
   clean: true,
   outExtensions: () => ({ js: ".js" }),
   banner: { js: "#!/usr/bin/env node" },
+  // analysis instructions are read at runtime from dist/prompts/ (see analysis/prompts.ts)
+  copy: [{ from: "src/analysis/prompts", to: "dist/prompts" }],
   define: {
     __PKG_VERSION__: JSON.stringify(pkg.version),
   },

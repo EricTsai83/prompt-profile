@@ -1,0 +1,107 @@
+{
+  "timezone": "Europe/Berlin",
+  "sessions": [
+    {
+      "start": "2026-08-03T07:30:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks.",
+        "Good plan. Let's start with step 1 only: the database migration. Use a unique index on (merchant_id, idempotency_key).",
+        "Write the migration and a rollback. Do not touch the handlers yet.",
+        "Now write integration tests for the migration using testcontainers."
+      ]
+    },
+    {
+      "start": "2026-08-04T08:10:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Step 2: implement the middleware that checks the idempotency key. Keep it under 80 lines and add tests first.",
+        "The test for concurrent requests is flaky. Can you explain why before changing anything?",
+        "Agreed, use SELECT ... FOR UPDATE. Show me the diff only.",
+        "Please add a metric for idempotent replays."
+      ]
+    },
+    {
+      "start": "2026-08-06T09:00:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Review this Go function for race conditions. Explain your reasoning step by step.",
+        "What are the trade-offs between using a mutex here and a channel?",
+        "Let's keep the mutex. Add a benchmark so we can compare later."
+      ]
+    },
+    {
+      "start": "2026-08-10T07:45:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "We need to rotate the database credentials without downtime. Propose two approaches and compare them.",
+        "Go with the dual-credential approach. Write a runbook in docs/runbooks/rotate-db-creds.md.",
+        "The runbook should include a verification step after each stage and a rollback section."
+      ]
+    },
+    {
+      "start": "2026-08-12T12:30:00Z",
+      "project": "/home/dev/ledger",
+      "prompts": [
+        "I want to model double-entry bookkeeping in PostgreSQL. What constraints guarantee that every transaction balances?",
+        "Use a deferred constraint trigger. Write the SQL and property-based tests with rapid.",
+        "Explain how this behaves under READ COMMITTED versus SERIALIZABLE.",
+        "Document the decision in an ADR."
+      ]
+    },
+    {
+      "start": "2026-08-17T08:20:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "The p99 latency of /invoices went from 120ms to 900ms after the last deploy. Help me form hypotheses before we look at code.",
+        "The slow query log shows a sequential scan on invoice_lines. Which index would you add and why?",
+        "Write the migration with CREATE INDEX CONCURRENTLY and a check that it is valid afterwards."
+      ]
+    },
+    {
+      "start": "2026-08-20T09:40:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Write a design doc for moving webhooks to an outbox pattern. Sections: context, goals, non-goals, design, alternatives, rollout.",
+        "Add a section about exactly-once vs at-least-once delivery and how consumers should deduplicate.",
+        "Now break the rollout into PR-sized steps."
+      ]
+    },
+    {
+      "start": "2026-08-25T07:15:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Implement step 1 of the outbox rollout: the outbox table and the transactional write. Tests first.",
+        "Please don't use an ORM here, plain sqlc queries.",
+        "Add a test that proves the webhook is not written when the transaction rolls back."
+      ]
+    },
+    {
+      "start": "2026-09-02T08:00:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Review my PR description for clarity. Is the testing section convincing?",
+        "Suggest which reviewers should look at which files, based on risk.",
+        "Write a short summary for the changelog."
+      ]
+    },
+    {
+      "start": "2026-09-08T07:50:00Z",
+      "project": "/home/dev/ledger",
+      "prompts": [
+        "What observability do we need before turning on the ledger in production? Make a checklist.",
+        "Add alerting thresholds and explain how you chose them.",
+        "Turn the checklist into a GitHub issue template."
+      ]
+    },
+    {
+      "start": "2026-09-15T08:30:00Z",
+      "project": "/home/dev/billing-service",
+      "prompts": [
+        "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour.",
+        "Good. Now refactor in small commits, one concern per commit, and tell me the commit messages first.",
+        "Run through the edge cases again: leap years, currency rounding, negative line items."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "timezone": "Asia/Taipei",
+  "sessions": [
+    {
+      "start": "2026-08-03T14:40:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "幫我把商品列表改成 grid，手機版兩欄、桌機四欄",
+        "不對，間距太大了，gap 改成 12px",
+        "還是不行，卡片高度不一致，用 flex 讓按鈕貼底",
+        "OK 這樣可以。順便把 hover 加個陰影",
+        "陰影太重了，淡一點，像 tailwind 的 shadow-sm"
+      ]
+    },
+    {
+      "start": "2026-08-04T16:10:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "React Query 的 staleTime 要設多少比較好？商品資料一小時更新一次",
+        "幫我寫一個 useProducts hook，支援分頁跟 category filter",
+        "錯了，category 是陣列，不是字串",
+        "把 loading 狀態改成 skeleton，不要用 spinner"
+      ]
+    },
+    {
+      "start": "2026-08-06T17:30:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "為什麼 Safari 上 sticky header 會跳一下？",
+        "不是這樣，問題是 iOS 的 rubber band scroll",
+        "好，用你說的 overscroll-behavior 試試",
+        "還是錯了，header 在 iPhone 13 上會閃",
+        "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+      ]
+    },
+    {
+      "start": "2026-08-10T15:05:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "dark mode 的顏色幫我從 design token 產生，不要寫死",
+        "token 命名改成 color-surface-1、color-surface-2 這種",
+        "不對不對，對比度不夠，文字要符合 WCAG AA",
+        "幫我寫個 script 檢查所有 token 組合的對比度"
+      ]
+    },
+    {
+      "start": "2026-08-12T18:20:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "結帳頁的表單驗證幫我改用 zod",
+        "錯誤訊息要中文，而且要在欄位下面顯示",
+        "你漏了電話欄位",
+        "還是不行，送出的時候沒有 focus 到第一個錯誤欄位",
+        "可以了，謝謝，順便幫我把按鈕的 disabled 樣式調一下"
+      ]
+    },
+    {
+      "start": "2026-08-15T16:45:00Z",
+      "project": "/home/dev/portfolio",
+      "prompts": [
+        "我想做一個作品集首頁，要有那種滑動時元素淡入的效果",
+        "動畫太慢了，duration 改 200ms，easing 用 ease-out",
+        "不要用 framer-motion，用 CSS + IntersectionObserver 就好",
+        "加上 prefers-reduced-motion 的處理"
+      ]
+    },
+    {
+      "start": "2026-08-19T17:55:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "Lighthouse 的 LCP 是 4.2 秒，幫我看看怎麼降",
+        "圖片已經是 webp 了，還有什麼方法？",
+        "不是這個問題，hero 圖是 CSS background，不會被 preload",
+        "改成 img + fetchpriority=high 試試看"
+      ]
+    },
+    {
+      "start": "2026-08-23T15:30:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "購物車的數量按鈕在手機上太小了，至少 44px",
+        "還是錯，你改到桌機版了",
+        "對，就是這樣。再幫我加個加入購物車的小動畫",
+        "動畫結束後 badge 要跳一下"
+      ]
+    },
+    {
+      "start": "2026-09-01T16:20:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "幫我把整個 Button 元件重構，variant 用 cva 管理",
+        "size 也要用 cva，sm md lg",
+        "不對，icon-only 的按鈕要有 aria-label",
+        "幫我補 storybook 的 stories"
+      ]
+    },
+    {
+      "start": "2026-09-05T17:10:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "Next.js 的 Image 元件在 export 模式下不能用，有替代方案嗎？",
+        "還是不行，build 的時候報錯",
+        "好，那先用原生 img，我之後再處理",
+        "幫我把 next.config 的 images 設定拿掉"
+      ]
+    },
+    {
+      "start": "2026-09-09T18:00:00Z",
+      "project": "/home/dev/portfolio",
+      "prompts": [
+        "首頁的字型換成 Noto Sans TC，但只載入用得到的字",
+        "subset 之後還是 800KB，太大了",
+        "那改用系統字型 fallback，標題才用 webfont",
+        "font-display 用 swap"
+      ]
+    },
+    {
+      "start": "2026-09-14T15:50:00Z",
+      "project": "/home/dev/shop-web",
+      "prompts": [
+        "商品頁的圖片輪播在 Android Chrome 上滑動會卡",
+        "不是效能問題，是 touch-action 沒設",
+        "對，pan-y。順便讓它支援鍵盤左右鍵",
+        "focus ring 不要拿掉，改成品牌色"
+      ]
+    }
+  ]
+}

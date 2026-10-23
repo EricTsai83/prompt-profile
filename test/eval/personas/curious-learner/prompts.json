@@ -1,0 +1,88 @@
+{
+  "timezone": "America/New_York",
+  "sessions": [
+    {
+      "start": "2026-08-02T14:00:00Z",
+      "project": "/home/dev/rust-playground",
+      "prompts": [
+        "I'm new to Rust. Can you explain ownership like I'm a Python developer?",
+        "Why does this borrow checker error happen? I thought I only had one mutable reference.",
+        "ok I think I get it. can you give me 3 small exercises about lifetimes?",
+        "here's my answer to exercise 1, is it idiomatic?"
+      ]
+    },
+    {
+      "start": "2026-08-05T23:30:00Z",
+      "project": "/home/dev/rust-playground",
+      "prompts": [
+        "What's the difference between Box, Rc and Arc? When would I use each?",
+        "Draw me an ASCII diagram of what Rc<RefCell<T>> looks like in memory",
+        "so RefCell moves the borrow check to runtime? that feels dangerous, why is it allowed?"
+      ]
+    },
+    {
+      "start": "2026-08-09T15:20:00Z",
+      "project": "/home/dev/rust-playground",
+      "prompts": [
+        "I want to build a tiny CLI todo app in Rust to practice. Don't write it for me, just give me the steps.",
+        "I'm stuck on step 3, how do I serialize a Vec of structs to JSON with serde?",
+        "it compiles now!! next step: how do I write tests for the CLI?"
+      ]
+    },
+    {
+      "start": "2026-08-14T01:10:00Z",
+      "project": "/home/dev/notes",
+      "prompts": [
+        "explain async/await in Rust vs JavaScript. why does Rust need an executor?",
+        "is tokio the only option? what are the trade-offs with smol?",
+        "summarize what I learned today in 5 bullet points so I can put it in my notes"
+      ]
+    },
+    {
+      "start": "2026-08-20T16:00:00Z",
+      "project": "/home/dev/rust-playground",
+      "prompts": [
+        "I rewrote my todo app with clap. can you review it and point out non-idiomatic parts? don't fix them, just tell me",
+        "why is unwrap considered bad? when is it ok?",
+        "I replaced the unwraps with ? and a custom error enum. better?"
+      ]
+    },
+    {
+      "start": "2026-08-27T22:45:00Z",
+      "project": "/home/dev/wasm-game",
+      "prompts": [
+        "Can I run Rust in the browser? I want to make a small game with WebAssembly",
+        "what's the difference between wasm-bindgen and wasm-pack?",
+        "the canvas is blank, what am I doing wrong? I'm calling draw() every frame",
+        "oh it was the requestAnimationFrame closure being dropped. why does that happen?"
+      ]
+    },
+    {
+      "start": "2026-09-03T15:30:00Z",
+      "project": "/home/dev/wasm-game",
+      "prompts": [
+        "how do games usually structure an update loop? fixed timestep vs variable?",
+        "I implemented a fixed timestep with an accumulator. can you check my logic?",
+        "what should I learn next to get better at game dev in Rust? give me a roadmap"
+      ]
+    },
+    {
+      "start": "2026-09-10T00:20:00Z",
+      "project": "/home/dev/notes",
+      "prompts": [
+        "quiz me on Rust traits, 5 questions, wait for my answers",
+        "1: a trait is like an interface. 2: impl Trait in argument position is static dispatch. 3: dyn needs a vtable",
+        "what did I get wrong? explain the ones I missed"
+      ]
+    },
+    {
+      "start": "2026-09-16T14:10:00Z",
+      "project": "/home/dev/wasm-game",
+      "prompts": [
+        "I want to add collision detection. explain AABB first, then let me try to implement it",
+        "here is my AABB function, any edge cases I missed?",
+        "can you explain spatial hashing simply? my game will have ~500 entities"
+      ]
+    }
+  ]
+}

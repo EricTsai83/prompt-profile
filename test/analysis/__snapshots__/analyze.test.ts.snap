@@ -1,0 +1,178 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`analyze > produces a valid, verified Profile 1`] = `
+{
+  "archetype": {
+    "description": "每天都在寫。",
+    "name": "穩定輸出者",
+  },
+  "coverage": {
+    "chunksAnalyzed": 12,
+    "chunksFailed": 0,
+    "chunksFromCache": 0,
+    "chunksTotal": 12,
+    "evidenceDropped": 1,
+    "evidenceKept": 6,
+    "promptsAnalyzed": 80,
+    "sampled": false,
+    "sessionsAnalyzed": 80,
+  },
+  "dimensions": [
+    {
+      "evidence": [
+        {
+          "promptId": "claude-code:d0s0:0",
+          "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
+        },
+        {
+          "promptId": "claude-code:d2s0:0",
+          "quote": "prompt d2s0/0 xxxxxxxxxxxxxxxx",
+        },
+      ],
+      "key": "work_style",
+      "summary": "摘要",
+      "title": "work_style",
+    },
+    {
+      "evidence": [],
+      "key": "communication",
+      "summary": "摘要",
+      "title": "communication",
+    },
+    {
+      "evidence": [],
+      "key": "tech_profile",
+      "summary": "摘要",
+      "title": "tech_profile",
+    },
+    {
+      "evidence": [],
+      "key": "interests",
+      "summary": "摘要",
+      "title": "interests",
+    },
+    {
+      "evidence": [],
+      "key": "growth",
+      "summary": "摘要",
+      "title": "growth",
+    },
+  ],
+  "engine": {
+    "analysisVersion": "1",
+    "model": "fake-model",
+    "runner": "claude-code",
+  },
+  "funFacts": [
+    "最長連續 3 天",
+  ],
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "headline": "規律的開發者",
+  "language": "zh-TW",
+  "schemaVersion": 1,
+  "stats": {
+    "activeDays": 0,
+    "analyzedPrompts": 0,
+    "byOrigin": {
+      "exec": 0,
+      "interactive": 0,
+      "sdk": 0,
+      "unknown": 0,
+    },
+    "bySource": {
+      "claude-code": 0,
+      "codex": 0,
+    },
+    "correctionRate": 0,
+    "dateRange": null,
+    "hourHistogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+    ],
+    "imageRate": 0,
+    "languageMix": {
+      "en": 0,
+      "mixed": 0,
+      "zh": 0,
+    },
+    "latestTime": null,
+    "longestStreakDays": 0,
+    "promptLength": {
+      "median": 0,
+      "p90": 0,
+    },
+    "timezone": "Asia/Taipei",
+    "topProjects": [],
+    "topSlashCommands": [],
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "weekdayHistogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+    ],
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z",
+    },
+  },
+  "traits": [
+    {
+      "confidence": "high",
+      "description": "d",
+      "evidence": [
+        {
+          "promptId": "claude-code:d0s0:0",
+          "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
+        },
+        {
+          "promptId": "claude-code:d2s0:0",
+          "quote": "prompt d2s0/0 xxxxxxxxxxxxxxxx",
+        },
+        {
+          "promptId": "claude-code:d8s0:0",
+          "quote": "prompt d8s0/0 xxxxxxxxxxxxxxxx",
+        },
+      ],
+      "name": "規律",
+    },
+    {
+      "confidence": "medium",
+      "description": "d",
+      "evidence": [
+        {
+          "promptId": "claude-code:d0s0:0",
+          "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
+        },
+      ],
+      "name": "孤證",
+    },
+  ],
+}
+`;

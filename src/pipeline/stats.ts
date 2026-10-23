@@ -163,7 +163,8 @@ export const computeStats = (input: StatsInput): Stats => {
   let longestStreakDays = 0
   let streak = 0
   for (let i = 0; i < sortedDays.length; i++) {
-    streak = i > 0 && (sortedDays[i]! - sortedDays[i - 1]!) === 1 ? streak + 1 : 1
+    const gap = i > 0 ? (sortedDays[i] ?? 0) - (sortedDays[i - 1] ?? 0) : 0
+    streak = gap === 1 ? streak + 1 : 1
     longestStreakDays = Math.max(longestStreakDays, streak)
   }
 
