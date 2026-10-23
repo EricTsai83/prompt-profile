@@ -1,0 +1,112 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`runPipeline > produces safe prompts with redacted text and project names 1`] = `
+{
+  "cleanExcluded": {
+    "too-short": 1,
+  },
+  "codeBlocksCollapsed": 0,
+  "filterExcluded": {},
+  "read": 7,
+  "redactions": {
+    "email": 1,
+  },
+  "truncated": 0,
+}
+`;
+
+exports[`stats > computes stats from filtered and cleaned data 1`] = `
+{
+  "activeDays": 5,
+  "analyzedPrompts": 6,
+  "byOrigin": {
+    "exec": 1,
+    "interactive": 5,
+    "sdk": 1,
+    "unknown": 0,
+  },
+  "bySource": {
+    "claude-code": 6,
+    "codex": 1,
+  },
+  "correctionRate": 0.3333,
+  "dateRange": {
+    "from": "2026-09-01T02:00:00.000Z",
+    "to": "2026-09-06T01:00:00.000Z",
+  },
+  "hourHistogram": [
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+  ],
+  "imageRate": 0.1667,
+  "languageMix": {
+    "en": 0.6667,
+    "mixed": 0,
+    "zh": 0.3333,
+  },
+  "latestTime": "02:12",
+  "longestStreakDays": 3,
+  "promptLength": {
+    "median": 25,
+    "p90": 33,
+  },
+  "timezone": "Asia/Taipei",
+  "topProjects": [
+    {
+      "count": 6,
+      "name": "drawstuff",
+    },
+    {
+      "count": 1,
+      "name": "infra",
+    },
+  ],
+  "topSlashCommands": [
+    {
+      "count": 3,
+      "name": "/clear",
+    },
+    {
+      "count": 1,
+      "name": "/model",
+    },
+  ],
+  "totalPrompts": 7,
+  "totalSessions": 3,
+  "weekdayHistogram": [
+    0,
+    2,
+    1,
+    2,
+    0,
+    1,
+    1,
+  ],
+  "window": {
+    "since": null,
+    "until": "2026-10-24T00:00:00.000Z",
+  },
+}
+`;
