@@ -41,9 +41,17 @@ const shannonEntropy = (s: string): number => {
   return h
 }
 
-/** Long random-looking token: ≥ 32 chars, letters and digits, high entropy. */
+/**
+ * Long random-looking token: ≥ 32 chars, letters and digits, high entropy, and at least one
+ * `-`/`_`-separated segment of ≥ 16 chars (kebab-case slugs such as branch or worktree names
+ * like `fix-login-2026-10-23-bd8471e3` are not secrets).
+ */
 export const looksRandom = (s: string): boolean =>
-  s.length >= 32 && /[A-Za-z]/.test(s) && /\d/.test(s) && shannonEntropy(s) >= 3.5
+  s.length >= 32 &&
+  /[A-Za-z]/.test(s) &&
+  /\d/.test(s) &&
+  shannonEntropy(s) >= 3.5 &&
+  s.split(/[-_]/).some((seg) => seg.length >= 16)
 
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 

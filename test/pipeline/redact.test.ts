@@ -112,6 +112,7 @@ describe("redact: must NOT redact", () => {
     ["lowercase id", "a123456789"],
     ["short username substring", "aliceblue color"],
     ["key without value", "what is a password manager?"],
+    ["kebab-case slug with a short hash", "checkout codex-claude-code-prompt-bd8471e3-2026-10-23"],
   ] as const)("%s", (_name, input) => {
     expect(run(input).text).toBe(input)
   })

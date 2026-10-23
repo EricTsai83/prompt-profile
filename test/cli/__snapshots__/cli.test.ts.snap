@@ -1,0 +1,67 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes report.html, card.png and profile.json > stdout 1`] = `
+"◆ prompt-profile v0.1.0
+
+● Reading data
+  Claude Code        9 prompts · 3 sessions
+  Codex              7 prompts · 5 sessions
+● Cleaning and redacting
+  Skipped 0 noisy prompts (-)
+  Redacted 1 sensitive items (PATH 1)
+● Range: all time · 16 prompts → 2 chunks
+  Using Claude Code (logged in): about 3 calls, billed to your subscription
+
+● Analysing ░░░░░░░░░░░░ 0/2 chunks
+● Analysing ██████░░░░░░ 1/2 chunks
+● Analysing ████████████ 2/2 chunks
+● Writing the profile…
+● Verifying evidence: kept 7 / 7
+
+✔ Done!
+  Report <tmp>/out/report.html
+  Card   <tmp>/out/card.png
+  Data   <tmp>/out/profile.json"
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `
+"
+✖ Unrecognised value "soon" for --since. --since accepts 1m, 3m, 6m, 1y or all."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > login expired during analysis > stderr 1`] = `
+"
+✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > no LLM installed > stderr 1`] = `
+"
+✖ prompt-profile needs Claude Code or Codex installed and logged in.
+Claude Code: https://claude.com/claude-code · Codex: https://github.com/openai/codex
+To see statistics without an LLM, run \`prompt-profile stats\`."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > no data > stderr 1`] = `
+"
+✖ No prompt history found. Looked in:
+  - /nope/claude/projects
+  - /nope/claude/history.jsonl
+  - /nope/codex/sessions
+  - /nope/codex/history.jsonl
+If your data lives elsewhere, set CLAUDE_CONFIG_DIR or CODEX_HOME."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > not logged in > stderr 1`] = `
+"
+✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > out of range > stderr 1`] = `
+"
+✖ No prompts to analyse in this time range. Try --since 1y or --since all."
+`;
+
+exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > rate limited > stderr 1`] = `
+"
+✖ Hit your plan's rate limit. Finished chunks are cached; run again later to continue where it stopped."
+`;
