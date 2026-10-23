@@ -130,6 +130,27 @@ describe("Claude Code adapter (fixture)", () => {
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
+  it.effect("slash commands of sessions without any prompt are not counted (automation)", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-claude-"))
+      const history = [
+        // a tool polling /usage, one fresh session each time
+        ...[1, 2, 3].map((i) => ({
+          display: "/usage",
+          timestamp: 1788447660000 + i,
+          sessionId: `poll-${i}`,
+        })),
+        // a person: a command and a prompt in the same session
+        { display: "/clear", timestamp: 1788447670000, sessionId: "human" },
+        { display: "please refactor this module", timestamp: 1788447680000, sessionId: "human" },
+      ]
+      writeFileSync(join(root, "history.jsonl"), history.map((h) => JSON.stringify(h)).join("\n"))
+      const { records, diagnostics } = yield* readSorted(yield* makeClaudeCodeAdapter(root))
+      expect(records.map((r) => r.text)).toEqual(["please refactor this module"])
+      expect(diagnostics.slashCommands).toEqual({ "/clear": 1 })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
   it.effect("missing directory → empty stream", () =>
     Effect.gen(function* () {
       const adapter = yield* makeClaudeCodeAdapter("/definitely/not/here")

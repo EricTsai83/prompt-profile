@@ -69,6 +69,26 @@ interface ReadState {
   /** Sessions with a transcript: their history.jsonl entries are skipped. */
   readonly knownSessions: Set<string>
   readonly seenUuids: Set<string>
+  /** Slash commands per session; counted at the end, for sessions with a prompt only. */
+  readonly slashCommands: Map<string, Array<string>>
+  readonly sessionsWithPrompts: Set<string>
+}
+
+const noteSlashCommand = (state: ReadState, sessionId: string, name: string): void => {
+  const list = state.slashCommands.get(sessionId) ?? []
+  list.push(name)
+  state.slashCommands.set(sessionId, list)
+}
+
+/**
+ * Count slash commands only for sessions that also hold a prompt: a session with nothing
+ * but a command is a tool or a script (e.g. polling `/usage` every minute), not the user.
+ */
+const countSlashCommands = (state: ReadState): void => {
+  for (const [sessionId, names] of state.slashCommands) {
+    if (state.sessionsWithPrompts.has(sessionId))
+      for (const name of names) state.diag.slashCommand(name)
+  }
 }
 
 export const makeClaudeCodeAdapter = (
@@ -113,7 +133,9 @@ export const makeClaudeCodeAdapter = (
       const { text, hasImage, toolResultOnly } = extractContent(line.message?.content)
       const candidate: ClaudeCandidate = { line, text, hasImage, toolResultOnly }
       const slash = text.trimStart().startsWith("<command-name>") ? slashCommandName(text) : null
-      if (slash !== null && line.isSidechain !== true) diag.slashCommand(slash)
+      if (slash !== null && line.isSidechain !== true && line.sessionId !== undefined) {
+        noteSlashCommand(state, line.sessionId, slash)
+      }
       const rule = firstMatch(CLAUDE_RULES, candidate)
       if (rule) {
         diag.exclude(rule.name)
@@ -136,6 +158,7 @@ export const makeClaudeCodeAdapter = (
         origin: toOrigin(line.entrypoint),
         client: line.entrypoint ?? null,
       }
+      state.sessionsWithPrompts.add(line.sessionId)
       return { uuid: line.uuid, record }
     }
 
@@ -150,7 +173,7 @@ export const makeClaudeCodeAdapter = (
       if (h.sessionId === undefined || knownSessions.has(h.sessionId)) return undefined
       const slash = slashCommandName(h.display)
       if (slash !== null) {
-        diag.slashCommand(slash)
+        noteSlashCommand(state, h.sessionId, slash)
         diag.exclude("slash-command")
         return undefined
       }
@@ -168,6 +191,7 @@ export const makeClaudeCodeAdapter = (
         diag.badLines++
         return undefined
       }
+      state.sessionsWithPrompts.add(h.sessionId)
       return {
         id: `${SOURCE}:${h.sessionId}:h${h.timestamp}`,
         source: SOURCE,
@@ -188,6 +212,8 @@ export const makeClaudeCodeAdapter = (
         diag: new DiagnosticsCollector(),
         knownSessions: new Set(files.map((f) => path.basename(f, ".jsonl"))),
         seenUuids: new Set(),
+        slashCommands: new Map(),
+        sessionsWithPrompts: new Set(),
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right
@@ -233,6 +259,7 @@ export const makeClaudeCodeAdapter = (
           Stream.filter((r): r is PromptRecord => r !== undefined),
         ),
       )
+      countSlashCommands(state)
       return { records, diagnostics: diag.snapshot() }
     })
 
