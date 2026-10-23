@@ -27,6 +27,7 @@ export const UserMessage = Schema.Struct({
     Schema.Struct({ type: Schema.String, text: Schema.optional(Schema.String) }),
   ),
 })
+export type UserMessage = typeof UserMessage.Type
 
 /** `history.jsonl`: `ts` is epoch **seconds**. */
 export const CodexHistoryLine = Schema.Struct({

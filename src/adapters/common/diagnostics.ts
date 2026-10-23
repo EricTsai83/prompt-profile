@@ -1,5 +1,8 @@
 import type { AdapterDiagnostics } from "../../domain/SourceAdapter.ts"
 
+const sortedKeys = (counts: Record<string, number>): Record<string, number> =>
+  Object.fromEntries(Object.entries(counts).toSorted(([a], [b]) => a.localeCompare(b)))
+
 /** Mutable counters collected while an adapter streams its data. */
 export class DiagnosticsCollector {
   filesRead = 0
@@ -16,13 +19,14 @@ export class DiagnosticsCollector {
     this.slashCounts[name] = (this.slashCounts[name] ?? 0) + 1
   }
 
+  /** Keys sorted: files are parsed concurrently, so insertion order is not deterministic. */
   snapshot(): AdapterDiagnostics {
     return {
       filesRead: this.filesRead,
       unreadableFiles: this.unreadableFiles,
       badLines: this.badLines,
-      excluded: { ...this.excludedCounts },
-      slashCommands: { ...this.slashCounts },
+      excluded: sortedKeys(this.excludedCounts),
+      slashCommands: sortedKeys(this.slashCounts),
     }
   }
 }

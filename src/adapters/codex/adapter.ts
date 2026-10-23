@@ -66,36 +66,50 @@ export const makeCodexAdapter = (
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
-        const lines = yield* Stream.runCollect(readJsonl(fs, file, jsonlCallbacks(diag)))
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
         const records: Array<{ dedupKey: string; record: PromptRecord }> = []
-        const userLines: Array<{ ts: string | undefined; ordinal: number; payload: unknown }> = []
-        for (const { value, lineNumber } of lines) {
-          const outer = decodeRollout(value)
-          if (Option.isNone(outer)) {
-            diag.badLines++
-            continue
-          }
-          const { type, payload, timestamp, ordinal } = outer.value
-          if (type === "session_meta" && meta === undefined) {
-            meta = Option.getOrUndefined(decodeMeta(payload))
-          } else if (type === "response_item") {
-            userLines.push({ ts: timestamp, ordinal: ordinal ?? lineNumber, payload })
-          }
-        }
+        // Only user messages are kept while streaming: rollouts are mostly large tool output.
+        const userLines: Array<{
+          ts: string | undefined
+          ordinal: number
+          content: UserMessage["content"]
+        }> = []
+        yield* readJsonl(fs, file, jsonlCallbacks(diag)).pipe(
+          Stream.runForEach(({ value, lineNumber }) =>
+            Effect.sync(() => {
+              const outer = decodeRollout(value)
+              if (Option.isNone(outer)) {
+                diag.badLines++
+                return
+              }
+              const { type, payload, timestamp, ordinal } = outer.value
+              if (type === "session_meta" && meta === undefined) {
+                meta = Option.getOrUndefined(decodeMeta(payload))
+              } else if (type === "response_item") {
+                const msg = decodeUser(payload)
+                // assistant / developer / tool items are skipped
+                if (Option.isSome(msg)) {
+                  userLines.push({
+                    ts: timestamp,
+                    ordinal: ordinal ?? lineNumber,
+                    content: msg.value.content,
+                  })
+                }
+              }
+            }),
+          ),
+        )
         const sessionId = meta?.id ?? fileId
         const ids = [meta?.id, meta?.session_id, fileId].filter((x): x is string => x !== undefined)
         if (sessionId === undefined) return { ids, records }
         const sessionRule = meta ? firstMatch(SESSION_RULES, meta) : undefined
         for (const line of userLines) {
-          const msg = decodeUser(line.payload)
-          if (Option.isNone(msg)) continue // assistant / developer / tool items
           if (sessionRule) {
             diag.exclude(sessionRule.name)
             continue
           }
-          const candidate = toCandidate(msg.value.content)
+          const candidate = toCandidate(line.content)
           const rule = firstMatch(MESSAGE_RULES, candidate)
           if (rule) {
             diag.exclude(rule.name)

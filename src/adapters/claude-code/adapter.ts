@@ -92,8 +92,12 @@ export const makeClaudeCodeAdapter = (
       return files
     })
 
-    const fromProjectLine = (value: unknown, state: ReadState): PromptRecord | undefined => {
-      const { diag, seenUuids, knownSessions } = state
+    /** A kept prompt with its uuid; uuid de-duplication happens later, in file order. */
+    const fromProjectLine = (
+      value: unknown,
+      state: ReadState,
+    ): { readonly uuid: string; readonly record: PromptRecord } | undefined => {
+      const { diag, knownSessions } = state
       const decoded = decodeLine(value)
       if (Option.isNone(decoded)) {
         diag.badLines++
@@ -120,12 +124,7 @@ export const makeClaudeCodeAdapter = (
         diag.badLines++
         return undefined
       }
-      if (seenUuids.has(line.uuid)) {
-        diag.exclude("duplicate-uuid")
-        return undefined
-      }
-      seenUuids.add(line.uuid)
-      return {
+      const record: PromptRecord = {
         id: `${SOURCE}:${line.sessionId}:${line.uuid}`,
         source: SOURCE,
         sessionId: line.sessionId,
@@ -137,6 +136,7 @@ export const makeClaudeCodeAdapter = (
         origin: toOrigin(line.entrypoint),
         client: line.entrypoint ?? null,
       }
+      return { uuid: line.uuid, record }
     }
 
     const fromHistoryLine = (value: unknown, state: ReadState): PromptRecord | undefined => {
@@ -190,20 +190,30 @@ export const makeClaudeCodeAdapter = (
         seenUuids: new Set(),
       }
       const { diag } = state
-      // Files are read concurrently but processed in path order, so cross-file uuid
-      // dedup is deterministic.
+      // Files are read and parsed concurrently — each line is reduced to a small record right
+      // away, so big tool results are not kept — but de-duplicated in path order, so the
+      // copy kept for a uuid is deterministic.
       const projects = Stream.fromIterable(files).pipe(
         Stream.mapEffect(
           (file) => {
             diag.filesRead++
-            return Stream.runCollect(
-              readJsonl(fs, file, { ...jsonlCallbacks(diag), prefilter: '"user"' }),
+            return readJsonl(fs, file, { ...jsonlCallbacks(diag), prefilter: '"user"' }).pipe(
+              Stream.map((l) => fromProjectLine(l.value, state)),
+              Stream.filter((c) => c !== undefined),
+              Stream.runCollect,
             )
           },
           { concurrency: READ_CONCURRENCY },
         ),
-        Stream.flatMap((lines) => Stream.fromIterable(lines)),
-        Stream.map((l) => fromProjectLine(l.value, state)),
+        Stream.flatMap((candidates) => Stream.fromIterable(candidates)),
+        Stream.map(({ uuid, record }) => {
+          if (state.seenUuids.has(uuid)) {
+            diag.exclude("duplicate-uuid")
+            return undefined
+          }
+          state.seenUuids.add(uuid)
+          return record
+        }),
       )
       // Read after `projects` (Stream.concat), so `knownSessions` is complete by then.
       const history = Stream.unwrap(
