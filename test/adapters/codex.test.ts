@@ -1,6 +1,9 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Path, Stream } from "effect"
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import {
   makeCodexAdapter,
   resolveCodexRoot,
@@ -73,6 +76,42 @@ describe("Codex adapter (fixture)", () => {
         "2026-05-28T20:26:40.000Z",
       )
       expect(diagnostics.badLines).toBe(2)
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("a message copied into another rollout file (resume / fork) is kept once", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-codex-"))
+      const day = join(root, "sessions", "2026", "09", "03")
+      mkdirSync(day, { recursive: true })
+      const user = (ts: string, text: string, ordinal: number) =>
+        JSON.stringify({
+          timestamp: ts,
+          type: "response_item",
+          ordinal,
+          payload: { type: "message", role: "user", content: [{ type: "input_text", text }] },
+        })
+      const rollout = (id: string, lines: ReadonlyArray<string>) => {
+        const meta = JSON.stringify({ type: "session_meta", payload: { id, source: "cli" } })
+        writeFileSync(
+          join(day, `rollout-2026-09-03T15-00-00-${id}.jsonl`),
+          [meta, ...lines].join("\n"),
+        )
+      }
+      rollout("aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", [
+        user("2026-09-03T15:01:00.000Z", "original", 1),
+      ])
+      rollout("bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", [
+        user("2026-09-03T15:01:00.000Z", "original", 1),
+        user("2026-09-03T16:00:00.000Z", "new after resume", 2),
+      ])
+      const adapter = yield* makeCodexAdapter(root)
+      const records = yield* readAllSorted(adapter)
+      expect(records.map((r) => [r.sessionId.slice(0, 1), r.text])).toEqual([
+        ["a", "original"],
+        ["b", "new after resume"],
+      ])
+      expect((yield* adapter.diagnostics).excluded).toEqual({ "duplicate-message": 1 })
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 

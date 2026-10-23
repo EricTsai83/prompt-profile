@@ -57,9 +57,13 @@ export const makeCodexAdapter = (
     const historyFile = path.join(root, "history.jsonl")
     let diag = new DiagnosticsCollector()
 
+    /** `dedupKey` identifies a message across files: a resume / fork copies old messages. */
     const readRollout = (
       file: string,
-    ): Effect.Effect<{ ids: ReadonlyArray<string>; records: ReadonlyArray<PromptRecord> }> =>
+    ): Effect.Effect<{
+      ids: ReadonlyArray<string>
+      records: ReadonlyArray<{ readonly dedupKey: string; readonly record: PromptRecord }>
+    }> =>
       Effect.gen(function* () {
         diag.filesRead++
         const lines = yield* Stream.runCollect(
@@ -67,8 +71,7 @@ export const makeCodexAdapter = (
         )
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
-        const records: Array<PromptRecord> = []
-        const seen = new Set<string>()
+        const records: Array<{ dedupKey: string; record: PromptRecord }> = []
         const userLines: Array<{ ts: string | undefined; ordinal: number; payload: unknown }> = []
         for (const { value, lineNumber } of lines) {
           const outer = decodeRollout(value)
@@ -106,24 +109,20 @@ export const makeCodexAdapter = (
             diag.badLines++
             continue
           }
-          // a resume may rewrite old messages into a new rollout file
-          const key = `${line.ts}\u0000${candidate.text}`
-          if (seen.has(key)) {
-            diag.exclude("duplicate-message")
-            continue
-          }
-          seen.add(key)
           records.push({
-            id: `${SOURCE}:${sessionId}:${line.ordinal}`,
-            source: SOURCE,
-            sessionId,
-            timestamp,
-            project: meta?.cwd ?? null,
-            gitBranch: meta?.git?.branch ?? null,
-            text: candidate.text,
-            hasImage: candidate.hasImage,
-            origin: codexOrigin(meta),
-            client: meta?.originator ?? null,
+            dedupKey: `${line.ts}\u0000${candidate.text}`,
+            record: {
+              id: `${SOURCE}:${sessionId}:${line.ordinal}`,
+              source: SOURCE,
+              sessionId,
+              timestamp,
+              project: meta?.cwd ?? null,
+              gitBranch: meta?.git?.branch ?? null,
+              text: candidate.text,
+              hasImage: candidate.hasImage,
+              origin: codexOrigin(meta),
+              client: meta?.originator ?? null,
+            },
           })
         }
         return { ids, records }
@@ -179,11 +178,23 @@ export const makeCodexAdapter = (
           const id = idFromFileName(path.basename(f))
           if (id) known.add(id)
         }
+        // Files are read concurrently but processed in path order, so the copy kept by the
+        // cross-file dedup is deterministic (the oldest file's).
+        const seen = new Set<string>()
         const rollouts = Stream.fromIterable(files).pipe(
           Stream.mapEffect(readRollout, { concurrency: READ_CONCURRENCY }),
           Stream.flatMap(({ ids, records }) => {
             for (const id of ids) known.add(id)
-            return Stream.fromIterable(records)
+            const fresh: Array<PromptRecord> = []
+            for (const { dedupKey, record } of records) {
+              if (seen.has(dedupKey)) {
+                diag.exclude("duplicate-message")
+                continue
+              }
+              seen.add(dedupKey)
+              fresh.push(record)
+            }
+            return Stream.fromIterable(fresh)
           }),
         )
         const history = Stream.unwrap(
