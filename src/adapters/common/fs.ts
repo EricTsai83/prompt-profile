@@ -13,7 +13,12 @@ export const isDirectory = (fs: FileSystem.FileSystem, p: string): Effect.Effect
     Effect.orElseSucceed(() => false),
   )
 
-/** Recursively find files whose name matches `predicate`. Sorted for deterministic output. */
+const STAT_CONCURRENCY = 16
+
+/**
+ * Recursively find files whose name matches `predicate`. Sorted for deterministic output.
+ * Symlinks are followed, but each real folder is visited once (no loops, no aliases).
+ */
 export const findFiles = (
   fs: FileSystem.FileSystem,
   path: Path.Path,
@@ -21,13 +26,26 @@ export const findFiles = (
   predicate: (name: string) => boolean,
 ): Effect.Effect<ReadonlyArray<string>> =>
   Effect.gen(function* () {
+    const visited = new Set<string>()
     const out: Array<string> = []
     const visit = (dir: string): Effect.Effect<void> =>
       Effect.gen(function* () {
-        for (const name of (yield* listDir(fs, dir)).toSorted()) {
-          const full = path.join(dir, name)
-          if (yield* isDirectory(fs, full)) yield* visit(full)
-          else if (predicate(name)) out.push(full)
+        const real = yield* fs.realPath(dir).pipe(Effect.orElseSucceed(() => dir))
+        if (visited.has(real)) return
+        visited.add(real)
+        const names = (yield* listDir(fs, dir)).toSorted()
+        const entries = yield* Effect.forEach(
+          names,
+          (name) => {
+            const full = path.join(dir, name)
+            return isDirectory(fs, full).pipe(Effect.map((isDir) => ({ name, full, isDir })))
+          },
+          { concurrency: STAT_CONCURRENCY },
+        )
+        // sequential: `visited` decides which alias of a folder is kept, in sorted order
+        for (const e of entries) {
+          if (e.isDir) yield* visit(e.full)
+          else if (predicate(e.name)) out.push(e.full)
         }
       })
     yield* visit(root)
