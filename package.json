@@ -34,6 +34,7 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "test": "vitest run",
+    "test:changed": "vitest run --changed",
     "test:smoke": "vitest run --config vitest.smoke.config.ts",
     "eval": "tsx scripts/eval.ts",
     "dev:report": "tsx scripts/dev-report.ts"

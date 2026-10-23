@@ -17,6 +17,7 @@ src/
   llm/            LlmRunner 介面 + claude / codex / fake 實作 + detect.ts（NOTES.md 記錄 CLI 行為）
   analysis/       chunk → map → verify → reduce，快取與 prompts/*.md
   report/         profile.json → HTML 報告 + PNG 圖卡
+  platform/       環境（Environment service）、私有檔案寫入、快取路徑
 test/
   fixtures/       手寫假資料（不可含真實個資）
   smoke/          讀真實本機資料 / 呼叫真的 CLI，找不到時自動 skip
@@ -35,8 +36,23 @@ pnpm typecheck
 pnpm lint
 pnpm format
 pnpm test         # 單元測試（CI）
+pnpm test:changed # 只跑受未 commit 變更影響的測試
 pnpm test:smoke   # 讀真實本機資料 / 呼叫真的 claude、codex（本機才跑）
 ```
+
+### 依模組選測試
+
+`test/<模組>/` 對應 `src/<模組>/`，每個資料夾是一個 vitest project（`vitest.config.ts` 自動掃描）。
+開發中只跑相關的部分，commit 前再跑全部：
+
+| 情境                          | 指令                                                                  |
+| ----------------------------- | --------------------------------------------------------------------- |
+| 只改了一個模組                | `pnpm test --project <模組>`（例：`analysis`）                        |
+| 改了幾個模組 / 不確定影響範圍 | `pnpm test:changed`（依 import graph 只跑受未 commit 變更影響的測試） |
+| commit 前 / CI                | `pnpm typecheck && pnpm lint && pnpm test`                            |
+| 改到 adapter 或 pipeline 規則 | 另外跑 `pnpm test:smoke`（真實資料，不印內容）                        |
+
+`domain/` 被所有模組依賴，改到它時直接跑全部。新增模組時在 `test/` 建同名資料夾即可。
 
 每個階段完成前：`pnpm typecheck && pnpm lint && pnpm test` 必須全過。
 
