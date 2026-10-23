@@ -88,6 +88,19 @@ describe("stats", () => {
 })
 
 describe("runPipeline", () => {
+  it("redacts before truncating: a secret at the cut point never leaks in part", () => {
+    const key = "sk-proj-A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6"
+    const filler = "請幫我看這段設定為什麼不能用。".repeat(400)
+    // the middle cut keeps the first 2376 characters: start the key just before it
+    for (const pad of [2362, 2366, 2370, 2374]) {
+      const text = `${"x ".repeat(pad / 2)}${key} ${filler}`
+      const { prompts, report } = processRecords([rec(text, "2026-09-01T02:00:00Z")], options)
+      const sent = prompts[0]!.text
+      expect(report.truncated).toBe(1)
+      for (let i = 0; i + 6 <= key.length; i++) expect(sent).not.toContain(key.slice(i, i + 6))
+    }
+  })
+
   it("counts redactions in project names (they are sent to the LLM)", () => {
     const { prompts, report } = processRecords(
       [rec("rename the folder please", "2026-09-01T02:00:00Z", { project: "/work/alice" })],

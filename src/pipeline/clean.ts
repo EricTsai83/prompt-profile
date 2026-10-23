@@ -160,7 +160,7 @@ export const truncateMiddle = (
 
 export interface CleanedPrompt {
   readonly record: PromptRecord
-  /** Cleaned (not yet redacted) text. */
+  /** Cleaned text: code collapsed, not yet redacted, not truncated (see `truncateMiddle`). */
   readonly text: string
 }
 
@@ -168,7 +168,6 @@ export interface CleanResult {
   readonly prompts: ReadonlyArray<CleanedPrompt>
   readonly excluded: Counts
   readonly codeBlocksCollapsed: number
-  readonly truncated: number
 }
 
 /** Input must be sorted by time (see filter.ts) for the consecutive-duplicate rule. */
@@ -177,7 +176,6 @@ export const cleanRecords = (records: ReadonlyArray<PromptRecord>): CleanResult 
   const previous = new Map<string, string>()
   const prompts: Array<CleanedPrompt> = []
   let codeBlocksCollapsed = 0
-  let truncated = 0
   for (const record of records) {
     const sessionKey = `${record.source}:${record.sessionId}`
     const prev = previous.get(sessionKey)
@@ -189,9 +187,7 @@ export const cleanRecords = (records: ReadonlyArray<PromptRecord>): CleanResult 
     }
     const collapsed = collapseCode(record.text.trim())
     codeBlocksCollapsed += collapsed.blocks
-    const cut = truncateMiddle(collapsed.text)
-    if (cut.truncated) truncated++
-    prompts.push({ record, text: cut.text })
+    prompts.push({ record, text: collapsed.text })
   }
-  return { prompts, excluded, codeBlocksCollapsed, truncated }
+  return { prompts, excluded, codeBlocksCollapsed }
 }

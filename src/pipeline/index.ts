@@ -2,7 +2,7 @@ import { type DateTime, Effect, Stream } from "effect"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import type { SafePrompt } from "../domain/SafePrompt.ts"
 import type { Stats } from "../domain/Stats.ts"
-import { cleanRecords } from "./clean.ts"
+import { cleanRecords, truncateMiddle } from "./clean.ts"
 import type { Counts } from "./counts.ts"
 import { filterRecords } from "./filter.ts"
 import { makeRules, projectName, redact } from "./redact.ts"
@@ -55,17 +55,25 @@ export const processRecords = (
       projectNames.set(r.project, projectName(r.project, rules, redactions))
     }
   }
-  const prompts: Array<SafePrompt> = cleaned.prompts.map(({ record, text }) => ({
-    id: record.id,
-    sessionId: record.sessionId,
-    source: record.source,
-    timestamp: record.timestamp,
-    project: record.project === null ? null : (projectNames.get(record.project) ?? null),
-    text: redact(text, rules, redactions),
-  }))
+  // Redact first, then truncate: a cut through a secret would leave two partial pieces
+  // that no rule recognises.
+  let truncated = 0
+  const prompts: Array<SafePrompt> = cleaned.prompts.map(({ record, text }) => {
+    const cut = truncateMiddle(redact(text, rules, redactions))
+    if (cut.truncated) truncated++
+    return {
+      id: record.id,
+      sessionId: record.sessionId,
+      source: record.source,
+      timestamp: record.timestamp,
+      project: record.project === null ? null : (projectNames.get(record.project) ?? null),
+      text: cut.text,
+    }
+  })
   const stats = computeStats({
     filtered: filtered.records,
-    cleaned: cleaned.prompts,
+    // content features use the cleaned text, at the length that is analysed
+    cleaned: cleaned.prompts.map((c) => ({ ...c, text: truncateMiddle(c.text).text })),
     projectNames,
     slashCommands: options.slashCommands ?? {},
     since: options.since,
@@ -81,12 +89,12 @@ export const processRecords = (
       cleanExcluded: cleaned.excluded,
       redactions,
       codeBlocksCollapsed: cleaned.codeBlocksCollapsed,
-      truncated: cleaned.truncated,
+      truncated,
     },
   }
 }
 
-/** filter → (sort) → clean → redact, plus stats. `--since` is applied here and only here. */
+/** filter → (sort) → clean → redact → truncate, plus stats. `--since` is applied here and only here. */
 export const runPipeline = <E, R>(
   records: Stream.Stream<PromptRecord, E, R>,
   options: PipelineOptions,

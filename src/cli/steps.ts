@@ -84,7 +84,7 @@ export const readSources = (t: CliMessages) =>
     return { records, locations, slashCommands } satisfies Collected
   })
 
-/** filter → clean → redact → stats, printing what was excluded and redacted. */
+/** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
 export const runPipelineStep = (collected: Collected, since: string, t: CliMessages) =>
   Effect.gen(function* () {
     const env = yield* Environment

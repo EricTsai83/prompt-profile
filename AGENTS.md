@@ -14,7 +14,7 @@ src/
                   steps.ts（指令共用步驟）、options.ts（flag 解析）、render-error.ts
   domain/         Schema 與純函式（PromptRecord、Stats、Profile…），不 import 其他目錄
   adapters/       讀取各來源的本機資料 → PromptRecord（common/、claude-code/、codex/、registry.ts）
-  pipeline/       filter → clean → redact → stats
+  pipeline/       filter → clean → redact → truncate，加上 stats
   llm/            LlmRunner 介面 + claude / codex / fake 實作 + detect.ts（NOTES.md 記錄 CLI 行為）
   analysis/       chunk → map → verify → reduce，快取與 prompts/*.md
   report/         profile.json → HTML 報告 + PNG 圖卡
