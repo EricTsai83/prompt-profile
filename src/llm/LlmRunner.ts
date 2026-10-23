@@ -4,12 +4,7 @@ import { toLlmJsonSchema, type JsonSchemaNode } from "../domain/llm/toLlmJsonSch
 export const RUNNER_IDS = ["claude-code", "codex"] as const
 export type RunnerId = (typeof RUNNER_IDS)[number]
 
-/**
- * First line of every prompt we send. Adapters skip any prompt starting with it, as a
- * second safeguard (on top of --no-session-persistence / --ephemeral) against analysing
- * our own analysis calls.
- */
-export const ANALYSIS_MARKER = "[prompt-profile:analysis]"
+export { ANALYSIS_MARKER } from "../domain/markers.ts"
 
 /**
  * Prepended to every system instruction. The user's global CLAUDE.md / AGENTS.md may

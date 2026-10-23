@@ -1,0 +1,118 @@
+import { NodeServices } from "@effect/platform-node"
+import { describe, expect, it } from "@effect/vitest"
+import { Effect, Path } from "effect"
+import {
+  extractContent,
+  makeClaudeCodeAdapter,
+  resolveClaudeRoot,
+  restorePasted,
+} from "../../src/adapters/claude-code/adapter.ts"
+import { CLAUDE_RULES, type ClaudeCandidate } from "../../src/adapters/claude-code/rules.ts"
+import { firstMatch, slashCommandName } from "../../src/adapters/common/rules.ts"
+import { fixtureDir, readAllSorted } from "./helpers.ts"
+
+const candidate = (line: Record<string, unknown>, text = "hello"): ClaudeCandidate => ({
+  line: { type: "user", ...line },
+  text,
+  hasImage: false,
+  toolResultOnly: false,
+})
+
+describe("Claude Code filter rules", () => {
+  it.each([
+    ["tool-result-only", { ...candidate({}), toolResultOnly: true }],
+    ["sidechain", candidate({ isSidechain: true })],
+    ["meta", candidate({ isMeta: true })],
+    ["compact-summary", candidate({ isCompactSummary: true })],
+    ["system-notification", candidate({ promptSource: "system" })],
+    ["system-notification", candidate({ turnOrigin: "task_notification" })],
+    ["system-notification", candidate({ origin: { kind: "task-notification" } })],
+    ["automated-turn", candidate({ turnOrigin: "scheduled" })],
+    ["automated-turn", candidate({ turnOrigin: "peer" })],
+    ["slash-command", candidate({}, "<command-name>/clear</command-name>")],
+    ["injected-content", candidate({}, "<task-notification>x</task-notification>")],
+    ["injected-content", candidate({}, "<local-command-caveat>x")],
+    ["injected-content", candidate({}, "<local-command-stdout>x")],
+    ["injected-content", candidate({}, "  <system-reminder>x")],
+    ["analysis-marker", candidate({}, "[prompt-profile:analysis]\nfoo")],
+    ["empty", candidate({}, "  \n ")],
+  ] as const)("%s", (name, c) => {
+    expect(firstMatch(CLAUDE_RULES, c)?.name).toBe(name)
+  })
+
+  it.each([
+    ["plain prompt", candidate({ entrypoint: "cli" })],
+    ["sdk prompt", candidate({ entrypoint: "sdk-ts", promptSource: "sdk", turnOrigin: "sdk" })],
+    ["marker mentioned mid-text", candidate({}, "why skip [prompt-profile:analysis] prompts?")],
+  ] as const)("keeps %s", (_name, c) => {
+    expect(firstMatch(CLAUDE_RULES, c)).toBeUndefined()
+  })
+})
+
+describe("helpers", () => {
+  it("extracts text and image from array content", () => {
+    expect(
+      extractContent([{ type: "text", text: "a" }, { type: "image" }, { type: "text", text: "b" }]),
+    ).toEqual({ text: "a\nb", hasImage: true, toolResultOnly: false })
+    expect(extractContent([{ type: "tool_result" }]).toolResultOnly).toBe(true)
+  })
+
+  it("restores pasted text", () => {
+    expect(
+      restorePasted("see [Pasted text #2 +3 lines] ok", { "2": { type: "text", content: "X" } }),
+    ).toEqual({ text: "see X ok", hasImage: false })
+    expect(restorePasted("[Pasted text #9]", {}).text).toBe("[Pasted text #9]")
+    expect(restorePasted("[Image #1] hi", {}).hasImage).toBe(true)
+  })
+
+  it.each([
+    ["/clear", "/clear"],
+    ["/model opus", "/model"],
+    ["<command-name>/opsx:apply</command-name>", "/opsx:apply"],
+    ["/Users/dev/file.ts broken", null],
+    ["hello /clear", null],
+  ] as const)("slashCommandName(%s)", (text, name) => {
+    expect(slashCommandName(text)).toBe(name)
+  })
+
+  it.effect("CLAUDE_CONFIG_DIR overrides ~/.claude", () =>
+    Effect.gen(function* () {
+      const path = yield* Path.Path
+      expect(resolveClaudeRoot({ CLAUDE_CONFIG_DIR: "/custom" }, "/home/x", path)).toBe("/custom")
+      expect(resolveClaudeRoot({}, "/home/x", path)).toBe("/home/x/.claude")
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+})
+
+describe("Claude Code adapter (fixture)", () => {
+  it.effect("parses the fixture directory", () =>
+    Effect.gen(function* () {
+      const adapter = yield* makeClaudeCodeAdapter(fixtureDir("claude-code"))
+      const records = yield* readAllSorted(adapter)
+      expect(records).toMatchSnapshot("records")
+      const diagnostics = yield* adapter.diagnostics
+      expect(diagnostics).toMatchSnapshot("diagnostics")
+
+      const texts = records.map((r) => r.text)
+      // session-level dedup: sess-a exists in projects/ → its history line is ignored
+      expect(texts.filter((t) => t === "請幫我把這個函式改成 async")).toHaveLength(1)
+      // history-only session is restored, pasted content expanded
+      expect(texts).toContain("look at this log line1\nline2\nline3 and fix it")
+      // a path is not a slash command
+      expect(texts.some((t) => t.startsWith("/Users/dev/old"))).toBe(true)
+      // subagent transcripts are not read
+      expect(texts).not.toContain("subagent file prompt")
+      // duplicate uuid (same file and across files) kept once
+      expect(records.filter((r) => r.id.endsWith(":u01"))).toHaveLength(1)
+      expect(diagnostics.slashCommands).toEqual({ "/clear": 2, "/model": 1 })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("missing directory → empty stream", () =>
+    Effect.gen(function* () {
+      const adapter = yield* makeClaudeCodeAdapter("/definitely/not/here")
+      expect(yield* readAllSorted(adapter)).toEqual([])
+      expect((yield* adapter.diagnostics).filesRead).toBe(0)
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+})

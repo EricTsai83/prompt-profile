@@ -1,0 +1,8 @@
+{"display": "請幫我把這個函式改成 async", "pastedContents": {}, "timestamp": 1788447660000, "project": "/home/dev/alpha", "sessionId": "sess-a"}
+{"display": "old session prompt from history only", "pastedContents": {}, "timestamp": 1780000000000, "project": "/home/dev/old", "sessionId": "sess-old"}
+{"display": "look at this log [Pasted text #1 +3 lines] and fix it", "pastedContents": {"1": {"id": 1, "type": "text", "content": "line1\nline2\nline3"}}, "timestamp": 1780000060000, "project": "/home/dev/old", "sessionId": "sess-old"}
+not json at all
+{"display": "/clear", "pastedContents": {}, "timestamp": 1780000120000, "project": "/home/dev/old", "sessionId": "sess-old"}
+{"display": "/model opus", "pastedContents": {}, "timestamp": 1780000130000, "project": "/home/dev/old", "sessionId": "sess-old"}
+{"display": "/Users/dev/old/src/index.ts 這個檔案為什麼壞了", "pastedContents": {}, "timestamp": 1780000180000, "project": "/home/dev/old", "sessionId": "sess-old"}
+{"display": "[Image #1] 這個 UI 對齊嗎", "pastedContents": {}, "timestamp": 1780000240000, "project": "/home/dev/old", "sessionId": "sess-old"}

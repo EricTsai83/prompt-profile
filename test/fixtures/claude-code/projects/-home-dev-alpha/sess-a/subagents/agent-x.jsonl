@@ -1,0 +1,1 @@
+{"type": "user", "parentUuid": null, "sessionId": "sess-a", "cwd": "/home/dev/alpha", "gitBranch": "main", "version": "2.1.309", "isSidechain": true, "entrypoint": "cli", "uuid": "s01", "timestamp": "2026-09-03T15:30:00.000Z", "message": {"role": "user", "content": "subagent file prompt"}}
