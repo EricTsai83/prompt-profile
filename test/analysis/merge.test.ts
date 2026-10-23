@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest"
 import type { Observation } from "../../src/domain/ChunkObservations.ts"
-import { groupForMerge, observationsText } from "../../src/analysis/merge.ts"
+import { capEvidence, groupForMerge, observationsText } from "../../src/analysis/merge.ts"
 
 const obs = (claim: string): Observation => ({
   dimension: "growth",
@@ -25,5 +25,33 @@ describe("groupForMerge", () => {
 
   it("no observations → one empty group", () => {
     expect(groupForMerge([], 100)).toEqual([[]])
+  })
+})
+
+describe("capEvidence", () => {
+  const withEvidence = (ids: ReadonlyArray<string>): Observation => ({
+    dimension: "growth",
+    claim: "c",
+    evidence: ids.map((promptId, i) => ({ promptId, quote: `q${i}` })),
+  })
+
+  it("keeps at most `max` items, preferring different prompts, in their original order", () => {
+    const [capped] = capEvidence([withEvidence(["a", "a", "a", "b", "c", "d", "e"])], 4)
+    expect(capped!.evidence).toEqual([
+      { promptId: "a", quote: "q0" },
+      { promptId: "b", quote: "q3" },
+      { promptId: "c", quote: "q4" },
+      { promptId: "d", quote: "q5" },
+    ])
+  })
+
+  it("fills up with repeats when there are not enough different prompts", () => {
+    const [capped] = capEvidence([withEvidence(["a", "a", "b", "a"])], 3)
+    expect(capped!.evidence.map((e) => e.quote)).toEqual(["q0", "q1", "q2"])
+  })
+
+  it("leaves small observations untouched", () => {
+    const o = withEvidence(["a", "b"])
+    expect(capEvidence([o], 4)).toEqual([o])
   })
 })

@@ -9,8 +9,10 @@ The user message is a JSON list of observations, each with a `dimension`, a `cla
 Merge duplicates and near-duplicates into fewer, stronger observations:
 
 - Keep the same five dimension keys.
-- Combine the evidence of merged observations. Copy evidence **exactly** as given — never
-  invent, edit or shorten quotes, never change prompt ids.
+- Combine the evidence of merged observations, keeping **at most 4** of the most
+  representative items per observation (prefer quotes from different prompts). Copy the
+  evidence you keep **exactly** as given — never invent, edit or shorten quotes, never
+  change prompt ids.
 - Keep observations that are supported by a single batch too, unless they are trivial.
 - Do not infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).

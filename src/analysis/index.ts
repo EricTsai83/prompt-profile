@@ -16,7 +16,13 @@ import type { Chunk } from "./chunk.ts"
 import { AnalysisFailed, type AnalyzeError } from "./errors.ts"
 import { sha256 } from "./hash.ts"
 import { Progress } from "./progress.ts"
-import { groupForMerge, observationsText, REDUCE_INPUT_LIMIT } from "./merge.ts"
+import {
+  capEvidence,
+  groupForMerge,
+  MIN_MERGE_SHRINK,
+  observationsText,
+  REDUCE_INPUT_LIMIT,
+} from "./merge.ts"
 import { DEFAULT_CONCURRENCY, keyParts, selectChunks, type AnalyzeOptions } from "./plan.ts"
 import { loadPrompt } from "./prompts.ts"
 import {
@@ -149,7 +155,9 @@ export const analyze = (input: {
     const verified = outcomes.flatMap((o) =>
       o.observations === null ? [] : [verifyObservations(o.observations, texts, mapCounts)],
     )
-    let observations: ReadonlyArray<Observation> = verified.flatMap((v) => v.observations)
+    let observations: ReadonlyArray<Observation> = capEvidence(
+      verified.flatMap((v) => v.observations),
+    )
 
     // ---- intermediate merges when the reduce input is too large -----------------------
     /** Fatal errors stop everything as-is; anything else means the reduce stage failed. */
@@ -185,15 +193,19 @@ export const analyze = (input: {
                     .pipe(Effect.as(fresh))
                 }),
               )
-        return verifyObservations(value, texts).observations
+        return capEvidence(verifyObservations(value, texts).observations)
       })
-    for (let round = 0; round < 3 && observationsText(observations).length > limit; round++) {
+    for (let round = 0; round < 3; round++) {
+      const before = observationsText(observations).length
+      if (before <= limit) break
       const groups = groupForMerge(observations, limit)
       yield* progress.onMergeStart(groups.length)
       const merged = yield* Effect.forEach(groups, merge, {
         concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
       }).pipe(Effect.mapError(reduceError))
       observations = merged.flat()
+      // another round would not get much smaller either
+      if (observationsText(observations).length > before * (1 - MIN_MERGE_SHRINK)) break
     }
 
     // ---- reduce ---------------------------------------------------------------------

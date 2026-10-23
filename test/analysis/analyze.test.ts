@@ -2,6 +2,7 @@ import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect, Fiber, Layer, Schema } from "effect"
 import { TestClock } from "effect/testing"
 import { analyze, plan, type AnalyzeOptions } from "../../src/analysis/index.ts"
+import { MAX_EVIDENCE_PER_OBSERVATION } from "../../src/analysis/merge.ts"
 import { AnalysisCache, makeMemoryCache } from "../../src/analysis/cache.ts"
 import { Progress, silentProgress } from "../../src/analysis/progress.ts"
 import { Profile } from "../../src/domain/Profile.ts"
@@ -275,6 +276,81 @@ describe("analyze", () => {
         yield* run(second, cache, small)
         expect(second.calls()).toBe(1) // reduce only: map and merge from the cache
         expect(second.log[0]!.prompt).not.toContain("merge made this up")
+      }),
+    )
+
+    /** Map: one observation citing every prompt of the chunk (all verifiable). Merge: all
+     * evidence of the group in one observation (an LLM ignoring the cap). */
+    const greedy: FakeOptions["respond"] = (input) => {
+      if (input.schemaName !== "LlmChunkObservations") return respond(input)
+      const all = input.prompt.startsWith("[")
+        ? (JSON.parse(input.prompt) as Array<{ evidence: Array<unknown> }>).flatMap(
+            (o) => o.evidence,
+          )
+        : [...input.prompt.matchAll(/<prompt id="([^"]+)"[^>]*>\n(.{0,30})/g)].map((m) => ({
+            promptId: m[1],
+            quote: m[2],
+          }))
+      return { observations: [{ dimension: "work_style", claim: "c", evidence: all }] }
+    }
+    const evidenceCounts = (prompt: string): Array<number> =>
+      (JSON.parse(prompt) as Array<{ evidence: Array<unknown> }>).map((o) => o.evidence.length)
+    /** Several observations per merge group, so a greedy merge exceeds the cap. */
+    const grouped = { ...options, reduceInputLimit: 2_000 }
+    const reduceObservations = (fake: ReturnType<typeof makeFakeLlmRunner>) =>
+      /observations:\n(.*)\n\nstats:/s.exec(fake.log.at(-1)!.prompt)![1]!
+
+    it.effect("merge and reduce inputs carry at most MAX_EVIDENCE_PER_OBSERVATION quotes", () =>
+      Effect.gen(function* () {
+        const fake = makeFakeLlmRunner({ respond: greedy })
+        yield* run(fake, makeMemoryCache(), grouped)
+        const merges = fake.log.filter((c) => c.prompt.startsWith("["))
+        expect(merges.length).toBeGreaterThan(0)
+        for (const prompt of [...merges.map((c) => c.prompt), reduceObservations(fake)]) {
+          for (const n of evidenceCounts(prompt)) {
+            expect(n).toBeLessThanOrEqual(MAX_EVIDENCE_PER_OBSERVATION)
+          }
+        }
+      }),
+    )
+
+    it.effect("a merge result read from the cache is capped too", () =>
+      Effect.gen(function* () {
+        // the cache stores what the (greedy) merge returned, uncapped
+        const cache = makeMemoryCache()
+        yield* run(makeFakeLlmRunner({ respond: greedy }), cache, grouped)
+        const uncapped = [...cache.entries.values()].filter(
+          (e) =>
+            e.kind === "merge" &&
+            e.value.observations.some((o) => o.evidence.length > MAX_EVIDENCE_PER_OBSERVATION),
+        )
+        expect(uncapped.length).toBeGreaterThan(0)
+        const second = makeFakeLlmRunner({ respond: greedy })
+        yield* run(second, cache, grouped)
+        expect(second.calls()).toBe(1) // reduce only
+        for (const n of evidenceCounts(reduceObservations(second))) {
+          expect(n).toBeLessThanOrEqual(MAX_EVIDENCE_PER_OBSERVATION)
+        }
+      }),
+    )
+
+    it.effect("stops merging when a round does not shrink the observations", () =>
+      Effect.gen(function* () {
+        // fabricatingMerge returns more than it was given
+        let rounds = 0
+        yield* analyze({ prompts, stats, options: small }).pipe(
+          Effect.provide(
+            Layer.mergeAll(
+              Layer.succeed(LlmRunner, makeFakeLlmRunner({ respond: fabricatingMerge })),
+              Layer.succeed(AnalysisCache, makeMemoryCache()),
+              Layer.succeed(Progress, {
+                ...silentProgress,
+                onMergeStart: () => Effect.sync(() => void rounds++),
+              }),
+            ),
+          ),
+        )
+        expect(rounds).toBe(1)
       }),
     )
 

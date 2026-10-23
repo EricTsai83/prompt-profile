@@ -3,6 +3,16 @@ import type { Observation } from "../domain/ChunkObservations.ts"
 /** Observations above this many characters are merged in groups before the final reduce. */
 export const REDUCE_INPUT_LIMIT = 100_000
 
+/**
+ * Quotes kept per observation. Quotes make up most of the merge / reduce input: keeping
+ * all of them meant merging barely shrank it, and merge calls slow enough to time out.
+ * The reduce step needs at least 2 per trait.
+ */
+export const MAX_EVIDENCE_PER_OBSERVATION = 4
+
+/** A round that shrinks the observations by less than this is the last one. */
+export const MIN_MERGE_SHRINK = 0.2
+
 /** How observations are sent to the merge / reduce steps (also what the limit measures). */
 export const observationsText = (obs: ReadonlyArray<Observation>): string =>
   JSON.stringify(
@@ -32,3 +42,28 @@ export const groupForMerge = (
   }
   return groups
 }
+
+/**
+ * Keep at most `max` evidence items per observation, in their original order: one per
+ * prompt first (different prompts are stronger evidence), then repeats if room is left.
+ */
+export const capEvidence = (
+  observations: ReadonlyArray<Observation>,
+  max: number = MAX_EVIDENCE_PER_OBSERVATION,
+): ReadonlyArray<Observation> =>
+  observations.map((o) => {
+    if (o.evidence.length <= max) return o
+    const seen = new Set<string>()
+    const firstPerPrompt = o.evidence.map((e) => {
+      const first = !seen.has(e.promptId)
+      seen.add(e.promptId)
+      return first
+    })
+    const keep = new Set<number>()
+    for (const pass of [true, false]) {
+      for (const [i, isFirst] of firstPerPrompt.entries()) {
+        if (keep.size < max && (isFirst || !pass)) keep.add(i)
+      }
+    }
+    return { ...o, evidence: o.evidence.filter((_, i) => keep.has(i)) }
+  })
