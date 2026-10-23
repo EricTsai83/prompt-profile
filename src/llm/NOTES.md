@@ -1,7 +1,8 @@
 # LLM runner notes
 
 Observed behaviour of the CLIs we borrow. **Re-check these whenever Claude Code / Codex
-ship a major release** (`pnpm test:smoke` covers the critical paths).
+ship a major release** (`pnpm test:smoke:llm` covers the critical paths; it calls the real
+CLIs and uses subscription quota).
 
 Verified on 2026-10-24 with **Claude Code 2.1.309** and **codex-cli 0.164.0** (macOS).
 

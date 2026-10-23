@@ -30,7 +30,7 @@
 - **Homebrew**：建立 `EricTsai83/homebrew-tap`，formula 指向 GitHub Releases 的執行檔。
 - **install.sh**：`curl -fsSL …/install.sh | sh`。
 - 新的 adapter：Gemini CLI、Cursor、opencode…（參考 ccusage 的 `rust/adapters/` 列表）。只需要實作 `SourceAdapter` 並登記到 registry。
-- 監控上游格式變動：每次 Claude Code / Codex 大改版時，在本機跑一次 `pnpm test:smoke`，看各過濾規則的排除數量是否突然改變。
+- 監控上游格式變動：每次 Claude Code / Codex 大改版時，在本機跑一次 `pnpm test:smoke`，看各過濾規則的排除數量是否突然改變；再跑 `pnpm test:smoke:llm`（會用到訂閱額度）確認 CLI 的呼叫方式與輸出格式沒變。
 
 ## 驗收標準
 
