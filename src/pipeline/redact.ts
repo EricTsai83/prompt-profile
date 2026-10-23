@@ -139,9 +139,41 @@ export const BASE_RULES: ReadonlyArray<RedactRule> = [
   },
 ]
 
-/** Redact the OS username as a whole word (only if ≥ 3 chars, to avoid nonsense matches). */
+/**
+ * Account names of containers, CI runners and cloud dev environments. They identify nobody
+ * and are everyday words ("dev server", "node", "user table"): redacting them would mangle
+ * prompts. Their home folders are still redacted by `home-path`.
+ */
+export const GENERIC_USERNAMES: ReadonlyArray<string> = [
+  "root",
+  "admin",
+  "administrator",
+  "user",
+  "users",
+  "guest",
+  "dev",
+  "developer",
+  "node",
+  "app",
+  "ubuntu",
+  "debian",
+  "ec2-user",
+  "runner",
+  "codespace",
+  "vscode",
+  "gitpod",
+  "docker",
+  "test",
+]
+
+const GENERIC = new Set(GENERIC_USERNAMES)
+
+/**
+ * Redact the OS username as a whole word — only if ≥ 3 chars (to avoid nonsense matches)
+ * and not a generic account name.
+ */
 export const usernameRule = (username: string | null): ReadonlyArray<RedactRule> =>
-  username !== null && username.length >= 3
+  username !== null && username.length >= 3 && !GENERIC.has(username.toLowerCase())
     ? [
         {
           name: "username",

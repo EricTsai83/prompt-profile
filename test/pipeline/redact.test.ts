@@ -117,6 +117,14 @@ describe("redact: must NOT redact", () => {
     expect(run(input).text).toBe(input)
   })
 
+  it.each(["node", "dev", "app", "user", "Root", "ubuntu"])(
+    "skips the username rule for the generic account name %s",
+    (name) => {
+      const text = "start the dev server with node, add a user table to the app as root on ubuntu"
+      expect(redact(text, makeRules(name))).toBe(text)
+    },
+  )
+
   it("skips the username rule for short names", () => {
     expect(redact("ed is here", makeRules("ed"))).toBe("ed is here")
   })
