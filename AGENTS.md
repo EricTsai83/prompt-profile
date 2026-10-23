@@ -33,8 +33,8 @@ pnpm install
 pnpm build        # tsdown → dist/bin.js
 pnpm dev          # tsx src/bin.ts
 pnpm typecheck
-pnpm lint
-pnpm format
+pnpm lint         # oxlint，warning 也算失敗
+pnpm format       # oxfmt 改寫；format:check 只檢查（CI）
 pnpm test         # 單元測試（CI）
 pnpm test:changed # 只跑受未 commit 變更影響的測試
 pnpm test:smoke   # 讀真實本機資料 / 呼叫真的 claude、codex（本機才跑）
@@ -49,12 +49,12 @@ pnpm test:smoke   # 讀真實本機資料 / 呼叫真的 claude、codex（本機
 | ----------------------------- | --------------------------------------------------------------------- |
 | 只改了一個模組                | `pnpm test --project <模組>`（例：`analysis`）                        |
 | 改了幾個模組 / 不確定影響範圍 | `pnpm test:changed`（依 import graph 只跑受未 commit 變更影響的測試） |
-| commit 前 / CI                | `pnpm typecheck && pnpm lint && pnpm test`                            |
+| commit 前 / CI                | `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test`       |
 | 改到 adapter 或 pipeline 規則 | 另外跑 `pnpm test:smoke`（真實資料，不印內容）                        |
 
 `domain/` 被所有模組依賴，改到它時直接跑全部。新增模組時在 `test/` 建同名資料夾即可。
 
-每個階段完成前：`pnpm typecheck && pnpm lint && pnpm test` 必須全過。
+每個階段完成前：`pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` 必須全過。
 
 ## 規範
 
