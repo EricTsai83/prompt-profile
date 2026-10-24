@@ -49,7 +49,8 @@ const WEEKDAYS = [
  * misread the Monday-first array as Sunday-first in the stage-3 comparison (plan 11).
  */
 export const statsForReduce = (stats: Stats) => {
-  const encoded = encodeStats(stats)
+  // Per-project activity is for the charts only: it would add project names by day.
+  const { activity: _activity, ...encoded } = encodeStats(stats)
   const byDay = <A>(xs: ReadonlyArray<A>) =>
     Object.fromEntries(WEEKDAYS.map((day, i) => [day, xs[i]]))
   return {

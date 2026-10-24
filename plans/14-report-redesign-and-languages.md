@@ -59,3 +59,15 @@ Schema v2 → v3 decoding; translation shape validation and failure fallback; ca
 includes translations; every language present in the HTML with the same quotes; the switch
 markup; per-language cards (font download mocked, checksum enforced); `--lang` parsing and
 locale default; snapshot of the new layout; package check renders a bilingual report.
+
+## Follow-up: activity by project (owner request, 2026-10-24)
+
+The owner asked for hover details on the heatmap (how many prompts at that time, on which
+projects), more charts and a responsive layout. `Stats.activity` (profile schemaVersion 4) adds
+per-day and per-weekday × hour counts split into the top six projects plus "other"; versions 2–3
+decode with empty activity and the report leaves those charts out. The report adds a daily
+calendar, a project ranking and projects by week; hour and weekday bars, the heatmap and the
+calendar show a CSS tooltip on hover or tap (no JavaScript, `tabindex="-1"` so it adds no Tab
+stops). `activity` is not sent to the LLM. Layout checked at 360, 390, 768, 1024 and 1280 px in
+Chrome and WebKit. The data counts prompts, not git commits; reading git history would be a new
+data source.

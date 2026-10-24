@@ -1,7 +1,7 @@
 import { DateTime } from "effect"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import { ORIGINS, SOURCE_IDS } from "../domain/Source.ts"
-import type { Stats } from "../domain/Stats.ts"
+import { MAX_ACTIVITY_PROJECTS, type Stats } from "../domain/Stats.ts"
 
 /** Corrections addressed to the AI (case-insensitive; matched anywhere in the prompt). */
 export const CORRECTION_PATTERNS: ReadonlyArray<RegExp> = [
@@ -125,6 +125,34 @@ export interface StatsInput {
   readonly timezone: string
 }
 
+/** Per-day and per-cell counts, split into the top projects plus "other" (last). */
+const activityOf = (
+  placed: ReadonlyArray<{ day: number; weekday: number; hour: number; project: string | null }>,
+  top: ReadonlyArray<string>,
+): Stats["activity"] => {
+  const slot = (project: string | null) => {
+    const i = project === null ? -1 : top.indexOf(project)
+    return i === -1 ? top.length : i
+  }
+  const empty = () => Array.from({ length: top.length + 1 }, () => 0)
+  const byDay = new Map<number, Array<number>>()
+  const grid = Array.from({ length: 7 }, () => Array.from({ length: 24 }, empty))
+  for (const x of placed) {
+    const counts = byDay.get(x.day) ?? empty()
+    counts[slot(x.project)]!++
+    byDay.set(x.day, counts)
+    grid[x.weekday]![x.hour]![slot(x.project)]!++
+  }
+  const days = [...byDay.entries()]
+    .toSorted((a, b) => a[0] - b[0])
+    .map(([day, byProject]) => ({
+      date: new Date(day * 86_400_000).toISOString().slice(0, 10),
+      count: byProject.reduce((a, b) => a + b, 0),
+      byProject,
+    }))
+  return { projects: top, days, gridByProject: grid }
+}
+
 export const computeStats = (input: StatsInput): Stats => {
   const local = makeLocalParts(input.timezone)
   const { filtered, cleaned } = input
@@ -144,6 +172,7 @@ export const computeStats = (input: StatsInput): Stats => {
   const sessions = new Set<string>()
   const days = new Set<number>()
   const projects = new Map<string, number>()
+  const placed: Array<{ day: number; weekday: number; hour: number; project: string | null }> = []
   let latest: { minutes: number; label: string } | null = null
   for (const r of filtered) {
     bySource[r.source]++
@@ -160,7 +189,12 @@ export const computeStats = (input: StatsInput): Stats => {
     }
     const name = r.project === null ? null : (input.projectNames.get(r.project) ?? null)
     if (name !== null) projects.set(name, (projects.get(name) ?? 0) + 1)
+    placed.push({ day: logicalDay(p), weekday: p.weekday, hour: p.hour, project: name })
   }
+  const activity = activityOf(
+    placed,
+    topN(projects, MAX_ACTIVITY_PROJECTS).map((x) => x.name),
+  )
   const sortedDays = [...days].toSorted((a, b) => a - b)
   let longestStreakDays = 0
   let streak = 0
@@ -213,5 +247,6 @@ export const computeStats = (input: StatsInput): Stats => {
     imageRate: ratio(images),
     longestStreakDays,
     latestTime: latest?.label ?? null,
+    activity,
   }
 }

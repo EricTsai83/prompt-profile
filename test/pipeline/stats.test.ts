@@ -51,6 +51,42 @@ describe("stats", () => {
     expect(stats.correctionRate).toBeCloseTo(2 / 6, 3)
   })
 
+  it("activity: prompts per day and per weekday × hour, split by project", () => {
+    const { stats } = processRecords(records, options)
+    const a = stats.activity
+    expect(a.projects).toEqual(["drawstuff", "infra"])
+    // the last bucket is "other" (no project or not in the top projects)
+    expect(a.days).toEqual([
+      { date: "2026-09-01", count: 2, byProject: [2, 0, 0] },
+      // 02:12 on Thursday still belongs to Wednesday (day boundary 05:00)
+      { date: "2026-09-02", count: 2, byProject: [2, 0, 0] },
+      { date: "2026-09-03", count: 1, byProject: [1, 0, 0] },
+      { date: "2026-09-05", count: 1, byProject: [0, 1, 0] },
+      { date: "2026-09-06", count: 1, byProject: [1, 0, 0] },
+    ])
+    expect(a.gridByProject).toHaveLength(7)
+    expect(a.gridByProject[1]![10]).toEqual([1, 0, 0]) // Tue 10:00
+    expect(a.gridByProject[5]![9]).toEqual([0, 1, 0]) // Sat 09:00
+    expect(a.gridByProject[0]![0]).toEqual([0, 0, 0])
+  })
+
+  it("activity keeps at most six projects; the rest is other", () => {
+    const many = Array.from({ length: 8 }, (_, i) =>
+      rec(`prompt number ${i} for a project`, `2026-09-0${(i % 7) + 1}T02:00:00Z`, {
+        project: `/home/dev/p${i}`,
+        sessionId: `s${i}`,
+      }),
+    )
+    const { stats } = processRecords(many, options)
+    expect(stats.activity.projects).toHaveLength(6)
+    const total = stats.activity.days.reduce(
+      (n, d) => n + d.byProject.reduce((x, y) => x + y, 0),
+      0,
+    )
+    expect(total).toBe(8)
+    expect(stats.activity.days.every((d) => d.byProject.length === 7)).toBe(true)
+  })
+
   it("latestTime is null without evening activity and handles empty input", () => {
     const { stats } = processRecords([rec("morning work item", "2026-09-01T02:00:00Z")], options)
     expect(stats.latestTime).toBeNull()

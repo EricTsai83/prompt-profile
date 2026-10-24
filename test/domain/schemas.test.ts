@@ -80,6 +80,16 @@ describe("Profile", () => {
     }),
   )
 
+  it.effect("a version 3 file decodes with empty project activity", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as { stats: Record<string, unknown> }
+      const { activity: _activity, ...stats } = sample.stats
+      const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
+      expect(profile.schemaVersion).toBe(4)
+      expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
+    }),
+  )
+
   it.effect("a version 2 file is read as an English-only profile", () =>
     Effect.gen(function* () {
       const {
@@ -88,7 +98,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(3)
+      expect(profile.schemaVersion).toBe(4)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -127,7 +137,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 4, undefined])(
+  it.effect.each([1, "3", 5, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {

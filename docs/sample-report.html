@@ -11,6 +11,7 @@
     <title>The Midnight Architect · prompt-profile</title>
     <style>
 
+      :root{--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#a0a4ad}
       *{box-sizing:border-box}
       body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
       .page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}
@@ -37,14 +38,14 @@
       .grid{display:grid;gap:12px;margin-bottom:12px}
       .g-2{grid-template-columns:2fr 1fr}
       .g-3{grid-template-columns:repeat(3,1fr)}
+      .g-2r{grid-template-columns:1fr 1.6fr}
+      .wide{margin-bottom:12px}
+      .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+      .panel-head h2{margin-bottom:0}.panel-head .note{margin-top:0}
       .panel{padding:18px 20px}
       .panel h2{font-size:14px;margin-bottom:10px}
       .panel .note{color:var(--muted);font-size:12px;margin-top:6px}
-      .chart{width:100%;height:auto;display:block}
-      .bar{fill:var(--accent);fill-opacity:.35}
-      .bar.peak{fill-opacity:1}
       .axis{fill:var(--muted);font-size:11px}
-      .value{fill:var(--fg);font-size:12px;font-weight:700}
       .donut{display:flex;align-items:center;gap:16px}
       .donut svg{width:112px;flex:none}
       .track{fill:none;stroke:var(--empty);stroke-width:14}
@@ -69,11 +70,6 @@
       .length{margin-top:14px}
       .length .shares li{grid-template-columns:84px 1fr 78px}
       details summary{cursor:pointer}
-      details.panel>summary{font-weight:700;font-size:14px}
-      details.panel>summary .note{font-weight:400;margin-left:8px}
-      .heatmap{width:100%;height:auto;margin-top:12px}
-      .heatmap .cell{fill:var(--accent)}
-      .heatmap .cell[data-empty="true"]{fill:var(--empty)}
       section>h2{font-size:20px;margin:36px 0 14px}
       .traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
       .trait{padding:18px 20px}
@@ -106,11 +102,59 @@
       .about summary{color:var(--fg);font-weight:600}
       .about p{margin-top:8px}
       :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+      @media (max-width:1000px){.g-3{grid-template-columns:repeat(2,1fr)}.g-2r{grid-template-columns:1fr}}
       @media (max-width:760px){
       .hero{padding:26px 22px}.hero .copy{max-width:none}.hero .split{display:none}
       .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
-      .kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3{grid-template-columns:1fr}
+      .kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
       .dim-name{min-width:0}.dimension>summary{flex-wrap:wrap;gap:6px 12px}
+      }
+
+      .cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
+      .hours{--n:24}.weekdays{--n:7;gap:10px}
+      .col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding-bottom:20px;outline:none}
+      .col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity .15s}
+      .col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
+      .col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
+      .heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr));gap:3px;margin-top:12px}
+      .heat-h{font-size:10px;color:var(--muted);text-align:left}
+      .heat-d{font-size:11px;color:var(--muted);align-self:center}
+      .heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none}
+      .heat-c{height:22px}
+      .cal-d{aspect-ratio:1}
+      :is(.heat-c,.cal-d,.scale i).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
+      :is(.heat-c,.cal-d,.scale i).l2{background:color-mix(in srgb,var(--accent) 52%,var(--empty))}
+      :is(.heat-c,.cal-d,.scale i).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}
+      :is(.heat-c,.cal-d,.scale i).l4{background:var(--accent)}
+      .heat-c:hover,.heat-c:focus,.cal-d:hover,.cal-d:focus{box-shadow:0 0 0 2px var(--fg)}
+      .cal{display:flex;gap:3px;margin-top:8px}
+      .cal-w{display:grid;grid-template-rows:16px repeat(7,auto);gap:3px;flex:1;min-width:0;max-width:30px}
+      .cal-m{font-size:10px;color:var(--muted);white-space:nowrap;overflow:visible}
+      .cal-d.out{background:transparent}
+      .scale{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--muted);margin-top:10px}
+      .scale i{width:11px;height:11px;border-radius:3px;background:var(--empty)}
+      .scale i:first-of-type{margin-left:6px}.scale i:last-of-type{margin-right:6px}
+      .ranks{list-style:none;margin:0;padding:0}
+      .ranks li{display:grid;grid-template-columns:minmax(0,10em) 1fr 38px;align-items:center;gap:10px;font-size:13px;margin:9px 0}
+      .rank-name{display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .ranks b{text-align:right;font-size:12px}
+      .stack{display:flex;align-items:flex-end;gap:3px;height:170px;margin-top:8px}
+      .stack-w{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;outline:none}
+      .stack-bar{display:flex;flex-direction:column-reverse;width:100%;border-radius:3px;overflow:hidden;opacity:.9}
+      .stack-w:hover .stack-bar,.stack-w:focus .stack-bar{opacity:1;box-shadow:0 0 0 2px var(--fg)}
+      .tip{cursor:default}
+      .tip:hover::after,.tip:focus::after{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:min(240px,80vw);padding:6px 9px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:12px;line-height:1.4;font-weight:500;white-space:normal;text-align:left;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+      .tip-l:hover::after,.tip-l:focus::after{left:0;transform:none}
+      .tip-r:hover::after,.tip-r:focus::after{left:auto;right:0;transform:none}
+      #lang-en:checked~.page .tip:hover::after,#lang-en:checked~.page .tip:focus::after{content:attr(data-tip-en)}
+      #lang-zh-TW:checked~.page .tip:hover::after,#lang-zh-TW:checked~.page .tip:focus::after{content:attr(data-tip-zh-TW)}
+      @media (max-width:640px){
+      .cal-w:nth-last-child(n+19){display:none}
+      .cols{height:140px}.hours{gap:2px}
+      .heat{grid-template-columns:20px repeat(24,minmax(0,1fr));gap:2px}
+      .heat-c{height:14px}
+      .heat-h{font-size:9px}
+      .stack{height:140px;gap:2px}
       }
       :root{color-scheme:light dark;--bg:#f6f6f3;--fg:#1d1d1f;--muted:#6b6b70;--card:#ffffff;--border:#e6e6e1;--accent:#5b5bd6;--accent-soft:#ececfb;--warn:#9a5800;--empty:#ececea}
       @media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececee;--muted:#9a9aa2;--card:#1c1c20;--border:#2c2c33;--accent:#9d9dff;--accent-soft:#25254a;--warn:#f0b35a;--empty:#26262c}}
@@ -200,92 +244,1444 @@
         </div>
       </section>
 
+      <article class="panel wide">
+        <div class="panel-head">
+          <h2>
+            <span data-l="en" lang="en">Every day</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">每一天</span>
+          </h2>
+          <p class="note">
+            <span data-l="en" lang="en">One square per day; darker = more prompts</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">每格代表一天，顏色越深代表 prompt 越多</span>
+          </p>
+        </div>
+        <div class="cal" role="img" aria-label="Every day">
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Apr</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">4月</span></span
+            >
+            <span class="cal-d out"></span><span class="cal-d out"></span
+            ><span class="cal-d out"></span><span class="cal-d out"></span
+            ><span class="cal-d out"></span><span class="cal-d out"></span
+            ><span
+              class="cal-d l3 tip tip-l"
+              data-tip-en="Sun, Apr 26, 2026 · 9 prompts · Other 5 · drawstuff 2"
+              data-tip-zh-TW="2026年4月26日週日 · 9 個 prompt · 其他 5 · drawstuff 2"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">May</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">5月</span></span
+            >
+            <span
+              class="cal-d l0 tip tip-l"
+              data-tip-en="Mon, Apr 27, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年4月27日週一 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-l"
+              data-tip-en="Tue, Apr 28, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年4月28日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip tip-l"
+              data-tip-en="Wed, Apr 29, 2026 · 33 prompts · Other 17 · drawstuff 12"
+              data-tip-zh-TW="2026年4月29日週三 · 33 個 prompt · 其他 17 · drawstuff 12"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-l"
+              data-tip-en="Thu, Apr 30, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年4月30日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-l"
+              data-tip-en="Fri, May 1, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月1日週五 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip tip-l"
+              data-tip-en="Sat, May 2, 2026 · 24 prompts · Other 12 · drawstuff 6"
+              data-tip-zh-TW="2026年5月2日週六 · 24 個 prompt · 其他 12 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-l"
+              data-tip-en="Sun, May 3, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月3日週日 · 0 個 prompt"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, May 4, 2026 · 27 prompts · Other 19 · prompt-profile 3"
+              data-tip-zh-TW="2026年5月4日週一 · 27 個 prompt · 其他 19 · prompt-profile 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Tue, May 5, 2026 · 19 prompts · Other 13 · drawstuff 3"
+              data-tip-zh-TW="2026年5月5日週二 · 19 個 prompt · 其他 13 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Wed, May 6, 2026 · 19 prompts · Other 8 · drawstuff 5"
+              data-tip-zh-TW="2026年5月6日週三 · 19 個 prompt · 其他 8 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, May 7, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月7日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Fri, May 8, 2026 · 22 prompts · Other 18 · drawstuff 2"
+              data-tip-zh-TW="2026年5月8日週五 · 22 個 prompt · 其他 18 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, May 9, 2026 · 34 prompts · Other 22 · drawstuff 5"
+              data-tip-zh-TW="2026年5月9日週六 · 34 個 prompt · 其他 22 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sun, May 10, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月10日週日 · 0 個 prompt"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l2 tip"
+              data-tip-en="Mon, May 11, 2026 · 5 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年5月11日週一 · 5 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, May 12, 2026 · 24 prompts · Other 17 · drawstuff 4"
+              data-tip-zh-TW="2026年5月12日週二 · 24 個 prompt · 其他 17 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, May 13, 2026 · 7 prompts · Other 4 · drawstuff 2"
+              data-tip-zh-TW="2026年5月13日週三 · 7 個 prompt · 其他 4 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, May 14, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月14日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, May 15, 2026 · 6 prompts · Other 3 · prompt-profile 2"
+              data-tip-zh-TW="2026年5月15日週五 · 6 個 prompt · 其他 3 · prompt-profile 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, May 16, 2026 · 27 prompts · Other 17 · drawstuff 7"
+              data-tip-zh-TW="2026年5月16日週六 · 27 個 prompt · 其他 17 · drawstuff 7"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sun, May 17, 2026 · 17 prompts · Other 8 · drawstuff 6"
+              data-tip-zh-TW="2026年5月17日週日 · 17 個 prompt · 其他 8 · drawstuff 6"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, May 18, 2026 · 28 prompts · Other 18 · drawstuff 5"
+              data-tip-zh-TW="2026年5月18日週一 · 28 個 prompt · 其他 18 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, May 19, 2026 · 29 prompts · Other 20 · dotfiles 5"
+              data-tip-zh-TW="2026年5月19日週二 · 29 個 prompt · 其他 20 · dotfiles 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Wed, May 20, 2026 · 17 prompts · drawstuff 6 · Other 6"
+              data-tip-zh-TW="2026年5月20日週三 · 17 個 prompt · drawstuff 6 · 其他 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, May 21, 2026 · 5 prompts · Other 5"
+              data-tip-zh-TW="2026年5月21日週四 · 5 個 prompt · 其他 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Fri, May 22, 2026 · 2 prompts · drawstuff 1 · Other 1"
+              data-tip-zh-TW="2026年5月22日週五 · 2 個 prompt · drawstuff 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, May 23, 2026 · 15 prompts · Other 9 · drawstuff 6"
+              data-tip-zh-TW="2026年5月23日週六 · 15 個 prompt · 其他 9 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sun, May 24, 2026 · 22 prompts · Other 12 · drawstuff 6"
+              data-tip-zh-TW="2026年5月24日週日 · 22 個 prompt · 其他 12 · drawstuff 6"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l2 tip"
+              data-tip-en="Mon, May 25, 2026 · 6 prompts · Other 4 · drawstuff 2"
+              data-tip-zh-TW="2026年5月25日週一 · 6 個 prompt · 其他 4 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, May 26, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月26日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Wed, May 27, 2026 · 2 prompts · Other 2"
+              data-tip-zh-TW="2026年5月27日週三 · 2 個 prompt · 其他 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, May 28, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年5月28日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Fri, May 29, 2026 · 2 prompts · Other 2"
+              data-tip-zh-TW="2026年5月29日週五 · 2 個 prompt · 其他 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sat, May 30, 2026 · 4 prompts · Other 3 · dotfiles 1"
+              data-tip-zh-TW="2026年5月30日週六 · 4 個 prompt · 其他 3 · dotfiles 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sun, May 31, 2026 · 21 prompts · Other 17 · drawstuff 4"
+              data-tip-zh-TW="2026年5月31日週日 · 21 個 prompt · 其他 17 · drawstuff 4"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Jun</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">6月</span></span
+            >
+            <span
+              class="cal-d l1 tip"
+              data-tip-en="Mon, Jun 1, 2026 · 2 prompts · prompt-profile 1 · Other 1"
+              data-tip-zh-TW="2026年6月1日週一 · 2 個 prompt · prompt-profile 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Tue, Jun 2, 2026 · 5 prompts · Other 4 · prompt-profile 1"
+              data-tip-zh-TW="2026年6月2日週二 · 5 個 prompt · 其他 4 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Jun 3, 2026 · 6 prompts · Other 4 · prompt-profile 1"
+              data-tip-zh-TW="2026年6月3日週三 · 6 個 prompt · 其他 4 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, Jun 4, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年6月4日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Fri, Jun 5, 2026 · 22 prompts · Other 14 · drawstuff 6"
+              data-tip-zh-TW="2026年6月5日週五 · 22 個 prompt · 其他 14 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, Jun 6, 2026 · 35 prompts · Other 26 · drawstuff 5"
+              data-tip-zh-TW="2026年6月6日週六 · 35 個 prompt · 其他 26 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Sun, Jun 7, 2026 · 2 prompts · drawstuff 1 · Other 1"
+              data-tip-zh-TW="2026年6月7日週日 · 2 個 prompt · drawstuff 1 · 其他 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l2 tip"
+              data-tip-en="Mon, Jun 8, 2026 · 3 prompts · Other 2 · drawstuff 1"
+              data-tip-zh-TW="2026年6月8日週一 · 3 個 prompt · 其他 2 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, Jun 9, 2026 · 32 prompts · Other 21 · drawstuff 7"
+              data-tip-zh-TW="2026年6月9日週二 · 32 個 prompt · 其他 21 · drawstuff 7"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Jun 10, 2026 · 34 prompts · Other 24 · drawstuff 7"
+              data-tip-zh-TW="2026年6月10日週三 · 34 個 prompt · 其他 24 · drawstuff 7"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Jun 11, 2026 · 4 prompts · Other 2 · drawstuff 1"
+              data-tip-zh-TW="2026年6月11日週四 · 4 個 prompt · 其他 2 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Jun 12, 2026 · 8 prompts · Other 7 · dotfiles 1"
+              data-tip-zh-TW="2026年6月12日週五 · 8 個 prompt · 其他 7 · dotfiles 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sat, Jun 13, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年6月13日週六 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sun, Jun 14, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年6月14日週日 · 0 個 prompt"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l3 tip"
+              data-tip-en="Mon, Jun 15, 2026 · 14 prompts · Other 7 · drawstuff 4"
+              data-tip-zh-TW="2026年6月15日週一 · 14 個 prompt · 其他 7 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Tue, Jun 16, 2026 · 8 prompts · Other 6 · drawstuff 2"
+              data-tip-zh-TW="2026年6月16日週二 · 8 個 prompt · 其他 6 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Wed, Jun 17, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年6月17日週三 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, Jun 18, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年6月18日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Fri, Jun 19, 2026 · 11 prompts · Other 6 · drawstuff 4"
+              data-tip-zh-TW="2026年6月19日週五 · 11 個 prompt · 其他 6 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Jun 20, 2026 · 13 prompts · Other 9 · drawstuff 2"
+              data-tip-zh-TW="2026年6月20日週六 · 13 個 prompt · 其他 9 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Jun 21, 2026 · 6 prompts · drawstuff 2 · Other 2"
+              data-tip-zh-TW="2026年6月21日週日 · 6 個 prompt · drawstuff 2 · 其他 2"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l1 tip"
+              data-tip-en="Mon, Jun 22, 2026 · 2 prompts · Other 2"
+              data-tip-zh-TW="2026年6月22日週一 · 2 個 prompt · 其他 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Tue, Jun 23, 2026 · 3 prompts · Other 3"
+              data-tip-zh-TW="2026年6月23日週二 · 3 個 prompt · 其他 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Jun 24, 2026 · 4 prompts · Other 2 · drawstuff 1"
+              data-tip-zh-TW="2026年6月24日週三 · 4 個 prompt · 其他 2 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Jun 25, 2026 · 3 prompts · drawstuff 1 · prompt-profile 1"
+              data-tip-zh-TW="2026年6月25日週四 · 3 個 prompt · drawstuff 1 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Fri, Jun 26, 2026 · 18 prompts · Other 10 · drawstuff 5"
+              data-tip-zh-TW="2026年6月26日週五 · 18 個 prompt · 其他 10 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, Jun 27, 2026 · 21 prompts · Other 12 · drawstuff 5"
+              data-tip-zh-TW="2026年6月27日週六 · 21 個 prompt · 其他 12 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Jun 28, 2026 · 6 prompts · prompt-profile 2 · Other 2"
+              data-tip-zh-TW="2026年6月28日週日 · 6 個 prompt · prompt-profile 2 · 其他 2"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Jul</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">7月</span></span
+            >
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Jun 29, 2026 · 25 prompts · Other 14 · drawstuff 9"
+              data-tip-zh-TW="2026年6月29日週一 · 25 個 prompt · 其他 14 · drawstuff 9"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, Jun 30, 2026 · 23 prompts · Other 14 · drawstuff 6"
+              data-tip-zh-TW="2026年6月30日週二 · 23 個 prompt · 其他 14 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Jul 1, 2026 · 8 prompts · Other 5 · drawstuff 2"
+              data-tip-zh-TW="2026年7月1日週三 · 8 個 prompt · 其他 5 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Thu, Jul 2, 2026 · 13 prompts · Other 8 · drawstuff 3"
+              data-tip-zh-TW="2026年7月2日週四 · 13 個 prompt · 其他 8 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Jul 3, 2026 · 4 prompts · Other 3 · prompt-profile 1"
+              data-tip-zh-TW="2026年7月3日週五 · 4 個 prompt · 其他 3 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, Jul 4, 2026 · 32 prompts · Other 22 · drawstuff 7"
+              data-tip-zh-TW="2026年7月4日週六 · 32 個 prompt · 其他 22 · drawstuff 7"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sun, Jul 5, 2026 · 16 prompts · Other 11 · prompt-profile 4"
+              data-tip-zh-TW="2026年7月5日週日 · 16 個 prompt · 其他 11 · prompt-profile 4"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l0 tip"
+              data-tip-en="Mon, Jul 6, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月6日週一 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Tue, Jul 7, 2026 · 2 prompts · Other 2"
+              data-tip-zh-TW="2026年7月7日週二 · 2 個 prompt · 其他 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Jul 8, 2026 · 4 prompts · Other 3 · prompt-profile 1"
+              data-tip-zh-TW="2026年7月8日週三 · 4 個 prompt · 其他 3 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Jul 9, 2026 · 21 prompts · Other 11 · prompt-profile 4"
+              data-tip-zh-TW="2026年7月9日週四 · 21 個 prompt · 其他 11 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Fri, Jul 10, 2026 · 10 prompts · Other 7 · drawstuff 1"
+              data-tip-zh-TW="2026年7月10日週五 · 10 個 prompt · 其他 7 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, Jul 11, 2026 · 22 prompts · Other 15 · drawstuff 3"
+              data-tip-zh-TW="2026年7月11日週六 · 22 個 prompt · 其他 15 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Jul 12, 2026 · 5 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年7月12日週日 · 5 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Jul 13, 2026 · 26 prompts · Other 14 · drawstuff 6"
+              data-tip-zh-TW="2026年7月13日週一 · 26 個 prompt · 其他 14 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, Jul 14, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月14日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Jul 15, 2026 · 26 prompts · Other 15 · prompt-profile 6"
+              data-tip-zh-TW="2026年7月15日週三 · 26 個 prompt · 其他 15 · prompt-profile 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Jul 16, 2026 · 3 prompts · Other 3"
+              data-tip-zh-TW="2026年7月16日週四 · 3 個 prompt · 其他 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Fri, Jul 17, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月17日週五 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Jul 18, 2026 · 17 prompts · Other 9 · drawstuff 5"
+              data-tip-zh-TW="2026年7月18日週六 · 17 個 prompt · 其他 9 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Jul 19, 2026 · 4 prompts · Other 3 · drawstuff 1"
+              data-tip-zh-TW="2026年7月19日週日 · 4 個 prompt · 其他 3 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Jul 20, 2026 · 22 prompts · Other 13 · dotfiles 5"
+              data-tip-zh-TW="2026年7月20日週一 · 22 個 prompt · 其他 13 · dotfiles 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, Jul 21, 2026 · 26 prompts · Other 18 · drawstuff 4"
+              data-tip-zh-TW="2026年7月21日週二 · 26 個 prompt · 其他 18 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Jul 22, 2026 · 25 prompts · Other 17 · drawstuff 4"
+              data-tip-zh-TW="2026年7月22日週三 · 25 個 prompt · 其他 17 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Jul 23, 2026 · 5 prompts · Other 3 · drawstuff 2"
+              data-tip-zh-TW="2026年7月23日週四 · 5 個 prompt · 其他 3 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Fri, Jul 24, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月24日週五 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sat, Jul 25, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月25日週六 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sun, Jul 26, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年7月26日週日 · 0 個 prompt"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Aug</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">8月</span></span
+            >
+            <span
+              class="cal-d l2 tip"
+              data-tip-en="Mon, Jul 27, 2026 · 3 prompts · Other 3"
+              data-tip-zh-TW="2026年7月27日週一 · 3 個 prompt · 其他 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, Jul 28, 2026 · 20 prompts · Other 11 · drawstuff 6"
+              data-tip-zh-TW="2026年7月28日週二 · 20 個 prompt · 其他 11 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Wed, Jul 29, 2026 · 16 prompts · Other 9 · prompt-profile 4"
+              data-tip-zh-TW="2026年7月29日週三 · 16 個 prompt · 其他 9 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Jul 30, 2026 · 3 prompts · Other 3"
+              data-tip-zh-TW="2026年7月30日週四 · 3 個 prompt · 其他 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Jul 31, 2026 · 5 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年7月31日週五 · 5 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Aug 1, 2026 · 17 prompts · Other 10 · prompt-profile 4"
+              data-tip-zh-TW="2026年8月1日週六 · 17 個 prompt · 其他 10 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Aug 2, 2026 · 3 prompts · Other 2 · dotfiles 1"
+              data-tip-zh-TW="2026年8月2日週日 · 3 個 prompt · 其他 2 · dotfiles 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l0 tip"
+              data-tip-en="Mon, Aug 3, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月3日週一 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Tue, Aug 4, 2026 · 19 prompts · Other 12 · drawstuff 3"
+              data-tip-zh-TW="2026年8月4日週二 · 19 個 prompt · 其他 12 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Wed, Aug 5, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月5日週三 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, Aug 6, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月6日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Aug 7, 2026 · 6 prompts · Other 3 · drawstuff 1"
+              data-tip-zh-TW="2026年8月7日週五 · 6 個 prompt · 其他 3 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sat, Aug 8, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月8日週六 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Aug 9, 2026 · 6 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年8月9日週日 · 6 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l3 tip"
+              data-tip-en="Mon, Aug 10, 2026 · 11 prompts · Other 8 · drawstuff 2"
+              data-tip-zh-TW="2026年8月10日週一 · 11 個 prompt · 其他 8 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Tue, Aug 11, 2026 · 15 prompts · Other 9 · drawstuff 4"
+              data-tip-zh-TW="2026年8月11日週二 · 15 個 prompt · 其他 9 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Aug 12, 2026 · 22 prompts · Other 13 · drawstuff 5"
+              data-tip-zh-TW="2026年8月12日週三 · 22 個 prompt · 其他 13 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Thu, Aug 13, 2026 · 2 prompts · drawstuff 1 · Other 1"
+              data-tip-zh-TW="2026年8月13日週四 · 2 個 prompt · drawstuff 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Fri, Aug 14, 2026 · 22 prompts · Other 8 · prompt-profile 7"
+              data-tip-zh-TW="2026年8月14日週五 · 22 個 prompt · 其他 8 · prompt-profile 7"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sat, Aug 15, 2026 · 5 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年8月15日週六 · 5 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Aug 16, 2026 · 7 prompts · Other 5 · drawstuff 1"
+              data-tip-zh-TW="2026年8月16日週日 · 7 個 prompt · 其他 5 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l3 tip"
+              data-tip-en="Mon, Aug 17, 2026 · 19 prompts · Other 14 · drawstuff 3"
+              data-tip-zh-TW="2026年8月17日週一 · 19 個 prompt · 其他 14 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Tue, Aug 18, 2026 · 21 prompts · Other 12 · prompt-profile 6"
+              data-tip-zh-TW="2026年8月18日週二 · 21 個 prompt · 其他 12 · prompt-profile 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Wed, Aug 19, 2026 · 18 prompts · Other 10 · drawstuff 5"
+              data-tip-zh-TW="2026年8月19日週三 · 18 個 prompt · 其他 10 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Aug 20, 2026 · 30 prompts · Other 19 · prompt-profile 6"
+              data-tip-zh-TW="2026年8月20日週四 · 30 個 prompt · 其他 19 · prompt-profile 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Aug 21, 2026 · 5 prompts · drawstuff 2 · Other 2"
+              data-tip-zh-TW="2026年8月21日週五 · 5 個 prompt · drawstuff 2 · 其他 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sat, Aug 22, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月22日週六 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Aug 23, 2026 · 8 prompts · drawstuff 4 · Other 2"
+              data-tip-zh-TW="2026年8月23日週日 · 8 個 prompt · drawstuff 4 · 其他 2"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Aug 24, 2026 · 20 prompts · Other 10 · drawstuff 8"
+              data-tip-zh-TW="2026年8月24日週一 · 20 個 prompt · 其他 10 · drawstuff 8"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, Aug 25, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月25日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Aug 26, 2026 · 6 prompts · Other 4 · drawstuff 1"
+              data-tip-zh-TW="2026年8月26日週三 · 6 個 prompt · 其他 4 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, Aug 27, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月27日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Fri, Aug 28, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年8月28日週五 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sat, Aug 29, 2026 · 4 prompts · prompt-profile 3 · Other 1"
+              data-tip-zh-TW="2026年8月29日週六 · 4 個 prompt · prompt-profile 3 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Aug 30, 2026 · 5 prompts · Other 3 · drawstuff 1"
+              data-tip-zh-TW="2026年8月30日週日 · 5 個 prompt · 其他 3 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Sep</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">9月</span></span
+            >
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Aug 31, 2026 · 24 prompts · Other 16 · prompt-profile 4"
+              data-tip-zh-TW="2026年8月31日週一 · 24 個 prompt · 其他 16 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, Sep 1, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月1日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Sep 2, 2026 · 27 prompts · Other 19 · drawstuff 6"
+              data-tip-zh-TW="2026年9月2日週三 · 27 個 prompt · 其他 19 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Sep 3, 2026 · 22 prompts · Other 14 · prompt-profile 5"
+              data-tip-zh-TW="2026年9月3日週四 · 22 個 prompt · 其他 14 · prompt-profile 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Fri, Sep 4, 2026 · 33 prompts · Other 14 · drawstuff 8"
+              data-tip-zh-TW="2026年9月4日週五 · 33 個 prompt · 其他 14 · drawstuff 8"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Sat, Sep 5, 2026 · 26 prompts · Other 18 · drawstuff 4"
+              data-tip-zh-TW="2026年9月5日週六 · 26 個 prompt · 其他 18 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Sep 6, 2026 · 7 prompts · Other 7"
+              data-tip-zh-TW="2026年9月6日週日 · 7 個 prompt · 其他 7"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l0 tip"
+              data-tip-en="Mon, Sep 7, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月7日週一 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Tue, Sep 8, 2026 · 8 prompts · Other 4 · drawstuff 2"
+              data-tip-zh-TW="2026年9月8日週二 · 8 個 prompt · 其他 4 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Wed, Sep 9, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月9日週三 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Sep 10, 2026 · 22 prompts · Other 15 · drawstuff 5"
+              data-tip-zh-TW="2026年9月10日週四 · 22 個 prompt · 其他 15 · drawstuff 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Fri, Sep 11, 2026 · 2 prompts · prompt-profile 1 · Other 1"
+              data-tip-zh-TW="2026年9月11日週五 · 2 個 prompt · prompt-profile 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Sep 12, 2026 · 18 prompts · Other 12 · drawstuff 4"
+              data-tip-zh-TW="2026年9月12日週六 · 18 個 prompt · 其他 12 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Sep 13, 2026 · 3 prompts · drawstuff 1 · prompt-profile 1"
+              data-tip-zh-TW="2026年9月13日週日 · 3 個 prompt · drawstuff 1 · prompt-profile 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l1 tip"
+              data-tip-en="Mon, Sep 14, 2026 · 2 prompts · drawstuff 1 · Other 1"
+              data-tip-zh-TW="2026年9月14日週一 · 2 個 prompt · drawstuff 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Tue, Sep 15, 2026 · 14 prompts · Other 10 · drawstuff 3"
+              data-tip-zh-TW="2026年9月15日週二 · 14 個 prompt · 其他 10 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Wed, Sep 16, 2026 · 4 prompts · Other 3 · prompt-profile 1"
+              data-tip-zh-TW="2026年9月16日週三 · 4 個 prompt · 其他 3 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Sep 17, 2026 · 32 prompts · Other 23 · drawstuff 4"
+              data-tip-zh-TW="2026年9月17日週四 · 32 個 prompt · 其他 23 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Fri, Sep 18, 2026 · 29 prompts · Other 18 · prompt-profile 5"
+              data-tip-zh-TW="2026年9月18日週五 · 29 個 prompt · 其他 18 · prompt-profile 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Sep 19, 2026 · 12 prompts · Other 6 · drawstuff 4"
+              data-tip-zh-TW="2026年9月19日週六 · 12 個 prompt · 其他 6 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Sun, Sep 20, 2026 · 5 prompts · Other 3 · drawstuff 1"
+              data-tip-zh-TW="2026年9月20日週日 · 5 個 prompt · 其他 3 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l2 tip"
+              data-tip-en="Mon, Sep 21, 2026 · 3 prompts · drawstuff 1 · prompt-profile 1"
+              data-tip-zh-TW="2026年9月21日週一 · 3 個 prompt · drawstuff 1 · prompt-profile 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, Sep 22, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月22日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Wed, Sep 23, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月23日週三 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Thu, Sep 24, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月24日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Fri, Sep 25, 2026 · 14 prompts · Other 11 · prompt-profile 2"
+              data-tip-zh-TW="2026年9月25日週五 · 14 個 prompt · 其他 11 · prompt-profile 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Sep 26, 2026 · 14 prompts · Other 9 · prompt-profile 3"
+              data-tip-zh-TW="2026年9月26日週六 · 14 個 prompt · 其他 9 · prompt-profile 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sun, Sep 27, 2026 · 9 prompts · drawstuff 3 · Other 3"
+              data-tip-zh-TW="2026年9月27日週日 · 9 個 prompt · drawstuff 3 · 其他 3"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"
+              ><span data-l="en" lang="en">Oct</span
+              ><span data-l="zh-TW" lang="zh-Hant-TW">10月</span></span
+            >
+            <span
+              class="cal-d l4 tip"
+              data-tip-en="Mon, Sep 28, 2026 · 22 prompts · Other 12 · drawstuff 6"
+              data-tip-zh-TW="2026年9月28日週一 · 22 個 prompt · 其他 12 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Tue, Sep 29, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年9月29日週二 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Wed, Sep 30, 2026 · 15 prompts · Other 9 · prompt-profile 5"
+              data-tip-zh-TW="2026年9月30日週三 · 15 個 prompt · 其他 9 · prompt-profile 5"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Thu, Oct 1, 2026 · 25 prompts · Other 16 · prompt-profile 4"
+              data-tip-zh-TW="2026年10月1日週四 · 25 個 prompt · 其他 16 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Oct 2, 2026 · 3 prompts · Other 3"
+              data-tip-zh-TW="2026年10月2日週五 · 3 個 prompt · 其他 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l1 tip"
+              data-tip-en="Sat, Oct 3, 2026 · 2 prompts · drawstuff 1 · Other 1"
+              data-tip-zh-TW="2026年10月3日週六 · 2 個 prompt · drawstuff 1 · 其他 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sun, Oct 4, 2026 · 10 prompts · Other 7 · drawstuff 1"
+              data-tip-zh-TW="2026年10月4日週日 · 10 個 prompt · 其他 7 · drawstuff 1"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l3 tip"
+              data-tip-en="Mon, Oct 5, 2026 · 13 prompts · Other 9 · drawstuff 2"
+              data-tip-zh-TW="2026年10月5日週一 · 13 個 prompt · 其他 9 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Tue, Oct 6, 2026 · 6 prompts · Other 3 · drawstuff 2"
+              data-tip-zh-TW="2026年10月6日週二 · 6 個 prompt · 其他 3 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip"
+              data-tip-en="Wed, Oct 7, 2026 · 20 prompts · Other 13 · drawstuff 3"
+              data-tip-zh-TW="2026年10月7日週三 · 20 個 prompt · 其他 13 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Thu, Oct 8, 2026 · 5 prompts · Other 3 · prompt-profile 2"
+              data-tip-zh-TW="2026年10月8日週四 · 5 個 prompt · 其他 3 · prompt-profile 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip"
+              data-tip-en="Fri, Oct 9, 2026 · 8 prompts · Other 5 · drawstuff 2"
+              data-tip-zh-TW="2026年10月9日週五 · 8 個 prompt · 其他 5 · drawstuff 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip"
+              data-tip-en="Sat, Oct 10, 2026 · 13 prompts · Other 7 · drawstuff 3"
+              data-tip-zh-TW="2026年10月10日週六 · 13 個 prompt · 其他 7 · drawstuff 3"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip"
+              data-tip-en="Sun, Oct 11, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年10月11日週日 · 0 個 prompt"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip tip-r"
+              data-tip-en="Mon, Oct 12, 2026 · 22 prompts · Other 14 · drawstuff 4"
+              data-tip-zh-TW="2026年10月12日週一 · 22 個 prompt · 其他 14 · drawstuff 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip tip-r"
+              data-tip-en="Tue, Oct 13, 2026 · 24 prompts · Other 14 · prompt-profile 4"
+              data-tip-zh-TW="2026年10月13日週二 · 24 個 prompt · 其他 14 · prompt-profile 4"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-r"
+              data-tip-en="Wed, Oct 14, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年10月14日週三 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip tip-r"
+              data-tip-en="Thu, Oct 15, 2026 · 9 prompts · Other 6 · prompt-profile 2"
+              data-tip-zh-TW="2026年10月15日週四 · 9 個 prompt · 其他 6 · prompt-profile 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip tip-r"
+              data-tip-en="Fri, Oct 16, 2026 · 12 prompts · Other 9 · prompt-profile 2"
+              data-tip-zh-TW="2026年10月16日週五 · 12 個 prompt · 其他 9 · prompt-profile 2"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-r"
+              data-tip-en="Sat, Oct 17, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年10月17日週六 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l4 tip tip-r"
+              data-tip-en="Sun, Oct 18, 2026 · 32 prompts · Other 14 · drawstuff 9"
+              data-tip-zh-TW="2026年10月18日週日 · 32 個 prompt · 其他 14 · drawstuff 9"
+              tabindex="-1"
+            ></span>
+          </div>
+          <div class="cal-w">
+            <span class="cal-m"></span>
+            <span
+              class="cal-d l4 tip tip-r"
+              data-tip-en="Mon, Oct 19, 2026 · 32 prompts · Other 16 · prompt-profile 8"
+              data-tip-zh-TW="2026年10月19日週一 · 32 個 prompt · 其他 16 · prompt-profile 8"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip tip-r"
+              data-tip-en="Tue, Oct 20, 2026 · 18 prompts · Other 10 · drawstuff 6"
+              data-tip-zh-TW="2026年10月20日週二 · 18 個 prompt · 其他 10 · drawstuff 6"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l2 tip tip-r"
+              data-tip-en="Wed, Oct 21, 2026 · 3 prompts · Other 2 · drawstuff 1"
+              data-tip-zh-TW="2026年10月21日週三 · 3 個 prompt · 其他 2 · drawstuff 1"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l0 tip tip-r"
+              data-tip-en="Thu, Oct 22, 2026 · 0 prompts"
+              data-tip-zh-TW="2026年10月22日週四 · 0 個 prompt"
+              tabindex="-1"
+            ></span
+            ><span
+              class="cal-d l3 tip tip-r"
+              data-tip-en="Fri, Oct 23, 2026 · 11 prompts · Other 7 · prompt-profile 3"
+              data-tip-zh-TW="2026年10月23日週五 · 11 個 prompt · 其他 7 · prompt-profile 3"
+              tabindex="-1"
+            ></span
+            ><span class="cal-d out"></span><span class="cal-d out"></span>
+          </div>
+        </div>
+        <div class="scale">
+          <span data-l="en" lang="en">Less</span><span data-l="zh-TW" lang="zh-Hant-TW">少</span
+          ><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i
+          ><span data-l="en" lang="en">More</span><span data-l="zh-TW" lang="zh-Hant-TW">多</span>
+        </div>
+      </article>
+
       <div class="grid g-2">
         <article class="panel">
           <h2>
             <span data-l="en" lang="en">Prompts by hour</span
             ><span data-l="zh-TW" lang="zh-Hant-TW">各時段的 prompt</span>
           </h2>
-          <svg viewBox="0 0 480 150" class="chart" role="img" aria-label="Prompts by hour">
-            <rect x="3" y="92.70588235294117" width="14" height="31.3" rx="3" class="bar">
-              <title>00:00 · 40</title>
-            </rect>
-            <rect x="23" y="104.98823529411764" width="14" height="19.0" rx="3" class="bar">
-              <title>01:00 · 22</title>
-            </rect>
-            <rect x="43" y="113.85882352941177" width="14" height="10.1" rx="3" class="bar">
-              <title>02:00 · 9</title>
-            </rect>
-            <rect x="63" y="117.95294117647059" width="14" height="6.0" rx="3" class="bar">
-              <title>03:00 · 3</title>
-            </rect>
-            <rect x="83" y="122" width="14" height="2.0" rx="3" class="bar">
-              <title>04:00 · 0</title>
-            </rect>
-            <rect x="103" y="122" width="14" height="2.0" rx="3" class="bar">
-              <title>05:00 · 0</title>
-            </rect>
-            <rect x="123" y="119.31764705882352" width="14" height="4.7" rx="3" class="bar">
-              <title>06:00 · 1</title>
-            </rect>
-            <rect x="143" y="117.27058823529411" width="14" height="6.7" rx="3" class="bar">
-              <title>07:00 · 4</title>
-            </rect>
-            <rect x="163" y="106.35294117647058" width="14" height="17.6" rx="3" class="bar">
-              <title>08:00 · 20</title>
-            </rect>
-            <rect x="183" y="78.37647058823529" width="14" height="45.6" rx="3" class="bar">
-              <title>09:00 · 61</title>
-            </rect>
-            <rect x="203" y="53.12941176470588" width="14" height="70.9" rx="3" class="bar">
-              <title>10:00 · 98</title>
-            </rect>
-            <rect x="223" y="38.117647058823536" width="14" height="85.9" rx="3" class="bar">
-              <title>11:00 · 120</title>
-            </rect>
-            <rect x="243" y="65.41176470588235" width="14" height="58.6" rx="3" class="bar">
-              <title>12:00 · 80</title>
-            </rect>
-            <rect x="263" y="44.94117647058823" width="14" height="79.1" rx="3" class="bar">
-              <title>13:00 · 110</title>
-            </rect>
-            <rect x="283" y="24.470588235294116" width="14" height="99.5" rx="3" class="bar">
-              <title>14:00 · 140</title>
-            </rect>
-            <rect x="303" y="17.647058823529406" width="14" height="106.4" rx="3" class="bar">
-              <title>15:00 · 150</title>
-            </rect>
-            <rect x="323" y="27.882352941176464" width="14" height="96.1" rx="3" class="bar">
-              <title>16:00 · 135</title>
-            </rect>
-            <rect x="343" y="39.48235294117647" width="14" height="84.5" rx="3" class="bar">
-              <title>17:00 · 118</title>
-            </rect>
-            <rect x="363" y="58.58823529411765" width="14" height="65.4" rx="3" class="bar">
-              <title>18:00 · 90</title>
-            </rect>
-            <rect x="383" y="51.76470588235294" width="14" height="72.2" rx="3" class="bar">
-              <title>19:00 · 100</title>
-            </rect>
-            <rect x="403" y="31.294117647058826" width="14" height="92.7" rx="3" class="bar">
-              <title>20:00 · 130</title>
-            </rect>
-            <rect x="423" y="10.82352941176471" width="14" height="113.2" rx="3" class="bar">
-              <title>21:00 · 160</title>
-            </rect>
-            <rect x="443" y="4" width="14" height="120.0" rx="3" class="bar peak">
-              <title>22:00 · 170</title>
-            </rect>
-            <rect x="463" y="38.117647058823536" width="14" height="85.9" rx="3" class="bar">
-              <title>23:00 · 120</title>
-            </rect>
-            <text x="3" y="142" text-anchor="start" class="axis">00:00</text>
-            <text x="130" y="142" text-anchor="middle" class="axis">06:00</text>
-            <text x="250" y="142" text-anchor="middle" class="axis">12:00</text>
-            <text x="370" y="142" text-anchor="middle" class="axis">18:00</text>
-            <text x="477" y="142" text-anchor="end" class="axis">23:00</text>
-            <text x="450" y="-2" text-anchor="middle" class="value">170</text>
-          </svg>
+          <div role="img" aria-label="Prompts by hour">
+            <div class="cols hours">
+              <div
+                class="col tip tip-l"
+                data-tip-en="00:00 · 40 prompts"
+                data-tip-zh-TW="00:00 · 40 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:23.5%"></span>
+                <span class="col-label">00</span>
+              </div>
+              <div
+                class="col tip tip-l"
+                data-tip-en="01:00 · 22 prompts"
+                data-tip-zh-TW="01:00 · 22 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:12.9%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="02:00 · 9 prompts"
+                data-tip-zh-TW="02:00 · 9 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:5.3%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="03:00 · 3 prompts"
+                data-tip-zh-TW="03:00 · 3 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:1.8%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="04:00 · 0 prompts"
+                data-tip-zh-TW="04:00 · 0 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:2px"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="05:00 · 0 prompts"
+                data-tip-zh-TW="05:00 · 0 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:2px"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="06:00 · 1 prompt"
+                data-tip-zh-TW="06:00 · 1 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:0.6%"></span>
+                <span class="col-label">06</span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="07:00 · 4 prompts"
+                data-tip-zh-TW="07:00 · 4 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:2.4%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="08:00 · 20 prompts"
+                data-tip-zh-TW="08:00 · 20 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:11.8%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="09:00 · 61 prompts"
+                data-tip-zh-TW="09:00 · 61 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:35.9%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="10:00 · 98 prompts"
+                data-tip-zh-TW="10:00 · 98 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:57.6%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="11:00 · 120 prompts"
+                data-tip-zh-TW="11:00 · 120 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:70.6%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="12:00 · 80 prompts"
+                data-tip-zh-TW="12:00 · 80 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:47.1%"></span>
+                <span class="col-label">12</span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="13:00 · 110 prompts"
+                data-tip-zh-TW="13:00 · 110 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:64.7%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="14:00 · 140 prompts"
+                data-tip-zh-TW="14:00 · 140 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:82.4%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="15:00 · 150 prompts"
+                data-tip-zh-TW="15:00 · 150 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:88.2%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="16:00 · 135 prompts"
+                data-tip-zh-TW="16:00 · 135 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:79.4%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="17:00 · 118 prompts"
+                data-tip-zh-TW="17:00 · 118 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:69.4%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="18:00 · 90 prompts"
+                data-tip-zh-TW="18:00 · 90 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:52.9%"></span>
+                <span class="col-label">18</span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="19:00 · 100 prompts"
+                data-tip-zh-TW="19:00 · 100 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:58.8%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="20:00 · 130 prompts"
+                data-tip-zh-TW="20:00 · 130 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:76.5%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="21:00 · 160 prompts"
+                data-tip-zh-TW="21:00 · 160 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:94.1%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip tip-r"
+                data-tip-en="22:00 · 170 prompts"
+                data-tip-zh-TW="22:00 · 170 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill peak" style="height:100.0%"></span>
+                <span class="col-label"></span>
+              </div>
+              <div
+                class="col tip tip-r"
+                data-tip-en="23:00 · 120 prompts"
+                data-tip-zh-TW="23:00 · 120 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:70.6%"></span>
+                <span class="col-label"></span>
+              </div>
+            </div>
+          </div>
           <p class="note">
             <span data-l="en" lang="en">Busiest at 22:00 · latest 03:12</span
             ><span data-l="zh-TW" lang="zh-Hant-TW">最忙 22:00 · 最晚 03:12</span>
@@ -296,43 +1692,1556 @@
             <span data-l="en" lang="en">Prompts by weekday</span
             ><span data-l="zh-TW" lang="zh-Hant-TW">星期分布</span>
           </h2>
-          <svg viewBox="0 0 280 140" class="chart" role="img" aria-label="Prompts by weekday">
-            <rect x="8" y="6" width="24" height="104.0" rx="4" class="bar peak">
-              <title>320</title>
-            </rect>
-            <text x="20" y="130" text-anchor="middle" class="axis" data-l="en">Mon</text>
-            <text x="20" y="130" text-anchor="middle" class="axis" data-l="zh-TW">一</text>
-            <rect x="48" y="12.25" width="24" height="97.8" rx="4" class="bar">
-              <title>300</title>
-            </rect>
-            <text x="60" y="130" text-anchor="middle" class="axis" data-l="en">Tue</text>
-            <text x="60" y="130" text-anchor="middle" class="axis" data-l="zh-TW">二</text>
-            <rect x="88" y="9.125" width="24" height="100.9" rx="4" class="bar">
-              <title>310</title>
-            </rect>
-            <text x="100" y="130" text-anchor="middle" class="axis" data-l="en">Wed</text>
-            <text x="100" y="130" text-anchor="middle" class="axis" data-l="zh-TW">三</text>
-            <rect x="128" y="15.375" width="24" height="94.6" rx="4" class="bar">
-              <title>290</title>
-            </rect>
-            <text x="140" y="130" text-anchor="middle" class="axis" data-l="en">Thu</text>
-            <text x="140" y="130" text-anchor="middle" class="axis" data-l="zh-TW">四</text>
-            <rect x="168" y="18.5" width="24" height="91.5" rx="4" class="bar">
-              <title>280</title>
-            </rect>
-            <text x="180" y="130" text-anchor="middle" class="axis" data-l="en">Fri</text>
-            <text x="180" y="130" text-anchor="middle" class="axis" data-l="zh-TW">五</text>
-            <rect x="208" y="31" width="24" height="79.0" rx="4" class="bar">
-              <title>240</title>
-            </rect>
-            <text x="220" y="130" text-anchor="middle" class="axis" data-l="en">Sat</text>
-            <text x="220" y="130" text-anchor="middle" class="axis" data-l="zh-TW">六</text>
-            <rect x="248" y="31" width="24" height="79.0" rx="4" class="bar">
-              <title>240</title>
-            </rect>
-            <text x="260" y="130" text-anchor="middle" class="axis" data-l="en">Sun</text>
-            <text x="260" y="130" text-anchor="middle" class="axis" data-l="zh-TW">日</text>
-          </svg>
+          <div role="img" aria-label="Prompts by weekday">
+            <div class="cols weekdays">
+              <div
+                class="col tip tip-l"
+                data-tip-en="Mon · 320 prompts"
+                data-tip-zh-TW="一 · 320 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill peak" style="height:100.0%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Mon</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">一</span></span
+                >
+              </div>
+              <div
+                class="col tip tip-l"
+                data-tip-en="Tue · 300 prompts"
+                data-tip-zh-TW="二 · 300 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:93.8%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Tue</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span
+                >
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="Wed · 310 prompts"
+                data-tip-zh-TW="三 · 310 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:96.9%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Wed</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span
+                >
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="Thu · 290 prompts"
+                data-tip-zh-TW="四 · 290 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:90.6%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Thu</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span
+                >
+              </div>
+              <div
+                class="col tip"
+                data-tip-en="Fri · 280 prompts"
+                data-tip-zh-TW="五 · 280 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:87.5%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Fri</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span
+                >
+              </div>
+              <div
+                class="col tip tip-r"
+                data-tip-en="Sat · 240 prompts"
+                data-tip-zh-TW="六 · 240 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:75.0%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Sat</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span
+                >
+              </div>
+              <div
+                class="col tip tip-r"
+                data-tip-en="Sun · 240 prompts"
+                data-tip-zh-TW="日 · 240 個 prompt"
+                tabindex="-1"
+              >
+                <span class="col-fill" style="height:75.0%"></span>
+                <span class="col-label"
+                  ><span data-l="en" lang="en">Sun</span
+                  ><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span
+                >
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <article class="panel wide">
+        <div class="panel-head">
+          <h2>
+            <span data-l="en" lang="en">Weekly rhythm</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">一週節奏</span>
+          </h2>
+          <p class="note">
+            <span data-l="en" lang="en">Weekday × hour, darker = more prompts</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">星期 × 時段，顏色越深代表 prompt 越多</span>
+          </p>
+        </div>
+        <div class="heat" role="img" aria-label="Weekly rhythm">
+          <span></span>
+          <span class="heat-h">00</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">03</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">06</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">09</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">12</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">15</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">18</span><span class="heat-h"></span><span class="heat-h"></span
+          ><span class="heat-h">21</span><span class="heat-h"></span><span class="heat-h"></span>
+          <span class="heat-d"
+            ><span data-l="en" lang="en">Mon</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">一</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Mon 00:00 · 7 prompts · Other 5 · drawstuff 2"
+            data-tip-zh-TW="週一 00:00 · 7 個 prompt · 其他 5 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Mon 01:00 · 4 prompts · drawstuff 2 · Other 2"
+            data-tip-zh-TW="週一 01:00 · 4 個 prompt · drawstuff 2 · 其他 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Mon 02:00 · 2 prompts · Other 2"
+            data-tip-zh-TW="週一 02:00 · 2 個 prompt · 其他 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Mon 03:00 · 1 prompt · prompt-profile 1"
+            data-tip-zh-TW="週一 03:00 · 1 個 prompt · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Mon 04:00 · 0 prompts"
+            data-tip-zh-TW="週一 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Mon 05:00 · 0 prompts"
+            data-tip-zh-TW="週一 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Mon 06:00 · 0 prompts"
+            data-tip-zh-TW="週一 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Mon 07:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週一 07:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Mon 08:00 · 3 prompts · Other 2 · drawstuff 1"
+            data-tip-zh-TW="週一 08:00 · 3 個 prompt · 其他 2 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Mon 09:00 · 10 prompts · Other 7 · drawstuff 2"
+            data-tip-zh-TW="週一 09:00 · 10 個 prompt · 其他 7 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 10:00 · 17 prompts · Other 13 · drawstuff 3"
+            data-tip-zh-TW="週一 10:00 · 17 個 prompt · 其他 13 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 11:00 · 20 prompts · Other 11 · drawstuff 8"
+            data-tip-zh-TW="週一 11:00 · 20 個 prompt · 其他 11 · drawstuff 8"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Mon 12:00 · 14 prompts · Other 9 · drawstuff 3"
+            data-tip-zh-TW="週一 12:00 · 14 個 prompt · 其他 9 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 13:00 · 19 prompts · Other 13 · drawstuff 3"
+            data-tip-zh-TW="週一 13:00 · 19 個 prompt · 其他 13 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 14:00 · 24 prompts · Other 17 · drawstuff 5"
+            data-tip-zh-TW="週一 14:00 · 24 個 prompt · 其他 17 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 15:00 · 26 prompts · Other 19 · drawstuff 4"
+            data-tip-zh-TW="週一 15:00 · 26 個 prompt · 其他 19 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 16:00 · 23 prompts · Other 15 · drawstuff 4"
+            data-tip-zh-TW="週一 16:00 · 23 個 prompt · 其他 15 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 17:00 · 20 prompts · Other 13 · drawstuff 3"
+            data-tip-zh-TW="週一 17:00 · 20 個 prompt · 其他 13 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Mon 18:00 · 15 prompts · Other 8 · drawstuff 4"
+            data-tip-zh-TW="週一 18:00 · 15 個 prompt · 其他 8 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 19:00 · 17 prompts · Other 7 · drawstuff 5"
+            data-tip-zh-TW="週一 19:00 · 17 個 prompt · 其他 7 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 20:00 · 22 prompts · Other 17 · prompt-profile 2"
+            data-tip-zh-TW="週一 20:00 · 22 個 prompt · 其他 17 · prompt-profile 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Mon 21:00 · 27 prompts · Other 11 · drawstuff 8"
+            data-tip-zh-TW="週一 21:00 · 27 個 prompt · 其他 11 · drawstuff 8"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Mon 22:00 · 29 prompts · Other 16 · drawstuff 6"
+            data-tip-zh-TW="週一 22:00 · 29 個 prompt · 其他 16 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Mon 23:00 · 20 prompts · Other 12 · drawstuff 5"
+            data-tip-zh-TW="週一 23:00 · 20 個 prompt · 其他 12 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Tue</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Tue 00:00 · 6 prompts · drawstuff 3 · Other 2"
+            data-tip-zh-TW="週二 00:00 · 6 個 prompt · drawstuff 3 · 其他 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Tue 01:00 · 4 prompts · Other 2 · drawstuff 1"
+            data-tip-zh-TW="週二 01:00 · 4 個 prompt · 其他 2 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Tue 02:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週二 02:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Tue 03:00 · 0 prompts"
+            data-tip-zh-TW="週二 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Tue 04:00 · 0 prompts"
+            data-tip-zh-TW="週二 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Tue 05:00 · 0 prompts"
+            data-tip-zh-TW="週二 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Tue 06:00 · 0 prompts"
+            data-tip-zh-TW="週二 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Tue 07:00 · 1 prompt · drawstuff 1"
+            data-tip-zh-TW="週二 07:00 · 1 個 prompt · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Tue 08:00 · 3 prompts · Other 3"
+            data-tip-zh-TW="週二 08:00 · 3 個 prompt · 其他 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Tue 09:00 · 10 prompts · Other 5 · drawstuff 4"
+            data-tip-zh-TW="週二 09:00 · 10 個 prompt · 其他 5 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Tue 10:00 · 16 prompts · Other 10 · drawstuff 3"
+            data-tip-zh-TW="週二 10:00 · 16 個 prompt · 其他 10 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 11:00 · 19 prompts · Other 12 · drawstuff 3"
+            data-tip-zh-TW="週二 11:00 · 19 個 prompt · 其他 12 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Tue 12:00 · 13 prompts · Other 10 · dotfiles 2"
+            data-tip-zh-TW="週二 12:00 · 13 個 prompt · 其他 10 · dotfiles 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 13:00 · 18 prompts · Other 11 · drawstuff 6"
+            data-tip-zh-TW="週二 13:00 · 18 個 prompt · 其他 11 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 14:00 · 22 prompts · Other 15 · drawstuff 4"
+            data-tip-zh-TW="週二 14:00 · 22 個 prompt · 其他 15 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 15:00 · 24 prompts · Other 17 · drawstuff 5"
+            data-tip-zh-TW="週二 15:00 · 24 個 prompt · 其他 17 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 16:00 · 22 prompts · Other 13 · drawstuff 4"
+            data-tip-zh-TW="週二 16:00 · 22 個 prompt · 其他 13 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 17:00 · 19 prompts · Other 11 · prompt-profile 6"
+            data-tip-zh-TW="週二 17:00 · 19 個 prompt · 其他 11 · prompt-profile 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Tue 18:00 · 14 prompts · Other 9 · drawstuff 4"
+            data-tip-zh-TW="週二 18:00 · 14 個 prompt · 其他 9 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Tue 19:00 · 16 prompts · Other 7 · drawstuff 4"
+            data-tip-zh-TW="週二 19:00 · 16 個 prompt · 其他 7 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 20:00 · 21 prompts · Other 14 · drawstuff 3"
+            data-tip-zh-TW="週二 20:00 · 21 個 prompt · 其他 14 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Tue 21:00 · 26 prompts · Other 18 · drawstuff 4"
+            data-tip-zh-TW="週二 21:00 · 26 個 prompt · 其他 18 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Tue 22:00 · 27 prompts · Other 17 · drawstuff 9"
+            data-tip-zh-TW="週二 22:00 · 27 個 prompt · 其他 17 · drawstuff 9"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Tue 23:00 · 19 prompts · Other 9 · drawstuff 5"
+            data-tip-zh-TW="週二 23:00 · 19 個 prompt · 其他 9 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Wed</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Wed 00:00 · 7 prompts · Other 4 · drawstuff 2"
+            data-tip-zh-TW="週三 00:00 · 7 個 prompt · 其他 4 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Wed 01:00 · 4 prompts · Other 3 · drawstuff 1"
+            data-tip-zh-TW="週三 01:00 · 4 個 prompt · 其他 3 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Wed 02:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週三 02:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Wed 03:00 · 0 prompts"
+            data-tip-zh-TW="週三 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Wed 04:00 · 0 prompts"
+            data-tip-zh-TW="週三 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Wed 05:00 · 0 prompts"
+            data-tip-zh-TW="週三 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Wed 06:00 · 0 prompts"
+            data-tip-zh-TW="週三 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Wed 07:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週三 07:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Wed 08:00 · 3 prompts · Other 2 · drawstuff 1"
+            data-tip-zh-TW="週三 08:00 · 3 個 prompt · 其他 2 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Wed 09:00 · 10 prompts · Other 9 · drawstuff 1"
+            data-tip-zh-TW="週三 09:00 · 10 個 prompt · 其他 9 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Wed 10:00 · 16 prompts · Other 11 · prompt-profile 2"
+            data-tip-zh-TW="週三 10:00 · 16 個 prompt · 其他 11 · prompt-profile 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 11:00 · 20 prompts · Other 12 · drawstuff 6"
+            data-tip-zh-TW="週三 11:00 · 20 個 prompt · 其他 12 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Wed 12:00 · 13 prompts · Other 6 · drawstuff 3"
+            data-tip-zh-TW="週三 12:00 · 13 個 prompt · 其他 6 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 13:00 · 18 prompts · Other 14 · drawstuff 2"
+            data-tip-zh-TW="週三 13:00 · 18 個 prompt · 其他 14 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 14:00 · 23 prompts · Other 13 · drawstuff 7"
+            data-tip-zh-TW="週三 14:00 · 23 個 prompt · 其他 13 · drawstuff 7"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 15:00 · 25 prompts · Other 16 · drawstuff 5"
+            data-tip-zh-TW="週三 15:00 · 25 個 prompt · 其他 16 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 16:00 · 22 prompts · Other 14 · drawstuff 5"
+            data-tip-zh-TW="週三 16:00 · 22 個 prompt · 其他 14 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 17:00 · 19 prompts · Other 12 · prompt-profile 4"
+            data-tip-zh-TW="週三 17:00 · 19 個 prompt · 其他 12 · prompt-profile 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Wed 18:00 · 15 prompts · Other 8 · drawstuff 6"
+            data-tip-zh-TW="週三 18:00 · 15 個 prompt · 其他 8 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Wed 19:00 · 16 prompts · Other 5 · drawstuff 4"
+            data-tip-zh-TW="週三 19:00 · 16 個 prompt · 其他 5 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 20:00 · 21 prompts · Other 14 · drawstuff 6"
+            data-tip-zh-TW="週三 20:00 · 21 個 prompt · 其他 14 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Wed 21:00 · 26 prompts · Other 16 · drawstuff 6"
+            data-tip-zh-TW="週三 21:00 · 26 個 prompt · 其他 16 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Wed 22:00 · 28 prompts · Other 16 · drawstuff 7"
+            data-tip-zh-TW="週三 22:00 · 28 個 prompt · 其他 16 · drawstuff 7"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Wed 23:00 · 20 prompts · Other 17 · prompt-profile 3"
+            data-tip-zh-TW="週三 23:00 · 20 個 prompt · 其他 17 · prompt-profile 3"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Thu</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Thu 00:00 · 6 prompts · Other 4 · prompt-profile 1"
+            data-tip-zh-TW="週四 00:00 · 6 個 prompt · 其他 4 · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Thu 01:00 · 3 prompts · Other 2 · drawstuff 1"
+            data-tip-zh-TW="週四 01:00 · 3 個 prompt · 其他 2 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Thu 02:00 · 1 prompt · prompt-profile 1"
+            data-tip-zh-TW="週四 02:00 · 1 個 prompt · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Thu 03:00 · 0 prompts"
+            data-tip-zh-TW="週四 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Thu 04:00 · 0 prompts"
+            data-tip-zh-TW="週四 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Thu 05:00 · 0 prompts"
+            data-tip-zh-TW="週四 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Thu 06:00 · 0 prompts"
+            data-tip-zh-TW="週四 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Thu 07:00 · 1 prompt · drawstuff 1"
+            data-tip-zh-TW="週四 07:00 · 1 個 prompt · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Thu 08:00 · 3 prompts · drawstuff 2 · Other 1"
+            data-tip-zh-TW="週四 08:00 · 3 個 prompt · drawstuff 2 · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Thu 09:00 · 9 prompts · Other 6 · drawstuff 2"
+            data-tip-zh-TW="週四 09:00 · 9 個 prompt · 其他 6 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Thu 10:00 · 15 prompts · Other 9 · drawstuff 3"
+            data-tip-zh-TW="週四 10:00 · 15 個 prompt · 其他 9 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 11:00 · 19 prompts · Other 13 · prompt-profile 3"
+            data-tip-zh-TW="週四 11:00 · 19 個 prompt · 其他 13 · prompt-profile 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Thu 12:00 · 12 prompts · Other 7 · drawstuff 4"
+            data-tip-zh-TW="週四 12:00 · 12 個 prompt · 其他 7 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 13:00 · 17 prompts · Other 11 · drawstuff 4"
+            data-tip-zh-TW="週四 13:00 · 17 個 prompt · 其他 11 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 14:00 · 22 prompts · Other 14 · drawstuff 5"
+            data-tip-zh-TW="週四 14:00 · 22 個 prompt · 其他 14 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 15:00 · 23 prompts · Other 16 · drawstuff 5"
+            data-tip-zh-TW="週四 15:00 · 23 個 prompt · 其他 16 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 16:00 · 21 prompts · Other 12 · drawstuff 6"
+            data-tip-zh-TW="週四 16:00 · 21 個 prompt · 其他 12 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 17:00 · 18 prompts · Other 11 · drawstuff 5"
+            data-tip-zh-TW="週四 17:00 · 18 個 prompt · 其他 11 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Thu 18:00 · 14 prompts · Other 7 · drawstuff 4"
+            data-tip-zh-TW="週四 18:00 · 14 個 prompt · 其他 7 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Thu 19:00 · 15 prompts · Other 9 · drawstuff 4"
+            data-tip-zh-TW="週四 19:00 · 15 個 prompt · 其他 9 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 20:00 · 20 prompts · Other 14 · drawstuff 2"
+            data-tip-zh-TW="週四 20:00 · 20 個 prompt · 其他 14 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Thu 21:00 · 25 prompts · Other 15 · prompt-profile 5"
+            data-tip-zh-TW="週四 21:00 · 25 個 prompt · 其他 15 · prompt-profile 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Thu 22:00 · 26 prompts · Other 17 · drawstuff 4"
+            data-tip-zh-TW="週四 22:00 · 26 個 prompt · 其他 17 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Thu 23:00 · 19 prompts · Other 13 · drawstuff 6"
+            data-tip-zh-TW="週四 23:00 · 19 個 prompt · 其他 13 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Fri</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Fri 00:00 · 6 prompts · Other 4 · drawstuff 1"
+            data-tip-zh-TW="週五 00:00 · 6 個 prompt · 其他 4 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Fri 01:00 · 3 prompts · Other 2 · drawstuff 1"
+            data-tip-zh-TW="週五 01:00 · 3 個 prompt · 其他 2 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Fri 02:00 · 1 prompt · drawstuff 1"
+            data-tip-zh-TW="週五 02:00 · 1 個 prompt · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Fri 03:00 · 0 prompts"
+            data-tip-zh-TW="週五 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Fri 04:00 · 0 prompts"
+            data-tip-zh-TW="週五 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Fri 05:00 · 0 prompts"
+            data-tip-zh-TW="週五 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Fri 06:00 · 0 prompts"
+            data-tip-zh-TW="週五 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Fri 07:00 · 1 prompt · drawstuff 1"
+            data-tip-zh-TW="週五 07:00 · 1 個 prompt · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Fri 08:00 · 3 prompts · Other 3"
+            data-tip-zh-TW="週五 08:00 · 3 個 prompt · 其他 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 09:00 · 9 prompts · drawstuff 4 · Other 4"
+            data-tip-zh-TW="週五 09:00 · 9 個 prompt · drawstuff 4 · 其他 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 10:00 · 15 prompts · Other 12 · drawstuff 3"
+            data-tip-zh-TW="週五 10:00 · 15 個 prompt · 其他 12 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 11:00 · 18 prompts · Other 9 · prompt-profile 5"
+            data-tip-zh-TW="週五 11:00 · 18 個 prompt · 其他 9 · prompt-profile 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 12:00 · 12 prompts · Other 9 · drawstuff 3"
+            data-tip-zh-TW="週五 12:00 · 12 個 prompt · 其他 9 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 13:00 · 16 prompts · Other 11 · drawstuff 3"
+            data-tip-zh-TW="週五 13:00 · 16 個 prompt · 其他 11 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 14:00 · 21 prompts · Other 14 · prompt-profile 3"
+            data-tip-zh-TW="週五 14:00 · 21 個 prompt · 其他 14 · prompt-profile 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 15:00 · 22 prompts · Other 12 · prompt-profile 4"
+            data-tip-zh-TW="週五 15:00 · 22 個 prompt · 其他 12 · prompt-profile 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 16:00 · 20 prompts · Other 14 · drawstuff 4"
+            data-tip-zh-TW="週五 16:00 · 20 個 prompt · 其他 14 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 17:00 · 18 prompts · Other 15 · drawstuff 3"
+            data-tip-zh-TW="週五 17:00 · 18 個 prompt · 其他 15 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 18:00 · 13 prompts · Other 5 · drawstuff 4"
+            data-tip-zh-TW="週五 18:00 · 13 個 prompt · 其他 5 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Fri 19:00 · 15 prompts · Other 11 · drawstuff 2"
+            data-tip-zh-TW="週五 19:00 · 15 個 prompt · 其他 11 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 20:00 · 19 prompts · Other 11 · drawstuff 6"
+            data-tip-zh-TW="週五 20:00 · 19 個 prompt · 其他 11 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Fri 21:00 · 24 prompts · Other 14 · drawstuff 4"
+            data-tip-zh-TW="週五 21:00 · 24 個 prompt · 其他 14 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Fri 22:00 · 25 prompts · Other 14 · drawstuff 6"
+            data-tip-zh-TW="週五 22:00 · 25 個 prompt · 其他 14 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Fri 23:00 · 18 prompts · Other 13 · drawstuff 4"
+            data-tip-zh-TW="週五 23:00 · 18 個 prompt · 其他 13 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Sat</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Sat 00:00 · 5 prompts · Other 4 · drawstuff 1"
+            data-tip-zh-TW="週六 00:00 · 5 個 prompt · 其他 4 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Sat 01:00 · 3 prompts · drawstuff 1 · prompt-profile 1"
+            data-tip-zh-TW="週六 01:00 · 3 個 prompt · drawstuff 1 · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Sat 02:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週六 02:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sat 03:00 · 0 prompts"
+            data-tip-zh-TW="週六 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sat 04:00 · 0 prompts"
+            data-tip-zh-TW="週六 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sat 05:00 · 0 prompts"
+            data-tip-zh-TW="週六 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sat 06:00 · 0 prompts"
+            data-tip-zh-TW="週六 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Sat 07:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週六 07:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Sat 08:00 · 3 prompts · Other 2 · prompt-profile 1"
+            data-tip-zh-TW="週六 08:00 · 3 個 prompt · 其他 2 · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 09:00 · 8 prompts · Other 4 · drawstuff 2"
+            data-tip-zh-TW="週六 09:00 · 8 個 prompt · 其他 4 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 10:00 · 13 prompts · Other 6 · drawstuff 5"
+            data-tip-zh-TW="週六 10:00 · 13 個 prompt · 其他 6 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 11:00 · 15 prompts · Other 11 · drawstuff 2"
+            data-tip-zh-TW="週六 11:00 · 15 個 prompt · 其他 11 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 12:00 · 10 prompts · drawstuff 6 · Other 4"
+            data-tip-zh-TW="週六 12:00 · 10 個 prompt · drawstuff 6 · 其他 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 13:00 · 14 prompts · Other 11 · drawstuff 2"
+            data-tip-zh-TW="週六 13:00 · 14 個 prompt · 其他 11 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sat 14:00 · 18 prompts · Other 13 · prompt-profile 3"
+            data-tip-zh-TW="週六 14:00 · 18 個 prompt · 其他 13 · prompt-profile 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sat 15:00 · 19 prompts · Other 14 · drawstuff 4"
+            data-tip-zh-TW="週六 15:00 · 19 個 prompt · 其他 14 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sat 16:00 · 17 prompts · Other 14 · drawstuff 2"
+            data-tip-zh-TW="週六 16:00 · 17 個 prompt · 其他 14 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 17:00 · 15 prompts · Other 9 · drawstuff 4"
+            data-tip-zh-TW="週六 17:00 · 15 個 prompt · 其他 9 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 18:00 · 11 prompts · Other 8 · prompt-profile 2"
+            data-tip-zh-TW="週六 18:00 · 11 個 prompt · 其他 8 · prompt-profile 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sat 19:00 · 13 prompts · Other 7 · drawstuff 5"
+            data-tip-zh-TW="週六 19:00 · 13 個 prompt · 其他 7 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sat 20:00 · 17 prompts · Other 9 · drawstuff 4"
+            data-tip-zh-TW="週六 20:00 · 17 個 prompt · 其他 9 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sat 21:00 · 20 prompts · Other 15 · drawstuff 3"
+            data-tip-zh-TW="週六 21:00 · 20 個 prompt · 其他 15 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Sat 22:00 · 22 prompts · Other 10 · drawstuff 9"
+            data-tip-zh-TW="週六 22:00 · 22 個 prompt · 其他 10 · drawstuff 9"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip tip-r"
+            data-tip-en="Sat 23:00 · 15 prompts · Other 9 · drawstuff 3"
+            data-tip-zh-TW="週六 23:00 · 15 個 prompt · 其他 9 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span class="heat-d"
+            ><span data-l="en" lang="en">Sun</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Sun 00:00 · 5 prompts · Other 4 · drawstuff 1"
+            data-tip-zh-TW="週日 00:00 · 5 個 prompt · 其他 4 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip tip-l"
+            data-tip-en="Sun 01:00 · 3 prompts · Other 2 · prompt-profile 1"
+            data-tip-zh-TW="週日 01:00 · 3 個 prompt · 其他 2 · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Sun 02:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週日 02:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sun 03:00 · 0 prompts"
+            data-tip-zh-TW="週日 03:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sun 04:00 · 0 prompts"
+            data-tip-zh-TW="週日 04:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sun 05:00 · 0 prompts"
+            data-tip-zh-TW="週日 05:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l0 tip"
+            data-tip-en="Sun 06:00 · 0 prompts"
+            data-tip-zh-TW="週日 06:00 · 0 個 prompt"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l1 tip"
+            data-tip-en="Sun 07:00 · 1 prompt · Other 1"
+            data-tip-zh-TW="週日 07:00 · 1 個 prompt · 其他 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l2 tip"
+            data-tip-en="Sun 08:00 · 3 prompts · drawstuff 1 · prompt-profile 1"
+            data-tip-zh-TW="週日 08:00 · 3 個 prompt · drawstuff 1 · prompt-profile 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 09:00 · 8 prompts · Other 6 · drawstuff 1"
+            data-tip-zh-TW="週日 09:00 · 8 個 prompt · 其他 6 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 10:00 · 13 prompts · Other 6 · prompt-profile 4"
+            data-tip-zh-TW="週日 10:00 · 13 個 prompt · 其他 6 · prompt-profile 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 11:00 · 15 prompts · Other 10 · drawstuff 3"
+            data-tip-zh-TW="週日 11:00 · 15 個 prompt · 其他 10 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 12:00 · 10 prompts · Other 8 · drawstuff 1"
+            data-tip-zh-TW="週日 12:00 · 10 個 prompt · 其他 8 · drawstuff 1"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 13:00 · 14 prompts · Other 12 · prompt-profile 2"
+            data-tip-zh-TW="週日 13:00 · 14 個 prompt · 其他 12 · prompt-profile 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sun 14:00 · 18 prompts · Other 12 · drawstuff 4"
+            data-tip-zh-TW="週日 14:00 · 18 個 prompt · 其他 12 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sun 15:00 · 19 prompts · Other 11 · drawstuff 5"
+            data-tip-zh-TW="週日 15:00 · 19 個 prompt · 其他 11 · drawstuff 5"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sun 16:00 · 17 prompts · Other 8 · drawstuff 6"
+            data-tip-zh-TW="週日 16:00 · 17 個 prompt · 其他 8 · drawstuff 6"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 17:00 · 15 prompts · Other 11 · prompt-profile 4"
+            data-tip-zh-TW="週日 17:00 · 15 個 prompt · 其他 11 · prompt-profile 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 18:00 · 11 prompts · Other 9 · drawstuff 2"
+            data-tip-zh-TW="週日 18:00 · 11 個 prompt · 其他 9 · drawstuff 2"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip"
+            data-tip-en="Sun 19:00 · 13 prompts · Other 7 · drawstuff 3"
+            data-tip-zh-TW="週日 19:00 · 13 個 prompt · 其他 7 · drawstuff 3"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sun 20:00 · 17 prompts · Other 9 · drawstuff 4"
+            data-tip-zh-TW="週日 20:00 · 17 個 prompt · 其他 9 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip"
+            data-tip-en="Sun 21:00 · 20 prompts · Other 9 · drawstuff 8"
+            data-tip-zh-TW="週日 21:00 · 20 個 prompt · 其他 9 · drawstuff 8"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l4 tip tip-r"
+            data-tip-en="Sun 22:00 · 22 prompts · Other 16 · drawstuff 4"
+            data-tip-zh-TW="週日 22:00 · 22 個 prompt · 其他 16 · drawstuff 4"
+            tabindex="-1"
+          ></span
+          ><span
+            class="heat-c l3 tip tip-r"
+            data-tip-en="Sun 23:00 · 15 prompts · Other 12 · drawstuff 2"
+            data-tip-zh-TW="週日 23:00 · 15 個 prompt · 其他 12 · drawstuff 2"
+            tabindex="-1"
+          ></span>
+        </div>
+      </article>
+
+      <div class="grid g-2r">
+        <article class="panel">
+          <h2>
+            <span data-l="en" lang="en">Projects</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">專案</span>
+          </h2>
+          <ul class="ranks">
+            <li>
+              <span class="rank-name"
+                ><i class="dot" style="background:var(--p0)"></i>drawstuff</span
+              >
+              <span class="share-track"
+                ><span class="share-fill" style="width:32.2%;background:var(--p0)"></span
+              ></span>
+              <b>20%</b>
+            </li>
+            <li>
+              <span class="rank-name"
+                ><i class="dot" style="background:var(--p1)"></i>prompt-profile</span
+              >
+              <span class="share-track"
+                ><span class="share-fill" style="width:20.8%;background:var(--p1)"></span
+              ></span>
+              <b>13%</b>
+            </li>
+            <li>
+              <span class="rank-name"
+                ><i class="dot" style="background:var(--p2)"></i>dotfiles</span
+              >
+              <span class="share-track"
+                ><span class="share-fill" style="width:9.0%;background:var(--p2)"></span
+              ></span>
+              <b>6%</b>
+            </li>
+            <li>
+              <span class="rank-name"
+                ><i class="dot" style="background:var(--po)"></i
+                ><span data-l="en" lang="en">Other</span
+                ><span data-l="zh-TW" lang="zh-Hant-TW">其他</span></span
+              >
+              <span class="share-track"
+                ><span class="share-fill" style="width:100.0%;background:var(--po)"></span
+              ></span>
+              <b>62%</b>
+            </li>
+          </ul>
+          <p class="note">
+            <span data-l="en" lang="en">Top projects by prompts (folder names)</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">依 prompt 數排序的專案（資料夾名稱）</span>
+          </p>
+        </article>
+        <article class="panel">
+          <h2>
+            <span data-l="en" lang="en">Projects by week</span
+            ><span data-l="zh-TW" lang="zh-Hant-TW">每週的專案分布</span>
+          </h2>
+          <div class="stack" role="img" aria-label="Projects by week">
+            <div
+              class="stack-w tip tip-l"
+              data-tip-en="Week of Apr 20 · 9 prompts · Other 5 · drawstuff 2"
+              data-tip-zh-TW="4月20日 那一週 · 9 個 prompt · 其他 5 · drawstuff 2"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:6.5%"
+                ><span style="flex:2;background:var(--p0)"></span
+                ><span style="flex:2;background:var(--p1)"></span
+                ><span style="flex:5;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip tip-l"
+              data-tip-en="Week of Apr 27 · 57 prompts · Other 29 · drawstuff 18"
+              data-tip-zh-TW="4月27日 那一週 · 57 個 prompt · 其他 29 · drawstuff 18"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:41.0%"
+                ><span style="flex:18;background:var(--p0)"></span
+                ><span style="flex:6;background:var(--p1)"></span
+                ><span style="flex:4;background:var(--p2)"></span
+                ><span style="flex:29;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of May 4 · 121 prompts · Other 80 · drawstuff 17"
+              data-tip-zh-TW="5月4日 那一週 · 121 個 prompt · 其他 80 · drawstuff 17"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:87.1%"
+                ><span style="flex:17;background:var(--p0)"></span
+                ><span style="flex:12;background:var(--p1)"></span
+                ><span style="flex:12;background:var(--p2)"></span
+                ><span style="flex:80;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of May 11 · 86 prompts · Other 53 · drawstuff 21"
+              data-tip-zh-TW="5月11日 那一週 · 86 個 prompt · 其他 53 · drawstuff 21"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:61.9%"
+                ><span style="flex:21;background:var(--p0)"></span
+                ><span style="flex:9;background:var(--p1)"></span
+                ><span style="flex:3;background:var(--p2)"></span
+                ><span style="flex:53;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of May 18 · 118 prompts · Other 71 · drawstuff 27"
+              data-tip-zh-TW="5月18日 那一週 · 118 個 prompt · 其他 71 · drawstuff 27"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:84.9%"
+                ><span style="flex:27;background:var(--p0)"></span
+                ><span style="flex:7;background:var(--p1)"></span
+                ><span style="flex:13;background:var(--p2)"></span
+                ><span style="flex:71;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of May 25 · 35 prompts · Other 28 · drawstuff 6"
+              data-tip-zh-TW="5月25日 那一週 · 35 個 prompt · 其他 28 · drawstuff 6"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:25.2%"
+                ><span style="flex:6;background:var(--p0)"></span
+                ><span style="flex:1;background:var(--p2)"></span
+                ><span style="flex:28;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jun 1 · 72 prompts · Other 50 · drawstuff 12"
+              data-tip-zh-TW="6月1日 那一週 · 72 個 prompt · 其他 50 · drawstuff 12"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:51.8%"
+                ><span style="flex:12;background:var(--p0)"></span
+                ><span style="flex:9;background:var(--p1)"></span
+                ><span style="flex:1;background:var(--p2)"></span
+                ><span style="flex:50;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jun 8 · 81 prompts · Other 56 · drawstuff 16"
+              data-tip-zh-TW="6月8日 那一週 · 81 個 prompt · 其他 56 · drawstuff 16"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:58.3%"
+                ><span style="flex:16;background:var(--p0)"></span
+                ><span style="flex:6;background:var(--p1)"></span
+                ><span style="flex:3;background:var(--p2)"></span
+                ><span style="flex:56;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jun 15 · 52 prompts · Other 30 · drawstuff 14"
+              data-tip-zh-TW="6月15日 那一週 · 52 個 prompt · 其他 30 · drawstuff 14"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:37.4%"
+                ><span style="flex:14;background:var(--p0)"></span
+                ><span style="flex:5;background:var(--p1)"></span
+                ><span style="flex:3;background:var(--p2)"></span
+                ><span style="flex:30;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jun 22 · 57 prompts · Other 32 · drawstuff 13"
+              data-tip-zh-TW="6月22日 那一週 · 57 個 prompt · 其他 32 · drawstuff 13"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:41.0%"
+                ><span style="flex:13;background:var(--p0)"></span
+                ><span style="flex:8;background:var(--p1)"></span
+                ><span style="flex:4;background:var(--p2)"></span
+                ><span style="flex:32;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jun 29 · 121 prompts · Other 77 · drawstuff 28"
+              data-tip-zh-TW="6月29日 那一週 · 121 個 prompt · 其他 77 · drawstuff 28"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:87.1%"
+                ><span style="flex:28;background:var(--p0)"></span
+                ><span style="flex:9;background:var(--p1)"></span
+                ><span style="flex:7;background:var(--p2)"></span
+                ><span style="flex:77;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jul 6 · 64 prompts · Other 42 · prompt-profile 9"
+              data-tip-zh-TW="7月6日 那一週 · 64 個 prompt · 其他 42 · prompt-profile 9"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:46.0%"
+                ><span style="flex:8;background:var(--p0)"></span
+                ><span style="flex:9;background:var(--p1)"></span
+                ><span style="flex:5;background:var(--p2)"></span
+                ><span style="flex:42;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jul 13 · 76 prompts · Other 44 · drawstuff 16"
+              data-tip-zh-TW="7月13日 那一週 · 76 個 prompt · 其他 44 · drawstuff 16"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:54.7%"
+                ><span style="flex:16;background:var(--p0)"></span
+                ><span style="flex:12;background:var(--p1)"></span
+                ><span style="flex:4;background:var(--p2)"></span
+                ><span style="flex:44;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jul 20 · 78 prompts · Other 51 · drawstuff 13"
+              data-tip-zh-TW="7月20日 那一週 · 78 個 prompt · 其他 51 · drawstuff 13"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:56.1%"
+                ><span style="flex:13;background:var(--p0)"></span
+                ><span style="flex:7;background:var(--p1)"></span
+                ><span style="flex:7;background:var(--p2)"></span
+                ><span style="flex:51;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Jul 27 · 67 prompts · Other 42 · drawstuff 12"
+              data-tip-zh-TW="7月27日 那一週 · 67 個 prompt · 其他 42 · drawstuff 12"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:48.2%"
+                ><span style="flex:12;background:var(--p0)"></span
+                ><span style="flex:11;background:var(--p1)"></span
+                ><span style="flex:2;background:var(--p2)"></span
+                ><span style="flex:42;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Aug 3 · 31 prompts · Other 19 · drawstuff 5"
+              data-tip-zh-TW="8月3日 那一週 · 31 個 prompt · 其他 19 · drawstuff 5"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:22.3%"
+                ><span style="flex:5;background:var(--p0)"></span
+                ><span style="flex:4;background:var(--p1)"></span
+                ><span style="flex:3;background:var(--p2)"></span
+                ><span style="flex:19;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Aug 10 · 84 prompts · Other 48 · drawstuff 20"
+              data-tip-zh-TW="8月10日 那一週 · 84 個 prompt · 其他 48 · drawstuff 20"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:60.4%"
+                ><span style="flex:20;background:var(--p0)"></span
+                ><span style="flex:13;background:var(--p1)"></span
+                ><span style="flex:3;background:var(--p2)"></span
+                ><span style="flex:48;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Aug 17 · 101 prompts · Other 59 · drawstuff 22"
+              data-tip-zh-TW="8月17日 那一週 · 101 個 prompt · 其他 59 · drawstuff 22"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:72.7%"
+                ><span style="flex:22;background:var(--p0)"></span
+                ><span style="flex:16;background:var(--p1)"></span
+                ><span style="flex:4;background:var(--p2)"></span
+                ><span style="flex:59;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Aug 24 · 35 prompts · Other 18 · drawstuff 10"
+              data-tip-zh-TW="8月24日 那一週 · 35 個 prompt · 其他 18 · drawstuff 10"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:25.2%"
+                ><span style="flex:10;background:var(--p0)"></span
+                ><span style="flex:7;background:var(--p1)"></span
+                ><span style="flex:18;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Aug 31 · 139 prompts · Other 88 · drawstuff 23"
+              data-tip-zh-TW="8月31日 那一週 · 139 個 prompt · 其他 88 · drawstuff 23"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:100.0%"
+                ><span style="flex:23;background:var(--p0)"></span
+                ><span style="flex:20;background:var(--p1)"></span
+                ><span style="flex:8;background:var(--p2)"></span
+                ><span style="flex:88;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Sep 7 · 53 prompts · Other 32 · drawstuff 12"
+              data-tip-zh-TW="9月7日 那一週 · 53 個 prompt · 其他 32 · drawstuff 12"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:38.1%"
+                ><span style="flex:12;background:var(--p0)"></span
+                ><span style="flex:8;background:var(--p1)"></span
+                ><span style="flex:1;background:var(--p2)"></span
+                ><span style="flex:32;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Sep 14 · 98 prompts · Other 64 · drawstuff 16"
+              data-tip-zh-TW="9月14日 那一週 · 98 個 prompt · 其他 64 · drawstuff 16"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:70.5%"
+                ><span style="flex:16;background:var(--p0)"></span
+                ><span style="flex:13;background:var(--p1)"></span
+                ><span style="flex:5;background:var(--p2)"></span
+                ><span style="flex:64;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Sep 21 · 40 prompts · Other 24 · prompt-profile 8"
+              data-tip-zh-TW="9月21日 那一週 · 40 個 prompt · 其他 24 · prompt-profile 8"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:28.8%"
+                ><span style="flex:7;background:var(--p0)"></span
+                ><span style="flex:8;background:var(--p1)"></span
+                ><span style="flex:1;background:var(--p2)"></span
+                ><span style="flex:24;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Sep 28 · 77 prompts · Other 48 · prompt-profile 13"
+              data-tip-zh-TW="9月28日 那一週 · 77 個 prompt · 其他 48 · prompt-profile 13"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:55.4%"
+                ><span style="flex:11;background:var(--p0)"></span
+                ><span style="flex:13;background:var(--p1)"></span
+                ><span style="flex:5;background:var(--p2)"></span
+                ><span style="flex:48;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip"
+              data-tip-en="Week of Oct 5 · 65 prompts · Other 40 · drawstuff 12"
+              data-tip-zh-TW="10月5日 那一週 · 65 個 prompt · 其他 40 · drawstuff 12"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:46.8%"
+                ><span style="flex:12;background:var(--p0)"></span
+                ><span style="flex:9;background:var(--p1)"></span
+                ><span style="flex:4;background:var(--p2)"></span
+                ><span style="flex:40;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip tip-r"
+              data-tip-en="Week of Oct 12 · 99 prompts · Other 57 · prompt-profile 19"
+              data-tip-zh-TW="10月12日 那一週 · 99 個 prompt · 其他 57 · prompt-profile 19"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:71.2%"
+                ><span style="flex:18;background:var(--p0)"></span
+                ><span style="flex:19;background:var(--p1)"></span
+                ><span style="flex:5;background:var(--p2)"></span
+                ><span style="flex:57;background:var(--po)"></span
+              ></span>
+            </div>
+            <div
+              class="stack-w tip tip-r"
+              data-tip-en="Week of Oct 19 · 64 prompts · Other 35 · drawstuff 15"
+              data-tip-zh-TW="10月19日 那一週 · 64 個 prompt · 其他 35 · drawstuff 15"
+              tabindex="-1"
+            >
+              <span class="stack-bar" style="height:46.0%"
+                ><span style="flex:15;background:var(--p0)"></span
+                ><span style="flex:12;background:var(--p1)"></span
+                ><span style="flex:2;background:var(--p2)"></span
+                ><span style="flex:35;background:var(--po)"></span
+              ></span>
+            </div>
+          </div>
         </article>
       </div>
 
@@ -528,2059 +3437,6 @@
           </div>
         </article>
       </div>
-
-      <details class="panel">
-        <summary>
-          <span data-l="en" lang="en">Weekly rhythm</span
-          ><span data-l="zh-TW" lang="zh-Hant-TW">一週節奏</span
-          ><span class="note"
-            ><span data-l="en" lang="en">Weekday × hour, darker = more prompts</span
-            ><span data-l="zh-TW" lang="zh-Hant-TW"
-              >星期 × 時段，顏色越深代表 prompt 越多</span
-            ></span
-          >
-        </summary>
-        <svg viewBox="0 0 636 197" role="img" aria-label="Weekly rhythm" class="heatmap">
-          <text x="47" y="14" text-anchor="middle" class="axis">00</text>
-          <text x="122" y="14" text-anchor="middle" class="axis">03</text>
-          <text x="197" y="14" text-anchor="middle" class="axis">06</text>
-          <text x="272" y="14" text-anchor="middle" class="axis">09</text>
-          <text x="347" y="14" text-anchor="middle" class="axis">12</text>
-          <text x="422" y="14" text-anchor="middle" class="axis">15</text>
-          <text x="497" y="14" text-anchor="middle" class="axis">18</text>
-          <text x="572" y="14" text-anchor="middle" class="axis">21</text>
-          <text x="28" y="37" text-anchor="end" class="axis" data-l="en">Mon</text>
-          <text x="28" y="37" text-anchor="end" class="axis" data-l="zh-TW">一</text>
-          <text x="28" y="62" text-anchor="end" class="axis" data-l="en">Tue</text>
-          <text x="28" y="62" text-anchor="end" class="axis" data-l="zh-TW">二</text>
-          <text x="28" y="87" text-anchor="end" class="axis" data-l="en">Wed</text>
-          <text x="28" y="87" text-anchor="end" class="axis" data-l="zh-TW">三</text>
-          <text x="28" y="112" text-anchor="end" class="axis" data-l="en">Thu</text>
-          <text x="28" y="112" text-anchor="end" class="axis" data-l="zh-TW">四</text>
-          <text x="28" y="137" text-anchor="end" class="axis" data-l="en">Fri</text>
-          <text x="28" y="137" text-anchor="end" class="axis" data-l="zh-TW">五</text>
-          <text x="28" y="162" text-anchor="end" class="axis" data-l="en">Sat</text>
-          <text x="28" y="162" text-anchor="end" class="axis" data-l="zh-TW">六</text>
-          <text x="28" y="187" text-anchor="end" class="axis" data-l="en">Sun</text>
-          <text x="28" y="187" text-anchor="end" class="axis" data-l="zh-TW">日</text>
-          <rect
-            x="36"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.568"
-            data-empty=""
-          >
-            <title>00:00 · 7</title>
-          </rect>
-          <rect
-            x="61"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.466"
-            data-empty=""
-          >
-            <title>01:00 · 4</title>
-          </rect>
-          <rect
-            x="86"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.373"
-            data-empty=""
-          >
-            <title>02:00 · 2</title>
-          </rect>
-          <rect
-            x="111"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>03:00 · 1</title>
-          </rect>
-          <rect
-            x="136"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.649"
-            data-empty=""
-          >
-            <title>09:00 · 10</title>
-          </rect>
-          <rect
-            x="286"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>10:00 · 17</title>
-          </rect>
-          <rect
-            x="311"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>11:00 · 20</title>
-          </rect>
-          <rect
-            x="336"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.741"
-            data-empty=""
-          >
-            <title>12:00 · 14</title>
-          </rect>
-          <rect
-            x="361"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>13:00 · 19</title>
-          </rect>
-          <rect
-            x="386"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.923"
-            data-empty=""
-          >
-            <title>14:00 · 24</title>
-          </rect>
-          <rect
-            x="411"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.955"
-            data-empty=""
-          >
-            <title>15:00 · 26</title>
-          </rect>
-          <rect
-            x="436"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.907"
-            data-empty=""
-          >
-            <title>16:00 · 23</title>
-          </rect>
-          <rect
-            x="461"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>17:00 · 20</title>
-          </rect>
-          <rect
-            x="486"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>18:00 · 15</title>
-          </rect>
-          <rect
-            x="511"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>19:00 · 17</title>
-          </rect>
-          <rect
-            x="536"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>20:00 · 22</title>
-          </rect>
-          <rect
-            x="561"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.970"
-            data-empty=""
-          >
-            <title>21:00 · 27</title>
-          </rect>
-          <rect
-            x="586"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1.000"
-            data-empty=""
-          >
-            <title>22:00 · 29</title>
-          </rect>
-          <rect
-            x="611"
-            y="22"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>23:00 · 20</title>
-          </rect>
-          <rect
-            x="36"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.537"
-            data-empty=""
-          >
-            <title>00:00 · 6</title>
-          </rect>
-          <rect
-            x="61"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.466"
-            data-empty=""
-          >
-            <title>01:00 · 4</title>
-          </rect>
-          <rect
-            x="86"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.649"
-            data-empty=""
-          >
-            <title>09:00 · 10</title>
-          </rect>
-          <rect
-            x="286"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.781"
-            data-empty=""
-          >
-            <title>10:00 · 16</title>
-          </rect>
-          <rect
-            x="311"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>11:00 · 19</title>
-          </rect>
-          <rect
-            x="336"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>12:00 · 13</title>
-          </rect>
-          <rect
-            x="361"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>13:00 · 18</title>
-          </rect>
-          <rect
-            x="386"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>14:00 · 22</title>
-          </rect>
-          <rect
-            x="411"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.923"
-            data-empty=""
-          >
-            <title>15:00 · 24</title>
-          </rect>
-          <rect
-            x="436"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>16:00 · 22</title>
-          </rect>
-          <rect
-            x="461"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>17:00 · 19</title>
-          </rect>
-          <rect
-            x="486"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.741"
-            data-empty=""
-          >
-            <title>18:00 · 14</title>
-          </rect>
-          <rect
-            x="511"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.781"
-            data-empty=""
-          >
-            <title>19:00 · 16</title>
-          </rect>
-          <rect
-            x="536"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.873"
-            data-empty=""
-          >
-            <title>20:00 · 21</title>
-          </rect>
-          <rect
-            x="561"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.955"
-            data-empty=""
-          >
-            <title>21:00 · 26</title>
-          </rect>
-          <rect
-            x="586"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.970"
-            data-empty=""
-          >
-            <title>22:00 · 27</title>
-          </rect>
-          <rect
-            x="611"
-            y="47"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>23:00 · 19</title>
-          </rect>
-          <rect
-            x="36"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.568"
-            data-empty=""
-          >
-            <title>00:00 · 7</title>
-          </rect>
-          <rect
-            x="61"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.466"
-            data-empty=""
-          >
-            <title>01:00 · 4</title>
-          </rect>
-          <rect
-            x="86"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.649"
-            data-empty=""
-          >
-            <title>09:00 · 10</title>
-          </rect>
-          <rect
-            x="286"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.781"
-            data-empty=""
-          >
-            <title>10:00 · 16</title>
-          </rect>
-          <rect
-            x="311"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>11:00 · 20</title>
-          </rect>
-          <rect
-            x="336"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>12:00 · 13</title>
-          </rect>
-          <rect
-            x="361"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>13:00 · 18</title>
-          </rect>
-          <rect
-            x="386"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.907"
-            data-empty=""
-          >
-            <title>14:00 · 23</title>
-          </rect>
-          <rect
-            x="411"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.939"
-            data-empty=""
-          >
-            <title>15:00 · 25</title>
-          </rect>
-          <rect
-            x="436"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>16:00 · 22</title>
-          </rect>
-          <rect
-            x="461"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>17:00 · 19</title>
-          </rect>
-          <rect
-            x="486"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>18:00 · 15</title>
-          </rect>
-          <rect
-            x="511"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.781"
-            data-empty=""
-          >
-            <title>19:00 · 16</title>
-          </rect>
-          <rect
-            x="536"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.873"
-            data-empty=""
-          >
-            <title>20:00 · 21</title>
-          </rect>
-          <rect
-            x="561"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.955"
-            data-empty=""
-          >
-            <title>21:00 · 26</title>
-          </rect>
-          <rect
-            x="586"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.985"
-            data-empty=""
-          >
-            <title>22:00 · 28</title>
-          </rect>
-          <rect
-            x="611"
-            y="72"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>23:00 · 20</title>
-          </rect>
-          <rect
-            x="36"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.537"
-            data-empty=""
-          >
-            <title>00:00 · 6</title>
-          </rect>
-          <rect
-            x="61"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>01:00 · 3</title>
-          </rect>
-          <rect
-            x="86"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.624"
-            data-empty=""
-          >
-            <title>09:00 · 9</title>
-          </rect>
-          <rect
-            x="286"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>10:00 · 15</title>
-          </rect>
-          <rect
-            x="311"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>11:00 · 19</title>
-          </rect>
-          <rect
-            x="336"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.697"
-            data-empty=""
-          >
-            <title>12:00 · 12</title>
-          </rect>
-          <rect
-            x="361"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>13:00 · 17</title>
-          </rect>
-          <rect
-            x="386"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>14:00 · 22</title>
-          </rect>
-          <rect
-            x="411"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.907"
-            data-empty=""
-          >
-            <title>15:00 · 23</title>
-          </rect>
-          <rect
-            x="436"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.873"
-            data-empty=""
-          >
-            <title>16:00 · 21</title>
-          </rect>
-          <rect
-            x="461"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>17:00 · 18</title>
-          </rect>
-          <rect
-            x="486"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.741"
-            data-empty=""
-          >
-            <title>18:00 · 14</title>
-          </rect>
-          <rect
-            x="511"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>19:00 · 15</title>
-          </rect>
-          <rect
-            x="536"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>20:00 · 20</title>
-          </rect>
-          <rect
-            x="561"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.939"
-            data-empty=""
-          >
-            <title>21:00 · 25</title>
-          </rect>
-          <rect
-            x="586"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.955"
-            data-empty=""
-          >
-            <title>22:00 · 26</title>
-          </rect>
-          <rect
-            x="611"
-            y="97"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>23:00 · 19</title>
-          </rect>
-          <rect
-            x="36"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.537"
-            data-empty=""
-          >
-            <title>00:00 · 6</title>
-          </rect>
-          <rect
-            x="61"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>01:00 · 3</title>
-          </rect>
-          <rect
-            x="86"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.624"
-            data-empty=""
-          >
-            <title>09:00 · 9</title>
-          </rect>
-          <rect
-            x="286"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>10:00 · 15</title>
-          </rect>
-          <rect
-            x="311"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>11:00 · 18</title>
-          </rect>
-          <rect
-            x="336"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.697"
-            data-empty=""
-          >
-            <title>12:00 · 12</title>
-          </rect>
-          <rect
-            x="361"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.781"
-            data-empty=""
-          >
-            <title>13:00 · 16</title>
-          </rect>
-          <rect
-            x="386"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.873"
-            data-empty=""
-          >
-            <title>14:00 · 21</title>
-          </rect>
-          <rect
-            x="411"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>15:00 · 22</title>
-          </rect>
-          <rect
-            x="436"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>16:00 · 20</title>
-          </rect>
-          <rect
-            x="461"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>17:00 · 18</title>
-          </rect>
-          <rect
-            x="486"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>18:00 · 13</title>
-          </rect>
-          <rect
-            x="511"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>19:00 · 15</title>
-          </rect>
-          <rect
-            x="536"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>20:00 · 19</title>
-          </rect>
-          <rect
-            x="561"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.923"
-            data-empty=""
-          >
-            <title>21:00 · 24</title>
-          </rect>
-          <rect
-            x="586"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.939"
-            data-empty=""
-          >
-            <title>22:00 · 25</title>
-          </rect>
-          <rect
-            x="611"
-            y="122"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>23:00 · 18</title>
-          </rect>
-          <rect
-            x="36"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.503"
-            data-empty=""
-          >
-            <title>00:00 · 5</title>
-          </rect>
-          <rect
-            x="61"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>01:00 · 3</title>
-          </rect>
-          <rect
-            x="86"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.596"
-            data-empty=""
-          >
-            <title>09:00 · 8</title>
-          </rect>
-          <rect
-            x="286"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>10:00 · 13</title>
-          </rect>
-          <rect
-            x="311"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>11:00 · 15</title>
-          </rect>
-          <rect
-            x="336"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.649"
-            data-empty=""
-          >
-            <title>12:00 · 10</title>
-          </rect>
-          <rect
-            x="361"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.741"
-            data-empty=""
-          >
-            <title>13:00 · 14</title>
-          </rect>
-          <rect
-            x="386"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>14:00 · 18</title>
-          </rect>
-          <rect
-            x="411"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>15:00 · 19</title>
-          </rect>
-          <rect
-            x="436"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>16:00 · 17</title>
-          </rect>
-          <rect
-            x="461"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>17:00 · 15</title>
-          </rect>
-          <rect
-            x="486"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.673"
-            data-empty=""
-          >
-            <title>18:00 · 11</title>
-          </rect>
-          <rect
-            x="511"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>19:00 · 13</title>
-          </rect>
-          <rect
-            x="536"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>20:00 · 17</title>
-          </rect>
-          <rect
-            x="561"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>21:00 · 20</title>
-          </rect>
-          <rect
-            x="586"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>22:00 · 22</title>
-          </rect>
-          <rect
-            x="611"
-            y="147"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>23:00 · 15</title>
-          </rect>
-          <rect
-            x="36"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.503"
-            data-empty=""
-          >
-            <title>00:00 · 5</title>
-          </rect>
-          <rect
-            x="61"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>01:00 · 3</title>
-          </rect>
-          <rect
-            x="86"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>02:00 · 1</title>
-          </rect>
-          <rect
-            x="111"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>03:00 · 0</title>
-          </rect>
-          <rect
-            x="136"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>04:00 · 0</title>
-          </rect>
-          <rect
-            x="161"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>05:00 · 0</title>
-          </rect>
-          <rect
-            x="186"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:1"
-            data-empty="true"
-          >
-            <title>06:00 · 0</title>
-          </rect>
-          <rect
-            x="211"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.308"
-            data-empty=""
-          >
-            <title>07:00 · 1</title>
-          </rect>
-          <rect
-            x="236"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.423"
-            data-empty=""
-          >
-            <title>08:00 · 3</title>
-          </rect>
-          <rect
-            x="261"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.596"
-            data-empty=""
-          >
-            <title>09:00 · 8</title>
-          </rect>
-          <rect
-            x="286"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>10:00 · 13</title>
-          </rect>
-          <rect
-            x="311"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>11:00 · 15</title>
-          </rect>
-          <rect
-            x="336"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.649"
-            data-empty=""
-          >
-            <title>12:00 · 10</title>
-          </rect>
-          <rect
-            x="361"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.741"
-            data-empty=""
-          >
-            <title>13:00 · 14</title>
-          </rect>
-          <rect
-            x="386"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.820"
-            data-empty=""
-          >
-            <title>14:00 · 18</title>
-          </rect>
-          <rect
-            x="411"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.838"
-            data-empty=""
-          >
-            <title>15:00 · 19</title>
-          </rect>
-          <rect
-            x="436"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>16:00 · 17</title>
-          </rect>
-          <rect
-            x="461"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>17:00 · 15</title>
-          </rect>
-          <rect
-            x="486"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.673"
-            data-empty=""
-          >
-            <title>18:00 · 11</title>
-          </rect>
-          <rect
-            x="511"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.719"
-            data-empty=""
-          >
-            <title>19:00 · 13</title>
-          </rect>
-          <rect
-            x="536"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.801"
-            data-empty=""
-          >
-            <title>20:00 · 17</title>
-          </rect>
-          <rect
-            x="561"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.856"
-            data-empty=""
-          >
-            <title>21:00 · 20</title>
-          </rect>
-          <rect
-            x="586"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.890"
-            data-empty=""
-          >
-            <title>22:00 · 22</title>
-          </rect>
-          <rect
-            x="611"
-            y="172"
-            width="22"
-            height="22"
-            rx="4"
-            class="cell"
-            style="fill-opacity:0.761"
-            data-empty=""
-          >
-            <title>23:00 · 15</title>
-          </rect>
-        </svg>
-      </details>
 
       <section>
         <h2>

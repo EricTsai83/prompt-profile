@@ -62,9 +62,10 @@ describe("report languages", () => {
     Effect.gen(function* () {
       const out = renderHtml(englishOnly(yield* sample()))
       expect(out).not.toContain("My AI collaboration profile")
-      expect(out.match(/class="chart"/g)?.length).toBe(2)
+      expect(out.match(/class="cols /g)?.length).toBe(2)
       expect(out).toContain('class="donut"')
-      expect(out).toContain('class="heatmap"')
+      expect(out).toContain('class="heat"')
+      expect(out).toContain('class="cal"')
       expect(out).toMatch(/<details class="dimension">/)
     }),
   )
@@ -96,5 +97,34 @@ describe("report languages", () => {
         join(dir, "card.zh-TW.png"),
       ])
     }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("hovering a chart cell names the time, the count and the main projects", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const out = renderHtml(p)
+      // Friday 23:00 in both languages
+      const n = p.stats.activityGrid[4]![23]!
+      expect(out).toContain(`data-tip-en="Fri 23:00 · ${n} prompts`)
+      expect(out).toContain(`data-tip-zh-TW="週五 23:00 · ${n} 個 prompt`)
+      const day = p.stats.activity.days[0]!
+      expect(out).toMatch(new RegExp(`data-tip-en="[^"]*· ${day.count} prompts?`))
+      expect(out).toContain("content:attr(data-tip-zh-TW)")
+      expect(out).toContain("drawstuff")
+    }),
+  )
+
+  it.effect("without project activity (an older profile) the project charts are left out", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const old = {
+        ...p,
+        stats: { ...p.stats, activity: { projects: [], days: [], gridByProject: [] } },
+      }
+      const out = renderHtml(old)
+      expect(out).not.toContain('class="cal"')
+      expect(out).not.toContain('class="ranks"')
+      expect(out).toContain('class="heat"')
+    }),
   )
 })

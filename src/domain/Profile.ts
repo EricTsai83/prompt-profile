@@ -4,9 +4,10 @@ import { Stats } from "./Stats.ts"
 
 /**
  * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
- * languages carry translated generated text only). Version 2 files are migrated on decode.
+ * languages carry translated generated text only). 4: `stats.activity` (per day and per
+ * weekday × hour, by project). Versions 2 and 3 are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 3 as const
+export const PROFILE_SCHEMA_VERSION = 4 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -157,10 +158,10 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && found !== 2) {
+    if (found !== PROFILE_SCHEMA_VERSION && found !== 2 && found !== 3) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
-    // Version 2 had English text only.
+    // Version 2 had English text only; versions 2–3 lack `stats.activity` (decoded as empty).
     const current =
       found === 2
         ? {
@@ -169,7 +170,9 @@ export const decodeProfile = (
             languages: ["en"],
             translations: {},
           }
-        : input
+        : found === 3
+          ? { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
+          : input
     return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(
       Effect.mapError((e) => new InvalidProfile({ message: e.message })),
     )

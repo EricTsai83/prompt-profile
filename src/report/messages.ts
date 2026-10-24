@@ -56,6 +56,18 @@ export interface Messages {
   readonly cardLatest: string
   readonly cardPeak: string
   readonly graphicAlt: string
+  readonly daily: string
+  readonly dailyNote: string
+  readonly less: string
+  readonly more: string
+  readonly prompts: (n: number) => string
+  readonly projects: string
+  readonly projectsNote: string
+  readonly projectsByWeek: string
+  readonly other: string
+  readonly weekOf: (date: string) => string
+  readonly cellTip: (weekday: string, hour: string) => string
+  readonly hourTip: (hour: string, n: number) => string
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
@@ -123,6 +135,18 @@ const en: Messages = {
   cardLatest: "latest session",
   cardPeak: "peak hour",
   graphicAlt: "Prompts by hour of day",
+  daily: "Every day",
+  dailyNote: "One square per day; darker = more prompts",
+  less: "Less",
+  more: "More",
+  prompts: (n) => plural(n, "prompt", "prompts"),
+  projects: "Projects",
+  projectsNote: "Top projects by prompts (folder names)",
+  projectsByWeek: "Projects by week",
+  other: "Other",
+  weekOf: (d) => `Week of ${d}`,
+  cellTip: (w, h) => `${w} ${h}`,
+  hourTip: (h, n) => `${h} · ${plural(n, "prompt", "prompts")}`,
 }
 
 const zhTW: Messages = {
@@ -188,6 +212,18 @@ const zhTW: Messages = {
   cardLatest: "最晚的 session",
   cardPeak: "最活躍時段",
   graphicAlt: "各時段的 prompt 數",
+  daily: "每一天",
+  dailyNote: "每格代表一天，顏色越深代表 prompt 越多",
+  less: "少",
+  more: "多",
+  prompts: (n) => `${n.toLocaleString("zh-TW")} 個 prompt`,
+  projects: "專案",
+  projectsNote: "依 prompt 數排序的專案（資料夾名稱）",
+  projectsByWeek: "每週的專案分布",
+  other: "其他",
+  weekOf: (d) => `${d} 那一週`,
+  cellTip: (w, h) => `週${w} ${h}`,
+  hourTip: (h, n) => `${h} · ${n.toLocaleString("zh-TW")} 個 prompt`,
 }
 
 /** Every text of the report and the card, per language. */

@@ -22,9 +22,11 @@ npm i -g prompt-profile && prompt-profile
 
 Output (in `./prompt-profile-report/` by default):
 
-- `report.html`: a single-file report that works offline — charts of when and how you prompt,
-  traits, five dimensions and fun facts, with verified quotes behind collapsible sections, and a
-  language switch when the report has more than one language
+- `report.html`: a single-file report that works offline — a daily calendar, prompts by hour,
+  weekday and project (hover or tap any square or bar for the count and main projects), language
+  and habit charts, traits, five dimensions and fun facts, with verified quotes behind collapsible
+  sections, and a language switch when the report has more than one language. It shows your
+  project folder names: keep it private (the card never shows them)
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
   other language (**omits evidence quotes**)
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)

@@ -1,4 +1,4 @@
-import { Schema } from "effect"
+import { Effect, Schema } from "effect"
 import { ORIGINS, SOURCE_IDS } from "./Source.ts"
 import { isTimeZone } from "./timezone.ts"
 
@@ -12,6 +12,30 @@ const countsFor = <const K extends ReadonlyArray<string>>(keys: K) =>
   Schema.Struct(
     Object.fromEntries(keys.map((k) => [k, Count])) as { readonly [P in K[number]]: typeof Count },
   )
+
+/** Prompts on one logical day (local, 05:00 boundary), split like `Activity.projects`. */
+const DayActivity = Schema.Struct({
+  /** YYYY-MM-DD in `timezone`. */
+  date: Schema.String,
+  count: Count,
+  /** One count per `Activity.projects` entry, then "other" (no project or not in the top). */
+  byProject: Schema.Array(Count),
+})
+
+/** Where and when: per day and per weekday × hour, split by the top projects. */
+export const Activity = Schema.Struct({
+  /** Up to MAX_ACTIVITY_PROJECTS redacted project folder names, busiest first. */
+  projects: Schema.Array(Schema.String),
+  /** Days with at least one prompt, oldest first. */
+  days: Schema.Array(DayActivity),
+  /** 7 × 24 (0 = Monday), each cell split like `days[].byProject`; empty in old profiles. */
+  gridByProject: Schema.Array(Schema.Array(Schema.Array(Count))),
+})
+export type Activity = typeof Activity.Type
+
+export const MAX_ACTIVITY_PROJECTS = 6
+
+export const EMPTY_ACTIVITY: typeof Activity.Encoded = { projects: [], days: [], gridByProject: [] }
 
 export const Stats = Schema.Struct({
   window: Schema.Struct({
@@ -46,6 +70,8 @@ export const Stats = Schema.Struct({
   longestStreakDays: Count,
   /** e.g. "03:12"; the day boundary is 05:00. */
   latestTime: Schema.NullOr(Schema.String),
+  /** Missing in profiles before schema version 4. */
+  activity: Activity.pipe(Schema.withDecodingDefaultKey(Effect.succeed(EMPTY_ACTIVITY))),
 })
 export type Stats = typeof Stats.Type
 

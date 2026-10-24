@@ -1,7 +1,16 @@
 import { DateTime } from "effect"
 import type { DimensionKey, Evidence, Language, Profile } from "../domain/Profile.ts"
-import { contentIn, type Content } from "./content.ts"
-import { peakHour, type Stats } from "../domain/Stats.ts"
+import {
+  calendar,
+  chartStyle,
+  heatmap,
+  hourChart,
+  projectRanking,
+  projectWeeks,
+  weekdayChart,
+} from "./charts.ts"
+import { LANG_TAGS, makeLoc, type Loc } from "./loc.ts"
+import { peakHour } from "../domain/Stats.ts"
 import { displayFontDataUrl } from "./fonts.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
@@ -13,51 +22,9 @@ import {
   type RenderOptions,
   type ReportTokens,
 } from "./looks.ts"
-import { MESSAGES, type Messages } from "./messages.ts"
+import { MESSAGES } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
-
-/** `lang` attribute per report language (zh-TW content is Traditional Chinese). */
-const LANG_TAGS: Record<Language, string> = { en: "en", "zh-TW": "zh-Hant-TW" }
-
-/**
- * Text in every report language. With several languages each version is a `[data-l]` span
- * and CSS shows the selected one (no JavaScript); with one language it is plain text.
- */
-interface Loc {
-  readonly langs: ReadonlyArray<Language>
-  readonly text: (pick: (m: Messages, c: Content, lang: Language) => string) => Raw
-  /** An SVG `<text>` per language (spans cannot be toggled inside SVG text). */
-  readonly svgText: (
-    attrs: string,
-    pick: (m: Messages, c: Content, lang: Language) => string,
-  ) => Raw
-  /** Default-language string for attributes (aria-label, title). */
-  readonly attr: (pick: (m: Messages, c: Content, lang: Language) => string) => string
-}
-
-const makeLoc = (p: Profile): Loc => {
-  const langs = p.languages
-  const contents = new Map(langs.map((l) => [l, contentIn(p, l)]))
-  const one = langs.length === 1
-  const value = (l: Language, pick: (m: Messages, c: Content, lang: Language) => string) =>
-    pick(MESSAGES[l], contents.get(l)!, l)
-  return {
-    langs,
-    text: (pick) =>
-      one
-        ? html`${value(langs[0]!, pick)}`
-        : html`${langs.map(
-            (l) => html`<span data-l="${l}" lang="${LANG_TAGS[l]}">${value(l, pick)}</span>`,
-          )}`,
-    svgText: (attrs, pick) =>
-      html`${langs.map(
-        (l) =>
-          html`<text ${raw(attrs)} ${one ? "" : raw(`data-l="${l}"`)}>${value(l, pick)}</text>`,
-      )}`,
-    attr: (pick) => value(langs[0]!, pick),
-  }
-}
 
 const formatDate = (t: DateTime.Utc, timeZone: string, locale: string): string =>
   new Intl.DateTimeFormat(locale, {
@@ -81,78 +48,6 @@ const percent = (x: number) => Math.round(x * 100)
 const hh = (h: number) => `${String(h).padStart(2, "0")}:00`
 
 // ---- charts (inline SVG / CSS, drawn from `stats` only) ----------------------------------
-
-/** Prompts per hour; the busiest hour is highlighted and labelled. */
-const hourChart = (s: Stats, loc: Loc): Raw => {
-  const max = Math.max(1, ...s.hourHistogram)
-  const peak = peakHour(s)
-  const bars = s.hourHistogram.map((n, h) => {
-    const height = n === 0 ? 2 : 4 + (116 * n) / max
-    return html`<rect
-      x="${h * 20 + 3}"
-      y="${124 - height}"
-      width="14"
-      height="${height.toFixed(1)}"
-      rx="3"
-      class="${h === peak ? "bar peak" : "bar"}"
-      ><title>${hh(h)} · ${n}</title></rect
-    >`
-  })
-  // The first and last labels align to the chart edges so they are never cut off.
-  const ticks = [0, 6, 12, 18, 23].map(
-    (h) =>
-      html`<text
-        x="${h === 0 ? 3 : h === 23 ? 477 : h * 20 + 10}"
-        y="142"
-        text-anchor="${h === 0 ? "start" : h === 23 ? "end" : "middle"}"
-        class="axis"
-        >${hh(h)}</text
-      >`,
-  )
-  const label =
-    peak === null
-      ? ""
-      : html`<text
-          x="${peak * 20 + 10}"
-          y="${124 - (4 + (116 * s.hourHistogram[peak]!) / max) - 6}"
-          text-anchor="middle"
-          class="value"
-          >${s.hourHistogram[peak]}</text
-        >`
-  return html`<svg
-    viewBox="0 0 480 150"
-    class="chart"
-    role="img"
-    aria-label="${loc.attr((m) => m.byHour)}"
-  >
-    ${bars}${ticks}${label}
-  </svg>`
-}
-
-const weekdayChart = (s: Stats, loc: Loc): Raw => {
-  const max = Math.max(1, ...s.weekdayHistogram)
-  const best = s.weekdayHistogram.indexOf(Math.max(...s.weekdayHistogram))
-  const bars = s.weekdayHistogram.map((n, d) => {
-    const height = n === 0 ? 2 : 4 + (100 * n) / max
-    return html`<rect
-        x="${d * 40 + 8}"
-        y="${110 - height}"
-        width="24"
-        height="${height.toFixed(1)}"
-        rx="4"
-        class="${d === best && n > 0 ? "bar peak" : "bar"}"
-        ><title>${n}</title></rect
-      >${loc.svgText(`x="${d * 40 + 20}" y="130" text-anchor="middle" class="axis"`, (m) => m.weekdays[d]!)}`
-  })
-  return html`<svg
-    viewBox="0 0 280 140"
-    class="chart"
-    role="img"
-    aria-label="${loc.attr((m) => m.byWeekday)}"
-  >
-    ${bars}
-  </svg>`
-}
 
 /** A donut of ratios with a legend; segments use the accent at three strengths. */
 const donut = (parts: ReadonlyArray<{ readonly value: number; readonly label: Raw }>): Raw => {
@@ -231,53 +126,6 @@ const ring = (value: number, label: Raw): Raw =>
     </svg>
     <div><b>${percent(value)}%</b><span>${label}</span></div>
   </div>`
-
-/** Weekday × hour heatmap. */
-export const heatmapSvg = (grid: Stats["activityGrid"], loc: Loc): Raw => {
-  const cell = 22
-  const gap = 3
-  const left = 36
-  const top = 22
-  const max = Math.max(1, ...grid.flat())
-  const width = left + 24 * (cell + gap)
-  const height = top + 7 * (cell + gap)
-  const cells = grid.flatMap((row, w) =>
-    row.map((n, h) => {
-      const level = n === 0 ? 0 : 0.15 + 0.85 * Math.sqrt(n / max)
-      return html`<rect
-        x="${left + h * (cell + gap)}"
-        y="${top + w * (cell + gap)}"
-        width="${cell}"
-        height="${cell}"
-        rx="4"
-        class="cell"
-        style="fill-opacity:${level === 0 ? 1 : level.toFixed(3)}"
-        data-empty="${n === 0}"
-        ><title>${hh(h)} · ${n}</title></rect
-      >`
-    }),
-  )
-  const hours = [0, 3, 6, 9, 12, 15, 18, 21].map(
-    (h) =>
-      html`<text x="${left + h * (cell + gap) + cell / 2}" y="14" text-anchor="middle" class="axis"
-        >${String(h).padStart(2, "0")}</text
-      >`,
-  )
-  const days = grid.map((_row, w) =>
-    loc.svgText(
-      `x="${left - 8}" y="${top + w * (cell + gap) + cell / 2 + 4}" text-anchor="end" class="axis"`,
-      (m) => m.weekdays[w]!,
-    ),
-  )
-  return html`<svg
-    viewBox="0 0 ${width} ${height}"
-    role="img"
-    aria-label="${loc.attr((m) => m.heatmap)}"
-    class="heatmap"
-  >
-    ${hours}${days}${cells}
-  </svg>`
-}
 
 // ---- profile sections ---------------------------------------------------------------------
 
@@ -380,10 +228,14 @@ const CLASSIC_IDENTITY: Identity = {
   graphicDetail: "#5b5bd6",
 }
 
+/** Categorical colors for up to six projects, then "other"; readable in light and dark. */
+const PROJECT_PALETTE = `--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#a0a4ad`
+
 const tokens = (t: ReportTokens) =>
   `--bg:${t.bg};--fg:${t.fg};--muted:${t.muted};--card:${t.card};--border:${t.border};--accent:${t.accent};--accent-soft:${t.accentSoft};--warn:${t.warn};--empty:${t.empty}`
 
 const BASE_STYLE = `
+:root{${PROJECT_PALETTE}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 .page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}
@@ -410,14 +262,14 @@ p{margin:0}
 .grid{display:grid;gap:12px;margin-bottom:12px}
 .g-2{grid-template-columns:2fr 1fr}
 .g-3{grid-template-columns:repeat(3,1fr)}
+.g-2r{grid-template-columns:1fr 1.6fr}
+.wide{margin-bottom:12px}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.panel-head h2{margin-bottom:0}.panel-head .note{margin-top:0}
 .panel{padding:18px 20px}
 .panel h2{font-size:14px;margin-bottom:10px}
 .panel .note{color:var(--muted);font-size:12px;margin-top:6px}
-.chart{width:100%;height:auto;display:block}
-.bar{fill:var(--accent);fill-opacity:.35}
-.bar.peak{fill-opacity:1}
 .axis{fill:var(--muted);font-size:11px}
-.value{fill:var(--fg);font-size:12px;font-weight:700}
 .donut{display:flex;align-items:center;gap:16px}
 .donut svg{width:112px;flex:none}
 .track{fill:none;stroke:var(--empty);stroke-width:14}
@@ -442,11 +294,6 @@ p{margin:0}
 .length{margin-top:14px}
 .length .shares li{grid-template-columns:84px 1fr 78px}
 details summary{cursor:pointer}
-details.panel>summary{font-weight:700;font-size:14px}
-details.panel>summary .note{font-weight:400;margin-left:8px}
-.heatmap{width:100%;height:auto;margin-top:12px}
-.heatmap .cell{fill:var(--accent)}
-.heatmap .cell[data-empty="true"]{fill:var(--empty)}
 section>h2{font-size:20px;margin:36px 0 14px}
 .traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .trait{padding:18px 20px}
@@ -479,10 +326,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .about summary{color:var(--fg);font-weight:600}
 .about p{margin-top:8px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media (max-width:1000px){.g-3{grid-template-columns:repeat(2,1fr)}.g-2r{grid-template-columns:1fr}}
 @media (max-width:760px){
 .hero{padding:26px 22px}.hero .copy{max-width:none}.hero .split{display:none}
 .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
-.kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3{grid-template-columns:1fr}
+.kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
 .dim-name{min-width:0}.dimension>summary{flex-wrap:wrap;gap:6px 12px}
 }
 `
@@ -539,6 +387,9 @@ export const renderHtml = (
   })
   const period = s.dateRange
   const n = (x: number) => html`${x.toLocaleString("en")}`
+  const cal = calendar(s, loc)
+  const ranking = projectRanking(s, loc)
+  const weekly = projectWeeks(s, loc)
 
   const page = html`<!doctype html>
     <html lang="${LANG_TAGS[loc.langs[0]!]}"${look ? raw(` data-look="${look.id}"`) : ""}>
@@ -552,7 +403,9 @@ export const renderHtml = (
         />
         <title>${profile.archetype.name} · prompt-profile</title>
         <style>
-          ${raw(BASE_STYLE)}${raw(lookStyle(look))}${raw(languageStyle(loc.langs))}
+          ${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(lookStyle(look))}${raw(
+            languageStyle(loc.langs),
+          )}
         </style>
       </head>
       <body>
@@ -637,6 +490,18 @@ export const renderHtml = (
             )}
           </section>
 
+          ${
+            cal
+              ? html`<article class="panel wide">
+                  <div class="panel-head">
+                    <h2>${loc.text((m) => m.daily)}</h2>
+                    <p class="note">${loc.text((m) => m.dailyNote)}</p>
+                  </div>
+                  ${cal}
+                </article>`
+              : ""
+          }
+
           <div class="grid g-2">
             <article class="panel">
               <h2>${loc.text((m) => m.byHour)}</h2>
@@ -652,6 +517,30 @@ export const renderHtml = (
               ${weekdayChart(s, loc)}
             </article>
           </div>
+
+          <article class="panel wide">
+            <div class="panel-head">
+              <h2>${loc.text((m) => m.heatmap)}</h2>
+              <p class="note">${loc.text((m) => m.heatmapNote)}</p>
+            </div>
+            ${heatmap(s, loc)}
+          </article>
+
+          ${
+            ranking && weekly
+              ? html`<div class="grid g-2r">
+                  <article class="panel">
+                    <h2>${loc.text((m) => m.projects)}</h2>
+                    ${ranking}
+                    <p class="note">${loc.text((m) => m.projectsNote)}</p>
+                  </article>
+                  <article class="panel">
+                    <h2>${loc.text((m) => m.projectsByWeek)}</h2>
+                    ${weekly}
+                  </article>
+                </div>`
+              : ""
+          }
 
           <div class="grid g-3">
             <article class="panel">
@@ -715,15 +604,6 @@ export const renderHtml = (
               </div>
             </article>
           </div>
-
-          <details class="panel">
-            <summary>
-              ${loc.text((m) => m.heatmap)}<span class="note"
-                >${loc.text((m) => m.heatmapNote)}</span
-              >
-            </summary>
-            ${heatmapSvg(s.activityGrid, loc)}
-          </details>
 
           <section>
             <h2>${loc.text((m) => m.traits)}</h2>

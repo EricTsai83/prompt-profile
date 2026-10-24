@@ -132,6 +132,8 @@ describe("analyze", () => {
         Sunday: 7,
       })
       expect(sent.activityGrid.Saturday[3]).toBe(503)
+      // per-project activity stays local: project names by day are not needed for the text
+      expect(sent.activity).toBeUndefined()
     }),
   )
 
