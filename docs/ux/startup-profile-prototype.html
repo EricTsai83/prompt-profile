@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en" data-direction="signal" data-capture="report">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Your prompt profile — share-first design study</title>
+    <style>
+          @font-face {font-family:Bricolage;src:url("assets/BricolageGrotesque-latin.woff2") format("woff2");font-weight:200 800;font-display:block}
+          @font-face {font-family:Inter;src:url("../../src/report/fonts/Inter-Regular.woff") format("woff");font-weight:400;font-display:block}
+          @font-face {font-family:Inter;src:url("../../src/report/fonts/Inter-Bold.woff") format("woff");font-weight:700;font-display:block}
+          :root {color-scheme:light;--paper:#f5f7ff;--text:#14204c;--muted:#657090;--accent:#3155f5;--line:#dce2f1;--display:Bricolage,system-ui,sans-serif;--reading:Inter,system-ui,sans-serif}
+          [data-direction="afterhours"] {--paper:#eef3f8;--text:#10243a;--muted:#596f82;--accent:#496c97;--line:#d3dfe8}
+          [data-direction="studio"] {--paper:#fff7f4;--text:#252323;--muted:#74615c;--accent:#da452e;--line:#ecded9}
+          * {box-sizing:border-box} body {margin:0;background:var(--paper);color:var(--text);font:15px/1.6 var(--reading)}
+          button,input {font:inherit} button {cursor:pointer} button:focus-visible,input:focus-visible,summary:focus-visible {outline:3px solid #dd8a16;outline-offset:5px}
+          button {color:inherit} [hidden] {display:none!important} h1,h2,h3,p {margin:0} h1,h2,h3 {font-family:var(--display);letter-spacing:-.035em;line-height:1.05}
+          .shell {max-width:1200px;padding:0 32px;margin:auto}
+          .topbar {display:flex;align-items:center;justify-content:space-between;padding:25px 0;border-bottom:1px solid var(--line);gap:16px}
+          .brand {display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:21px;font-weight:700;letter-spacing:-.04em;white-space:nowrap}
+          .brandmark {width:26px;height:26px;position:relative;display:inline-block;background:currentColor;border-radius:8px 8px 8px 2px}
+          .brandmark:after {content:"";position:absolute;width:7px;height:7px;left:10px;top:9px;border-radius:50%;background:var(--paper)}
+          .prototype-label {font-size:11px;letter-spacing:0;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:4px 8px}
+          .intro {display:flex;align-items:flex-end;justify-content:space-between;gap:22px;padding:35px 0 26px}
+          .intro h1 {font-size:42px;font-weight:700}.intro p {margin-top:9px;color:var(--muted);font-size:14px}
+          .primary {border:0;border-radius:10px;padding:13px 18px;background:var(--text);color:var(--paper);font-weight:700;font-size:13px;white-space:nowrap}
+          .chooser {display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 18px}
+          .choices {display:flex;gap:7px}.choice {display:flex;align-items:center;gap:9px;border:1px solid transparent;border-radius:8px;padding:9px 14px;background:transparent;color:var(--muted);font-size:13px}
+          .choice[aria-selected="true"] {background:white;border-color:var(--line);color:var(--text);box-shadow:0 2px 3px #18255108}
+          .swatch {width:12px;height:12px;border-radius:4px;background:#3155f5;display:inline-block}.choice[data-choice="afterhours"] .swatch {background:#10243a}.choice[data-choice="studio"] .swatch {background:#ff654b}
+          .chooser small {font-size:11px;color:var(--muted)}
+          .preview-wrap {container-type:inline-size;position:relative;isolation:isolate;border-radius:20px;overflow:hidden;box-shadow:0 16px 48px #17264c10}
+          .identity-card {width:100%;aspect-ratio:1200 / 630;position:relative;overflow:hidden;font-family:var(--display);color:white;background:#3155f5;isolation:isolate}
+          .card-inner {height:100%;position:relative;padding:4.4cqw 5cqw;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+          .card-top {display:flex;align-items:center;justify-content:space-between;font-size:1.55cqw;line-height:1.2}
+          .card-wordmark {font-weight:700;letter-spacing:-.05em}.card-top .edition {font-family:var(--reading);font-size:1.02cqw;font-weight:400;opacity:.8}
+          .card-copy {position:relative;max-width:73%;z-index:3}
+          .identity-card h2 {font-size:8.7cqw;line-height:.94;font-weight:800;letter-spacing:-.035em;margin:0 0 1.8cqw;max-width:100%;font-variation-settings:"wdth" 95}
+          .card-description {font-family:var(--reading);font-size:1.62cqw;line-height:1.5;font-weight:400;max-width:42cqw;opacity:.94}
+          .card-traits {display:flex;gap:.7cqw;align-items:center;margin-top:1.8cqw;font:1.05cqw/1.4 var(--reading)}
+          .card-traits span {display:inline-block;border:1px solid #ffffff60;border-radius:3cqw;padding:.42cqw .9cqw}
+          .card-bottom {display:flex;justify-content:space-between;align-items:flex-end;gap:1cqw}
+          .card-metrics {display:flex;gap:3cqw;font-family:var(--reading)}.card-metrics strong {display:block;font:700 2.9cqw/1 var(--display);letter-spacing:-.04em;margin-bottom:.45cqw}.card-metrics small {font-size:.95cqw;opacity:.8}
+          .card-signoff {font:1.07cqw/1.4 var(--reading);opacity:.8;text-align:right}
+          .rhythm {position:absolute;right:3.5cqw;top:16.5cqw;width:28cqw;height:20cqw;z-index:1;color:#e0f59a}
+          .rhythm svg {display:block;width:100%;height:100%;overflow:visible}.rhythm-caption {position:absolute;right:6cqw;top:37.6cqw;font:1.03cqw/1.4 var(--reading);color:inherit;opacity:.7;z-index:3}
+          .signal-line {position:absolute;width:43cqw;height:18cqw;border:1px solid #a8b8ff44;border-radius:12cqw;right:-5cqw;top:10cqw;transform:rotate(-35deg);z-index:0}
+          .afterhours.identity-card {background:#10243a;color:#eaf4fb}
+          .afterhours .card-inner {padding-top:4.3cqw}.afterhours h2 {font-weight:650;font-size:8.2cqw;line-height:.99;letter-spacing:-.035em}
+          .afterhours .card-copy {max-width:67%}.afterhours .card-description {max-width:39cqw;color:#c7dce9}.afterhours .card-traits span {border-color:#8ca8bc70;color:#bcebff}
+          .afterhours .rhythm {right:3.8cqw;top:12.5cqw;width:31cqw;height:31cqw;color:#b9b3ff}
+          .afterhours .rhythm-caption {top:44cqw;right:7.8cqw;color:#bcebff}.afterhours .card-metrics small {color:#a8c1d2}.afterhours .edition {color:#bcebff}
+          .afterhours .signal-line {display:none}
+          .studio.identity-card {background:#ffffff;color:#252323}
+        .studio.identity-card:before {content:"";position:absolute;right:0;top:0;width:36%;height:100%;background:#ff654b}
+          .studio .card-top {color:#252323}.studio .card-copy {max-width:66%}.studio h2 {font-size:7.7cqw;line-height:.92;font-weight:800;letter-spacing:-.04em}
+          .studio .card-description {max-width:42cqw;font-weight:400}.studio .card-traits span {border-color:#ecb0b8;background:#fff0ed}
+          .studio .rhythm {right:3.8cqw;top:18cqw;width:24cqw;height:23cqw;color:#ffd5dd;transform:rotate(-9deg)}
+          .studio .rhythm-caption {top:41cqw;right:6.5cqw;font-weight:700;opacity:.85}.studio .signal-line {display:none}
+          .preview-note {display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:11px;margin:13px 2px 0}
+          .story {display:grid;grid-template-columns:1.08fr .92fr;gap:72px;padding:48px 0 42px;border-bottom:1px solid var(--line)}
+          .story h2 {font-size:30px;margin-bottom:21px;font-weight:700}.story p {font-size:14px;line-height:1.75;max-width:60ch}.lead-trait {display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:9px}.lead-trait h3 {font-size:21px;font-weight:700}
+          .confidence {color:var(--muted);font-size:10px;white-space:nowrap}.reading-note {margin-top:13px;color:var(--muted);font-size:12px!important}
+          .evidence {margin:0;border-left:3px solid var(--accent);padding:0 0 0 20px;font:500 22px/1.4 var(--display);letter-spacing:-.02em}.evidence p {font:inherit}
+          details {margin-top:18px;font-size:12px;color:var(--muted)}summary {cursor:pointer;color:var(--text);padding:4px 0}.extra-quote {font-size:12px;padding:12px 0;word-break:break-word}
+          .stats {display:grid;grid-template-columns:repeat(4,1fr);padding:28px 0;gap:20px}.stats strong {font:700 30px/1 var(--display);letter-spacing:-.04em;display:block}.stats span {font-size:11px;color:var(--muted);display:block;margin-top:8px}
+          .page-footer {border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;padding:20px 0 28px;font-size:11px;color:var(--muted)}
+          dialog {width:min(1020px,calc(100% - 28px));max-height:calc(100% - 32px);padding:22px;border:0;border-radius:20px;background:var(--paper);color:var(--text);box-shadow:0 30px 100px #10243a50}
+          dialog::backdrop {background:#10243a99;backdrop-filter:blur(8px)}.dialog-header {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.dialog-header h2 {font-size:26px}.close {border:1px solid var(--line);border-radius:8px;background:transparent;padding:7px 13px;font-size:12px}
+          .privacy-controls {display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:20px;font-size:12px}.privacy-controls label {display:flex;align-items:center;gap:7px}.privacy-controls input {accent-color:var(--accent)}.dialog-note {font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6}
+          html[data-capture="card"] body {background:none;margin:0}html[data-capture="card"] .shell {display:none}html[data-capture="card"] #standalone-card {display:block!important;width:1200px;container-type:inline-size}html[data-capture="card"] #standalone-card .identity-card {height:630px;aspect-ratio:auto;border-radius:0}
+          [data-hide-traits="true"] .card-traits,[data-hide-stats="true"] .card-metrics,[data-hide-rhythm="true"] .rhythm,[data-hide-rhythm="true"] .rhythm-caption,[data-hide-rhythm="true"] .signal-line {visibility:hidden}
+          [data-hide-rhythm="true"] .card-copy {max-width:100%;text-align:center;align-self:center}
+      [data-hide-rhythm="true"] .card-description {max-width:65cqw;margin-inline:auto}
+      [data-hide-rhythm="true"] .card-traits {justify-content:center}
+      @media(max-width:700px) {.shell {padding:0 18px}.topbar {padding:20px 0}.brand {font-size:19px}.prototype-label {font-size:9px;padding:3px 6px}.intro {display:block;padding:30px 0 22px}.intro h1 {font-size:37px}.intro p {font-size:13px;max-width:32ch}.intro .primary {margin-top:20px;width:100%;padding:12px}.chooser {display:block}.choices {gap:3px;justify-content:space-between}.choice {padding:8px 11px;font-size:12px;gap:7px}.chooser small {display:block;margin:10px 0 0;font-size:10px}.preview-wrap {border-radius:13px}.preview-note {display:block;font-size:10px}.preview-note span {display:block;margin-top:4px}.story {grid-template-columns:1fr;gap:32px;padding:34px 0}.story h2 {font-size:27px;margin-bottom:17px}.story p {font-size:13px}.lead-trait h3 {font-size:20px}.evidence {font-size:21px}.stats {grid-template-columns:repeat(2,1fr);gap:26px;padding:28px 0}.stats strong {font-size:30px}.page-footer {display:block;font-size:10px}.page-footer span {display:block;margin-top:5px}.confidence {font-size:9px}.privacy-controls {gap:12px}.dialog-header h2 {font-size:23px}}
+          @media(prefers-reduced-motion:no-preference) {.choice {transition:background .15s,color .15s}.primary:hover {transform:translateY(-1px)}}
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand"><span class="brandmark" aria-hidden="true"></span>prompt/profile</div>
+        <span class="prototype-label">Design study · fictional profile</span>
+      </header>
+      <section class="intro">
+        <div>
+          <h1>A little more you.</h1>
+          <p>Same profile. Pick the version you’d share.</p>
+        </div>
+        <button type="button" class="primary" id="open-share">Preview share card</button>
+      </section>
+      <div class="chooser">
+        <div class="choices" role="tablist" aria-label="Choose a visual direction">
+          <button
+            type="button"
+            class="choice"
+            role="tab"
+            aria-selected="true"
+            aria-controls="profile-preview"
+            data-choice="signal"
+          >
+            <span class="swatch" aria-hidden="true"></span>Signal</button
+          ><button
+            type="button"
+            class="choice"
+            role="tab"
+            aria-selected="false"
+            aria-controls="profile-preview"
+            data-choice="afterhours"
+          >
+            <span class="swatch" aria-hidden="true"></span>Afterhours</button
+          ><button
+            type="button"
+            class="choice"
+            role="tab"
+            aria-selected="false"
+            aria-controls="profile-preview"
+            data-choice="studio"
+          >
+            <span class="swatch" aria-hidden="true"></span>Studio
+          </button>
+        </div>
+        <small>Appearance only. Your profile stays the same.</small>
+      </div>
+      <div
+        class="preview-wrap"
+        id="profile-preview"
+        role="tabpanel"
+        aria-label="Selected profile design"
+      ></div>
+      <div class="preview-note">
+        <span>A fictional profile, made from synthetic prompts.</span
+        ><span>Landscape share composition · 1200 × 630</span>
+      </div>
+      <section class="story">
+        <div>
+          <h2>How you build.</h2>
+          <div class="lead-trait">
+            <h3>Plan first</h3>
+            <span class="confidence">High confidence · sample</span>
+          </div>
+          <p>
+            You ask for the steps and risks before jumping into code. The strongest signal in this
+            sample is the way you structure the work.
+          </p>
+          <p class="reading-note">
+            A profile describes patterns in your prompts. It isn’t a personality test.
+          </p>
+        </div>
+        <div>
+          <h2>Proof, not just a vibe.</h2>
+          <blockquote class="evidence">
+            <p>“don't write code yet, break the plan into small steps”</p>
+          </blockquote>
+          <details>
+            <summary>Read the two sample excerpts</summary>
+            <p class="extra-quote">don't write code yet, break the plan into small steps</p>
+            <p class="extra-quote">
+              &lt;script&gt;alert('x')&lt;/script&gt;
+              &#x9019;&#x6bb5;&#x70ba;&#x4ec0;&#x9ebc;&#x6703;&#x88ab;&#x57f7;&#x884c;&#xff1f;
+            </p>
+          </details>
+          <p class="reading-note">
+            The growth dimension has no verified evidence in this sample. Its uncertainty stays
+            visible in every design.
+          </p>
+        </div>
+      </section>
+      <section class="stats" aria-label="Activity statistics">
+        <div><strong>1,980</strong><span>Prompts in scope</span></div>
+        <div><strong>312</strong><span>Sessions</span></div>
+        <div><strong>141</strong><span>Active days</span></div>
+        <div><strong>23 days</strong><span>Longest streak</span></div>
+      </section>
+      <footer class="page-footer">
+        <span>Research prototype. These designs are not shipped in the CLI.</span
+        ><span>Private report + public card. Different things to share.</span>
+      </footer>
+    </div>
+    <div id="standalone-card" hidden></div>
+    <dialog id="share-dialog" aria-labelledby="share-heading">
+      <div class="dialog-header">
+        <h2 id="share-heading">Make it yours to share.</h2>
+        <button type="button" class="close" id="close-share">Done</button>
+      </div>
+      <div class="preview-wrap" id="dialog-card"></div>
+      <div class="privacy-controls">
+        <label><input type="checkbox" id="show-traits" checked />Trait labels</label
+        ><label><input type="checkbox" id="show-stats" checked />Activity stats</label
+        ><label><input type="checkbox" id="show-rhythm" checked />Signature graphic</label>
+      </div>
+      <p class="dialog-note">
+        Preview only. Evidence quotes, project names and exact activity times are omitted. These
+        controls change the card, not the private report or JSON. PNG export is a later
+        implementation step.
+      </p>
+    </dialog>
+    <script>
+      const profile = Object.freeze({name:"The Midnight Architect",description:"Ships features by day. Refactors by night.",prompts:1980,sessions:312,activeDays:141,streak:23,traits:["Plan first","Straight talker"],hours:[40,22,9,3,0,0,1,4,20,61,98,120,80,110,140,150,135,118,90,100,130,160,170,120]})
+      const originalProfile = JSON.stringify(profile)
+      const root = document.documentElement
+      const choices = [...document.querySelectorAll("[data-choice]")]
+      const directionNames = ["signal","afterhours","studio"]
+      const query = new URLSearchParams(location.search)
+      let direction = query.get("direction") || root.dataset.direction
+      if (!directionNames.includes(direction)) direction = "signal"
+      const capture = query.get("capture") || root.dataset.capture
+      root.dataset.capture = capture === "card" ? "card" : "report"
+      function graphic(kind) {
+        const max = Math.max(...profile.hours)
+        if (kind === "signal") {
+          const bars = profile.hours.map((value,i) => {
+            const h = 18 + 154 * value/max
+            return `<rect x="${i*11.7}" y="${185-h}" width="7.4" height="${h}" rx="3.7" fill="currentColor" opacity="${.4+.6*value/max}"/>`
+          }).join("")
+          return `<svg viewBox="0 0 285 210" role="img" aria-label="Activity trace of the fictional 24-hour histogram">${bars}<line x1="0" y1="200" x2="280" y2="200" stroke="currentColor" opacity=".35"/></svg>`
+        }
+        if (kind === "afterhours") {
+          const points = profile.hours.map((value,i) => {
+            const angle = (i/24)*Math.PI*2-Math.PI/2
+            const radius = 91 + 15*value/max
+            const x = 150+Math.cos(angle)*radius, y=150+Math.sin(angle)*radius
+            return `<circle cx="${x}" cy="${y}" r="${3+8*value/max}" fill="currentColor" opacity="${.2+.8*value/max}"/>`
+          }).join("")
+          return `<svg viewBox="0 0 300 300" role="img" aria-label="Radial activity trace of the fictional 24-hour histogram"><circle cx="150" cy="150" r="126" stroke="#8ca8bc" fill="none" opacity=".16"/><circle cx="150" cy="150" r="65" stroke="#8ca8bc" fill="none" opacity=".3"/>${points}<path d="M150 131v21l16 10" fill="none" stroke="#bcebff" stroke-width="5" stroke-linecap="round"/><circle cx="150" cy="152" r="3" fill="#bcebff"/></svg>`
+        }
+        return `<svg viewBox="0 0 270 270" role="img" aria-label="A folded conversation shape, a decorative brand motif"><path d="M30 30h170a24 24 0 0 1 24 24v122a24 24 0 0 1-24 24h-73l-52 43v-43H30a24 24 0 0 1-24-24V54a24 24 0 0 1 24-24Z" fill="currentColor"/><path d="M224 118v58a24 24 0 0 1-24 24h-73l-52 43v-43" fill="none" stroke="#252323" stroke-width="2" opacity=".75"/><rect x="48" y="78" width="122" height="16" rx="8" fill="#ff654b"/><rect x="48" y="113" width="80" height="16" rx="8" fill="#ff654b"/></svg>`
+      }
+      function card(kind) {
+        return `<article class="identity-card ${kind}" aria-label="${kind} share card for a fictional profile"><div class="signal-line" aria-hidden="true"></div><div class="rhythm">${graphic(kind)}</div><div class="rhythm-caption">${kind === "studio" ? "A point of view." : "A rhythm of your own."}</div><div class="card-inner"><div class="card-top"><span class="card-wordmark">prompt/profile</span><span class="edition">Made from your prompts.</span></div><div class="card-copy"><h2>The Midnight<br/>Architect</h2><p class="card-description">${profile.description}</p><div class="card-traits">${profile.traits.map(t=>`<span>${t}</span>`).join("")}</div></div><div class="card-bottom"><div class="card-metrics"><div><strong>${profile.prompts.toLocaleString("en")}</strong><small>prompts</small></div><div><strong>${profile.streak} days</strong><small>longest streak</small></div></div><div class="card-signoff">What do your<br/>prompts say about you?</div></div></div></article>`
+      }
+      function render(kind) {
+        direction=kind
+        root.dataset.direction=kind
+        for (const b of choices) b.setAttribute("aria-selected",String(b.dataset.choice===kind))
+        for (const id of ["profile-preview","dialog-card","standalone-card"]) document.getElementById(id).innerHTML=card(kind)
+        applyPrivacy()
+      }
+      function applyPrivacy() {
+        const target=document.getElementById("dialog-card")
+        target.dataset.hideTraits=String(!document.getElementById("show-traits").checked)
+        target.dataset.hideStats=String(!document.getElementById("show-stats").checked)
+        target.dataset.hideRhythm=String(!document.getElementById("show-rhythm").checked)
+      }
+      choices.forEach((b,index)=>{
+        b.addEventListener("click",()=>render(b.dataset.choice))
+        b.addEventListener("keydown",event=>{
+          const next=event.key==="ArrowRight"?(index+1)%choices.length:event.key==="ArrowLeft"?(index+choices.length-1)%choices.length:null
+          if(next===null)return
+          event.preventDefault();render(choices[next].dataset.choice);choices[next].focus()
+        })
+      })
+      const dialog=document.getElementById("share-dialog")
+      document.getElementById("open-share").addEventListener("click",()=>dialog.showModal())
+      document.getElementById("close-share").addEventListener("click",()=>dialog.close())
+      for(const id of ["show-traits","show-stats","show-rhythm"])document.getElementById(id).addEventListener("change",applyPrivacy)
+      render(direction)
+      document.fonts.ready.then(()=>requestAnimationFrame(()=>{
+        const cardOnly=root.dataset.capture==="card"
+        const cardElement=document.querySelector(cardOnly?"#standalone-card .identity-card":"#profile-preview .identity-card")
+        const box=cardElement.getBoundingClientRect()
+        const overflow=document.documentElement.scrollWidth>innerWidth
+        console.assert(!overflow,"Horizontal page overflow")
+        console.assert(JSON.stringify(profile)===originalProfile,"Presentation changed source profile")
+        console.assert(document.fonts.check('700 20px Bricolage'),"Display font not loaded")
+        console.assert(!cardElement.textContent.includes("don't write code"),"Evidence quote leaked into share card")
+        if(cardOnly)console.assert(Math.round(box.width)===1200&&Math.round(box.height)===630,"Incorrect card dimensions")
+        console.log(JSON.stringify({direction,capture:root.dataset.capture,width:innerWidth,cardWidth:Math.round(box.width),cardHeight:Math.round(box.height),overflow,sourceProfileUnchanged:JSON.stringify(profile)===originalProfile,evidenceQuotesInCard:false,fontLoaded:document.fonts.check('700 20px Bricolage'),status:"Research prototype, not shipped"}))
+      }))
+    </script>
+  </body>
+</html>

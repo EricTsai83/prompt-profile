@@ -2,146 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Profile UX research — screenshot evidence</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Share-first profile directions</title>
     <style>
-      * { box-sizing:border-box }
-      body { margin:0; color:var(--foreground,#202b25); font:14px/1.5 system-ui,sans-serif }
-      nav { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px }
-      button { padding:7px 10px; background:var(--card,#fff); color:inherit; border:1px solid var(--border,#dce3de); border-radius:5px; cursor:pointer; font:inherit; font-size:12px }
-      button[aria-selected="true"] { background:var(--foreground,#202b25); color:var(--background,#fff) }
-      button:focus-visible { outline:3px solid var(--ring,#26785d); outline-offset:2px }
-      figure { margin:0 }
-      img { display:block; width:100%; height:auto; border:1px solid var(--border,#dce3de) }
-      .mobile img { max-width:390px; margin:auto }
-      figcaption { font-size:12px; margin:8px 0; color:var(--muted-foreground,#5c6b63) }
-      [hidden] { display:none!important }
+      *{box-sizing:border-box}body{margin:0;color:var(--foreground,#14204c);font:14px/1.5 system-ui,sans-serif}header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.directions,.views{display:flex;flex-wrap:wrap;gap:6px}button{font:inherit;font-size:12px;padding:8px 12px;border:1px solid var(--border,#dce2f1);border-radius:7px;background:var(--card,#fff);color:inherit;cursor:pointer}button[aria-pressed="true"]{background:var(--foreground,#14204c);color:var(--background,#fff);border-color:var(--foreground,#14204c)}button:focus-visible{outline:3px solid var(--ring,#3155f5);outline-offset:3px}.views button{font-size:11px;padding:7px 10px}figure{margin:0}img{display:block;width:100%;height:auto;border-radius:12px}.mobile img{max-width:390px;margin:auto}figcaption{font-size:12px;color:var(--muted-foreground,#657090);margin:10px 0 0}[hidden]{display:none!important}@media(max-width:580px){header{display:block}.views{margin-top:10px}.directions button{flex:1}img{border-radius:8px}}
     </style>
   </head>
   <body>
-    <nav role="tablist" aria-label="Captured UX comparisons">
-      <button type="button" role="tab" id="tab-design" aria-controls="design" aria-selected="true">
-        Three designs
-      </button>
-      <button
-        type="button"
-        role="tab"
-        id="tab-content"
-        aria-controls="content"
-        aria-selected="false"
-      >
-        Three content directions
-      </button>
-      <button type="button" role="tab" id="tab-flow" aria-controls="flow" aria-selected="false">
-        Free vs paid
-      </button>
-      <button type="button" role="tab" id="tab-model" aria-controls="model" aria-selected="false">
-        Model study
-      </button>
-      <button type="button" role="tab" id="tab-mobile" aria-controls="mobile" aria-selected="false">
-        Mobile
-      </button>
-      <button type="button" role="tab" id="tab-dark" aria-controls="dark" aria-selected="false">
-        Dark mobile
-      </button>
-      <button
-        type="button"
-        role="tab"
-        id="tab-current"
-        aria-controls="current"
-        aria-selected="false"
-      >
-        Current report
-      </button>
-    </nav>
-    <figure id="design" role="tabpanel" aria-labelledby="tab-design">
+    <header>
+      <div class="directions" role="group" aria-label="Design direction">
+        <button type="button" data-direction="signal" aria-pressed="true">Signal</button
+        ><button type="button" data-direction="afterhours" aria-pressed="false">Afterhours</button
+        ><button type="button" data-direction="studio" aria-pressed="false">Studio</button>
+      </div>
+      <div class="views" role="group" aria-label="Captured view">
+        <button type="button" data-view="card" aria-pressed="true">Share card</button
+        ><button type="button" data-view="report" aria-pressed="false">Desktop</button
+        ><button type="button" data-view="mobile" aria-pressed="false">Mobile</button>
+      </div>
+    </header>
+    <figure data-panel="signal-card">
       <img
-        src="screenshots/02-report-design-desktop.png"
-        alt="Three proposed report designs: editorial, evidence notebook and share poster, with the same profile"
+        src="startup-screenshots/signal-card.png"
+        alt="Signal: 1200 × 630 share-card concept, using a fictional profile"
       />
       <figcaption>
-        Research prototype, not shipped. Same synthetic profile, three proposed visual directions.
-        Captured at 1440px.
+        Signal · 1200 × 630 share-card concept. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
-    <figure id="content" role="tabpanel" aria-labelledby="tab-content" hidden>
+    <figure data-panel="signal-report" hidden>
       <img
-        src="screenshots/01-content-directions-desktop.png"
-        alt="Three proposed content directions: work mirror, growth journal and share story; the growth version preserves an evidence gap"
+        src="startup-screenshots/signal-report.png"
+        alt="Signal: 1440px desktop report prototype, using a fictional profile"
       />
       <figcaption>
-        Research prototype, not shipped. The question and emphasis change; evidence and numbers stay
-        fixed. Captured at 1440px.
+        Signal · 1440px desktop report prototype. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
-    <figure id="flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+    <figure data-panel="signal-mobile" class="mobile" hidden>
       <img
-        src="screenshots/03-generation-cost-flow.png"
-        alt="Proposed paths distinguish a free appearance change from a new narrative that requires LLM calls and confirmation"
+        src="startup-screenshots/signal-mobile.png"
+        alt="Signal: 390px mobile report prototype, using a fictional profile"
       />
       <figcaption>
-        Proposed UX states. Actual call counts and profile hashes must verify these promises during
-        implementation.
+        Signal · 390px mobile report prototype. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
-    <figure id="model" role="tabpanel" aria-labelledby="tab-model" hidden>
+    <figure data-panel="afterhours-card" hidden>
       <img
-        src="screenshots/04-model-study-protocol.png"
-        alt="Existing Claude synthetic-persona quality results beside a proposed blind model comparison marked not run"
+        src="startup-screenshots/afterhours-card.png"
+        alt="Afterhours: 1200 × 630 share-card concept, using a fictional profile"
       />
       <figcaption>
-        The Claude baseline is observed; the Codex profile comparison is not run. No missing model
-        result is invented.
+        Afterhours · 1200 × 630 share-card concept. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
-    <figure id="mobile" role="tabpanel" aria-labelledby="tab-mobile" class="mobile" hidden>
+    <figure data-panel="afterhours-report" hidden>
       <img
-        src="screenshots/02-report-design-mobile.png"
-        alt="Three proposed layouts stacked at a 390 pixel mobile width without horizontal overflow"
+        src="startup-screenshots/afterhours-report.png"
+        alt="Afterhours: 1440px desktop report prototype, using a fictional profile"
       />
       <figcaption>
-        390px research prototype. All three layouts remain readable in a vertical sequence.
+        Afterhours · 1440px desktop report prototype. Fictional data. Research prototype, not
+        shipped.
       </figcaption>
     </figure>
-    <figure id="dark" role="tabpanel" aria-labelledby="tab-dark" class="mobile" hidden>
+    <figure data-panel="afterhours-mobile" class="mobile" hidden>
       <img
-        src="screenshots/02-report-design-mobile-dark.png"
-        alt="Dark mobile research prototype captured at 360 pixel width"
+        src="startup-screenshots/afterhours-mobile.png"
+        alt="Afterhours: 390px mobile report prototype, using a fictional profile"
       />
       <figcaption>
-        360px dark research prototype. Browser checks found one active panel and no horizontal
-        overflow.
+        Afterhours · 390px mobile report prototype. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
-    <figure id="current" role="tabpanel" aria-labelledby="tab-current" hidden>
+    <figure data-panel="studio-card" hidden>
       <img
-        src="screenshots/00-current-report-desktop.png"
-        alt="The existing actual report renderer showing summary, statistics, heatmap, traits, dimensions and evidence controls"
+        src="startup-screenshots/studio-card.png"
+        alt="Studio: 1200 × 630 share-card concept, using a fictional profile"
       />
       <figcaption>
-        Actual current renderer, with the fictional sample profile. This is the baseline, not a new
-        customization feature.
+        Studio · 1200 × 630 share-card concept. Fictional data. Research prototype, not shipped.
+      </figcaption>
+    </figure>
+    <figure data-panel="studio-report" hidden>
+      <img
+        src="startup-screenshots/studio-report.png"
+        alt="Studio: 1440px desktop report prototype, using a fictional profile"
+      />
+      <figcaption>
+        Studio · 1440px desktop report prototype. Fictional data. Research prototype, not shipped.
+      </figcaption>
+    </figure>
+    <figure data-panel="studio-mobile" class="mobile" hidden>
+      <img
+        src="startup-screenshots/studio-mobile.png"
+        alt="Studio: 390px mobile report prototype, using a fictional profile"
+      />
+      <figcaption>
+        Studio · 390px mobile report prototype. Fictional data. Research prototype, not shipped.
       </figcaption>
     </figure>
     <script>
-      const tabs = [...document.querySelectorAll('[role="tab"]')]
-      function select(tab) {
-        for (const candidate of tabs) candidate.setAttribute("aria-selected", String(candidate === tab))
-        for (const panel of document.querySelectorAll('[role="tabpanel"]')) panel.hidden = panel.id !== tab.getAttribute("aria-controls")
-      }
-      for (const [index, tab] of tabs.entries()) {
-        tab.addEventListener("click", () => select(tab))
-        tab.addEventListener("keydown", (event) => {
-          const next = event.key === "ArrowRight" ? (index + 1) % tabs.length
-            : event.key === "ArrowLeft" ? (index + tabs.length - 1) % tabs.length
-            : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : null
-          if (next === null) return
-          event.preventDefault()
-          select(tabs[next])
-          tabs[next].focus()
-        })
-      }
-      console.assert(document.querySelectorAll('[role="tabpanel"]:not([hidden])').length === 1, "One screenshot must be visible")
+      let direction="signal",view="card";
+      function select(){for(const el of document.querySelectorAll("[data-direction]"))el.setAttribute("aria-pressed",String(el.dataset.direction===direction));for(const el of document.querySelectorAll("[data-view]"))el.setAttribute("aria-pressed",String(el.dataset.view===view));for(const panel of document.querySelectorAll("[data-panel]"))panel.hidden=panel.dataset.panel!==direction+"-"+view;}
+      for(const button of document.querySelectorAll("[data-direction]"))button.addEventListener("click",()=>{direction=button.dataset.direction;select()});
+      for(const button of document.querySelectorAll("[data-view]"))button.addEventListener("click",()=>{view=button.dataset.view;select()});
+      console.assert(document.querySelectorAll("figure:not([hidden])").length===1,"Expected one visible capture");
     </script>
   </body>
 </html>

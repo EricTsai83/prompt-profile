@@ -42,7 +42,7 @@ The choices below are research candidates, not a promise to ship every control.
 | Purpose | Work mirror, growth journal, share story | Three bounded presets with explicit instructions; a useful default | Rendering when only selection/order changes; reduce when narrative changes |
 | Tone | Direct or lightly playful | Honest, respectful and evidence-based; no flattery/roast/diagnosis modes | New narrative requires reduce |
 | Depth | Concise overview or detailed reading | Defined section budgets and a stable five-dimension schema | Render first; extra interpretation requires reduce |
-| Report design | Editorial, evidence notebook, share poster | Accessible layouts, typography, contrast and bundled fonts | Render only; zero LLM calls |
+| Report design | Signal, Afterhours, Studio | Accessible layouts, typography, contrast and bundled fonts | Render only; zero LLM calls |
 | Display | Section visibility, evidence expansion, selected metrics | Missing evidence stays visible; confidence cannot be hidden to imply certainty | Render only |
 | Share privacy | Omit project labels, activity times and selected metrics | Card never exposes evidence quotes; separate explicit share preview | Render only; does not sanitize the private source JSON |
 | Title | Optional custom display title | Label user-edited text; retain generated title and provenance | Render only, without changing inferred traits |
@@ -78,9 +78,17 @@ Compare direct/playful wording within the winning content direction, not across 
 
 ### B. Design: three layouts, without re-analysis
 
-- **Editorial:** a strong opening, short sections and a calm reading rhythm.
-- **Evidence notebook:** claims close to expandable evidence, coverage and uncertainty.
-- **Share poster:** a compact, visually distinctive card plus a readable report companion.
+The owner rejected the initial editorial directions as dated and insufficiently shareable.
+The revised candidates are share-first, each with an explicit visual identity:
+
+- **Signal:** cobalt, expressive sans typography and a data-derived activity trace.
+- **Afterhours:** midnight blue, an activity orbit and a quieter night-session identity.
+- **Studio:** a white/coral split composition and a folded conversation motif.
+
+See the [design brief](../docs/ux/startup-design-brief.md) for palettes, typography, first-pass
+critique and the frontend-design skill reference. The [revised prototype](../docs/ux/startup-profile-prototype.html)
+uses the same synthetic profile and offers a real local share-preview dialog with visibility controls.
+These controls are prototype interactions, not production CLI customization or PNG export.
 
 Render the same serialized profile in each layout. Verify that switching a theme preserves the
 profile hash and starts no CLI process. Inspect desktop, 390px mobile, 360px mobile, light/dark,
@@ -167,13 +175,17 @@ Pair it with an observed process-call count, unchanged profile hash, evidence ch
 
 Store synthetic screenshots and their capture manifest under `docs/ux/screenshots/`. Each capture
 records the source path/hash, view, viewport, appearance and whether it is actual output or a
-research prototype. Capture prototype screens with a persistent "not shipped" label. For model
+research prototype. Label prototype captures as "not shipped" in the gallery and manifest. Full-size card captures
+show the exact composition without surrounding UI; their captions retain the research status. For model
 comparisons, never fill a missing result with invented model output. Record "not run" explicitly.
 Real personal outputs stay outside git and are never substituted for synthetic research fixtures.
 
 The initial planning package includes the actual current report and proposed comparison screens
-from [the prototype](../docs/ux/profile-customization-prototype.html). Their captions and
-[manifest](../docs/ux/screenshots/manifest.json) distinguish observed behavior from proposals.
+from the [original prototype](../docs/ux/profile-customization-prototype.html), which is now
+historical/rejected design evidence. The [revised design gallery](../docs/ux/index.html) and
+[new capture manifest](../docs/ux/startup-screenshots/manifest.json) cover Signal, Afterhours and
+Studio at real share-card size and desktop/mobile report widths. The [original manifest](../docs/ux/screenshots/manifest.json)
+remains intact. Captions distinguish observed behavior from proposals.
 These initial screens establish experiment scope; they are not completed participant validation.
 
 ## Architecture questions to resolve before implementation
@@ -211,3 +223,19 @@ These initial screens establish experiment scope; they are not completed partici
 Recommended starting order: render-only design choices and safe share previews, then bounded
 content directions, then advanced model comparison. This is a hypothesis about cost and clarity,
 not a final product decision. Keep the existing default command working throughout.
+
+
+## Shareability criteria added after visual review
+
+The first set of designs did not meet the owner's desired startup-style, shareable identity.
+The next user sessions should test the revised directions, keeping the old version as a baseline:
+
+- Can someone recognize the archetype and distinguish the direction at a 360px-wide thumbnail?
+- Would they actually choose to save/post it, and what would they remove first?
+- Does the card have one memorable visual device rather than a collection of generic badges?
+- Is the exact share preview convincing, with clear controls for potentially personal metrics?
+- Does the report remain readable and evidence-driven after the expressive first impression?
+
+Record actual export choices and the reasons for reluctance; a designer's preference or a polished
+screenshot does not establish willingness to share. Keep a simple default and three bounded looks
+until the study justifies more controls.

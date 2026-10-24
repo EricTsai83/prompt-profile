@@ -1,0 +1,331 @@
+{
+  "capturedAtUtc": "2026-10-24T04:44:51.354242+00:00",
+  "tool": "T3 html_preview",
+  "source": "docs/ux/startup-profile-prototype.html",
+  "sourceSha256": "24d97d6ebc8d34755ed430c2408327e5273de1b886958623aaf785429fc3ff7d",
+  "sourceFixture": "test/fixtures/profile.sample.json",
+  "sourceFixtureSha256": "d9d362251d5f10936176a76accc15cf85feed4049b56006da0cb07b46c8641a0",
+  "fontAssets": [
+    {
+      "path": "docs/ux/assets/BricolageGrotesque-latin.woff2",
+      "sha256": "a79fdb52d4a5c76552452f69202add96e287401fff03d3e8c0e38b4dcb5a99cd"
+    },
+    {
+      "path": "src/report/fonts/Inter-Regular.woff",
+      "sha256": "e20fa0b4fd2dd26e4d14b3ac3cc922509c3a63fa5e910e90c614544aa042dd45"
+    },
+    {
+      "path": "src/report/fonts/Inter-Bold.woff",
+      "sha256": "7c5ed5655730de337704d3fc94628515cd7e3d8d32368871709bf56ac0397e7a"
+    }
+  ],
+  "renderTransform": "Local fonts inlined as data URLs for headless capture; root data-direction and data-capture select state. Source file uses local assets.",
+  "captures": [
+    {
+      "file": "signal-card.png",
+      "direction": "signal",
+      "mode": "card",
+      "width": 1200,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1200,
+        "contentHeight": 630,
+        "capturedHeight": 630,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"signal\",\"capture\":\"card\",\"width\":1200,\"cardWidth\":1200,\"cardHeight\":630,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1200,
+          "height": 630
+        }
+      },
+      "imageSha256": "dd6c648fae037627068e2b764f69a86443d8c4a016ed7e4c1e7dc5b7c53612ee"
+    },
+    {
+      "file": "signal-report.png",
+      "direction": "signal",
+      "mode": "report",
+      "width": 1440,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 1390,
+        "capturedHeight": 1390,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"signal\",\"capture\":\"report\",\"width\":1440,\"cardWidth\":1136,\"cardHeight\":596,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 1390
+        }
+      },
+      "imageSha256": "b8bbe4bf3c2cf339af9bc93097dead4faa4c4c0fa4e4dedd72717f7435fadad3"
+    },
+    {
+      "file": "signal-mobile.png",
+      "direction": "signal",
+      "mode": "mobile",
+      "width": 390,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 390,
+        "contentHeight": 1320,
+        "capturedHeight": 1320,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"signal\",\"capture\":\"report\",\"width\":390,\"cardWidth\":354,\"cardHeight\":186,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 1320
+        }
+      },
+      "imageSha256": "dbbec199b71f4857f6483b87fce44c327e9af68b80b50227ccb5110d6c133d3f"
+    },
+    {
+      "file": "afterhours-card.png",
+      "direction": "afterhours",
+      "mode": "card",
+      "width": 1200,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1200,
+        "contentHeight": 630,
+        "capturedHeight": 630,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"afterhours\",\"capture\":\"card\",\"width\":1200,\"cardWidth\":1200,\"cardHeight\":630,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1200,
+          "height": 630
+        }
+      },
+      "imageSha256": "8891ec2b17481f354eaf77184d99989a22427ef1a3d525a9f572a31c0068f60a"
+    },
+    {
+      "file": "afterhours-report.png",
+      "direction": "afterhours",
+      "mode": "report",
+      "width": 1440,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 1390,
+        "capturedHeight": 1390,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"afterhours\",\"capture\":\"report\",\"width\":1440,\"cardWidth\":1136,\"cardHeight\":596,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 1390
+        }
+      },
+      "imageSha256": "3051a1f325c90947beba29baa20d2a720cd130b276427504cc5e93bbe9b5c84a"
+    },
+    {
+      "file": "afterhours-mobile.png",
+      "direction": "afterhours",
+      "mode": "mobile",
+      "width": 390,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 390,
+        "contentHeight": 1320,
+        "capturedHeight": 1320,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"afterhours\",\"capture\":\"report\",\"width\":390,\"cardWidth\":354,\"cardHeight\":186,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 1320
+        }
+      },
+      "imageSha256": "19c4bfe42540d93e536c7f57eedf980e5aecbfad9b815f1c57c7af2d252d6a02"
+    },
+    {
+      "file": "studio-card.png",
+      "direction": "studio",
+      "mode": "card",
+      "width": 1200,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1200,
+        "contentHeight": 630,
+        "capturedHeight": 630,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"studio\",\"capture\":\"card\",\"width\":1200,\"cardWidth\":1200,\"cardHeight\":630,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1200,
+          "height": 630
+        }
+      },
+      "imageSha256": "78e5cd56051563b4b745d29330cc23a8af62606547e6e91b389ebdca8babf4dc"
+    },
+    {
+      "file": "studio-report.png",
+      "direction": "studio",
+      "mode": "report",
+      "width": 1440,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 1390,
+        "capturedHeight": 1390,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"studio\",\"capture\":\"report\",\"width\":1440,\"cardWidth\":1136,\"cardHeight\":596,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 1390
+        }
+      },
+      "imageSha256": "42c5176509f664e99b6fd3abea56577bbf7ecdc92169d82b7f8817b69ab98f4a"
+    },
+    {
+      "file": "studio-mobile.png",
+      "direction": "studio",
+      "mode": "mobile",
+      "width": 390,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 390,
+        "contentHeight": 1320,
+        "capturedHeight": 1320,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"studio\",\"capture\":\"report\",\"width\":390,\"cardWidth\":354,\"cardHeight\":186,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 1320
+        }
+      },
+      "imageSha256": "2c34f9fb2f4e5f91ac920893026212d8dc39f1ba2faa2c0971f42b5b27189b08"
+    },
+    {
+      "file": "signal-mobile-360.png",
+      "direction": "signal",
+      "mode": "mobile",
+      "width": 360,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Select direction and capture mode",
+      "capture": {
+        "width": 360,
+        "contentHeight": 1323,
+        "capturedHeight": 1323,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"direction\":\"signal\",\"capture\":\"report\",\"width\":360,\"cardWidth\":324,\"cardHeight\":170,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 360,
+          "height": 1323
+        }
+      },
+      "imageSha256": "769ae82a76348213850e891cfcbefa6e46af9048d7b30ce80d63091119f024d4"
+    },
+    {
+      "file": "signal-share-preview.png",
+      "direction": "signal",
+      "mode": "privacy-preview",
+      "width": 1440,
+      "appearance": "light",
+      "kind": "research-prototype",
+      "transform": "Open share preview; hide statistics and signature graphic",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 1390,
+        "capturedHeight": 1390,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"sharePreview\":true,\"statsVisible\":false,\"activityVisible\":false,\"traitsVisible\":true}"
+          },
+          {
+            "level": "log",
+            "text": "{\"direction\":\"signal\",\"capture\":\"report\",\"width\":1440,\"cardWidth\":1136,\"cardHeight\":596,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 1390
+        }
+      },
+      "imageSha256": "8edad8431b6ddaa7786a1cbf7dc701492bac27df3b2557b8197049d170bc6e3c"
+    }
+  ],
+  "interactionChecks": [
+    {
+      "level": "log",
+      "text": "{\"interactionChecks\":\"passed\",\"themeSelection\":true,\"shareDialog\":true,\"privacyControls\":true,\"privateReportPreserved\":true,\"sourceProfilePreserved\":true,\"keyboardNavigation\":true}"
+    },
+    {
+      "level": "log",
+      "text": "{\"direction\":\"studio\",\"capture\":\"report\",\"width\":1440,\"cardWidth\":1136,\"cardHeight\":596,\"overflow\":false,\"sourceProfileUnchanged\":true,\"evidenceQuotesInCard\":false,\"fontLoaded\":true,\"status\":\"Research prototype, not shipped\"}"
+    }
+  ],
+  "limitations": [
+    "Research prototype only; production PNG renderer not changed",
+    "No participant shareability study completed",
+    "No new LLM calls or model comparison",
+    "Screenshots do not prove privacy or network isolation"
+  ]
+}

@@ -1,44 +1,75 @@
 # Profile customization research package
 
-This is a planning artifact, not a production feature. All screenshots use fictional input.
+This is a planning artifact, not a production feature. All captures use fictional input.
 The [research plan](../../plans/11-profile-customization-ux.md) defines the study and decision gates.
 
-Open [the screenshot gallery](index.html) for the captured comparisons, or open the
-[interactive prototype](profile-customization-prototype.html) to switch research views.
-The prototype supports `?view=content`, `?view=layout`, `?view=flow` and `?view=model`.
-Its action-shaped labels are illustrations; it does not generate or save profiles.
+## Revised direction: a profile worth sharing
 
-## Captures
+The owner rejected the initial editorial designs as dated. The new study treats the share card
+as the first design surface, with a readable private report behind it:
 
-| Screenshot                                                           | Type                               | Purpose                                                                       |
-| -------------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- |
-| [Current desktop report](screenshots/00-current-report-desktop.png)  | Actual renderer, synthetic profile | Establish the current hierarchy and evidence affordances                      |
-| [Current mobile report](screenshots/00-current-report-mobile.png)    | Actual renderer, synthetic profile | Establish the 390px baseline                                                  |
-| [Content directions](screenshots/01-content-directions-desktop.png)  | Research prototype                 | Work mirror, growth journal and share story on the same evidence              |
-| [Content on mobile](screenshots/01-content-directions-mobile.png)    | Research prototype                 | Check 390px wrapping and section order                                        |
-| [Report designs](screenshots/02-report-design-desktop.png)           | Research prototype                 | Editorial, evidence notebook and share poster                                 |
-| [Designs on mobile](screenshots/02-report-design-mobile.png)         | Research prototype                 | Check 390px layout                                                            |
-| [Designs in dark mode](screenshots/02-report-design-mobile-dark.png) | Research prototype                 | Check 360px dark appearance                                                   |
-| [Generation cost flow](screenshots/03-generation-cost-flow.png)      | Research prototype                 | Separate a free render from new narrative analysis                            |
-| [Model study protocol](screenshots/04-model-study-protocol.png)      | Baseline + proposed experiment     | Existing Claude quality baseline; Codex profile comparison explicitly not run |
+- **Signal:** cobalt, expressive typography and an activity trace. Recommended starting direction.
+- **Afterhours:** midnight blue and a radial activity signature.
+- **Studio:** white/coral split composition with a folded conversation motif.
 
-The [capture manifest](screenshots/manifest.json) records source/image hashes, viewport widths,
-appearance, full capture heights and browser-console checks. The seven prototype captures show
-one active panel and no horizontal page overflow. Browser-console assertions reported no errors.
-The original report has no JavaScript; its captures are visual baselines, not runtime assertions.
-The PNG share card remains available as [the actual sample export](../sample-card.png).
+Open the [captured comparison gallery](index.html) to switch directions and card/desktop/mobile
+views. The [interactive prototype](startup-profile-prototype.html) has working style selection,
+a share-preview dialog and visibility controls for traits, statistics and the signature graphic.
+It does not export PNGs or add customization flags to the CLI.
 
-These captures do not establish participant preference, factual correctness, production theme
-switching, network isolation or comparative model quality. Keyboard, exact share-export behavior
-and actual call-count checks are required in the implementation experiment. Screenshot review
-is one part of that validation, alongside hashes, process counts, evidence checks and user tasks.
+The [design brief](startup-design-brief.md) records the token systems, critique and application of
+[Anthropic's frontend-design skill](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md).
+The skill was read remotely, not installed. Bricolage Grotesque is bundled as a licensed research
+font alongside its OFL notice; the production package remains unchanged.
 
-## Reproduction
+## Revised screenshot evidence
 
-- Baseline source: `docs/sample-report.html`, rendered from `test/fixtures/profile.sample.json`.
-- Prototype source: `docs/ux/profile-customization-prototype.html`; no fonts or scripts are fetched.
-- Captured with T3 `html_preview`, light at 1440/390px and dark at 360px as recorded per image.
-- The capture helper selects a prototype view by changing the root `data-view` value before
-  rendering. The equivalent view is accessible with the URL query parameters above.
-- A content or layout edit requires recapturing the affected images and updating their hashes;
-  do not annotate or alter a screenshot while describing it as an untouched capture.
+| Direction  | Share card at 1200 × 630                        | Desktop at 1440px                                   | Mobile at 390px                                     |
+| ---------- | ----------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- |
+| Signal     | [Card](startup-screenshots/signal-card.png)     | [Report](startup-screenshots/signal-report.png)     | [Mobile](startup-screenshots/signal-mobile.png)     |
+| Afterhours | [Card](startup-screenshots/afterhours-card.png) | [Report](startup-screenshots/afterhours-report.png) | [Mobile](startup-screenshots/afterhours-mobile.png) |
+| Studio     | [Card](startup-screenshots/studio-card.png)     | [Report](startup-screenshots/studio-report.png)     | [Mobile](startup-screenshots/studio-mobile.png)     |
+
+Additional captures: [Signal at 360px](startup-screenshots/signal-mobile-360.png) and
+[share preview with statistics/activity hidden](startup-screenshots/signal-share-preview.png).
+
+The [new capture manifest](startup-screenshots/manifest.json) records source, font, fixture and
+image hashes, browser-console checks and limitations. All eleven captures loaded the intended
+font, had no horizontal page overflow and preserved the source profile. The share compositions
+omit evidence quotes. All three card captures are exactly 1200 × 630.
+
+The browser interaction probe checked actual click/key events for direction switching, opening
+and closing the dialog, and changing its privacy controls. Hidden share metrics/traits/graphics
+did not alter the private report or source data. These are prototype behavior checks, not proof
+of production export, provider privacy, accessibility conformance or willingness to share.
+
+## Reproduce the revised study
+
+Serve the repository root locally, then open the prototype:
+
+```sh
+python3 -m http.server 8765 --bind 127.0.0.1
+# http://127.0.0.1:8765/docs/ux/startup-profile-prototype.html
+```
+
+The prototype accepts `?direction=signal`, `?direction=afterhours` or `?direction=studio`.
+For a full-size landscape composition use `?direction=signal&capture=card` at a 1200px viewport.
+For T3 headless captures, inline the three local font assets as data URLs: the synthetic page
+origin cannot load local font paths. No external font requests are required after preparation.
+The manifest records the font assets and this transformation. Root `data-direction` and
+`data-capture` attributes select the same state for headless rendering.
+
+The privacy-preview capture opens the dialog and unchecks statistics and the signature graphic.
+The design rebalances the title when the signature is hidden. It does not modify or annotate the
+captured PNG afterward. Re-capture changed views and update the manifest when changing the design.
+
+## Historical first study
+
+The [initial gallery](initial-study-gallery.html), [initial prototype](profile-customization-prototype.html)
+and [initial capture manifest](screenshots/manifest.json) remain intact as rejected-design evidence.
+They include the actual current renderer at desktop/mobile widths, the first content/design
+sketches, free-versus-paid flow and the model-study protocol. The original production
+[share card](../sample-card.png) is also preserved for comparison.
+
+The model comparison is still not run. Participant preference, actual sharing behavior and
+production theme/export work remain future research and implementation stages.
