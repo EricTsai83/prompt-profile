@@ -1,6 +1,7 @@
 # Profile customization UX research plan
 
-Status: proposed research; production customization is not implemented by this plan.
+Status: stages 1 (plan and baseline) and 2 (presentation experiment) done; stages 3–6 not
+started. Production customization is not implemented by this plan.
 
 ## Goal
 
@@ -207,10 +208,13 @@ These initial screens establish experiment scope; they are not completed partici
 
 ## Deliverables and rollout
 
-1. **Plan and baseline (this stage):** current-control inventory, customization boundaries,
+1. **Plan and baseline (done):** current-control inventory, customization boundaries,
    hypothesis matrix, research prototype, baseline/proposal screenshots and capture manifest.
-2. **Presentation experiment:** three content presentations and three designs on shared synthetic
+2. **Presentation experiment (done):** three content presentations and three designs on shared synthetic
    evidence; desktop/mobile/dark/card captures; no production flags or new model calls needed.
+   Results: [presentation experiment](../docs/ux/presentation/README.md). Work mirror works as
+   presentation alone; Share story belongs in the share preview; Growth journal needs dated
+   evidence (a schema and analysis change), so it is deferred.
 3. **Controlled analysis experiment:** bounded preset instructions only where necessary, followed
    by the controlled model comparison. Record actual provenance, budgets and failures.
 4. **Usability review:** complete tasks, annotate screenshots with observed confusion, record

@@ -63,6 +63,15 @@ The privacy-preview capture opens the dialog and unchecks statistics and the sig
 The design rebalances the title when the signature is hidden. It does not modify or annotate the
 captured PNG afterward. Re-capture changed views and update the manifest when changing the design.
 
+## Presentation experiment (stage 2)
+
+The [presentation experiment](presentation/README.md) applies the three content directions
+(Work mirror, Growth journal, Share story) to the Signal look as data presets over one synthetic
+profile. It adds dark-mode, edge-case (long title, CJK quotes, absent evidence, large counts)
+and keyboard-focus captures with a reproducible Playwright script and manifest. Every capture
+checks that evidence, confidence, statistics and warnings are unchanged and that the card has
+no quotes. The stage 1 files above are unchanged.
+
 ## Historical first study
 
 The [initial gallery](initial-study-gallery.html), [initial prototype](profile-customization-prototype.html)

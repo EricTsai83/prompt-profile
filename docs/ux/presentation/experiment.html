@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en" data-story="work-mirror" data-direction="signal" data-capture="report">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Your prompt profile — presentation experiment</title>
+    <style>
+      @font-face {font-family:Bricolage;src:url("../assets/BricolageGrotesque-latin.woff2") format("woff2");font-weight:200 800;font-display:block}
+      @font-face {font-family:Inter;src:url("../../../src/report/fonts/Inter-Regular.woff") format("woff");font-weight:400;font-display:block}
+      @font-face {font-family:Inter;src:url("../../../src/report/fonts/Inter-Bold.woff") format("woff");font-weight:700;font-display:block}
+      :root {color-scheme:light dark;--paper:#f5f7ff;--surface:#ffffff;--text:#14204c;--muted:#5d6888;--accent:#3155f5;--line:#dce2f1;--warn-bg:#fff4dc;--warn-text:#6b4500;--display:Bricolage,system-ui,sans-serif;--reading:Inter,system-ui,sans-serif}
+      [data-direction="afterhours"] {--paper:#eef3f8;--text:#10243a;--muted:#55697b;--accent:#496c97;--line:#d3dfe8}
+      [data-direction="studio"] {--paper:#fff7f4;--text:#252323;--muted:#6f5d58;--accent:#da452e;--line:#ecded9}
+      @media (prefers-color-scheme:dark) {
+        :root {--paper:#0c1330;--surface:#141d42;--text:#eef1ff;--muted:#a5afd3;--accent:#9fb2ff;--line:#2a3566;--warn-bg:#3a2c0c;--warn-text:#ffd98a}
+        [data-direction="afterhours"] {--paper:#08131f;--surface:#0f2133;--text:#eaf4fb;--muted:#9fb6c7;--accent:#bcebff;--line:#21384d}
+        [data-direction="studio"] {--paper:#1c1716;--surface:#272020;--text:#fbefec;--muted:#c3aaa4;--accent:#ff8c76;--line:#3d3230}
+      }
+      * {box-sizing:border-box} body {margin:0;background:var(--paper);color:var(--text);font:15px/1.6 var(--reading)}
+      button {font:inherit;color:inherit;cursor:pointer} button:focus-visible,summary:focus-visible {outline:3px solid #dd8a16;outline-offset:4px}
+      [hidden] {display:none!important} h1,h2,h3,p {margin:0} h1,h2,h3 {font-family:var(--display);letter-spacing:-.035em;line-height:1.05}
+      .shell {max-width:1200px;padding:0 32px;margin:auto}
+      .topbar {display:flex;align-items:center;justify-content:space-between;padding:25px 0;border-bottom:1px solid var(--line);gap:16px}
+      .brand {display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:21px;font-weight:700;letter-spacing:-.04em;white-space:nowrap}
+      .brandmark {width:26px;height:26px;position:relative;display:inline-block;background:currentColor;border-radius:8px 8px 8px 2px}
+      .brandmark:after {content:"";position:absolute;width:7px;height:7px;left:10px;top:9px;border-radius:50%;background:var(--paper)}
+      .prototype-label {font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:4px 8px;text-align:right}
+      .intro {padding:35px 0 22px}.intro h1 {font-size:42px;font-weight:700}.intro p {margin-top:9px;color:var(--muted);font-size:14px;max-width:62ch}
+      .controls {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin:0 0 18px}
+      .group {display:flex;align-items:center;gap:10px}.group-label {font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+      .tabs {display:flex;gap:4px;flex-wrap:wrap}
+      .tab {border:1px solid transparent;border-radius:8px;padding:9px 14px;background:transparent;color:var(--muted);font-size:13px}
+      .tab[aria-selected="true"] {background:var(--surface);border-color:var(--line);color:var(--text);box-shadow:0 2px 3px #18255108}
+      .cost {display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin:-4px 0 18px}
+      .cost-dot {width:8px;height:8px;border-radius:50%;background:#2f9e6a;flex:none}.cost[data-kind="needs-data"] .cost-dot {background:#d08a12}
+      .preview-wrap {container-type:inline-size;position:relative;isolation:isolate;border-radius:20px;overflow:hidden;box-shadow:0 16px 48px #17264c14}
+      .identity-card {width:100%;aspect-ratio:1200 / 630;position:relative;overflow:hidden;font-family:var(--display);color:white;background:#3155f5;isolation:isolate}
+      .card-inner {height:100%;position:relative;padding:4.4cqw 5cqw;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+      .card-top {display:flex;align-items:center;justify-content:space-between;font-size:1.55cqw;line-height:1.2}
+      .card-wordmark {font-weight:700;letter-spacing:-.05em}.card-top .edition {font-family:var(--reading);font-size:1.02cqw;opacity:.8}
+      .card-copy {position:relative;max-width:66%;z-index:3}
+      .identity-card h2 {font-size:8.2cqw;line-height:.96;font-weight:800;letter-spacing:-.035em;margin:0 0 1.6cqw;overflow-wrap:break-word}
+      .identity-card h2.long {font-size:6cqw}.identity-card h2.xlong {font-size:4.9cqw;line-height:1}
+      .card-description {font-family:var(--reading);font-size:1.62cqw;line-height:1.45;max-width:44cqw;opacity:.94;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+      .card-traits {display:flex;flex-wrap:wrap;gap:.7cqw;margin-top:1.6cqw;font:1.05cqw/1.4 var(--reading)}
+      .card-traits span {display:inline-block;border:1px solid #ffffff60;border-radius:3cqw;padding:.42cqw .9cqw;max-width:30cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .card-bottom {display:flex;justify-content:space-between;align-items:flex-end;gap:1cqw}
+      .card-metrics {display:flex;gap:3cqw;font-family:var(--reading)}.card-metrics strong {display:block;font:700 2.9cqw/1 var(--display);letter-spacing:-.04em;margin-bottom:.45cqw;white-space:nowrap}.card-metrics small {font-size:.95cqw;opacity:.8}
+      .card-signoff {font:1.07cqw/1.4 var(--reading);opacity:.8;text-align:right}
+      .rhythm {position:absolute;right:3.5cqw;top:16.5cqw;width:28cqw;height:20cqw;z-index:1;color:#e0f59a}
+      .rhythm svg {display:block;width:100%;height:100%;overflow:visible}
+      .signal-line {position:absolute;width:43cqw;height:18cqw;border:1px solid #a8b8ff44;border-radius:12cqw;right:-5cqw;top:10cqw;transform:rotate(-35deg);z-index:0}
+      .afterhours.identity-card {background:#10243a;color:#eaf4fb}.afterhours h2 {font-weight:650}
+      .afterhours .card-description {color:#c7dce9}.afterhours .card-traits span {border-color:#8ca8bc70;color:#bcebff}
+      .afterhours .rhythm {right:3.8cqw;top:12.5cqw;width:31cqw;height:31cqw;color:#b9b3ff}.afterhours .signal-line {display:none}
+      .studio.identity-card {background:#ffffff;color:#252323}
+      .studio.identity-card:before {content:"";position:absolute;right:0;top:0;width:34%;height:100%;background:#ff654b}
+      .studio .card-traits span {border-color:#ecb0b8;background:#fff0ed}
+      .studio .rhythm {right:3.8cqw;top:18cqw;width:24cqw;height:23cqw;color:#ffd5dd;transform:rotate(-9deg)}.studio .signal-line {display:none}
+      .preview-note {display:flex;justify-content:space-between;gap:15px;color:var(--muted);font-size:11px;margin:13px 2px 0}
+      .story {padding:44px 0 36px;border-bottom:1px solid var(--line)}
+      .story-head {display:flex;justify-content:space-between;align-items:baseline;gap:20px;margin-bottom:26px}
+      .story-head h2 {font-size:32px;font-weight:700}.story-head p {color:var(--muted);font-size:13px;max-width:52ch}
+      .lead {display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+      .lead-item {background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+      .lead-item h3 {font-size:22px;font-weight:700;margin-bottom:8px}.lead-item p {font-size:14px;line-height:1.7}
+      .quote {margin:14px 0 0;border-left:3px solid var(--accent);padding:2px 0 2px 14px;font:500 17px/1.45 var(--display);letter-spacing:-.01em;overflow-wrap:anywhere}
+      .missing {display:flex;gap:8px;margin-top:14px;padding:9px 12px;border-radius:10px;background:var(--warn-bg);color:var(--warn-text);font-size:12px;line-height:1.5}
+      .missing:before {content:"!";font-weight:700}
+      .note {margin-top:22px;padding:16px 18px;border:1px dashed var(--line);border-radius:14px;font-size:13px;color:var(--muted)}
+      .note strong {color:var(--text)}
+      .section {padding:34px 0;border-bottom:1px solid var(--line)}.section h2 {font-size:24px;font-weight:700;margin-bottom:16px}
+      .traits {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+      .trait {padding:16px 18px;border:1px solid var(--line);border-radius:14px}.trait-head {display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+      .trait h3 {font-size:18px;font-weight:700;overflow-wrap:anywhere}.trait p {font-size:13px;color:var(--muted);margin-top:6px}
+      .confidence {font-size:11px;color:var(--muted);white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:1px 8px}
+      .dims {display:grid;gap:0}.dim {display:grid;grid-template-columns:180px 1fr;gap:20px;padding:14px 0;border-top:1px solid var(--line)}
+      .dim:first-child {border-top:0}.dim h3 {font-size:16px;font-weight:700}.dim p {font-size:13px}
+      details {margin-top:6px;font-size:12px;color:var(--muted)} summary {cursor:pointer;color:var(--text);padding:3px 0}
+      details .quote {font-size:14px}
+      .stats {display:grid;grid-template-columns:repeat(4,1fr);padding:28px 0;gap:20px}.stats strong {font:700 30px/1 var(--display);letter-spacing:-.04em;display:block;overflow-wrap:anywhere}.stats span {font-size:11px;color:var(--muted);display:block;margin-top:8px}
+      .coverage {font-size:12px;color:var(--muted);padding:0 0 24px}
+      .page-footer {border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;padding:20px 0 28px;font-size:11px;color:var(--muted)}
+      html[data-capture="card"] body {background:none}html[data-capture="card"] .shell {display:none}
+      html[data-capture="card"] #standalone-card {display:block!important;width:1200px;container-type:inline-size}
+      html[data-capture="card"] #standalone-card .identity-card {height:630px;aspect-ratio:auto}
+      @media (max-width:700px) {
+        .shell {padding:0 18px}.topbar {padding:20px 0}.brand {font-size:19px}.prototype-label {font-size:9px;padding:3px 6px}
+        .intro {padding:28px 0 18px}.intro h1 {font-size:35px}.intro p {font-size:13px}
+        .controls {display:block}.group {display:block;margin-bottom:12px}.group-label {display:block;margin-bottom:6px}
+        .tab {padding:8px 10px;font-size:12px}.preview-wrap {border-radius:13px}.preview-note {display:block;font-size:10px}.preview-note span {display:block;margin-top:3px}
+        .story {padding:32px 0}.story-head {display:block}.story-head h2 {font-size:27px;margin-bottom:8px}
+        .lead {grid-template-columns:1fr}.lead-item {padding:18px}.lead-item h3 {font-size:20px}
+        .dim {grid-template-columns:1fr;gap:4px}.stats {grid-template-columns:repeat(2,1fr);gap:24px}.stats strong {font-size:26px}
+        .page-footer {display:block;font-size:10px}.page-footer span {display:block;margin-top:5px}
+      }
+      @media (prefers-reduced-motion:no-preference) {.tab {transition:background .15s,color .15s}}
+    </style>
+    <script src="fixtures.js"></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand"><span class="brandmark" aria-hidden="true"></span>prompt/profile</div>
+        <span class="prototype-label"
+          >Presentation experiment · fictional profile · not shipped</span
+        >
+      </header>
+      <section class="intro">
+        <h1>Same evidence. Three stories.</h1>
+        <p>
+          Each story changes what comes first and how much you read. The traits, quotes, counts and
+          confidence stay the same.
+        </p>
+      </section>
+      <div class="controls">
+        <div class="group">
+          <span class="group-label" id="story-label">Story</span>
+          <div class="tabs" role="tablist" aria-labelledby="story-label" id="story-tabs"></div>
+        </div>
+        <div class="group">
+          <span class="group-label" id="look-label">Look</span>
+          <div class="tabs" role="tablist" aria-labelledby="look-label" id="look-tabs"></div>
+        </div>
+      </div>
+      <p class="cost" id="cost" aria-live="polite">
+        <span class="cost-dot" aria-hidden="true"></span><span></span>
+      </p>
+      <div class="preview-wrap" id="profile-preview"></div>
+      <div class="preview-note">
+        <span>Share card preview. It never includes quotes or project names.</span
+        ><span>1200 × 630</span>
+      </div>
+      <main id="report"></main>
+      <footer class="page-footer">
+        <span>Research prototype. Stories and looks are not CLI options.</span>
+        <span>Private report: contains quotes. Share card: no quotes.</span>
+      </footer>
+    </div>
+    <div id="standalone-card" hidden></div>
+    <script>
+      // Presentation presets: data, not branches. They choose order, emphasis and copy for the
+      // product's own headings; every profile field is shown unchanged.
+      const STORIES = Object.freeze([
+        {
+          id: "work-mirror", version: 1, label: "Work mirror",
+          heading: "How you work", intro: "Your recurring work habits, with the evidence behind each one.",
+          order: ["work_style", "communication", "tech_profile", "interests", "growth"], lead: 2,
+          cardLine: "archetype", cardTraits: 2, cardMetrics: ["totalPrompts", "totalSessions"],
+          cost: { kind: "free", text: "Presentation only. No new analysis, no LLM calls." },
+        },
+        {
+          id: "growth-journal", version: 1, label: "Growth journal",
+          heading: "What you were learning", intro: "What you asked about and tried. It cannot show how that changed; see the note below.",
+          order: ["growth", "interests", "tech_profile", "work_style", "communication"], lead: 2,
+          cardLine: "growth", cardTraits: 2, cardMetrics: ["activeDays", "longestStreakDays"],
+          cost: { kind: "needs-data", text: "Partial: this profile has no dates on its evidence, so it can't show change over time. That would need new analysis." },
+          progressionNote: true,
+        },
+        {
+          id: "share-story", version: 1, label: "Share story",
+          heading: "The short version", intro: "One line and the strongest supported traits. The full evidence is still below.",
+          order: ["work_style", "communication", "interests", "tech_profile", "growth"], lead: 1,
+          cardLine: "headline", cardTraits: 3, cardMetrics: ["totalPrompts", "longestStreakDays"],
+          cost: { kind: "free", text: "Presentation only. No new analysis, no LLM calls." },
+        },
+      ])
+      const LOOKS = Object.freeze([
+        { id: "signal", label: "Signal" }, { id: "afterhours", label: "Afterhours" }, { id: "studio", label: "Studio" },
+      ])
+      const METRIC_LABELS = { totalPrompts: "prompts", totalSessions: "sessions", activeDays: "active days", longestStreakDays: "longest streak" }
+      const CONFIDENCE_LABELS = { high: "High confidence", medium: "Medium confidence", low: "Low confidence" }
+
+      const deepFreeze = (o) => { Object.values(o).forEach((v) => v && typeof v === "object" && deepFreeze(v)); return Object.freeze(o) }
+      const query = new URLSearchParams(location.search)
+      const fixtureName = query.get("fixture") === "edge" ? "edge" : "sample"
+      const profile = deepFreeze(window.PRESENTATION_FIXTURES[fixtureName])
+      const originalJson = JSON.stringify(profile)
+      const root = document.documentElement
+      const pick = (value, list, fallback) => (list.some((x) => x.id === value) ? value : fallback)
+      let storyId = pick(query.get("story") || root.dataset.story, STORIES, "work-mirror")
+      let lookId = pick(query.get("direction") || root.dataset.direction, LOOKS, "signal")
+      root.dataset.capture = query.get("capture") === "card" ? "card" : "report"
+
+      const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c])
+      const fmt = (key, n) => (key === "longestStreakDays" ? `${n.toLocaleString("en")} days` : n.toLocaleString("en"))
+      const supported = (t) => t.evidence.length > 0
+
+      function graphic(kind) {
+        const hours = profile.stats.hourHistogram, max = Math.max(...hours)
+        if (kind === "signal") {
+          const bars = hours.map((v, i) => { const h = 18 + 154 * v / max; return `<rect x="${i * 11.7}" y="${185 - h}" width="7.4" height="${h}" rx="3.7" fill="currentColor" opacity="${.4 + .6 * v / max}"/>` }).join("")
+          return `<svg viewBox="0 0 285 210" role="img" aria-label="Activity by hour of day">${bars}<line x1="0" y1="200" x2="280" y2="200" stroke="currentColor" opacity=".35"/></svg>`
+        }
+        if (kind === "afterhours") {
+          const dots = hours.map((v, i) => { const a = (i / 24) * Math.PI * 2 - Math.PI / 2, r = 91 + 15 * v / max; return `<circle cx="${150 + Math.cos(a) * r}" cy="${150 + Math.sin(a) * r}" r="${3 + 8 * v / max}" fill="currentColor" opacity="${.2 + .8 * v / max}"/>` }).join("")
+          return `<svg viewBox="0 0 300 300" role="img" aria-label="Activity by hour of day, as a clock"><circle cx="150" cy="150" r="126" stroke="#8ca8bc" fill="none" opacity=".16"/><circle cx="150" cy="150" r="65" stroke="#8ca8bc" fill="none" opacity=".3"/>${dots}<path d="M150 131v21l16 10" fill="none" stroke="#bcebff" stroke-width="5" stroke-linecap="round"/></svg>`
+        }
+        return `<svg viewBox="0 0 270 270" role="img" aria-label="A folded conversation shape"><path d="M30 30h170a24 24 0 0 1 24 24v122a24 24 0 0 1-24 24h-73l-52 43v-43H30a24 24 0 0 1-24-24V54a24 24 0 0 1 24-24Z" fill="currentColor"/><rect x="48" y="78" width="122" height="16" rx="8" fill="#ff654b"/><rect x="48" y="113" width="80" height="16" rx="8" fill="#ff654b"/></svg>`
+      }
+
+      function cardLine(story) {
+        if (story.cardLine === "headline") return profile.headline
+        if (story.cardLine === "growth") return profile.dimensions.find((d) => d.key === "growth").summary
+        return profile.archetype.description
+      }
+
+      function card(story, look) {
+        const name = profile.archetype.name
+        const size = name.length > 44 ? "xlong" : name.length > 26 ? "long" : ""
+        const traits = profile.traits.filter(supported).slice(0, story.cardTraits)
+        const metrics = story.cardMetrics.map((k) => `<div><strong>${esc(fmt(k, profile.stats[k]))}</strong><small>${METRIC_LABELS[k]}</small></div>`).join("")
+        return `<article class="identity-card ${look}" aria-label="Share card preview"><div class="signal-line" aria-hidden="true"></div><div class="rhythm">${graphic(look)}</div><div class="card-inner"><div class="card-top"><span class="card-wordmark">prompt/profile</span><span class="edition">Made from your prompts.</span></div><div class="card-copy"><h2 class="${size}">${esc(name)}</h2><p class="card-description">${esc(cardLine(story))}</p><div class="card-traits">${traits.map((t) => `<span title="${esc(t.name)}">${esc(t.name)}</span>`).join("")}</div></div><div class="card-bottom"><div class="card-metrics">${metrics}</div><div class="card-signoff">What do your<br/>prompts say about you?</div></div></div></article>`
+      }
+
+      const quote = (owner) => (e) => `<blockquote class="quote" data-owner="${esc(owner)}" data-evidence="${esc(e.promptId)}" lang="${/[㐀-鿿]/.test(e.quote) ? "zh-Hant" : "en"}">${esc(e.quote)}</blockquote>`
+      const missing = (what) => `<p class="missing" data-missing>No verified evidence for ${esc(what)} in this sample. Treat it as a guess.</p>`
+
+      function report(story) {
+        const dims = story.order.map((k) => profile.dimensions.find((d) => d.key === k))
+        const lead = dims.slice(0, story.lead), rest = dims.slice(story.lead)
+        const leadHtml = lead.map((d) => `<div class="lead-item"><h3>${esc(d.title)}</h3><p>${esc(d.summary)}</p>${d.evidence.length ? quote(d.key)(d.evidence[0]) + (d.evidence.length > 1 ? `<details><summary>${d.evidence.length - 1} more excerpt${d.evidence.length > 2 ? "s" : ""}</summary>${d.evidence.slice(1).map(quote(d.key)).join("")}</details>` : "") : missing(d.title.toLowerCase())}</div>`).join("")
+        const progression = story.progressionNote ? `<p class="note"><strong>No progression shown.</strong> This profile doesn't record when each piece of evidence was written, so it can't say whether anything changed across ${esc(profile.stats.activeDays.toLocaleString("en"))} active days. It shows what you asked about, not how you improved.</p>` : ""
+        const traits = profile.traits.map((t) => `<div class="trait" data-trait="${esc(t.name)}" data-confidence="${t.confidence}"><div class="trait-head"><h3>${esc(t.name)}</h3><span class="confidence">${CONFIDENCE_LABELS[t.confidence]}</span></div><p>${esc(t.description)}</p>${t.evidence.length ? `<details><summary>${t.evidence.length} excerpt${t.evidence.length > 1 ? "s" : ""}</summary>${t.evidence.map(quote(t.name)).join("")}</details>` : missing(`“${t.name}”`)}</div>`).join("")
+        const others = rest.map((d) => `<div class="dim"><h3>${esc(d.title)}</h3><div><p>${esc(d.summary)}</p>${d.evidence.length ? `<details><summary>${d.evidence.length} excerpt${d.evidence.length > 1 ? "s" : ""}</summary>${d.evidence.map(quote(d.key)).join("")}</details>` : missing(d.title.toLowerCase())}</div></div>`).join("")
+        const s = profile.stats, c = profile.coverage
+        return `<section class="story"><div class="story-head"><h2>${esc(story.heading)}</h2><p>${esc(story.intro)}</p></div><div class="lead">${leadHtml}</div>${progression}</section>
+          <section class="section"><h2>Traits</h2><div class="traits">${traits}</div></section>
+          <section class="section"><h2>The rest of the profile</h2><div class="dims">${others}</div></section>
+          <section class="stats" aria-label="Activity statistics">${["totalPrompts", "totalSessions", "activeDays", "longestStreakDays"].map((k) => `<div data-stat="${k}" data-value="${s[k]}"><strong>${esc(fmt(k, s[k]))}</strong><span>${({ totalPrompts: "Prompts in scope", totalSessions: "Sessions", activeDays: "Active days", longestStreakDays: "Longest streak" })[k]}</span></div>`).join("")}</section>
+          <p class="coverage">Analyzed ${c.chunksAnalyzed} of ${c.chunksTotal} weeks${c.sampled ? " (sampled)" : ""}; ${c.chunksFailed} failed. ${c.evidenceDropped} quotes were dropped because they could not be matched to a prompt.</p>`
+      }
+
+      function tabs(container, items, current, onSelect) {
+        container.innerHTML = items.map((x) => `<button type="button" class="tab" role="tab" data-id="${x.id}" aria-selected="${x.id === current}" tabindex="${x.id === current ? 0 : -1}">${esc(x.label)}</button>`).join("")
+        const buttons = [...container.children]
+        buttons.forEach((b, i) => {
+          b.addEventListener("click", () => onSelect(b.dataset.id))
+          b.addEventListener("keydown", (e) => {
+            const next = e.key === "ArrowRight" ? (i + 1) % buttons.length : e.key === "ArrowLeft" ? (i + buttons.length - 1) % buttons.length : null
+            if (next === null) return
+            e.preventDefault(); onSelect(buttons[next].dataset.id); container.children[next].focus()
+          })
+        })
+      }
+
+      function render() {
+        const story = STORIES.find((s) => s.id === storyId)
+        root.dataset.story = storyId; root.dataset.direction = lookId
+        tabs(document.getElementById("story-tabs"), STORIES, storyId, (id) => { storyId = id; render() })
+        tabs(document.getElementById("look-tabs"), LOOKS, lookId, (id) => { lookId = id; render() })
+        const cost = document.getElementById("cost")
+        cost.dataset.kind = story.cost.kind; cost.lastElementChild.textContent = story.cost.text
+        for (const id of ["profile-preview", "standalone-card"]) document.getElementById(id).innerHTML = card(story, lookId)
+        document.getElementById("report").innerHTML = report(story)
+      }
+
+      // Invariant checks, logged for the capture manifest. They compare what the page shows with
+      // the source profile; they do not prove privacy or the absence of network activity.
+      function checks() {
+        const reportEl = document.getElementById("report")
+        const cardEl = document.querySelector(root.dataset.capture === "card" ? "#standalone-card .identity-card" : "#profile-preview .identity-card")
+        const sourceEvidence = [...profile.dimensions, ...profile.traits].flatMap((x) => x.evidence.map((e) => `${x.key ?? x.name}|${e.promptId}|${e.quote}`)).sort()
+        const shownEvidence = [...reportEl.querySelectorAll("[data-evidence]")].map((q) => `${q.dataset.owner}|${q.dataset.evidence}|${q.textContent}`).sort()
+        const evidenceMatches = JSON.stringify(sourceEvidence) === JSON.stringify(shownEvidence)
+        const confidenceMatches = profile.traits.every((t) => reportEl.querySelector(`[data-trait="${CSS.escape(t.name)}"]`)?.dataset.confidence === t.confidence)
+        const statsMatch = [...reportEl.querySelectorAll("[data-stat]")].every((el) => Number(el.dataset.value) === profile.stats[el.dataset.stat])
+        const expectedMissing = [...profile.dimensions, ...profile.traits].filter((x) => x.evidence.length === 0).length
+        const missingEls = [...reportEl.querySelectorAll("[data-missing]")]
+        const missingVisible = root.dataset.capture === "card" || (missingEls.length === expectedMissing && missingEls.every((el) => el.checkVisibility()))
+        const cardText = cardEl.textContent
+        const cardLeaks = [...[...profile.dimensions, ...profile.traits].flatMap((x) => x.evidence.map((e) => e.quote)), ...profile.stats.topProjects.map((p) => p.name)].filter((t) => cardText.includes(t))
+        const box = cardEl.getBoundingClientRect()
+        const clipped = [...cardEl.querySelectorAll(".card-inner *")].filter((el) => {
+          const r = el.getBoundingClientRect()
+          return r.width > 0 && (r.right > box.right + 1 || r.bottom > box.bottom + 1 || r.left < box.left - 1)
+        }).map((el) => el.className || el.tagName)
+        // Ellipsis and line clamps are deliberate, but they hide text: report them as findings.
+        const truncated = [...cardEl.querySelectorAll(".card-description, .card-traits span")].filter((el) => el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1)
+          .map((el) => `${el.className || el.tagName}: ${el.textContent.slice(0, 40)}`)
+        const overflow = document.documentElement.scrollWidth > innerWidth
+        const fontLoaded = document.fonts.check("700 20px Bricolage") && document.fonts.check("400 15px Inter")
+        const result = {
+          story: storyId, direction: lookId, fixture: fixtureName, capture: root.dataset.capture, width: innerWidth,
+          appearance: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+          cardWidth: Math.round(box.width), cardHeight: Math.round(box.height),
+          sourceProfileUnchanged: JSON.stringify(profile) === originalJson,
+          evidenceShown: shownEvidence.length, evidenceMatches, confidenceMatches, statsMatch,
+          missingWarnings: missingEls.length, missingVisible, cardLeaks, clipped, truncated, overflow, fontLoaded,
+          status: "Research prototype, not shipped",
+        }
+        console.assert(result.sourceProfileUnchanged, "Presentation changed the source profile")
+        console.assert(root.dataset.capture === "card" || evidenceMatches, "Report evidence differs from the source profile")
+        console.assert(root.dataset.capture === "card" || (confidenceMatches && statsMatch), "Confidence or statistics differ from the source profile")
+        console.assert(missingVisible, "A missing-evidence warning is absent or hidden")
+        console.assert(cardLeaks.length === 0, "Quote or project name in the share card")
+        console.assert(clipped.length === 0, `Clipped card content: ${clipped.join(", ")}`)
+        console.assert(!overflow, "Horizontal page overflow")
+        console.assert(fontLoaded, "Fonts not loaded")
+        if (root.dataset.capture === "card") console.assert(result.cardWidth === 1200 && result.cardHeight === 630, "Incorrect card dimensions")
+        return result
+      }
+
+      window.presentationChecks = checks
+      window.presentationSelect = (story, look) => { storyId = pick(story, STORIES, storyId); lookId = pick(look, LOOKS, lookId); render(); return checks() }
+      render()
+      document.fonts.ready.then(() => requestAnimationFrame(() => { console.log(JSON.stringify(checks())); root.dataset.ready = "true" }))
+    </script>
+  </body>
+</html>
