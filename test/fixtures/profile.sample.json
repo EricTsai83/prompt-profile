@@ -3001,6 +3001,7 @@
       }
     },
     "techniques": {
+      "coveredSessions": 180,
       "tools": {
         "subagents": {
           "count": 235,
@@ -3055,6 +3056,7 @@
         {
           "month": "2026-04",
           "sessions": 8,
+          "covered": 4,
           "prompts": 60,
           "tools": {
             "subagents": 0,
@@ -3083,6 +3085,7 @@
         {
           "month": "2026-05",
           "sessions": 46,
+          "covered": 30,
           "prompts": 280,
           "tools": {
             "subagents": 0,
@@ -3111,6 +3114,7 @@
         {
           "month": "2026-06",
           "sessions": 44,
+          "covered": 30,
           "prompts": 260,
           "tools": {
             "subagents": 1,
@@ -3139,6 +3143,7 @@
         {
           "month": "2026-07",
           "sessions": 41,
+          "covered": 28,
           "prompts": 240,
           "tools": {
             "subagents": 4,
@@ -3167,6 +3172,7 @@
         {
           "month": "2026-08",
           "sessions": 49,
+          "covered": 32,
           "prompts": 300,
           "tools": {
             "subagents": 9,
@@ -3195,6 +3201,7 @@
         {
           "month": "2026-09",
           "sessions": 52,
+          "covered": 30,
           "prompts": 320,
           "tools": {
             "subagents": 15,
@@ -3223,6 +3230,7 @@
         {
           "month": "2026-10",
           "sessions": 40,
+          "covered": 26,
           "prompts": 232,
           "tools": {
             "subagents": 18,

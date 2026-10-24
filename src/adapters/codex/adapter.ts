@@ -118,9 +118,24 @@ export const makeCodexAdapter = (
         const ids = [meta?.id, meta?.session_id, fileId].filter((x): x is string => x !== undefined)
         if (sessionId === undefined) return { ids, records, events: [] }
         const sessionRule = meta ? firstMatch(SESSION_RULES, meta) : undefined
-        const events: ReadonlyArray<TechniqueEvent> = sessionRule
-          ? []
-          : tools.map((t) => ({ source: SOURCE, sessionId, timestampMs: t.ms, kind: t.kind }))
+        const firstMs = [
+          ...userLines.map((l) => (l.ts ? Date.parse(l.ts) : Number.NaN)),
+          ...tools.map((t) => t.ms),
+        ]
+          .filter((ms) => !Number.isNaN(ms))
+          .toSorted((a, b) => a - b)[0]
+        const events: ReadonlyArray<TechniqueEvent> =
+          sessionRule || firstMs === undefined
+            ? []
+            : [
+                { source: SOURCE, sessionId, timestampMs: firstMs, kind: "transcript" },
+                ...tools.map((t) => ({
+                  source: SOURCE,
+                  sessionId,
+                  timestampMs: t.ms,
+                  kind: t.kind,
+                })),
+              ]
         for (const line of userLines) {
           if (sessionRule) {
             diag.exclude(sessionRule.name)

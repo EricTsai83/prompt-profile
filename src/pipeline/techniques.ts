@@ -102,6 +102,7 @@ export const techniquesOf = (input: {
     string,
     {
       sessions: Set<string>
+      covered: Set<string>
       prompts: number
       tools: Record<ToolTechnique, Set<string>>
       techniques: Record<PromptTechnique, number>
@@ -112,6 +113,7 @@ export const techniquesOf = (input: {
     if (!entry) {
       entry = {
         sessions: new Set(),
+        covered: new Set(),
         prompts: 0,
         tools: Object.fromEntries(TOOL_TECHNIQUES.map((t) => [t, new Set<string>()])) as Record<
           ToolTechnique,
@@ -135,8 +137,26 @@ export const techniquesOf = (input: {
       m.techniques[t]++
     }
   }
-  for (const e of events)
-    month(input.monthOf(e.timestampMs)).tools[e.kind].add(key(e.source, e.sessionId))
+  for (const e of events) {
+    const m = month(input.monthOf(e.timestampMs))
+    if (e.kind === "transcript") m.covered.add(key(e.source, e.sessionId))
+    else m.tools[e.kind].add(key(e.source, e.sessionId))
+  }
+  // Every month from the first to the last, so a quiet month shows as a gap, not a jump.
+  const known = [...months.keys()].toSorted()
+  if (known.length > 0) {
+    let [y, mo] = known[0]!.split("-").map(Number) as [number, number]
+    const last = known.at(-1)!
+    for (let ym = known[0]!; ym <= last;) {
+      month(ym)
+      mo++
+      if (mo > 12) {
+        mo = 1
+        y++
+      }
+      ym = `${y}-${String(mo).padStart(2, "0")}`
+    }
+  }
 
   const n = input.cleanedTexts.length
   const prompts = Object.fromEntries(
@@ -173,6 +193,9 @@ export const techniquesOf = (input: {
   }
 
   return {
+    coveredSessions: new Set(
+      events.filter((e) => e.kind === "transcript").map((e) => key(e.source, e.sessionId)),
+    ).size,
     tools,
     prompts,
     monthly: [...months.entries()]
@@ -180,6 +203,7 @@ export const techniquesOf = (input: {
       .map(([m, e]) => ({
         month: m,
         sessions: e.sessions.size,
+        covered: e.covered.size,
         prompts: e.prompts,
         tools: Object.fromEntries(TOOL_TECHNIQUES.map((t) => [t, e.tools[t].size])) as Record<
           ToolTechnique,

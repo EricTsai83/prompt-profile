@@ -109,6 +109,8 @@ export interface Messages {
   readonly unitSessions: string
   readonly unitPrompts: string
   readonly growing: string
+  readonly coverageNote: (sessions: number) => string
+  readonly noData: string
   readonly sinceLast: (date: string) => string
   readonly lastSuggestions: string
   readonly correctionsShare: string
@@ -249,6 +251,9 @@ const en: Messages = {
   unitSessions: "share of sessions",
   unitPrompts: "share of prompts",
   growing: "growing fastest",
+  noData: "no transcripts kept",
+  coverageNote: (n) =>
+    `Workflow shares cover the ${plural(n, "session", "sessions")} whose transcripts are still on disk (Claude Code deletes old ones)`,
   sinceLast: (d) => `Since your last report (${d})`,
   lastSuggestions: "Suggested last time",
   correctionsShare: "Prompts that correct the AI",
@@ -421,6 +426,9 @@ const zhTW: Messages = {
   unitSessions: "佔 session 的比例",
   unitPrompts: "佔 prompt 的比例",
   growing: "成長最快",
+  noData: "沒有保留紀錄",
+  coverageNote: (n) =>
+    `工作流程的比例只涵蓋還保留完整紀錄的 ${n} 個 session（Claude Code 會刪除舊紀錄）`,
   sinceLast: (d) => `跟上次報告比（${d}）`,
   lastSuggestions: "上次的建議",
   correctionsShare: "糾正 AI 的 prompt",

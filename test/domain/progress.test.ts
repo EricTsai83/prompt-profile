@@ -20,7 +20,7 @@ describe("progress snapshot", () => {
       )
       expect(snap.promptShares.planFirst).toBe(p.stats.techniques!.prompts.planFirst)
       expect(snap.toolShares.subagents).toBeCloseTo(
-        p.stats.techniques!.tools.subagents.sessions / p.stats.totalSessions,
+        p.stats.techniques!.tools.subagents.sessions / p.stats.techniques!.coveredSessions,
         4,
       )
       expect(snap.improvements).toEqual(p.improvements.map((i) => i.title))

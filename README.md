@@ -26,11 +26,15 @@ Output (in `./prompt-profile-report/` by default):
   a 24-hour clock of your busiest hours), four measured habits with their definitions, your top
   traits with a quote each and how widely they are supported, **how to improve your prompts**
   (2–4 suggestions, each with a real prompt of yours and a suggested rewrite, plus signals such
-  as frequent corrections or very short follow-ups), a daily calendar and a weekday ×
+  as frequent corrections or very short follow-ups), **how you work with AI** (subagents, skills,
+  plan mode, MCP, pull requests, parallel sessions and prompt-writing habits, counted from tool
+  metadata — never tool inputs or outputs), what changed since your last report, a daily
+  calendar and a weekday ×
   hour heatmap (hover or tap for the count and main projects), project chapters, the five
   dimensions, and how it was measured; a language switch when there is more than one language.
   It contains quotes and project folder names: keep it private
-- `share.html`: the page to show other people — identity, measured habits, rhythm and project
+- `share.html`: the page to show other people — identity, measured habits, how you work with AI,
+  rhythm and project
   chapters, with **no quotes, no project names** (shown as "Project A, B…", also inside the
   generated text) **and no exact dates**
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each

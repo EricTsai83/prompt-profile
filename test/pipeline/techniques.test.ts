@@ -78,6 +78,42 @@ describe("techniques in stats", () => {
     expect(t.parallelDays).toBe(1)
   })
 
+  it("workflow shares use only sessions with transcript metadata; months are continuous", () => {
+    const covered: Array<TechniqueEvent> = [
+      ...events,
+      {
+        source: "claude-code",
+        sessionId: "a",
+        timestampMs: ms("2026-09-01T02:00:00Z"),
+        kind: "transcript",
+      },
+      {
+        source: "claude-code",
+        sessionId: "c",
+        timestampMs: ms("2026-10-02T02:00:00Z"),
+        kind: "transcript",
+      },
+    ]
+    const gap = [
+      ...records,
+      rec("a prompt in december", "2026-12-03T02:00:00Z", { sessionId: "d" }),
+    ]
+    const t = processRecords(gap, {
+      ...options,
+      now: DateTime.makeUnsafe("2027-01-01T00:00:00Z"),
+      events: covered,
+    }).stats.techniques!
+    // b has no transcript: only a and c count
+    expect(t.coveredSessions).toBe(2)
+    expect(t.monthly.map((m) => [m.month, m.covered])).toEqual([
+      ["2026-09", 1],
+      ["2026-10", 1],
+      // a month without any activity is still shown
+      ["2026-11", 0],
+      ["2026-12", 0],
+    ])
+  })
+
   it("without events the workflow counts are zero, not missing", () => {
     const t = processRecords(records, options).stats.techniques!
     expect(t.tools.subagents).toEqual({ count: 0, sessions: 0 })

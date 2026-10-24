@@ -40,7 +40,8 @@ export interface TechniqueEvent {
   readonly source: string
   readonly sessionId: string
   readonly timestampMs: number
-  readonly kind: ToolTechnique
+  /** `transcript`: the session has full metadata on disk (one per session; the denominator). */
+  readonly kind: ToolTechnique | "transcript"
 }
 
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
@@ -60,6 +61,8 @@ const MonthTechniques = Schema.Struct({
   /** YYYY-MM in the stats time zone. */
   month: Schema.String,
   sessions: Count,
+  /** Sessions with transcript metadata (the denominator of `tools`). */
+  covered: Count,
   prompts: Count,
   /** Sessions using each workflow technique that month. */
   tools: countsOf(TOOL_TECHNIQUES, Count),
@@ -68,6 +71,11 @@ const MonthTechniques = Schema.Struct({
 })
 
 export const Techniques = Schema.Struct({
+  /**
+   * Sessions whose transcript (with tool metadata) is still on disk. Claude Code deletes old
+   * transcripts, so workflow shares use this, not all sessions.
+   */
+  coveredSessions: Count,
   tools: countsOf(TOOL_TECHNIQUES, ToolUse),
   /** Share of cleaned prompts using each prompt technique. */
   prompts: countsOf(PROMPT_TECHNIQUES, Ratio),

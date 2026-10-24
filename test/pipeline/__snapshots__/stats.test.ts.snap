@@ -1174,9 +1174,11 @@ exports[`stats > computes stats from filtered and cleaned data 1`] = `
     "p90": 33,
   },
   "techniques": {
+    "coveredSessions": 0,
     "maxParallel": 1,
     "monthly": [
       {
+        "covered": 0,
         "month": "2026-09",
         "prompts": 6,
         "sessions": 3,

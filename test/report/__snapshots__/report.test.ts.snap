@@ -227,7 +227,8 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 }
 
 .g-2e{grid-template-columns:1fr 1fr}
-.tech-callout{display:inline-block;margin:0 0 12px;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600}
+.tech-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px}.tech-head .note{margin:0}
+.tech-callout{display:inline-block;margin:0;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600}
 .tech-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .tech-badge{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;outline:none}
 .tech-badge:hover,.tech-badge:focus{border-color:var(--accent)}
@@ -246,6 +247,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .tt-c{position:relative;height:22px;border-radius:4px;background:var(--empty);outline:none}
 .tt-c.first::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--fg)}
 .tt-c:hover,.tt-c:focus{box-shadow:0 0 0 2px var(--fg)}
+.tt-c.nodata{background:repeating-linear-gradient(135deg,var(--empty) 0 4px,transparent 4px 8px)}
 :is(.tt-c).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
 :is(.tt-c).l2{background:color-mix(in srgb,var(--accent) 52%,var(--empty))}
 :is(.tt-c).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}
@@ -424,7 +426,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                     <h2><span data-l="en" lang="en">How I work with AI</span><span data-l="zh-TW" lang="zh-Hant-TW">我怎麼用 AI</span></h2>
                     <p class="note"><span data-l="en" lang="en">Measured from tool metadata and prompt text; hover for definitions</span><span data-l="zh-TW" lang="zh-Hant-TW">從工具中繼資料與 prompt 文字量出來；滑過看定義</span></p>
                   </div>
-                  <p class="tech-callout"><span data-l="en" lang="en">Up to 4 sessions at once · parallel on 31 days</span><span data-l="zh-TW" lang="zh-Hant-TW">最多同時 4 個 session · 31 天平行作業</span></p>
+                  <div class="tech-head">
+    <p class="tech-callout"><span data-l="en" lang="en">Up to 4 sessions at once · parallel on 31 days</span><span data-l="zh-TW" lang="zh-Hant-TW">最多同時 4 個 session · 31 天平行作業</span></p>
+    <p class="note"><span data-l="en" lang="en">Workflow shares cover the 180 sessions whose transcripts are still on disk (Claude Code deletes old ones)</span><span data-l="zh-TW" lang="zh-Hant-TW">工作流程的比例只涵蓋還保留完整紀錄的 180 個 session（Claude Code 會刪除舊紀錄）</span></p>
+  </div>
     <div class="grid g-2e">
       <article class="panel">
         <h3><span data-l="en" lang="en">Workflow</span><span data-l="zh-TW" lang="zh-Hant-TW">工作流程</span></h3>
@@ -434,55 +439,55 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <span class="share-track"
             ><span class="share-fill" style="width:100.0%"></span
           ></span>
-          <b>15%</b>
+          <b>27%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions where the agent started subagents (Agent / Task tools)" data-tip-zh-TW="agent 啟動子代理（Agent / Task 工具）的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:97.9%"></span
           ></span>
-          <b>15%</b>
+          <b>26%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions with web search or web fetch" data-tip-zh-TW="有網路搜尋或抓取網頁的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Researches the web</span><span data-l="zh-TW" lang="zh-Hant-TW">上網查資料</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:45.8%"></span
           ></span>
-          <b>7%</b>
+          <b>12%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions that called a tool from an MCP server" data-tip-zh-TW="呼叫了 MCP server 工具的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Connects MCP tools</span><span data-l="zh-TW" lang="zh-Hant-TW">串接 MCP 工具</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:41.7%"></span
           ></span>
-          <b>6%</b>
+          <b>11%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions that invoked a Claude Code skill" data-tip-zh-TW="呼叫了 Claude Code skill 的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Uses skills</span><span data-l="zh-TW" lang="zh-Hant-TW">使用 skills</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:37.5%"></span
           ></span>
-          <b>6%</b>
+          <b>10%</b>
         </li><li class="tip tip-l" data-tip-en="Prompts sent in plan mode, or plan mode entered by the agent" data-tip-zh-TW="在 plan 模式下送出的 prompt，或 agent 進入 plan 模式" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Plans in plan mode</span><span data-l="zh-TW" lang="zh-Hant-TW">用 plan 模式規劃</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:29.2%"></span
           ></span>
-          <b>4%</b>
+          <b>8%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions where the agent asked a structured question" data-tip-zh-TW="agent 提出結構化問題的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Lets the agent ask</span><span data-l="zh-TW" lang="zh-Hant-TW">讓 agent 反問</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:29.2%"></span
           ></span>
-          <b>4%</b>
+          <b>8%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions with monitors, scheduled wake-ups or cron tasks" data-tip-zh-TW="有監控、排程喚醒或 cron 任務的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Runs background work</span><span data-l="zh-TW" lang="zh-Hant-TW">跑背景任務</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:27.1%"></span
           ></span>
-          <b>4%</b>
+          <b>7%</b>
         </li><li class="tip tip-l" data-tip-en="Sessions that used a git worktree" data-tip-zh-TW="使用 git worktree 的 session" tabindex="-1">
           <span class="tbr-name"><span data-l="en" lang="en">Isolates work in worktrees</span><span data-l="zh-TW" lang="zh-Hant-TW">用 worktree 隔離工作</span></span>
           <span class="share-track"
             ><span class="share-fill" style="width:18.8%"></span
           ></span>
-          <b>3%</b>
+          <b>5%</b>
         </li>
   </ul>
       </article>
@@ -626,20 +631,20 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
   </li>
       <li class="chg flat">
     <span><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
-    <b>6% → 15%</b>
-    <i>▲ 9</i>
+    <b>6% → 26%</b>
+    <i>▲ 20</i>
   </li><li class="chg flat">
-    <span><span data-l="en" lang="en">States constraints</span><span data-l="zh-TW" lang="zh-Hant-TW">說明限制</span></span>
-    <b>31% → 36%</b>
-    <i>▲ 5</i>
+    <span><span data-l="en" lang="en">Ships pull requests</span><span data-l="zh-TW" lang="zh-Hant-TW">發 pull request</span></span>
+    <b>11% → 27%</b>
+    <i>▲ 16</i>
   </li><li class="chg flat">
-    <span><span data-l="en" lang="en">Defines done</span><span data-l="zh-TW" lang="zh-Hant-TW">定義完成</span></span>
-    <b>7% → 12%</b>
-    <i>▲ 5</i>
+    <span><span data-l="en" lang="en">Uses skills</span><span data-l="zh-TW" lang="zh-Hant-TW">使用 skills</span></span>
+    <b>2% → 10%</b>
+    <i>▲ 8</i>
   </li><li class="chg flat">
-    <span><span data-l="en" lang="en">Asks for verification</span><span data-l="zh-TW" lang="zh-Hant-TW">要求驗證</span></span>
-    <b>19% → 24%</b>
-    <i>▲ 5</i>
+    <span><span data-l="en" lang="en">Connects MCP tools</span><span data-l="zh-TW" lang="zh-Hant-TW">串接 MCP 工具</span></span>
+    <b>4% → 11%</b>
+    <i>▲ 7</i>
   </li>
     </ul>
     <p class="last-tips">

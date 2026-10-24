@@ -199,6 +199,7 @@ describe("Claude Code adapter (fixture)", () => {
       expect(
         read.events.map((e) => [e.kind, new Date(e.timestampMs).toISOString().slice(11, 16)]),
       ).toEqual([
+        ["transcript", "15:00"],
         ["planMode", "15:00"],
         ["subagents", "15:01"],
         ["mcp", "15:04"],

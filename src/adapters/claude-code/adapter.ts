@@ -79,6 +79,7 @@ interface ReadState {
   readonly events: Array<TechniqueEvent>
   readonly seenPullRequests: Set<string>
   readonly worktreeSessions: Set<string>
+  readonly transcriptSessions: Set<string>
 }
 
 /** Lines that can carry a workflow technique; everything else is skipped unparsed. */
@@ -93,13 +94,18 @@ const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state
   const ms = line.timestamp === undefined ? null : Date.parse(line.timestamp)
   if (ms !== null && !Number.isNaN(ms)) file.lastMs = ms
   if (line.isSidechain === true || line.sessionId === undefined || file.lastMs === null) return
-  const push = (kind: ToolTechnique) =>
+  const push = (kind: ToolTechnique | "transcript") =>
     state.events.push({
       source: SOURCE,
       sessionId: line.sessionId!,
       timestampMs: file.lastMs!,
       kind,
     })
+  // the session has a transcript with metadata: it counts in the workflow denominator
+  if (!state.transcriptSessions.has(line.sessionId)) {
+    state.transcriptSessions.add(line.sessionId)
+    push("transcript")
+  }
   if (line.type === "user" && line.permissionMode === "plan") push("planMode")
   if (line.type === "pr-link" && typeof line.prUrl === "string") {
     const key = createHash("sha256").update(line.prUrl).digest("hex")
@@ -268,6 +274,7 @@ export const makeClaudeCodeAdapter = (
         events: [],
         seenPullRequests: new Set(),
         worktreeSessions: new Set(),
+        transcriptSessions: new Set(),
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right

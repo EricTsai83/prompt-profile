@@ -37,13 +37,13 @@ const rowsOf = (s: Stats, t: Techniques): { tools: Array<Row>; prompts: Array<Ro
   const tools = TOOL_TECHNIQUES.map((id: ToolTechnique): Row => ({
     id,
     kind: "tool",
-    share: s.totalSessions === 0 ? 0 : t.tools[id].sessions / s.totalSessions,
+    share: t.coveredSessions === 0 ? 0 : Math.min(1, t.tools[id].sessions / t.coveredSessions),
     amount: id === "pullRequests" ? t.tools[id].count : t.tools[id].sessions,
     monthly: t.monthly.map((m) => ({
       month: m.month,
       n: m.tools[id],
-      of: m.sessions,
-      share: m.sessions === 0 ? 0 : m.tools[id] / m.sessions,
+      of: m.covered,
+      share: m.covered === 0 ? 0 : Math.min(1, m.tools[id] / m.covered),
     })),
     name: (m) => m.toolNames[id][0],
     definition: (m) => m.toolNames[id][1],
@@ -76,7 +76,15 @@ const monthName = (ym: string, m: Messages, year = false) =>
     timeZone: "UTC",
   }).format(new Date(`${ym}-01T00:00:00Z`))
 
-const firstMonth = (r: Row) => r.monthly.find((x) => x.n > 0)?.month ?? null
+/**
+ * The first month a technique was used, only when that is later than the first month with data:
+ * otherwise "since" would only show when transcripts start (Claude Code deletes old ones).
+ */
+const firstMonth = (r: Row) => {
+  const withData = r.monthly.filter((x) => x.of > 0)
+  const first = withData.find((x) => x.n > 0)?.month ?? null
+  return first !== null && first !== withData[0]?.month ? first : null
+}
 
 const pct = (x: number) => Math.round(x * 100)
 
@@ -99,9 +107,14 @@ const spark = (r: Row): Raw => {
 }
 
 const callout = (t: Techniques, loc: Loc): Raw =>
-  t.maxParallel >= 2
-    ? html`<p class="tech-callout">${loc.text((m) => m.parallel(t.maxParallel, t.parallelDays))}</p>`
-    : html``
+  html`<div class="tech-head">
+    ${
+      t.maxParallel >= 2
+        ? html`<p class="tech-callout">${loc.text((m) => m.parallel(t.maxParallel, t.parallelDays))}</p>`
+        : ""
+    }
+    <p class="note">${loc.text((m) => m.coverageNote(t.coveredSessions))}</p>
+  </div>`
 
 const amountText = (r: Row, m: Messages) =>
   r.kind === "prompt"
@@ -184,8 +197,8 @@ const timeline = (rows: ReadonlyArray<Row>, loc: Loc): Raw => {
         >${r.monthly.map(
           (x, i) =>
             html`<span
-              class="tt-c l${x.n === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil((4 * x.share) / max)))}${x.month === first ? " first" : ""} ${tipClass(i, months.length)}"
-              ${loc.tip((m) => `${monthName(x.month, m, true)} · ${x.n} / ${x.of}`)}
+              class="tt-c l${x.n === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil((4 * x.share) / max)))}${x.of === 0 ? " nodata" : ""}${x.month === first ? " first" : ""} ${tipClass(i, months.length)}"
+              ${loc.tip((m) => `${monthName(x.month, m, true)} · ${x.of === 0 ? m.noData : `${x.n} / ${x.of}`}`)}
               tabindex="-1"
             ></span>`,
         )}`
@@ -280,7 +293,8 @@ export const techniquesSection = (s: Stats, loc: Loc, view: TechniqueView): Raw 
 
 export const techniqueStyle = `
 .g-2e{grid-template-columns:1fr 1fr}
-.tech-callout{display:inline-block;margin:0 0 12px;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600}
+.tech-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 12px}.tech-head .note{margin:0}
+.tech-callout{display:inline-block;margin:0;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600}
 .tech-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .tech-badge{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;outline:none}
 .tech-badge:hover,.tech-badge:focus{border-color:var(--accent)}
@@ -299,6 +313,7 @@ export const techniqueStyle = `
 .tt-c{position:relative;height:22px;border-radius:4px;background:var(--empty);outline:none}
 .tt-c.first::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--fg)}
 .tt-c:hover,.tt-c:focus{box-shadow:0 0 0 2px var(--fg)}
+.tt-c.nodata{background:repeating-linear-gradient(135deg,var(--empty) 0 4px,transparent 4px 8px)}
 :is(.tt-c).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
 :is(.tt-c).l2{background:color-mix(in srgb,var(--accent) 52%,var(--empty))}
 :is(.tt-c).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}

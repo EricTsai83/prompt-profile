@@ -309,7 +309,7 @@ const progressBlock = (p: Profile, loc: Loc): Raw | null => {
           ...TOOL_TECHNIQUES.map((k) => ({
             label: loc.text((m) => m.toolNames[k][0]),
             before: prev.toolShares[k],
-            now: s.totalSessions === 0 ? 0 : Math.min(1, t.tools[k].sessions / s.totalSessions),
+            now: t.coveredSessions === 0 ? 0 : Math.min(1, t.tools[k].sessions / t.coveredSessions),
           })),
           ...PROMPT_TECHNIQUES.map((k) => ({
             label: loc.text((m) => m.promptNames[k][0]),

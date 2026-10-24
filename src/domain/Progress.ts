@@ -48,9 +48,9 @@ export const snapshotOf = (p: {
     toolShares: Object.fromEntries(
       TOOL_TECHNIQUES.map((k: ToolTechnique) => [
         k,
-        t === null || s.totalSessions === 0
+        t === null || t.coveredSessions === 0
           ? 0
-          : round(Math.min(1, t.tools[k].sessions / s.totalSessions)),
+          : round(Math.min(1, t.tools[k].sessions / t.coveredSessions)),
       ]),
     ) as Snapshot["toolShares"],
     promptShares: Object.fromEntries(
