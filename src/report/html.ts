@@ -24,7 +24,8 @@ import {
   type RenderOptions,
   type ReportTokens,
 } from "./looks.ts"
-import { MESSAGES } from "./messages.ts"
+import { MESSAGES, type Messages } from "./messages.ts"
+import { triggeredSignals } from "./signals.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -228,6 +229,59 @@ const dimensionRow = (
   </details>`
 }
 
+const improvementCard = (p: Profile, i: number, loc: Loc): Raw => {
+  const imp = p.improvements[i]!
+  const before = imp.rewrite
+    ? imp.evidence.find((e) => e.promptId === imp.rewrite!.promptId)
+    : undefined
+  const others = imp.evidence.filter((e) => e !== before)
+  return html`<article class="improve">
+    <header><span class="improve-n">${i + 1}</span><h3>${loc.text((_m, c) => c.improvement(i).title)}</h3></header>
+    <p class="improve-pattern">${loc.text((_m, c) => c.improvement(i).pattern)}</p>
+    <p class="improve-impact">${loc.text((_m, c) => c.improvement(i).impact)}</p>
+    <p class="improve-tip">${loc.text((_m, c) => c.improvement(i).suggestion)}</p>
+    ${
+      before && imp.rewrite
+        ? html`<div class="rewrite">
+            <div>
+              <span class="rw-label">${loc.text((m) => m.before)}</span>
+              <blockquote>${before.quote}</blockquote>
+            </div>
+            <div>
+              <span class="rw-label">${loc.text((m) => m.after)}</span>
+              <p class="rw-after" title="${loc.attr((m) => m.suggested)}">${imp.rewrite.after}</p>
+            </div>
+          </div>`
+        : ""
+    }
+    ${
+      others.length > 0
+        ? html`<details>
+            <summary>${loc.text((m) => m.showEvidence(others.length))}</summary>
+            ${quotes(others)}
+          </details>`
+        : ""
+    }
+  </article>`
+}
+
+const signalRow = (p: Profile, loc: Loc): Raw | null => {
+  const list = triggeredSignals(p.stats)
+  if (list.length === 0) return null
+  const r = p.stats.promptHabits.reusedOpenings
+  const texts = (m: Messages, id: (typeof list)[number]["id"], amount: number) =>
+    id === "reusedOpenings" ? m.signal.reusedOpenings(r.openings, r.sessions) : m.signal[id](amount)
+  return html`<ul class="signals">
+    ${list.map(
+      (x) =>
+        html`<li>
+          <b>${loc.text((m) => texts(m, x.id, x.amount)[0])}</b>
+          <span>${loc.text((m) => texts(m, x.id, x.amount)[1])}</span>
+        </li>`,
+    )}
+  </ul>`
+}
+
 const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
   html`<div class="sig tip ${i === 0 ? "tip-l" : i === 3 ? "tip-r" : ""}" ${tip} tabindex="-1">
     <b>${value}</b><span>${label}</span>
@@ -403,6 +457,22 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .dim-body{padding:0 18px 16px}
 .dim-body p{font-size:14px}
 .warning{color:var(--warn);font-size:13px;margin-top:8px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.section-head h2{font-size:20px;margin:36px 0 14px}
+.improves{display:grid;gap:12px}
+.improve{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:18px;padding:18px 20px}
+.improve header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.improve-n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;flex:none}
+.improve h3{font-size:17px}
+.improve-pattern{font-size:14px}
+.improve-impact{font-size:13px;color:var(--muted);margin-top:4px}
+.improve-tip{font-size:14px;font-weight:600;margin-top:8px}
+.rewrite{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.rw-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:4px}
+.rw-after{margin:0;padding:8px 12px;border-radius:10px;background:var(--accent-soft);font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.signals{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.signals li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.signals b{font-size:14px}.signals span{font-size:13px;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
@@ -421,7 +491,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
 .hero:has(.hero-clock){min-height:0}
 .hero-clock{position:static;transform:none;width:70%;margin:18px auto 0}
-.sigs{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
+.sigs{grid-template-columns:repeat(2,1fr)}.rewrite{grid-template-columns:1fr}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
 .dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
 `
@@ -501,6 +571,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
   const signature = order.slice(0, 3)
   const minor = order.slice(3)
   const every = correctionEvery(s)
+  const signals = isPrivate ? signalRow(profile, loc) : null
   const perSession = promptsPerSession(s)
   const graphic = look
     ? graphicSvg(identity.graphic, s.hourHistogram, {
@@ -639,6 +710,26 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                 : ""
             }
           </section>
+
+          ${
+            isPrivate && (profile.improvements.length > 0 || signals !== null)
+              ? html`<section class="coaching">
+                  <div class="section-head">
+                    <h2>${loc.text((m) => m.coaching)}</h2>
+                    <p class="note">${loc.text((m) => m.coachingNote)}</p>
+                  </div>
+                  <div class="improves">
+                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc))}
+                  </div>
+                  ${
+                    signals
+                      ? html`<h3 class="sub-h">${loc.text((m) => m.signalsTitle)}</h3>
+                          ${signals}`
+                      : ""
+                  }
+                </section>`
+              : ""
+          }
 
           <section>
             <h2>${loc.text((m) => m.rhythm)}</h2>

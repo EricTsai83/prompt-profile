@@ -13,7 +13,7 @@ const SAMPLE = new URL("../fixtures/profile.sample.json", import.meta.url)
 const sample = () => decodeProfile(JSON.parse(readFileSync(SAMPLE, "utf8")))
 const englishOnly = (p: Profile): Profile => ({ ...p, languages: ["en"], translations: {} })
 const evidenceTotal = (p: Profile) =>
-  [...p.traits, ...p.dimensions].reduce((n, x) => n + x.evidence.length, 0)
+  [...p.traits, ...p.dimensions, ...p.improvements].reduce((n, x) => n + x.evidence.length, 0)
 
 const texts = (node: unknown): Array<string> => {
   if (typeof node === "string") return [node]

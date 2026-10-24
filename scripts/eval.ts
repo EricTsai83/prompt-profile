@@ -91,6 +91,7 @@ const program = Effect.gen(function* () {
       evidenceRetention: `${Math.round(score.evidenceRetention * 100)}%`,
       emptyDimensions: score.emptyDimensions,
       universalClaims: score.overgeneralisations,
+      improvements: profile.improvements.length,
       archetype: profile.archetype.name,
       seconds: Math.round((Date.now() - started) / 1000),
     })

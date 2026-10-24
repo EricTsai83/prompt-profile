@@ -116,6 +116,22 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .dim-body{padding:0 18px 16px}
 .dim-body p{font-size:14px}
 .warning{color:var(--warn);font-size:13px;margin-top:8px}
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.section-head h2{font-size:20px;margin:36px 0 14px}
+.improves{display:grid;gap:12px}
+.improve{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:18px;padding:18px 20px}
+.improve header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.improve-n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;flex:none}
+.improve h3{font-size:17px}
+.improve-pattern{font-size:14px}
+.improve-impact{font-size:13px;color:var(--muted);margin-top:4px}
+.improve-tip{font-size:14px;font-weight:600;margin-top:8px}
+.rewrite{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.rw-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:4px}
+.rw-after{margin:0;padding:8px 12px;border-radius:10px;background:var(--accent-soft);font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.signals{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.signals li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.signals b{font-size:14px}.signals span{font-size:13px;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
@@ -134,7 +150,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
 .hero:has(.hero-clock){min-height:0}
 .hero-clock{position:static;transform:none;width:70%;margin:18px auto 0}
-.sigs{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
+.sigs{grid-template-columns:repeat(2,1fr)}.rewrite{grid-template-columns:1fr}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
 .dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
 
@@ -361,6 +377,57 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             </div>
             
           </section>
+
+          <section class="coaching">
+                  <div class="section-head">
+                    <h2><span data-l="en" lang="en">Improve your prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">讓 prompt 更好</span></h2>
+                    <p class="note"><span data-l="en" lang="en">From your own prompts; each suggestion cites what it is based on</span><span data-l="zh-TW" lang="zh-Hant-TW">來自你自己的 prompt；每個建議都標出根據</span></p>
+                  </div>
+                  <div class="improves">
+                    <article class="improve">
+    <header><span class="improve-n">1</span><h3><span data-l="en" lang="en">State the expected result first</span><span data-l="zh-TW" lang="zh-Hant-TW">先講預期結果</span></h3></header>
+    <p class="improve-pattern"><span data-l="en" lang="en">You often describe the change and add the real requirement only after the first answer.</span><span data-l="zh-TW" lang="zh-Hant-TW">你常先描述要改什麼，等第一次回答後才補上真正的要求。</span></p>
+    <p class="improve-impact"><span data-l="en" lang="en">Several follow-ups in this sample start with a correction such as “no, keep the old API”.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份樣本裡有幾個追問是以糾正開頭，例如「不對，保留舊的 API」。</span></p>
+    <p class="improve-tip"><span data-l="en" lang="en">Put the expected result and the constraints in the first prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">在第一個 prompt 就寫出預期結果和限制。</span></p>
+    <div class="rewrite">
+            <div>
+              <span class="rw-label"><span data-l="en" lang="en">You wrote</span><span data-l="zh-TW" lang="zh-Hant-TW">你寫的</span></span>
+              <blockquote>don&#39;t write code yet, break the plan into small steps</blockquote>
+            </div>
+            <div>
+              <span class="rw-label"><span data-l="en" lang="en">Try</span><span data-l="zh-TW" lang="zh-Hant-TW">可以試試</span></span>
+              <p class="rw-after" title="Suggested rewrite">Plan only, no code yet: break the change into small steps, list the risks of each, and keep the public API unchanged.</p>
+            </div>
+          </div>
+    
+  </article><article class="improve">
+    <header><span class="improve-n">2</span><h3><span data-l="en" lang="en">Name the file and the error</span><span data-l="zh-TW" lang="zh-Hant-TW">指出檔案和錯誤訊息</span></h3></header>
+    <p class="improve-pattern"><span data-l="en" lang="en">Debugging prompts rarely say which file or which error message.</span><span data-l="zh-TW" lang="zh-Hant-TW">除錯的 prompt 很少說是哪個檔案、哪個錯誤。</span></p>
+    <p class="improve-impact"><span data-l="en" lang="en">The AI has to ask or guess before it can help.</span><span data-l="zh-TW" lang="zh-Hant-TW">AI 必須先問或先猜，才能幫上忙。</span></p>
+    <p class="improve-tip"><span data-l="en" lang="en">Paste the error line and name the file and function in the same prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">同一個 prompt 裡貼上錯誤那一行，並寫出檔案和函式名稱。</span></p>
+    
+    <details>
+            <summary><span data-l="en" lang="en">1 quote as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
+  </ul>
+          </details>
+  </article>
+                  </div>
+                  <h3 class="sub-h"><span data-l="en" lang="en">Signals worth a look</span><span data-l="zh-TW" lang="zh-Hant-TW">值得注意的訊號</span></h3>
+                          <ul class="signals">
+    <li>
+          <b><span data-l="en" lang="en">1 in 8 prompts corrects the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">每 8 則 prompt 就有一次糾正 AI</span></b>
+          <span><span data-l="en" lang="en">Most corrections add something you already knew: put the expected result and the constraints in the first prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">多數糾正補上的是你早就知道的事：把預期結果和限制寫在第一個 prompt。</span></span>
+        </li><li>
+          <b><span data-l="en" lang="en">31% of prompts are under ~4 words</span><span data-l="zh-TW" lang="zh-Hant-TW">31% 的 prompt 不到四個字詞</span></b>
+          <span><span data-l="en" lang="en">Follow-ups like “fix it” make the AI guess. Name the file, the error and what “done” looks like.</span><span data-l="zh-TW" lang="zh-Hant-TW">像「改一下」這樣的追問會讓 AI 用猜的。寫出檔案、錯誤訊息，以及怎樣才算完成。</span></span>
+        </li><li>
+          <b><span data-l="en" lang="en">2 openings start 14 sessions</span><span data-l="zh-TW" lang="zh-Hant-TW">2 種開頭重複用在 14 個 session</span></b>
+          <span><span data-l="en" lang="en">If you type these yourself, save them as a slash command, a skill or a CLAUDE.md / AGENTS.md note.</span><span data-l="zh-TW" lang="zh-Hant-TW">如果這些是你自己打的，把它們存成 slash command、skill，或寫進 CLAUDE.md / AGENTS.md。</span></span>
+        </li>
+  </ul>
+                </section>
 
           <section>
             <h2><span data-l="en" lang="en">Rhythm</span><span data-l="zh-TW" lang="zh-Hant-TW">節奏</span></h2>

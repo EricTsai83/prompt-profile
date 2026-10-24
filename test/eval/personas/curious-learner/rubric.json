@@ -20,5 +20,6 @@
   ],
   "minTraits": 2,
   "minEvidenceRetention": 0.8,
-  "maxEmptyDimensions": 2
+  "maxEmptyDimensions": 2,
+  "minImprovements": 1
 }

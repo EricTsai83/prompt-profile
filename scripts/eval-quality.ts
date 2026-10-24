@@ -10,6 +10,8 @@ export interface QualityRubric {
   readonly minTraits: number
   readonly minEvidenceRetention: number
   readonly maxEmptyDimensions: number
+  /** At least this many verified improvements (plan 16); unset = not checked. */
+  readonly minImprovements?: number
   /** Fails above this many universal claims; unset = counted only (see plan 13). */
   readonly maxOvergeneralisations?: number
 }
@@ -26,6 +28,7 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     ...profile.traits.flatMap((t) => [t.name, t.description]),
     ...profile.dimensions.flatMap((d) => [d.title, d.summary]),
     ...profile.funFacts,
+    ...profile.improvements.flatMap((i) => [i.title, i.pattern, i.impact, i.suggestion]),
   ].join("\n")
   const failures: Array<string> = []
   for (const concept of rubric.requiredConcepts) {
@@ -44,6 +47,8 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     failures.push("Evidence retention below threshold")
   if (emptyDimensions > rubric.maxEmptyDimensions)
     failures.push("Too many dimensions without evidence")
+  if (profile.improvements.length < (rubric.minImprovements ?? 0))
+    failures.push("Too few improvements")
   const overgeneralisations = claims.match(UNIVERSAL)?.length ?? 0
   const maxUniversal = rubric.maxOvergeneralisations
   if (maxUniversal !== undefined && overgeneralisations > maxUniversal)

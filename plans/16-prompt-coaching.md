@@ -1,6 +1,6 @@
 # 16 · Prompt coaching: from "who you are" to "how to prompt better"
 
-Status: in progress (2026-10-24). Owner request: the report should not only describe; it should
+Status: implemented (2026-10-24); a budgeted persona run to validate the improvements is pending the owner's approval. Owner request: the report should not only describe; it should
 show where the owner's prompts can improve.
 
 ## Two sources, both evidence-based

@@ -15,3 +15,4 @@ Should be recognised:
 - Plans before building: asks for comparisons and designs first ("先設計不要寫 code").
 - Growth across about six weeks: from a single CSV parser to a packaged library, a dbt project
   and Dagster orchestration, ending with an architecture summary for new colleagues.
+- Improvements: few; maybe say which edge cases matter up front instead of adding them after the first test, and keep repeated instructions ("先寫 test 再寫") in a saved note or command.

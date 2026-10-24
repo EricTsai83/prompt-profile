@@ -92,3 +92,15 @@ it.effect("counts universal claims in generated text, not in quotes", () =>
     expect(strict.failures).toContain("Too many universal claims (3 > 2)")
   }),
 )
+
+it.effect("requires a minimum number of improvements when the rubric asks for it", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const loose = { ...rubric, requiredConcepts: [] }
+    expect(scoreProfile(sample, { ...loose, minImprovements: 2 }).passed).toBe(true)
+    const none = scoreProfile({ ...sample, improvements: [] }, { ...loose, minImprovements: 1 })
+    expect(none.failures).toContain("Too few improvements")
+  }),
+)

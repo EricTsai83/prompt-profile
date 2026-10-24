@@ -20,7 +20,10 @@ const mentioning = (p: Profile): Profile => ({
 })
 
 const forbidden = (p: Profile) => [
-  ...[...p.traits, ...p.dimensions].flatMap((x) => x.evidence.map((e) => e.quote)),
+  ...[...p.traits, ...p.dimensions, ...p.improvements].flatMap((x) =>
+    x.evidence.map((e) => e.quote),
+  ),
+  ...p.improvements.flatMap((i) => (i.rewrite ? [i.rewrite.after] : [])),
   ...p.stats.activity.projects.filter((n) => n !== "prompt-profile"),
   ...p.stats.topProjects.map((x) => x.name).filter((n) => n !== "prompt-profile"),
 ]

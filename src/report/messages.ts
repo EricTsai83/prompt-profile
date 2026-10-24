@@ -89,6 +89,18 @@ export interface Messages {
   readonly howMeasured: string
   readonly projectAnon: string
   readonly cardActive: string
+  readonly coaching: string
+  readonly coachingNote: string
+  readonly before: string
+  readonly after: string
+  readonly suggested: string
+  readonly signalsTitle: string
+  readonly signal: {
+    readonly corrections: (rate: number) => readonly [string, string]
+    readonly terse: (share: number) => readonly [string, string]
+    readonly longSessions: (share: number) => readonly [string, string]
+    readonly reusedOpenings: (openings: number, sessions: number) => readonly [string, string]
+  }
 }
 
 const plural = (n: number, one: string, many: string) =>
@@ -197,6 +209,30 @@ const en: Messages = {
   howMeasured: "How this was measured",
   projectAnon: "Project",
   cardActive: "most active",
+  coaching: "Improve your prompts",
+  coachingNote: "From your own prompts; each suggestion cites what it is based on",
+  before: "You wrote",
+  after: "Try",
+  suggested: "Suggested rewrite",
+  signalsTitle: "Signals worth a look",
+  signal: {
+    corrections: (r) => [
+      `1 in ${Math.round(1 / r)} prompts corrects the AI`,
+      "Most corrections add something you already knew: put the expected result and the constraints in the first prompt.",
+    ],
+    terse: (x) => [
+      `${Math.round(x * 100)}% of prompts are under ~4 words`,
+      "Follow-ups like “fix it” make the AI guess. Name the file, the error and what “done” looks like.",
+    ],
+    longSessions: (x) => [
+      `${Math.round(x * 100)}% of sessions run past 40 prompts`,
+      "Long conversations carry stale context. Start a new session (or /clear) when the task changes.",
+    ],
+    reusedOpenings: (o, se) => [
+      `${o} ${o === 1 ? "opening starts" : "openings start"} ${se} sessions`,
+      "If you type these yourself, save them as a slash command, a skill or a CLAUDE.md / AGENTS.md note.",
+    ],
+  },
 }
 
 const zhTW: Messages = {
@@ -295,6 +331,30 @@ const zhTW: Messages = {
   howMeasured: "這份報告怎麼量的",
   projectAnon: "專案",
   cardActive: "最活躍時段",
+  coaching: "讓 prompt 更好",
+  coachingNote: "來自你自己的 prompt；每個建議都標出根據",
+  before: "你寫的",
+  after: "可以試試",
+  suggested: "建議的寫法",
+  signalsTitle: "值得注意的訊號",
+  signal: {
+    corrections: (r) => [
+      `每 ${Math.round(1 / r)} 則 prompt 就有一次糾正 AI`,
+      "多數糾正補上的是你早就知道的事：把預期結果和限制寫在第一個 prompt。",
+    ],
+    terse: (x) => [
+      `${Math.round(x * 100)}% 的 prompt 不到四個字詞`,
+      "像「改一下」這樣的追問會讓 AI 用猜的。寫出檔案、錯誤訊息，以及怎樣才算完成。",
+    ],
+    longSessions: (x) => [
+      `${Math.round(x * 100)}% 的 session 超過 40 則 prompt`,
+      "對話太長會累積過時的脈絡。換任務時開新的 session（或 /clear）。",
+    ],
+    reusedOpenings: (o, se) => [
+      `${o} 種開頭重複用在 ${se} 個 session`,
+      "如果這些是你自己打的，把它們存成 slash command、skill，或寫進 CLAUDE.md / AGENTS.md。",
+    ],
+  },
 }
 
 /** Every text of the report and the card, per language. */

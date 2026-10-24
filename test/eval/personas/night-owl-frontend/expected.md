@@ -8,3 +8,4 @@ Should be recognised:
 - Often corrects the AI with short Chinese phrases: 「不對」, 「還是不行」, 「錯了」; high correction rate.
 - Small, fast iterations: changes one thing at a time, checks the result, then adjusts.
 - Performance-aware: LCP, font sizes, image preload.
+- Improvements: frequent short corrections (「不對」「還是不行」) after the first answer: state the expected visual result, the breakpoint/device and constraints in the first prompt; name the browser/device when reporting a bug.

@@ -196,6 +196,7 @@ const program = Effect.gen(function* () {
           traits: profile.traits.length,
           emptyDimensions: score.emptyDimensions,
           universalClaims: score.overgeneralisations,
+          improvements: profile.improvements.length,
           archetype: profile.archetype.name,
           seconds,
         })

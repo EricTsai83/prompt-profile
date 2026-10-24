@@ -24,7 +24,9 @@ Output (in `./prompt-profile-report/` by default):
 
 - `report.html`: your private, single-file report that works offline — who you are (archetype,
   a 24-hour clock of your busiest hours), four measured habits with their definitions, your top
-  traits with a quote each and how widely they are supported, a daily calendar and a weekday ×
+  traits with a quote each and how widely they are supported, **how to improve your prompts**
+  (2–4 suggestions, each with a real prompt of yours and a suggested rewrite, plus signals such
+  as frequent corrections or very short follow-ups), a daily calendar and a weekday ×
   hour heatmap (hover or tap for the count and main projects), project chapters, the five
   dimensions, and how it was measured; a language switch when there is more than one language.
   It contains quotes and project folder names: keep it private

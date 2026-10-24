@@ -8,3 +8,4 @@ Should be recognised:
 - Clear growth over time (from borrow-checker confusion to fixed timesteps and spatial hashing).
 - Irregular hours from morning to evening (local time 10:00–21:30, no late nights); lowercase,
   casual English with enthusiasm ("it compiles now!!").
+- Improvements: the prompts are already explicit about what kind of help is wanted; expect at most small suggestions, e.g. say what was tried before asking "why", or state the level of detail wanted.

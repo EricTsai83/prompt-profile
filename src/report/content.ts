@@ -7,6 +7,12 @@ export interface Content {
   readonly dimension: (key: DimensionKey) => { readonly title: string; readonly summary: string }
   readonly trait: (i: number) => { readonly name: string; readonly description: string }
   readonly funFacts: ReadonlyArray<string>
+  readonly improvement: (i: number) => {
+    readonly title: string
+    readonly pattern: string
+    readonly impact: string
+    readonly suggestion: string
+  }
 }
 
 export const contentIn = (p: Profile, lang: Language): Content => {
@@ -20,5 +26,6 @@ export const contentIn = (p: Profile, lang: Language): Content => {
     },
     trait: (i) => t?.traits[i] ?? p.traits[i]!,
     funFacts: t?.funFacts ?? p.funFacts,
+    improvement: (i) => t?.improvements[i] ?? p.improvements[i]!,
   }
 }
