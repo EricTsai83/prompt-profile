@@ -1,6 +1,6 @@
 {
   "name": "prompt-profile",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Analyze your past prompts from AI coding agents (Claude Code, Codex) locally and generate a personal profile.",
   "keywords": [
     "ai",
