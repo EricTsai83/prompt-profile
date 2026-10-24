@@ -2,7 +2,14 @@ import type { CacheClearFailed } from "../analysis/cache.ts"
 import type { AnalyzeError } from "../analysis/errors.ts"
 import type { InvalidProfile, UnsupportedProfileVersion } from "../domain/Profile.ts"
 import type { LlmError } from "../llm/LlmRunner.ts"
-import type { FileError, InvalidArgument, NeedsConfirmation, NoData } from "./errors.ts"
+import type {
+  FileError,
+  InvalidArgument,
+  NeedsConfirmation,
+  NoData,
+  OutputCheckBlocked,
+} from "./errors.ts"
+import { findingGroups } from "./messages.ts"
 
 export type AppError =
   | CacheClearFailed
@@ -12,6 +19,7 @@ export type AppError =
   | NeedsConfirmation
   | InvalidArgument
   | FileError
+  | OutputCheckBlocked
   | UnsupportedProfileVersion
   | InvalidProfile
 
@@ -20,6 +28,8 @@ const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
   "--since": "--since accepts 1m, 3m, 6m, 1y or all.",
   "--max-calls": "Use a positive safe integer.",
   "--card-hide": "Use a comma list of traits, stats, graphic.",
+  "--allow":
+    "Use a comma list of email, home-path, username, internal-url, tw-national-id, credit-card, phone. Secrets cannot be allowed.",
   "--exclude":
     "Use a comma list of quotes, projects, dates, coaching, funfacts, custom-names, or personal (all of them).",
   "--lang": "Use a comma list of en, zh-TW (the first is the default).",
@@ -116,6 +126,16 @@ const RENDERERS: Renderers = {
   InvalidArgument: (e) => ({
     code: EXIT.usage,
     message: `Unrecognised value "${e.value}" for ${e.flag}. ${ARGUMENT_HINTS[e.flag] ?? ARGUMENT_HINTS["--since"]}`,
+  }),
+  OutputCheckBlocked: (e) => ({
+    code: EXIT.error,
+    message: `The final check found secrets or personal data (--check strict), so nothing was written:\n${findingGroups(
+      e.findings,
+    )
+      .map((g) => `  ${g}`)
+      .join(
+        "\n",
+      )}\nLeave the part out with --exclude, allow a personal rule with --allow, or drop --check strict.`,
   }),
   FileError: (e) => ({
     code: EXIT.error,

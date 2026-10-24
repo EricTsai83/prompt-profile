@@ -45,10 +45,13 @@ are written. Reuses the redaction rules of `pipeline/redact.ts`, in two tiers:
 | Tier | Rules | Behaviour |
 | --- | --- | --- |
 | Secret | private key, connection string, bearer, key–value secret, API token, JWT, high-entropy token | Always masked, whatever `--check` says; `--allow` cannot release them |
-| Personal | email, home path, username, internal URL, Taiwan national ID, credit card, phone | `--check mask` (default): masked and listed. `--check warn`: kept and listed. `--check strict`: nothing is written, the command fails and lists them |
+| Personal | email, home path, username, internal URL, Taiwan national ID, credit card, phone | `--check mask` (default): masked and listed. `--check warn`: kept and listed. `--check strict`: nothing is written, the command fails (exit 1) and lists every finding, secrets included |
 
-- `--allow <rule,…>` releases personal rules (e.g. `--allow email` for a public address).
-- Masked text reads `[masked: <rule>]`, so the reader sees that something was there.
+- `--allow <rule,…>` releases personal rules (e.g. `--allow email` for a public address); a
+  secret rule there is a usage error (exit 2). Allowing `home-path` alone still masks the
+  username inside the path (`username` is its own rule).
+- Masked text uses the redaction placeholders (`[SECRET]`, `[EMAIL]`, `~` for a home folder…),
+  as in quotes redacted before the LLM, so the reader sees that something was there.
 - Machine fields (dates, ids, numbers, model ids) are not checked. Rules that only flag
   identifiers in prompts (UUID, long hex hash) are left out of the check: generated text and
   names do not carry them, and they would only produce noise.

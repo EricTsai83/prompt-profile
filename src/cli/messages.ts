@@ -1,3 +1,5 @@
+import type { Finding } from "../pipeline/audit.ts"
+
 const n = (x: number) => x.toLocaleString("en")
 
 /** Numbers for the `stats` summary, already formatted where needed. */
@@ -61,6 +63,9 @@ export const messages = {
   cardSkipped: (language: string, reason: string) =>
     `  Card   (${language}) not created: ${reason}`,
   dataLine: (p: string) => `  Data   ${p}`,
+  checkClean: "  Check  no secrets or personal data found",
+  checkMasked: (count: number, groups: string) => `  Check  ${count} masked: ${groups}`,
+  checkKept: (count: number, groups: string) => `  Check  ${count} kept (--check warn): ${groups}`,
   skippedChunks: (k: number) => `  ${k} chunk(s) failed and were skipped (noted in the report)`,
   interrupted: "Interrupted. Run again to resume from the cache.",
   dryRun: (dir: string, chunks: number, chars: number) =>
@@ -87,3 +92,24 @@ export const messages = {
 }
 
 export type Messages = typeof messages
+
+/** `rule (location, location)` per rule, in the order found. Never the matched text. */
+export const findingGroups = (findings: ReadonlyArray<Finding>): Array<string> => {
+  const byRule = new Map<string, Array<string>>()
+  for (const f of findings) byRule.set(f.rule, [...(byRule.get(f.rule) ?? []), f.location])
+  return [...byRule.entries()].map(([rule, at]) => `${rule} (${at.join(", ")})`)
+}
+
+/** The "Check" lines after writing: what was masked and what was kept. */
+export const checkLines = (findings: ReadonlyArray<Finding>): Array<string> => {
+  if (findings.length === 0) return [messages.checkClean]
+  const total = (fs: ReadonlyArray<Finding>) => fs.reduce((sum, f) => sum + f.count, 0)
+  const masked = findings.filter((f) => f.masked)
+  const kept = findings.filter((f) => !f.masked)
+  return [
+    ...(masked.length > 0
+      ? [messages.checkMasked(total(masked), findingGroups(masked).join(", "))]
+      : []),
+    ...(kept.length > 0 ? [messages.checkKept(total(kept), findingGroups(kept).join(", "))] : []),
+  ]
+}

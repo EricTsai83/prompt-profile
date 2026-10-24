@@ -7,11 +7,12 @@ import { LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
 import { withCallBudget } from "../../llm/budget.ts"
 import { withRetry } from "../../llm/retry.ts"
 import { Environment } from "../../platform/Environment.ts"
+import type { CheckMode } from "../../pipeline/audit.ts"
 import type { LookId } from "../../report/looks.ts"
 import { VERSION } from "../../version.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
-import { messages, type Messages } from "../messages.ts"
-import { parseLanguages, parseRenderOptions } from "../options.ts"
+import { checkLines, messages, type Messages } from "../messages.ts"
+import { parseAllow, parseLanguages, parseRenderOptions } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
   previousSnapshot,
@@ -40,6 +41,8 @@ export interface MainOptions {
   readonly look?: LookId
   readonly cardHide?: string | undefined
   readonly exclude?: string | undefined
+  readonly check?: CheckMode
+  readonly allow?: string | undefined
 }
 
 /** `--dry-run`: the chunks that would be sent, plus plan.json. Never calls an LLM. */
@@ -109,6 +112,7 @@ export const runMain = (options: MainOptions) =>
       options.cardHide,
       options.exclude,
     )
+    const allow = yield* parseAllow(options.allow)
     const env = yield* Environment
     const languages = yield* parseLanguages(options.lang, env.locale)
     const out = yield* Output
@@ -174,7 +178,10 @@ export const runMain = (options: MainOptions) =>
 
     // The report in this folder before this run, if any: "since your last report".
     const previous = yield* previousSnapshot(outDir)
-    const files = yield* writeReportFiles({ ...profile, previous }, outDir, renderOptions)
+    const files = yield* writeReportFiles({ ...profile, previous }, outDir, renderOptions, null, {
+      mode: options.check ?? "mask",
+      allow,
+    })
     const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
     yield* out.line("")
     yield* out.line(t.done)
@@ -184,6 +191,7 @@ export const runMain = (options: MainOptions) =>
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
     yield* out.line(t.dataLine(files.profileJson))
+    for (const line of checkLines(files.findings)) yield* out.line(line)
     if (profile.coverage.chunksFailed > 0)
       yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))
   })

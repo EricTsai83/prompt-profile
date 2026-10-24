@@ -1,4 +1,5 @@
 import { Data, Runtime } from "effect"
+import type { Finding } from "../pipeline/audit.ts"
 
 /** No prompts found at all, or none in the selected range. */
 export class NoData extends Data.TaggedError("NoData")<{
@@ -12,6 +13,11 @@ export class NeedsConfirmation extends Data.TaggedError("NeedsConfirmation")<{}>
 export class InvalidArgument extends Data.TaggedError("InvalidArgument")<{
   readonly flag: string
   readonly value: string
+}> {}
+
+/** `--check strict` found something: nothing was written. */
+export class OutputCheckBlocked extends Data.TaggedError("OutputCheckBlocked")<{
+  readonly findings: ReadonlyArray<Finding>
 }> {}
 
 export class FileError extends Data.TaggedError("FileError")<{

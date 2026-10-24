@@ -9,6 +9,7 @@ import {
   type RenderOptions,
   type ReportPart,
 } from "../report/looks.ts"
+import { PERSONAL_RULES, type PersonalRule } from "../pipeline/audit.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */
@@ -75,4 +76,17 @@ export const parseLanguages = (
   return parts.length > 0 && parts.every(isLanguage)
     ? Effect.succeed([...new Set(parts)])
     : Effect.fail(new InvalidArgument({ flag: "--lang", value }))
+}
+
+/** `--allow`: a comma list of personal rules (secret rules can never be allowed). */
+export const parseAllow = (
+  value: string | undefined,
+): Effect.Effect<Array<PersonalRule>, InvalidArgument> => {
+  if (value === undefined) return Effect.succeed([])
+  const parts = value.split(",").map((p) => p.trim())
+  const isPersonal = (p: string): p is PersonalRule =>
+    (PERSONAL_RULES as ReadonlyArray<string>).includes(p)
+  return parts.every(isPersonal)
+    ? Effect.succeed([...new Set(parts)])
+    : Effect.fail(new InvalidArgument({ flag: "--allow", value }))
 }

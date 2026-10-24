@@ -5,6 +5,7 @@ import { snapshotOf } from "../domain/Progress.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import type { TechniqueEvent } from "../domain/Techniques.ts"
 import type { SkillOrigin } from "../domain/SourceAdapter.ts"
+import { checkOutput, type CheckMode } from "../pipeline/audit.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
 import { withSkillCatalog } from "../pipeline/techniques.ts"
 import { readSkillCatalog } from "../adapters/claude-code/skills.ts"
@@ -13,7 +14,7 @@ import { Environment } from "../platform/Environment.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
 import { writeReport, type RenderOptions } from "../report/index.ts"
-import { FileError, NoData } from "./errors.ts"
+import { FileError, NoData, OutputCheckBlocked } from "./errors.ts"
 import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
 import { FontSource, Output } from "./services.ts"
@@ -181,19 +182,36 @@ export const writeFileOrFail = (file: string, data: string) =>
     )
   })
 
-/** report.html, profile.json and card.png in `outDir` (a card failure is not an error). */
+/** The final output check's settings (`--check`, `--allow`). */
+export interface OutputCheck {
+  readonly mode: CheckMode
+  readonly allow: ReadonlyArray<string>
+}
+
+export const DEFAULT_CHECK: OutputCheck = { mode: "mask", allow: [] }
+
+/**
+ * Run the final check, then write report.html, profile.json and the cards in `outDir` (a card
+ * failure is not an error). What is written is the checked profile; `--check strict` with a
+ * finding fails with OutputCheckBlocked before anything is written.
+ */
 export const writeReportFiles = (
   profile: Profile,
   outDir: string,
   options?: RenderOptions,
   source?: string | null,
+  check: OutputCheck = DEFAULT_CHECK,
 ) =>
   Effect.gen(function* () {
+    const env = yield* Environment
+    const result = checkOutput(profile, { ...check, username: env.username })
+    if (result.blocked) return yield* new OutputCheckBlocked({ findings: result.findings })
     const fonts = yield* FontSource
     const cjk = fonts.cjk(yield* cacheDirOf)
-    return yield* writeReport(profile, outDir, options, source, cjk).pipe(
+    const files = yield* writeReport(result.profile, outDir, options, source, cjk).pipe(
       Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
     )
+    return { ...files, findings: result.findings }
   })
 
 /** The key numbers of `<outDir>/profile.json`, if it exists and decodes; otherwise null. */

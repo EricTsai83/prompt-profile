@@ -1,11 +1,12 @@
 import { Effect, FileSystem, Path } from "effect"
+import type { CheckMode } from "../../pipeline/audit.ts"
 import { decodeProfile } from "../../domain/Profile.ts"
 import { Environment } from "../../platform/Environment.ts"
 import { FileError } from "../errors.ts"
-import { messages } from "../messages.ts"
+import { checkLines, messages } from "../messages.ts"
 import { Output } from "../services.ts"
 import { isDefaultRender, variantName, type LookId } from "../../report/looks.ts"
-import { parseRenderOptions } from "../options.ts"
+import { parseAllow, parseRenderOptions } from "../options.ts"
 import { resolveOut, writeReportFiles } from "../steps.ts"
 
 /**
@@ -18,9 +19,12 @@ export const runRender = (options: {
   readonly look: LookId
   readonly cardHide: string | undefined
   readonly exclude?: string | undefined
+  readonly check?: CheckMode
+  readonly allow?: string | undefined
 }) =>
   Effect.gen(function* () {
     const renderOptions = yield* parseRenderOptions(options.look, options.cardHide, options.exclude)
+    const allow = yield* parseAllow(options.allow)
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const env = yield* Environment
@@ -40,7 +44,10 @@ export const runRender = (options: {
         ? path.dirname(input)
         : path.join(path.dirname(input), "variants", variantName(renderOptions))
     const source = path.relative(outDir, input)
-    const files = yield* writeReportFiles(profile, outDir, renderOptions, source)
+    const files = yield* writeReportFiles(profile, outDir, renderOptions, source, {
+      mode: options.check ?? "mask",
+      allow,
+    })
     const t = messages
     yield* out.line(t.rendered(files.html))
     yield* out.line(t.renderedNoAnalysis)
@@ -48,4 +55,5 @@ export const runRender = (options: {
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
+    for (const line of checkLines(files.findings)) yield* out.line(line)
   })

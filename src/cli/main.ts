@@ -17,6 +17,7 @@ import { runMain } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
+import { CHECK_MODES } from "../pipeline/audit.ts"
 import { LOOK_IDS } from "../report/looks.ts"
 import { DEFAULT_OUT } from "./options.ts"
 import { cacheDirOf } from "./steps.ts"
@@ -47,6 +48,16 @@ const lang = Flag.String("lang").pipe(
 )
 const cardHide = Flag.String("card-hide").pipe(
   Flag.withDescription("Leave parts out of the card: comma list of traits, stats, graphic"),
+  Flag.optional,
+)
+const check = Flag.Literals("check", CHECK_MODES).pipe(
+  Flag.withDescription(
+    "Final check for personal data (email, home path, username, phone…): mask (default), warn keeps it, strict writes nothing. Secrets are always masked",
+  ),
+  Flag.withDefault("mask" as const),
+)
+const allow = Flag.String("allow").pipe(
+  Flag.withDescription("Personal-data rules the final check skips: comma list, e.g. email"),
   Flag.optional,
 )
 const exclude = Flag.String("exclude").pipe(
@@ -112,6 +123,8 @@ const renderCommand = Command.make(
     look,
     cardHide,
     exclude,
+    check,
+    allow,
     verbose,
   },
   (f) =>
@@ -122,6 +135,8 @@ const renderCommand = Command.make(
         look: f.look,
         cardHide: optional(f.cardHide),
         exclude: optional(f.exclude),
+        check: f.check,
+        allow: optional(f.allow),
       }),
       f,
     ),
@@ -157,6 +172,8 @@ export const command = Command.make(
     look,
     cardHide,
     exclude,
+    check,
+    allow,
     full: Flag.Boolean("full").pipe(
       Flag.withDescription("Analyse everything, no sampling (slower, uses more quota)"),
       Flag.withDefault(false),
@@ -195,6 +212,8 @@ export const command = Command.make(
           look: f.look,
           cardHide: optional(f.cardHide),
           exclude: optional(f.exclude),
+          check: f.check,
+          allow: optional(f.allow),
         }),
       ),
       f,

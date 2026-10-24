@@ -22,7 +22,8 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 ✔ Done!
   Report <tmp>/out/report.html
   Card   <tmp>/out/card.png
-  Data   <tmp>/out/profile.json"
+  Data   <tmp>/out/profile.json
+  Check  no secrets or personal data found"
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `

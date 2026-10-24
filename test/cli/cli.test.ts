@@ -1,7 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Fiber } from "effect"
 import { TestClock } from "effect/testing"
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 import { NotLoggedIn, RateLimited } from "../../src/llm/LlmRunner.ts"
 import { VERSION } from "../../src/version.ts"
@@ -197,6 +197,70 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(bad.code).toBe(2)
       expect(bad.stderr).toContain("--exclude")
       expect(bad.stderr).toContain("personal")
+    }),
+  )
+
+  it.effect("the final check masks secrets and personal data, and lists where", () =>
+    Effect.gen(function* () {
+      const TOKEN = "ghp_abcdefghijklmnopqrstuvwxyz0123456789"
+      const EMAIL = "someone@example.com"
+      const leaky = JSON.parse(readFileSync(fixture("profile.sample.json"), "utf8"))
+      leaky.funFacts[0] = `Pasted ${TOKEN} once`
+      leaky.traits[1].description = `Mails ${EMAIL} a lot`
+      const setup = (name: string) => {
+        const h = makeHarness()
+        const dir = join(h.root, name)
+        mkdirSync(dir)
+        writeFileSync(join(dir, "profile.json"), JSON.stringify(leaky))
+        return { h, dir, profile: join(dir, "profile.json") }
+      }
+
+      const masked = setup("mask")
+      const r = yield* masked.h.run(["render", masked.profile])
+      expect(r.code).toBe(0)
+      const report = readFileSync(join(masked.dir, "report.html"), "utf8")
+      expect(report).not.toContain(TOKEN)
+      expect(report).not.toContain(EMAIL)
+      expect(readFileSync(join(masked.dir, "profile.json"), "utf8")).not.toContain(TOKEN)
+      expect(r.stdout).toContain("Check  2 masked")
+      expect(r.stdout).toContain("api-token (Fun facts › 1)")
+      expect(r.stdout).toContain("email (Traits › 2)")
+      expect(r.stdout + r.stderr).not.toContain(TOKEN)
+      expect(r.stdout + r.stderr).not.toContain(EMAIL)
+
+      const strict = setup("strict")
+      const rs = yield* strict.h.run(["render", strict.profile, "--check", "strict"])
+      expect(rs.code).toBe(1)
+      expect(existsSync(join(strict.dir, "report.html"))).toBe(false)
+      expect(rs.stderr).toContain("--check strict")
+      expect(rs.stderr).toContain("email (Traits › 2)")
+      expect(rs.stdout + rs.stderr).not.toContain(EMAIL)
+
+      const warn = setup("warn")
+      const rw = yield* warn.h.run(["render", warn.profile, "--check", "warn"])
+      expect(rw.code).toBe(0)
+      const warned = readFileSync(join(warn.dir, "report.html"), "utf8")
+      expect(warned).toContain(EMAIL)
+      expect(warned).not.toContain(TOKEN)
+      expect(rw.stdout).toContain("1 kept (--check warn): email (Traits › 2)")
+
+      const allowed = setup("allow")
+      const ra = yield* allowed.h.run(["render", allowed.profile, "--allow", "email"])
+      expect(ra.code).toBe(0)
+      expect(readFileSync(join(allowed.dir, "report.html"), "utf8")).toContain(EMAIL)
+      const bad = yield* allowed.h.run(["render", allowed.profile, "--allow", "api-token"])
+      expect(bad.code).toBe(2)
+      expect(bad.stderr).toContain("--allow")
+    }),
+  )
+
+  it.effect("the final check reports a clean profile", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const profile = join(h.root, "profile.json")
+      writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
+      const r = yield* h.run(["render", profile])
+      expect(r.stdout).toContain("Check  no secrets or personal data found")
     }),
   )
 
