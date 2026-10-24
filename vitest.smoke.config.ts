@@ -14,10 +14,10 @@ export default defineConfig({
         test: {
           name: "data",
           include: ["test/smoke/**/*.test.ts"],
-          exclude: ["test/smoke/llm-runner.test.ts"],
+          exclude: ["test/smoke/llm-*.test.ts"],
         },
       },
-      { test: { name: "llm", include: ["test/smoke/llm-runner.test.ts"] } },
+      { test: { name: "llm", include: ["test/smoke/llm-*.test.ts"] } },
     ],
   },
 })

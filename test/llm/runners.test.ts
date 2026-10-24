@@ -48,6 +48,7 @@ describe("ClaudeCodeRunner", () => {
       expect(result.usage).toEqual({ inputTokens: 1175, outputTokens: 52, costUsd: 0.0105593 })
       const rec = fake.records[0]!
       expect(rec.command).toBe("claude")
+      expect(rec.args).toContain("--safe-mode")
       expect(rec.stdin).toBe(`${ANALYSIS_MARKER}\nsecret user prompt text`)
       expect(rec.args.join(" ")).not.toContain("secret user prompt")
       expect(
@@ -145,6 +146,8 @@ describe("CodexRunner", () => {
       expect(result.value).toEqual({ ok: true })
       expect(result.usage).toEqual({ inputTokens: 15835, outputTokens: 15, costUsd: null })
       expect(result.model).toBeNull()
+      expect(fake.records[0]!.args).toContain("--ignore-user-config")
+      expect(fake.records[0]!.args).toContain("features.hooks=false")
       expect(schemaSeen).toEqual(OkSchema.jsonSchema)
       const rec = fake.records[0]!
       expect(rec.stdin.startsWith(`${ANALYSIS_MARKER}\n`)).toBe(true)

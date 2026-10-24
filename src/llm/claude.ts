@@ -29,6 +29,7 @@ export const claudeArgs = (
   options: RunnerOptions,
 ): ReadonlyArray<string> => [
   "-p",
+  "--safe-mode",
   "--output-format",
   "json",
   "--json-schema",

@@ -3,6 +3,7 @@
 exports[`ClaudeCodeRunner > sends the expected args, prompt on stdin, and parses structured_output 1`] = `
 [
   "-p",
+  "--safe-mode",
   "--output-format",
   "json",
   "--json-schema",
@@ -29,6 +30,11 @@ exports[`CodexRunner > writes the schema file, sends system+prompt on stdin, rea
   "-o",
   "<tmp>/output.json",
   "--ephemeral",
+  "--ignore-user-config",
+  "-c",
+  "features.hooks=false",
+  "-c",
+  "notify=[]",
   "--ignore-rules",
   "-s",
   "read-only",

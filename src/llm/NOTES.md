@@ -25,10 +25,11 @@ Command: see `claudeArgs` in `claude.ts`. Prompt is sent on stdin (never in argv
 2. **`--settings '{"disableAllHooks": true}'` works**: tested with a project-level
    `UserPromptSubmit` hook that touches a file — fires without the flag, not with it.
    (Managed/enterprise policy hooks may still be enforced; not testable here.)
-3. **CLAUDE.md is still loaded** with `--system-prompt`: a `CLAUDE.md` in the cwd changed the
-   answer. Mitigations: every call runs in a fresh empty temp dir (no project CLAUDE.md), and
-   `SYSTEM_PREAMBLE` tells the model to ignore memory-file instructions. The user's global
-   `~/.claude/CLAUDE.md` can still leak style instructions — the preamble is best-effort.
+3. `--system-prompt` alone does not isolate CLAUDE.md: a file in the cwd changed the answer
+   in the original probe. We now also use `--safe-mode`, which the installed CLI describes as
+   disabling user customizations (including memory, skills, plugins, hooks and MCP). Every call
+   still runs in a fresh empty directory. Managed policy can remain; the system preamble is
+   defense in depth, not an isolation boundary.
 4. **Do not use `--bare`**: it skips the keychain, so subscription logins fail.
 5. `--disable-slash-commands` is added to keep skills out of the context.
 6. `claude auth status --json` → `{ "loggedIn": boolean, ... }`. The output also contains the
@@ -59,7 +60,27 @@ Command: see `codexArgs` in `codex.ts`. System text + prompt on stdin (no system
 5. `codex login status` prints `Logged in using ChatGPT` (exit 0) **on stderr** (stdout is
    empty), so detection reads both streams.
 6. `--ephemeral`: verified no new rollout file / history line (nonce grep).
-7. We do not pass `--ignore-user-config` (would drop the user's model provider settings).
+7. We now pass `--ignore-user-config`: the installed CLI explicitly states that auth still
+   uses `CODEX_HOME`. Custom providers and model defaults from `config.toml` are intentionally
+   not inherited. `--model` still works. `features.hooks=false` also disables adjacent hook
+   files, and `notify=[]` prevents notification commands. Administrator configuration and
+   inherited environment variables can still apply; read-only does not remove all tools.
+
+## Isolation regression probes
+
+`test/smoke/llm-isolation.test.ts` passed on 2026-10-24 with the versions above. Each probe
+uses a synthetic hook and a minimal stdio MCP server that create separate marker files.
+The positive control starts both, then the production isolation flags prevent both markers.
+Claude's probe uses explicit synthetic settings and a project MCP file; Codex uses a temporary
+`CODEX_HOME` with synthetic config/hooks and a symlink to the existing login. No user config is
+modified. Both probes require successful CLI completion, so an auth failure cannot be mistaken
+for isolation. The history/schema probes also passed after the flag changes (8 tests total).
+
+Codex settings reference: [official configuration reference](https://developers.openai.com/codex/config-reference)
+and [hooks guide](https://learn.chatgpt.com/docs/hooks). CLI help for codex-cli 0.164.0 is the
+source for `--ignore-user-config` retaining authentication. CLI help for Claude Code 2.1.309
+is the source for safe mode. Re-run these probes when changing flags or upgrading supported
+CLI versions. Results do not establish isolation from enterprise-managed policy or CLI logs.
 
 ## Rate limits
 
