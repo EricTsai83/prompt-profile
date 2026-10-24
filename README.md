@@ -8,12 +8,6 @@ personal profile.
 [Sample HTML report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/sample-report.html)
 · [Sample profile JSON](docs/sample-profile.json) (all sample data is hand-written and fictional).
 
-The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
-
-| Signal                                      | Afterhours                                          | Studio                                      |
-| ------------------------------------------- | --------------------------------------------------- | ------------------------------------------- |
-| ![Signal look](docs/sample-card-signal.png) | ![Afterhours look](docs/sample-card-afterhours.png) | ![Studio look](docs/sample-card-studio.png) |
-
 ### A real report
 
 The author's own report, from about 1,700 real prompts over six months, published as written:
@@ -24,9 +18,14 @@ The author's own report, from about 1,700 real prompts over six months, publishe
   `--exclude personal`: no quotes, rewrites or fun facts, projects shown as "Project A, B…",
   dates by month. This is what you would post publicly.
 
-![Share card of the real report](docs/demo/card.png)
+The share card is the same for both: it never contains quotes or project names. The full report
+in every look (`--look`; render only, no new analysis):
 
-The share card is the same for both: it never contains quotes or project names.
+| [Classic](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/full/report.html) (default) | [Signal](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/signal/report.html) |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| ![Classic card](docs/demo/card.png)                                                                                                   | ![Signal card](docs/demo/signal/card.png)                                                                                    |
+| [Afterhours](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/afterhours/report.html)  | [Studio](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/studio/report.html) |
+| ![Afterhours card](docs/demo/afterhours/card.png)                                                                                     | ![Studio card](docs/demo/studio/card.png)                                                                                    |
 
 ## Quick start
 
