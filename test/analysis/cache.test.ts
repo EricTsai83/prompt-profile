@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect, Option } from "effect"
+import { Effect, FileSystem, Option, PlatformError } from "effect"
 import { mkdirSync, mkdtempSync, readdirSync, statSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -57,5 +57,38 @@ describe("file cache", () => {
       yield* cache.clear
       expect(readdirSync(dir)).toEqual(["fonts"])
     }).pipe(Effect.provide(fileCacheLayer(dir)), Effect.provide(NodeServices.layer)),
+  )
+})
+
+describe("cache deletion failures", () => {
+  it.effect("reports removal failures instead of claiming sensitive entries were deleted", () =>
+    Effect.gen(function* () {
+      const cache = yield* AnalysisCache
+      const result = yield* Effect.result(cache.clear)
+      expect(result._tag).toBe("Failure")
+    }).pipe(
+      Effect.provide(fileCacheLayer("/cache")),
+      Effect.provideService(
+        FileSystem.FileSystem,
+        FileSystem.makeNoop({
+          remove: () =>
+            Effect.fail(
+              PlatformError.systemError({
+                _tag: "PermissionDenied",
+                module: "FileSystem",
+                method: "remove",
+              }),
+            ),
+        }),
+      ),
+      Effect.provide(NodeServices.layer),
+    ),
+  )
+
+  it.effect("clearing a missing cache succeeds", () =>
+    Effect.gen(function* () {
+      const cache = yield* AnalysisCache
+      yield* cache.clear
+    }).pipe(Effect.provide(fileCacheLayer("/missing-cache")), Effect.provide(NodeServices.layer)),
   )
 })

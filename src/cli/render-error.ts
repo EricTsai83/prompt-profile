@@ -1,9 +1,11 @@
+import type { CacheClearFailed } from "../analysis/cache.ts"
 import type { AnalyzeError } from "../analysis/errors.ts"
 import type { InvalidProfile, UnsupportedProfileVersion } from "../domain/Profile.ts"
 import type { LlmError } from "../llm/LlmRunner.ts"
 import type { FileError, InvalidArgument, NeedsConfirmation, NoData } from "./errors.ts"
 
 export type AppError =
+  | CacheClearFailed
   | AnalyzeError
   | LlmError
   | NoData
@@ -41,6 +43,14 @@ type Renderers = {
  * Messages say what happened and what to do next; details only with --verbose.
  */
 const RENDERERS: Renderers = {
+  CallBudgetExceeded: (e) => ({
+    code: EXIT.error,
+    message: `Stopped at the call budget of ${e.limit}. Retries count toward this limit. Completed chunks are cached; increase --max-calls to continue.`,
+  }),
+  CacheClearFailed: (e) => ({
+    code: EXIT.error,
+    message: `Could not delete analysis cache at ${e.path}. Sensitive entries may remain. Check folder permissions and retry.`,
+  }),
   NoData: (e) => ({
     code: EXIT.noData,
     message:
@@ -84,7 +94,9 @@ const RENDERERS: Renderers = {
         ? "There are no prompts to analyse."
         : e.reason === "too-many-chunk-failures"
           ? `${e.chunksFailed} of ${e.chunksTotal} chunks failed, so no reliable report could be made. Successful chunks are cached; run again.`
-          : "The final profile step failed. Chunk results are cached, so a re-run only repeats this step.",
+          : e.reason === "input-too-large"
+            ? "The observations are still too large after merging. No final profile call was sent. Try a shorter --since range; completed chunks are cached."
+            : "The final profile step failed. Chunk results are cached, so a re-run only repeats this step.",
   }),
   NeedsConfirmation: () => ({
     code: EXIT.usage,
@@ -93,7 +105,7 @@ const RENDERERS: Renderers = {
   }),
   InvalidArgument: (e) => ({
     code: EXIT.usage,
-    message: `Unrecognised value "${e.value}" for ${e.flag}. --since accepts 1m, 3m, 6m, 1y or all.`,
+    message: `Unrecognised value "${e.value}" for ${e.flag}. ${e.flag === "--max-calls" ? "Use a positive safe integer." : "--since accepts 1m, 3m, 6m, 1y or all."}`,
   }),
   FileError: (e) => ({
     code: EXIT.error,

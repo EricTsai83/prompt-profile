@@ -1943,7 +1943,7 @@ footer p{margin:4px 0}
               Generated: Oct 24, 2026, 10:00 AM
             </p>
             <p>
-              41 pieces of evidence verified (3 unverifiable quotes removed) · 1 chunk failed and was skipped
+              41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped
             </p>
             <p>Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</p>
             <p>prompt-profile · npx prompt-profile</p>

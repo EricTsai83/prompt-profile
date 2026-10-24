@@ -89,7 +89,13 @@ export class Interrupted extends Data.TaggedError("Interrupted")<{
   readonly runner: RunnerId
 }> {}
 
+export class CallBudgetExceeded extends Data.TaggedError("CallBudgetExceeded")<{
+  readonly runner: RunnerId
+  readonly limit: number
+}> {}
+
 export type LlmError =
+  | CallBudgetExceeded
   | NotInstalled
   | NotLoggedIn
   | RateLimited

@@ -3,7 +3,7 @@ import type { LlmError } from "../llm/LlmRunner.ts"
 
 /** Analysis could not produce a profile (other than a fatal LlmError). */
 export class AnalysisFailed extends Data.TaggedError("AnalysisFailed")<{
-  readonly reason: "no-prompts" | "too-many-chunk-failures" | "reduce-failed"
+  readonly reason: "no-prompts" | "too-many-chunk-failures" | "reduce-failed" | "input-too-large"
   readonly chunksFailed: number
   readonly chunksTotal: number
   /** The underlying LLM error when there was one (for --verbose). */

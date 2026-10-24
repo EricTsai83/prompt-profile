@@ -31,14 +31,17 @@ export const messages = {
   excludedLine: (count: number, rules: string) => `  Skipped ${n(count)} noisy prompts (${rules})`,
   redactedLine: (count: number, detail: string) =>
     count === 0
-      ? "  No sensitive data found to redact"
+      ? "  No supported redaction pattern matched"
       : `  Redacted ${n(count)} sensitive items (${detail})`,
   range: (since: string, prompts: number, chunks: number) =>
     `● Range: ${since} · ${n(prompts)} prompts → ${chunks} chunks`,
   sampledNote: (selected: number, total: number) =>
     `  Large history: sampling ${selected} / ${total} chunks (--full analyses everything)`,
   engineLine: (name: string, calls: number, hits: number) =>
-    `  Using ${name} (logged in): about ${calls} call${calls === 1 ? "" : "s"}${hits > 0 ? ` (${hits} chunks cached)` : ""}, billed to your subscription`,
+    `  Using ${name} (logged in): base estimate ${calls} call${calls === 1 ? "" : "s"}${hits > 0 ? ` (${hits} chunks cached)` : ""}, billed to your subscription`,
+  callEstimateNote:
+    "  Base estimate excludes intermediate merges and retries (up to 2 retries per call).",
+  callBudget: (limit: number) => `  Call budget: at most ${limit} CLI calls, including retries`,
   confirm: "Continue?",
   cancelled: "Cancelled. No LLM was called.",
   analysing: (done: number, total: number, cached: number) =>

@@ -47,7 +47,12 @@ const OBSERVATIONS_SCHEMA = makeLlmSchema("LlmChunkObservations", LlmChunkObserv
 const DRAFT_SCHEMA = makeLlmSchema("LlmProfileDraft", LlmProfileDraft)
 
 /** LLM errors that will not succeed on a retry: stop everything immediately. */
-const FATAL: ReadonlySet<LlmError["_tag"]> = new Set(["NotInstalled", "NotLoggedIn", "Interrupted"])
+const FATAL: ReadonlySet<LlmError["_tag"]> = new Set([
+  "NotInstalled",
+  "NotLoggedIn",
+  "Interrupted",
+  "CallBudgetExceeded",
+])
 
 // ---------------------------------------------------------------------------------------
 // Analyze
@@ -208,6 +213,14 @@ export const analyze = (input: {
       if (observationsText(observations).length > before * (1 - MIN_MERGE_SHRINK)) break
     }
 
+    if (observationsText(observations).length > limit) {
+      return yield* new AnalysisFailed({
+        reason: "input-too-large",
+        chunksFailed: failed.length,
+        chunksTotal: total,
+      })
+    }
+
     // ---- reduce ---------------------------------------------------------------------
     yield* progress.onReduceStart
     const reducePrompt = `observations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(encodeStats(input.stats))}`
@@ -247,7 +260,12 @@ export const analyze = (input: {
         evidenceDropped: 0,
       },
     })
-    const traits = verifyTraits(profile.traits, texts, counts)
+    const traits = verifyTraits(
+      profile.traits,
+      texts,
+      counts,
+      new Map(input.prompts.map((p) => [p.id, `${p.source}:${p.sessionId}`])),
+    )
     const dimensions = verifyDimensions(profile.dimensions, texts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)
     return {

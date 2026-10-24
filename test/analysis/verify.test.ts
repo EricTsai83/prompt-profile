@@ -147,3 +147,68 @@ describe("verify", () => {
     expect(dims).toEqual([{ key: "growth", title: "t", summary: "s", evidence: [] }])
   })
 })
+
+describe("independent evidence", () => {
+  it("counts normalized duplicate quotes once", () => {
+    const counts = { kept: 0, dropped: 0 }
+    const result = verifyTraits(
+      [
+        {
+          name: "t",
+          description: "d",
+          confidence: "high",
+          evidence: [
+            { promptId: "p2", quote: "fix the <Button>" },
+            { promptId: "p2", quote: "FIX  THE &lt;Button&gt;" },
+          ],
+        },
+      ],
+      texts,
+      counts,
+    )
+    expect(result[0]!.evidence).toHaveLength(1)
+    expect(counts).toEqual({ kept: 1, dropped: 1 })
+  })
+
+  it("different excerpts of one prompt do not count as independent support", () => {
+    const result = verifyTraits(
+      [
+        {
+          name: "t",
+          description: "d",
+          confidence: "high",
+          evidence: [
+            { promptId: "p3", quote: "no, that's wrong" },
+            { promptId: "p3", quote: "use a Map" },
+          ],
+        },
+      ],
+      texts,
+      { kept: 0, dropped: 0 },
+    )
+    expect(result[0]!.confidence).toBe("medium")
+  })
+
+  it("caps confidence when independent prompts belong to one session", () => {
+    const result = verifyTraits(
+      [
+        {
+          name: "t",
+          description: "d",
+          confidence: "high",
+          evidence: [
+            { promptId: "p1", quote: "拆成小步驟" },
+            { promptId: "p3", quote: "use a Map" },
+          ],
+        },
+      ],
+      texts,
+      { kept: 0, dropped: 0 },
+      new Map([
+        ["p1", "session"],
+        ["p3", "session"],
+      ]),
+    )
+    expect(result[0]!.confidence).toBe("medium")
+  })
+})

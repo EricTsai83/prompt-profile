@@ -28,7 +28,7 @@ export interface AnalysisPlan {
   readonly chunks: ReadonlyArray<Chunk>
   readonly sampled: boolean
   readonly cacheHits: number
-  /** Map calls for uncached chunks + at least one reduce call. */
+  /** Base estimate: uncached map calls + final reduce; merges and retries are additional. */
   readonly llmCalls: number
   /** Characters that will be sent (uncached chunks only). */
   readonly charsToSend: number

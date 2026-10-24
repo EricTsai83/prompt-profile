@@ -4,10 +4,11 @@ import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../ana
 import { Progress, type ProgressShape } from "../../analysis/progress.ts"
 import { chooseRunner } from "../../llm/detect.ts"
 import { LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
+import { withCallBudget } from "../../llm/budget.ts"
 import { withRetry } from "../../llm/retry.ts"
 import { Environment } from "../../platform/Environment.ts"
 import { VERSION } from "../../version.ts"
-import { NeedsConfirmation } from "../errors.ts"
+import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, type Messages } from "../messages.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
@@ -21,6 +22,7 @@ import {
 /** The main command: read → pipeline → (confirm) → analyse → report. */
 
 export interface MainOptions {
+  readonly maxCalls?: string | undefined
   readonly since: string
   readonly engine: RunnerId | undefined
   readonly model: string | undefined
@@ -47,6 +49,7 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
       sampled: p.sampled,
       cacheHits: p.cacheHits,
       llmCalls: p.llmCalls,
+      llmCallsEstimate: "Map + final reduce only; merges and retries are additional.",
       charsToSend: p.charsToSend,
       promptsAnalyzed: p.promptsAnalyzed,
       sessionsAnalyzed: p.sessionsAnalyzed,
@@ -83,6 +86,13 @@ const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressSha
 export const runMain = (options: MainOptions) =>
   Effect.gen(function* () {
     const t = messages
+    const maxCalls = options.maxCalls === undefined ? null : Number(options.maxCalls)
+    if (
+      maxCalls !== null &&
+      (!/^\d+$/.test(options.maxCalls!) || !Number.isSafeInteger(maxCalls) || maxCalls < 1)
+    ) {
+      return yield* new InvalidArgument({ flag: "--max-calls", value: options.maxCalls! })
+    }
     const env = yield* Environment
     const out = yield* Output
     const outDir = yield* resolveOut(options.out)
@@ -115,12 +125,15 @@ export const runMain = (options: MainOptions) =>
 
     // Pick the engine (no prompt is sent to check login).
     const status = yield* chooseRunner(yield* provider.detect, options.engine ?? null)
-    const runner = withRetry(yield* provider.make(status.id, { model: options.model }))
+    const base = yield* provider.make(status.id, { model: options.model })
+    const runner = withRetry(maxCalls === null ? base : withCallBudget(base, maxCalls))
 
     const p = yield* plan({ prompts, options: analyzeOptions, runner: runner.id })
     yield* out.line(t.range(t.sinceLabel(options.since), p.promptsAnalyzed, p.chunks.length))
     if (p.sampled) yield* out.line(t.sampledNote(p.chunks.length, p.chunksTotal))
     yield* out.line(t.engineLine(runner.displayName, p.llmCalls, p.cacheHits))
+    yield* out.line(t.callEstimateNote)
+    if (maxCalls !== null) yield* out.line(t.callBudget(maxCalls))
     yield* out.line("")
 
     if (!options.yes) {

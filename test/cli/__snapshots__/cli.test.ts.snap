@@ -10,7 +10,8 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   Skipped 0 noisy prompts (-)
   Redacted 1 sensitive items (PATH 1)
 ● Range: all time · 16 prompts → 2 chunks
-  Using Claude Code (logged in): about 3 calls, billed to your subscription
+  Using Claude Code (logged in): base estimate 3 calls, billed to your subscription
+  Base estimate excludes intermediate merges and retries (up to 2 retries per call).
 
 ● Analysing ░░░░░░░░░░░░ 0/2 chunks
 ● Analysing ██████░░░░░░ 1/2 chunks

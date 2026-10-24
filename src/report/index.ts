@@ -35,6 +35,11 @@ export const writeReport = (
         Effect.mapError((e) => new Error(`cannot write ${file}: ${e.message}`)),
       )
 
+    // Remove the previous card before publishing any new data. A failed card render or
+    // interrupted run must never leave a share card belonging to an older profile.
+    yield* fs
+      .remove(cardPath, { force: true })
+      .pipe(Effect.mapError((e) => new Error(`cannot remove old card ${cardPath}: ${e.message}`)))
     yield* write(profileJson, `${JSON.stringify(encodeProfile(profile), null, 2)}\n`)
     yield* write(html, renderHtml(profile))
 

@@ -264,3 +264,22 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 })
+
+it.effect("a call budget stops analysis with an actionable error", () =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const result = yield* h.run(["--yes", "--since", "all", "--max-calls", "1"])
+    expect(result.code).toBe(1)
+    expect(result.stderr).toContain("call budget")
+    expect(h.fakes[0]!.calls()).toBe(1)
+  }),
+)
+
+it.effect.each(["0", "-1", "1.5", "NaN"])("rejects invalid call budget %s", (value) =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const result = yield* h.run(["--yes", "--since", "all", "--max-calls", value])
+    expect(result.code).toBe(2)
+    expect(h.fakes).toHaveLength(0)
+  }),
+)

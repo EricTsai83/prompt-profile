@@ -65,7 +65,7 @@ export const messages: Messages = {
   engine: (r, m) => `Engine: ${r}${m ? ` (${m})` : ""}`,
   generatedAt: (at) => `Generated: ${at}`,
   evidenceVerified: (k, d) =>
-    `${k} pieces of evidence verified${d > 0 ? ` (${d} unverifiable quotes removed)` : ""}`,
+    `${k} pieces of evidence verified${d > 0 ? ` (${d} invalid or duplicate quotes removed)` : ""}`,
   chunksSkipped: (n) =>
     `${n} chunk${n === 1 ? "" : "s"} failed and ${n === 1 ? "was" : "were"} skipped`,
   privacy:

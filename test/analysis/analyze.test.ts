@@ -123,7 +123,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "3",
+        analysisVersion: "4",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -253,6 +253,17 @@ describe("analyze", () => {
     }),
   )
 
+  it.effect("never sends oversized observations to reduce after a merge fails to shrink", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({ respond })
+      const error = yield* Effect.flip(
+        run(fake, makeMemoryCache(), { ...options, reduceInputLimit: 300 }),
+      )
+      expect(error).toMatchObject({ _tag: "AnalysisFailed", reason: "input-too-large" })
+      expect(fake.log.some((c) => c.schema === "LlmProfileDraft")).toBe(false)
+    }),
+  )
+
   describe("intermediate merges", () => {
     const small = { ...options, reduceInputLimit: 300 }
     /** Merge calls return an extra observation whose quote was never said. */
@@ -260,7 +271,7 @@ describe("analyze", () => {
       input.schemaName === "LlmChunkObservations" && input.prompt.startsWith("[")
         ? {
             observations: [
-              ...(JSON.parse(input.prompt) as Array<unknown>),
+              ...(JSON.parse(input.prompt) as Array<unknown>).slice(0, 1),
               {
                 dimension: "growth",
                 claim: "a made-up merged observation",
@@ -274,11 +285,12 @@ describe("analyze", () => {
       Effect.gen(function* () {
         const cache = makeMemoryCache()
         const first = makeFakeLlmRunner({ respond: fabricatingMerge })
-        yield* run(first, cache, small)
+        const mergeOptions = { ...options, reduceInputLimit: 1_000 }
+        yield* run(first, cache, mergeOptions)
         expect(first.log.some((c) => c.prompt.startsWith("["))).toBe(true)
         const second = makeFakeLlmRunner({ respond: fabricatingMerge })
-        yield* run(second, cache, small)
-        expect(second.calls()).toBe(1) // reduce only: map and merge from the cache
+        yield* run(second, cache, mergeOptions)
+        expect(second.calls()).toBe(1) // map and merge cached; only reduce is sent
         expect(second.log[0]!.prompt).not.toContain("merge made this up")
       }),
     )
@@ -343,6 +355,7 @@ describe("analyze", () => {
         // fabricatingMerge returns more than it was given
         let rounds = 0
         yield* analyze({ prompts, stats, options: small }).pipe(
+          Effect.result,
           Effect.provide(
             Layer.mergeAll(
               Layer.succeed(LlmRunner, makeFakeLlmRunner({ respond: fabricatingMerge })),
@@ -361,8 +374,8 @@ describe("analyze", () => {
     it.effect("a fatal error during a merge is not wrapped", () =>
       Effect.gen(function* () {
         const mapCalls = makeFakeLlmRunner({ respond })
-        yield* run(mapCalls, makeMemoryCache(), small)
-        const chunks = mapCalls.log.filter((c) => !c.prompt.startsWith("[")).length - 1
+        yield* Effect.result(run(mapCalls, makeMemoryCache(), small))
+        const chunks = mapCalls.log.filter((c) => !c.prompt.startsWith("[")).length
         const fake = makeFakeLlmRunner({
           respond,
           failures: new Map([[chunks + 1, new NotLoggedIn({ runner: "claude-code", detail: "" })]]),

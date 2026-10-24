@@ -1,4 +1,4 @@
-import { Context, Effect, FileSystem, Layer, Option, Path, Schema } from "effect"
+import { Context, Data, Effect, FileSystem, Layer, Option, Path, Schema } from "effect"
 import { ChunkObservations } from "../domain/ChunkObservations.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { sha256 } from "./hash.ts"
@@ -33,11 +33,15 @@ export const CacheEntry = Schema.Struct({
 })
 export type CacheEntry = typeof CacheEntry.Type
 
+export class CacheClearFailed extends Data.TaggedError("CacheClearFailed")<{
+  readonly path: string
+}> {}
+
 export interface AnalysisCacheShape {
   readonly get: (parts: CacheKeyParts) => Effect.Effect<Option.Option<CacheEntry>>
   readonly set: (entry: CacheEntry) => Effect.Effect<void>
   /** Delete every analysis entry (they contain prompt excerpts). */
-  readonly clear: Effect.Effect<void>
+  readonly clear: Effect.Effect<void, CacheClearFailed>
   readonly location: string
 }
 
@@ -76,7 +80,9 @@ export const fileCacheLayer = (dir: string) =>
           writePrivateFile(fs, path, fileFor(entry), encodeEntry(entry)).pipe(Effect.ignore),
         // only the analysis entries: downloaded fonts in the same folder are kept
         clear: Effect.forEach(CACHE_KINDS, (kind) =>
-          fs.remove(path.join(dir, kind), { recursive: true }).pipe(Effect.ignore),
+          fs
+            .remove(path.join(dir, kind), { recursive: true, force: true })
+            .pipe(Effect.mapError(() => new CacheClearFailed({ path: path.join(dir, kind) }))),
         ).pipe(Effect.asVoid),
       }
     }),

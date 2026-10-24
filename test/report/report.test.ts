@@ -1,7 +1,7 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect } from "effect"
-import { mkdtempSync, readFileSync, statSync } from "node:fs"
+import { Effect, FileSystem, PlatformError } from "effect"
+import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { decodeProfile } from "../../src/domain/Profile.ts"
@@ -55,7 +55,9 @@ describe("renderHtml", () => {
       const out = renderHtml(yield* sample())
       expect(out).toContain("Insufficient evidence")
       expect(out).toContain("1 chunk failed and was skipped")
-      expect(out).toContain("41 pieces of evidence verified (3 unverifiable quotes removed)")
+      expect(out).toContain(
+        "41 pieces of evidence verified (3 invalid or duplicate quotes removed)",
+      )
     }),
   )
 })
@@ -120,3 +122,57 @@ describe("clip (card text)", () => {
     expect(Array.from(out).length).toBeLessThanOrEqual(max)
   })
 })
+
+it.effect("removes an old card before updating the report, even if rendering fails", () =>
+  Effect.gen(function* () {
+    const outDir = mkdtempSync(join(tmpdir(), "pp-stale-card-"))
+    const card = join(outDir, "card.png")
+    writeFileSync(card, "previous person's card")
+    const fs = yield* FileSystem.FileSystem
+    const files = yield* writeReport(yield* sample(), outDir).pipe(
+      Effect.provideService(FileSystem.FileSystem, {
+        ...fs,
+        writeFile: (file, data, options) =>
+          file.startsWith(card)
+            ? Effect.fail(
+                PlatformError.systemError({
+                  _tag: "PermissionDenied",
+                  module: "FileSystem",
+                  method: "writeFile",
+                }),
+              )
+            : fs.writeFile(file, data, options),
+      }),
+    )
+    expect(files.card).toBeNull()
+    expect(files.cardError).not.toBeNull()
+    expect(existsSync(card)).toBe(false)
+    expect(existsSync(files.html)).toBe(true)
+  }).pipe(Effect.provide(NodeServices.layer)),
+)
+
+it.effect("does not update the report if the stale card cannot be removed", () =>
+  Effect.gen(function* () {
+    const outDir = mkdtempSync(join(tmpdir(), "pp-card-removal-"))
+    const htmlPath = join(outDir, "report.html")
+    writeFileSync(htmlPath, "previous report")
+    const fs = yield* FileSystem.FileSystem
+    const result = yield* Effect.result(
+      writeReport(yield* sample(), outDir).pipe(
+        Effect.provideService(FileSystem.FileSystem, {
+          ...fs,
+          remove: () =>
+            Effect.fail(
+              PlatformError.systemError({
+                _tag: "PermissionDenied",
+                module: "FileSystem",
+                method: "remove",
+              }),
+            ),
+        }),
+      ),
+    )
+    expect(result._tag).toBe("Failure")
+    expect(readFileSync(htmlPath, "utf8")).toBe("previous report")
+  }).pipe(Effect.provide(NodeServices.layer)),
+)

@@ -111,6 +111,10 @@ export const command = Command.make(
       Flag.withDescription("Model passed to claude / codex"),
       Flag.optional,
     ),
+    maxCalls: Flag.String("max-calls").pipe(
+      Flag.withDescription("Maximum LLM CLI calls, including retries (default: no explicit cap)"),
+      Flag.optional,
+    ),
     out,
     full: Flag.Boolean("full").pipe(
       Flag.withDescription("Analyse everything, no sampling (slower, uses more quota)"),
@@ -140,6 +144,7 @@ export const command = Command.make(
             optional(f.engine),
           ) as RunnerId | undefined,
           model: optional(f.model),
+          maxCalls: optional(f.maxCalls),
           out: f.out,
           full: f.full,
           cache: f.cache,

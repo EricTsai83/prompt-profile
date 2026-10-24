@@ -67,17 +67,21 @@ export const verifyEvidence = (
   evidence: ReadonlyArray<Evidence>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
-): ReadonlyArray<Evidence> =>
-  evidence.flatMap((e) => {
+): ReadonlyArray<Evidence> => {
+  const seen = new Set<string>()
+  return evidence.flatMap((e) => {
     const text = texts.get(e.promptId)
     const quote = text === undefined ? null : matchQuote(e.quote, text)
-    if (quote === null) {
+    const key = JSON.stringify([e.promptId, quote === null ? null : normalizeForMatch(quote)])
+    if (quote === null || seen.has(key)) {
       counts.dropped++
       return []
     }
+    seen.add(key)
     counts.kept++
     return [{ ...e, quote }]
   })
+}
 
 /** After map: drop invalid evidence, then observations with no evidence left. */
 export const verifyObservations = (
@@ -94,20 +98,30 @@ export const verifyObservations = (
 const DOWNGRADE: Record<Confidence, Confidence> = { high: "medium", medium: "low", low: "low" }
 
 /**
- * After reduce: a trait with < 2 valid evidence drops one confidence level; with 0 it is
- * removed. Fewer than 3 traits is reported as-is (never loosen the rules to fill up).
+ * After reduce: a trait supported by < 2 distinct prompts drops one confidence level; with 0 it is
+ * removed. High confidence also requires distinct sessions when session metadata is supplied.
+ * Fewer than 3 traits is reported as-is (never loosen the rules to fill up).
  */
 export const verifyTraits = (
   traits: ReadonlyArray<Trait>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
+  sessions?: ReadonlyMap<string, string>,
 ): ReadonlyArray<Trait> =>
   traits.flatMap((t) => {
     const evidence = verifyEvidence(t.evidence, texts, counts)
     if (evidence.length === 0) return []
-    return [
-      { ...t, evidence, confidence: evidence.length < 2 ? DOWNGRADE[t.confidence] : t.confidence },
-    ]
+    const prompts = new Set(evidence.map((e) => e.promptId))
+    const independentSessions = new Set(
+      evidence.map((e) => sessions?.get(e.promptId) ?? e.promptId),
+    )
+    const confidence =
+      prompts.size < 2
+        ? DOWNGRADE[t.confidence]
+        : independentSessions.size < 2 && t.confidence === "high"
+          ? "medium"
+          : t.confidence
+    return [{ ...t, evidence, confidence }]
   })
 
 /** Dimensions keep their summary even with 0 evidence (the report flags "insufficient evidence"). */
