@@ -1,5 +1,7 @@
 # 02 · Domain and Schemas
 
+Status: implemented; the schemas have grown since (profile `schemaVersion` 8, see plans 14–17). Acceptance checked 2026-10-24.
+
 ## Goal
 
 Define the data formats shared by the whole system with Effect Schema. Every later module depends on these formats. **`Profile` is the product's core format**: design it carefully and give it a version number.
@@ -169,8 +171,8 @@ Provide `toLlmJsonSchema(schema)`: it produces a JSON Schema, and **a test check
 
 ## Acceptance criteria
 
-- [ ] Every Schema has tests for "valid data decodes" and "invalid data fails"
-- [ ] `Profile` can go encode → JSON → decode back to the same value (round-trip test)
-- [ ] An unrecognized `schemaVersion` yields `UnsupportedProfileVersion`
-- [ ] `LlmChunkObservations` and `LlmProfileDraft` can be converted to JSON Schema, pass the subset check, and have snapshot tests
-- [ ] `pnpm typecheck && pnpm lint && pnpm test` all pass
+- [x] Every Schema has tests for "valid data decodes" and "invalid data fails"
+- [x] `Profile` can go encode → JSON → decode back to the same value (round-trip test)
+- [x] An unrecognized `schemaVersion` yields `UnsupportedProfileVersion`
+- [x] `LlmChunkObservations` and `LlmProfileDraft` can be converted to JSON Schema, pass the subset check, and have snapshot tests
+- [x] `pnpm typecheck && pnpm lint && pnpm test` all pass

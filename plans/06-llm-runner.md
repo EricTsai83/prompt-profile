@@ -1,5 +1,7 @@
 # 06 · LlmRunner: borrowing the user's local claude / codex
 
+Status: implemented. Acceptance checked 2026-10-24; run `pnpm test:smoke:llm` again only when a CLI or its output format changes.
+
 ## Goal
 
 Provide an `LlmRunner` service: given "instructions + an LLM Schema", it returns a value that has passed Schema validation. At runtime it calls the user's already-logged-in `claude` or `codex` CLI in the background, **without any API key**.
@@ -116,7 +118,7 @@ Confirm before implementing:
 
 ## Acceptance criteria
 
-- [ ] Unit tests pass
-- [ ] Local smoke test: both `claude` and `codex` return validated JSON for plan 02's LLM Schemas
-- [ ] Confirmed that after a run, the user's session and history files contain no new analysis content
-- [ ] `src/llm/NOTES.md` records the conclusion of every "Confirm before implementing" item
+- [x] Unit tests pass
+- [x] Local smoke test: both `claude` and `codex` return validated JSON for plan 02's LLM Schemas
+- [x] Confirmed that after a run, the user's session and history files contain no new analysis content
+- [x] `src/llm/NOTES.md` records the conclusion of every "Confirm before implementing" item

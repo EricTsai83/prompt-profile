@@ -1,5 +1,7 @@
 # 05 · Pipeline: filter, clean, redact, stats
 
+Status: implemented; `PIPELINE_VERSION` 4. The final output check reuses its redaction rules (plan 18). Acceptance checked 2026-10-24.
+
 ## Goal
 
 Turn the `PromptRecord`s produced by the adapters into:
@@ -97,5 +99,5 @@ runPipeline(records: Stream<PromptRecord>, opts: { since: DateTime.Utc | null; n
 
 ## Acceptance criteria
 
-- [ ] All tests pass
-- [ ] Smoke test: run the full pipeline on real local data and print `PipelineReport` and `Stats` (without printing prompt content)
+- [x] All tests pass
+- [x] Smoke test: run the full pipeline on real local data and print `PipelineReport` and `Stats` (without printing prompt content)

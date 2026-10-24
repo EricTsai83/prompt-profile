@@ -1,5 +1,7 @@
 # 04 · Codex adapter
 
+Status: implemented; later extended with skills and models (plan 17). Acceptance checked 2026-10-24.
+
 ## Goal
 
 From the user's local Codex data, read the prompts the user actually typed themselves and output a `Stream<PromptRecord>`. The structure mirrors plan 03 and shares `src/adapters/common/`.
@@ -74,5 +76,5 @@ All other `type`s (`event_msg`, `turn_context`, `token_usage_record`, `world_sta
 
 ## Acceptance criteria
 
-- [ ] All tests pass; the smoke test prints how many records each filter rule excluded and the count per `origin`
-- [ ] `readAll` can read both sources together
+- [x] All tests pass; the smoke test prints how many records each filter rule excluded and the count per `origin`
+- [x] `readAll` can read both sources together

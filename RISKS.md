@@ -12,25 +12,19 @@ Sorted by severity.
    - No OpenAI terms were found that explicitly forbid or allow it.
    - I only read the official terms pages and a few news articles. **This is not legal advice**; please read the originals yourself before release.
 
-2. **The filter list for delegated subtasks (AI-written prompts) is currently empty** (`DELEGATION_PATTERNS` in `src/pipeline/filter.ts`)
-   - About 97% of the Claude Code prompts in your data are `entrypoint: sdk-ts` (T3 Code and other desktop apps),
-     which may include child-thread prompts created automatically by an orchestrator (not typed by you).
-   - As the plan requires, I **did not look at the original text** and judged only by signatures: session groups with a repeated opening have on average 5–19 follow-up prompts,
-     which looks more like workflow phrasings you reuse yourself, so no rule was added.
-   - Suggestion: run `pnpm test:smoke`, look at the `first-prompt prefix hashes` output, and confirm yourself whether those groups are AI delegation;
-     if so, add their fixed openings to `DELEGATION_PATTERNS` (and bump `PIPELINE_VERSION`).
-   - `topSlashCommands` works in the CLI (5 commands on the owner's data, 2026-10-24). An earlier note said it was empty: that came from the smoke test, which did not pass slash commands to the pipeline. It does now and prints only the count.
+2. **Delegated subtasks (AI-written prompts) are excluded by an owner-confirmed list** (`DELEGATION_OPENINGS` in `src/pipeline/filter.ts`)
+   - On 2026-10-24 the owner reviewed the 10 repeated session openings with `pnpm inspect:openings` and marked one as automated (`codex_exec dd4ff67f`, 8 sessions); the others are the owner's own reused requests. Only the key is stored, never the text.
+   - Other users' orchestrators may write different openings; `DELEGATION_PATTERNS` stays empty until such a pattern is known.
+   - `topSlashCommands` works in the CLI (5 commands on the owner's data, 2026-10-24).
 
-3. **Profile quality needs your own assessment** (plan 07's manual acceptance)
-   - Ran successfully end to end with Claude on your real data (`--since 2w`, 9 chunks): 40/40 pieces of evidence passed verification, and the second run hit the cache entirely.
-     The results are in `tmp/real/` (git-ignored). **Please read `tmp/real/report.html` and judge whether it is accurate**, then tune
-     `src/analysis/prompts/map.md` / `reduce.md` (bump `ANALYSIS_VERSION` if you change them).
-   - I have not run the full 6-month window or `--full` (about 25 chunks, 660,000 characters, out of consideration for your quota).
-   - `pnpm eval --engine codex` has not been run; only Claude has.
+3. **Profile quality needs your own assessment** (plan 07's manual acceptance, plan 13 item 8)
+   - Full 6-month runs on your real data with Claude (v6, v9 bilingual): every chunk succeeded and every quote passed verification; persona evals ran on both engines.
+     The latest render is `tmp/p18/report.html` (git-ignored). **Please read it and judge whether it is accurate**; prompt changes go into
+     `src/analysis/prompts/map.md` / `reduce.md` with an `ANALYSIS_VERSION` bump.
 
-4. **Not pushed yet; GitHub Actions has never actually run**
-   - As instructed, everything is committed to local `main` and not pushed. Neither CI (`.github/workflows/ci.yml`) nor the release workflow has been verified on GitHub.
-   - Releasing first requires setting up Trusted Publishing (OIDC) on npm and creating the permissions release-please needs on GitHub.
+4. **The release has not been exercised yet**
+   - CI (`.github/workflows/ci.yml`) is green on `main`. The current `release.yml` (release-please) fails on every push because the repository does not let Actions open pull requests; it publishes nothing. Plan 10 replaces it with a tag-triggered release.
+   - Publishing first requires a manual first publish and npm Trusted Publishing (plan 10).
    - Publishing must use `pnpm pack`: `npm pack` / `npm publish` do not understand `catalog:` versions and produce a broken package
      (the release workflow handles this; be careful when publishing manually).
 
@@ -73,7 +67,7 @@ Sorted by severity.
     otherwise real prompts in which you mention this string while developing this tool would be dropped by mistake.
 14. **Extra Claude Code filter rules** (not listed in the plan, but found in real data): `isMeta`, `isCompactSummary` (AI-generated conversation summaries),
     `origin.kind: task-notification`, `turnOrigin: scheduled / peer`; files under `subagents/` are also not read.
-15. **The eval personas are smaller than specified**: 3 personas with 31–45 prompts each (the plan asks for 50–150).
+15. **The eval personas are mostly smaller than specified**: 4 personas, three with 31–45 prompts and `weekend-data-engineer` with 82 (the plan asks for 50–150).
 16. **The report's light / dark modes were checked in Chrome and in WebKit 26.5** (Safari's engine, through Playwright) for every look at 1440 and 390 px on 2026-10-24: no overflow, no requests, display font loaded. Not yet opened in the Safari app itself.
 17. **"Clean environment (Docker) + `npx prompt-profile` from start to finish" and npm provenance** have not been verified (they require publishing first).
 18. **Font source**: Noto Sans TC is downloaded from GitHub raw (pinned commit `165c01b`) and its SHA-256 is verified; if GitHub changes its raw URL policy,

@@ -1,5 +1,7 @@
 # 08 · Report output: HTML report + PNG card
 
+Status: implemented; the report was redesigned in plans 14–18 (languages, looks, one report with `--exclude`). Acceptance checked 2026-10-24.
+
 ## Goal
 
 Take a `Profile` and output:
@@ -22,7 +24,7 @@ This plan depends only on plan 02's Schemas and can be developed against a fake 
   5. **Five dimensions**: each dimension's summary and evidence
   6. **Fun facts**
   7. **Footer**: analysis engine and model, generation time, "N pieces of evidence verified", number of skipped chunks (if any), privacy note (data is read only locally; redacted prompts are sent to your own Claude Code / Codex account for analysis), project link
-- Text switches between Chinese and English according to `profile.language` (UI strings live in `src/report/i18n.ts`). (Removed later: the product is English-only.)
+- Text switches between Chinese and English according to `profile.language` (UI strings live in `src/report/i18n.ts`). (Plan 14 brought languages back: en and zh-TW, texts in `src/report/messages.ts`.)
 
 ## 2. PNG card: `src/report/card.tsx`
 
@@ -34,7 +36,7 @@ This plan depends only on plan 02's Schemas and can be developed against a fake 
 
 ### Fonts (needs special care)
 
-(Removed later: the product is English-only, so the CJK font download described below no longer exists.)
+(Plan 14 brought this back: Noto Sans TC is downloaded once and verified by SHA-256 for zh-TW cards.)
 
 - satori **must be given font files**, and they must support Chinese.
 - The full Noto Sans TC is several MB, too big to ship directly in the npm package. Choose one of two approaches (decide after evaluating during implementation, and explain in the PR):
@@ -53,13 +55,13 @@ This plan depends only on plan 02's Schemas and can be developed against a fake 
 
 ## Tests
 
-- `test/fixtures/profile.sample.json`: a complete fake profile (one Chinese version and one English version). (Removed later: the product is English-only.)
+- `test/fixtures/profile.sample.json`: a complete fake profile (one Chinese version and one English version). (Plan 14 brought languages back: en and zh-TW, texts in `src/report/messages.ts`.)
 - HTML: snapshot; confirm a quote containing `<script>` is escaped; confirm there are no requests to external URLs (no `<link href="http…">`, `<script src=…>`).
 - Card: a PNG can be produced (check the PNG header and dimensions). No pixel comparison needed.
 - Development command: `pnpm dev:report` generates a report from the sample profile, so the layout can be tweaked directly in a browser.
 
 ## Acceptance criteria
 
-- [ ] HTML generated from the sample profile displays correctly in Chrome / Safari (both light and dark)
-- [ ] The Chinese card has no missing glyphs (tofu) (Removed later: the product is English-only.)
-- [ ] The HTML displays completely without a network connection
+- [x] HTML generated from the sample profile displays correctly in Chrome / Safari (both light and dark) — Chrome and WebKit 26.5 (plan 13 item 5); the Safari app itself not opened
+- [x] The Chinese card has no missing glyphs (tofu) (Plan 14 brought languages back: en and zh-TW, texts in `src/report/messages.ts`.)
+- [x] The HTML displays completely without a network connection (CSP `default-src 'none'`, everything inlined)

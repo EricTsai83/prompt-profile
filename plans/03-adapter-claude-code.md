@@ -1,5 +1,7 @@
 # 03 · Claude Code adapter
 
+Status: implemented; later extended with technique metadata (plan 17). Acceptance checked 2026-10-24.
+
 ## Goal
 
 From the user's local Claude Code data, read **the prompts the user actually typed themselves** and output a `Stream<PromptRecord>`.
@@ -85,5 +87,5 @@ Keep:
 
 ## Acceptance criteria
 
-- [ ] All tests pass; the smoke test reads a record count locally and prints how many records each filter rule excluded
-- [ ] Parsing all of the user's local data completes within 5 seconds
+- [x] All tests pass; the smoke test reads a record count locally and prints how many records each filter rule excluded
+- [x] Parsing all of the user's local data completes within 5 seconds (`test/smoke/claude-code.test.ts`; it can exceed this when the machine is busy)

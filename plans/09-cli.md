@@ -1,5 +1,7 @@
 # 09 · CLI integration and user experience
 
+Status: implemented; later flags in plans 12, 14 and 18. Acceptance checked 2026-10-24.
+
 ## Goal
 
 Wire the earlier modules into the complete `prompt-profile` command. By default it runs to completion **without any arguments or configuration**.
@@ -95,6 +97,6 @@ Exit codes: `0` success (including partial chunk failures), `1` general error, `
 
 ## Acceptance criteria
 
-- [ ] All tests pass
-- [ ] Manual: run `pnpm build && node dist/bin.js` locally from start to finish, and check the resulting report yourself
-- [ ] Manual: run with `claude` removed from PATH and see the correct hint
+- [x] All tests pass
+- [ ] Manual (with the release, plan 10 step 7): run `pnpm build && node dist/bin.js` locally from start to finish, and check the resulting report yourself
+- [x] Run with `claude` removed from PATH and see the correct hint (covered by the CLI test and its snapshot)

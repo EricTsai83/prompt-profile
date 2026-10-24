@@ -1,5 +1,7 @@
 # 01 · Project setup
 
+Status: implemented. Acceptance checked 2026-10-24.
+
 ## Goal
 
 Create an empty project that builds, tests and lints, and write the `AGENTS.md` for AI agents.
@@ -42,7 +44,7 @@ Create an empty project that builds, tests and lints, and write the `AGENTS.md` 
 
 ## Acceptance criteria
 
-- [ ] `pnpm build` succeeds and `node dist/bin.js --version` prints the version
-- [ ] `pnpm typecheck && pnpm lint && pnpm test` all pass
-- [ ] `AGENTS.md`, `CLAUDE.md` and the CI workflow exist
-- [ ] GitHub Actions passes after push
+- [x] `pnpm build` succeeds and `node dist/bin.js --version` prints the version
+- [x] `pnpm typecheck && pnpm lint && pnpm test` all pass
+- [x] `AGENTS.md`, `CLAUDE.md` and the CI workflow exist
+- [x] GitHub Actions passes after push (CI green on `main`)

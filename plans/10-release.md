@@ -24,7 +24,7 @@ section records where things stand; the release design was revised on 2026-10-24
 
 1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
 2. Regenerate the README sample card/report if the product changed since (plan 13).
-3. Confirm CI passes on GitHub (the repository is pushed; RISKS 4).
+3. ~~Confirm CI passes on GitHub~~ — done: CI is green on `main` since 2026-10-24.
 4. Replace release-please with the tag-triggered workflow below (TDD where it applies:
    the tag/version check is a script with a test).
 5. Owner: publish `0.1.0` by hand once, then register the Trusted Publisher (steps below).

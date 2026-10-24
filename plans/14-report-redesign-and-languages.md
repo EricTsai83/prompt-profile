@@ -1,6 +1,6 @@
 # 14 · Report redesign and multiple languages
 
-Status: implemented (2026-10-24); a real bilingual run is pending the owner's quota approval.
+Status: implemented (2026-10-24); a real bilingual run (zh-TW, en) was done with the owner's approval (`tmp/real-v9/`, not committed).
 
 Owner request: the HTML report has too much text; it needs
 more charts, collapsible sections and a shorter title, no "My AI collaboration profile"

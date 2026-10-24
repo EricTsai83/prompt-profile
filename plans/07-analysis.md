@@ -1,5 +1,7 @@
 # 07 · Analysis flow: from prompts to profile.json
 
+Status: implemented; `ANALYSIS_VERSION` 9 after plans 13–16. Acceptance checked 2026-10-24; the owner's read of a real profile is tracked as plan 13 item 8.
+
 ## Goal
 
 Take plan 05's `SafePrompt[]` and `Stats` and, through plan 06's `LlmRunner`, produce a validated `Profile`. Use two stages (map → reduce) and cache the intermediate results.
@@ -137,7 +139,7 @@ Profile quality depends mostly on `map.md` / `reduce.md`, which will keep being 
 
 ## Acceptance criteria
 
-- [ ] All tests pass
-- [ ] Manual: run once with real local data + the real `claude` to produce a `profile.json`, **read it yourself and judge whether it is accurate**, and feed adjustments back into `map.md` / `reduce.md`
-- [ ] On the second run, every map call hits the cache and total time is clearly shorter
-- [ ] `pnpm eval` runs and produces results for each persona
+- [x] All tests pass
+- [ ] Manual (owner, plan 13 item 8): run once with real local data + the real `claude` to produce a `profile.json`, **read it yourself and judge whether it is accurate**, and feed adjustments back into `map.md` / `reduce.md`
+- [x] On the second run, every map call hits the cache and total time is clearly shorter
+- [x] `pnpm eval` runs and produces results for each persona
