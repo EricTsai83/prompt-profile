@@ -5,8 +5,8 @@ personal profile.
 
 ![Synthetic sample share card](docs/sample-card.png)
 
-[Sample HTML report](docs/sample-report.html) · [Sample profile JSON](docs/sample-profile.json)
-(all sample data is hand-written and fictional).
+[Sample HTML report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/sample-report.html)
+· [Sample profile JSON](docs/sample-profile.json) (all sample data is hand-written and fictional).
 
 The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
 
@@ -14,15 +14,38 @@ The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
 | ------------------------------------------- | --------------------------------------------------- | ------------------------------------------- |
 | ![Signal look](docs/sample-card-signal.png) | ![Afterhours look](docs/sample-card-afterhours.png) | ![Studio look](docs/sample-card-studio.png) |
 
+## Quick start
+
+1. Install [Claude Code](https://claude.com/claude-code) or [Codex](https://github.com/openai/codex)
+   and log in once (`claude`, or `codex login`). prompt-profile uses it to analyse your prompts;
+   **no API key needed**.
+2. Run it (Node.js ≥ 22):
+
+   ```bash
+   npx prompt-profile
+   ```
+
+3. It reads your local history, shows how many prompts it found and how many CLI calls the
+   analysis will take, and asks `Continue?`. The calls use your Claude / ChatGPT subscription
+   quota. To see what would be sent first, run `npx prompt-profile --dry-run` (calls nothing).
+4. When it is done, the report opens in your browser. Everything is written to
+   `./prompt-profile-report/`.
+
+Want to look around for free first? `npx prompt-profile stats` shows statistics without any LLM
+call.
+
+## Install
+
 ```bash
-npx prompt-profile
-# or
-npm i -g prompt-profile && prompt-profile
+npx prompt-profile              # run without installing
+npm i -g prompt-profile         # or install the `prompt-profile` command
+prompt-profile --help
 ```
 
-No Node.js? Every [GitHub Release](https://github.com/EricTsai83/prompt-profile/releases) also
-has a standalone executable for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64), with a
-`SHA256SUMS` file:
+No Node.js? Every [GitHub Release](https://github.com/EricTsai83/prompt-profile/releases) has a
+standalone executable for macOS (`darwin-arm64` for Apple silicon, `darwin-x64`), Linux
+(`linux-x64`, `linux-arm64`) and Windows (`windows-x64`), with a `SHA256SUMS` file. Download the
+archive for your platform from the release page, then:
 
 ```bash
 tar -xzf prompt-profile-<version>-darwin-arm64.tar.gz
@@ -31,23 +54,40 @@ tar -xzf prompt-profile-<version>-darwin-arm64.tar.gz
 xattr -d com.apple.quarantine ./prompt-profile-<version>-darwin-arm64/prompt-profile
 ```
 
-Output (in `./prompt-profile-report/` by default):
+On Windows, `tar -xzf` works in PowerShell too; run `prompt-profile.exe` from the extracted
+folder. Move the executable to a folder on your `PATH` to run it as `prompt-profile`.
 
-- `report.html`: your private, single-file report that works offline — who you are (archetype,
-  a 24-hour clock of your busiest hours), four measured habits with their definitions, your top
-  traits with a quote each and how widely they are supported, **how to improve your prompts**
-  (2–4 suggestions, each with a real prompt of yours and a suggested rewrite, plus signals such
-  as frequent corrections or very short follow-ups), **how you work with AI** (a capability map
-  — plan, delegate, extend, verify, ship — with the skills you used and what each does, subagent
-  types, MCP servers, models, pull requests, parallel sessions and prompt-writing habits; counted
-  from tool metadata and the skill descriptions recorded in your transcripts, never tool inputs,
-  outputs or skill arguments), what
-  changed since your last report, a daily
-  calendar and a weekday ×
-  hour heatmap (hover or tap for the count and main projects), project chapters, the five
-  dimensions, and how it was measured; a language switch when there is more than one language.
+## Requirements
+
+- Node.js ≥ 22, or the standalone executable (no Node.js needed)
+- [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex)
+  (`codex`) installed and logged in
+- **No API key needed**: the analysis runs your own logged-in `claude -p` or `codex exec` in the
+  background and **uses your subscription quota**. The base call estimate is shown
+  before confirmation. Intermediate merges and up to two retries per call can add calls;
+  use `--max-calls` to set a hard limit on CLI invocations, including retries.
+
+## What you get
+
+Written to `./prompt-profile-report/` (change it with `--out`):
+
+- `report.html`: your private, single-file report that works offline:
+  - who you are: archetype, a 24-hour clock of your busiest hours, four measured habits with
+    their definitions, your top traits with a quote each and how widely they are supported
+  - **how to improve your prompts**: 2–4 suggestions, each with a real prompt of yours and a
+    suggested rewrite, plus signals such as frequent corrections or very short follow-ups
+  - **how you work with AI**: a capability map (plan, delegate, extend, verify, ship) with the
+    skills you used and what each does, subagent types, MCP servers, models, pull requests,
+    parallel sessions and prompt-writing habits; counted from tool metadata and the skill
+    descriptions recorded in your transcripts, never tool inputs, outputs or skill arguments
+  - what changed since your last report, a daily calendar and a weekday × hour heatmap (hover
+    or tap for the count and main projects), project chapters, the five dimensions, and how it
+    was measured
+  - a language switch when there is more than one language
+
   It shows everything by default, quotes and project folder names included. To share it, leave
-  parts out with `--exclude` (below)
+  parts out with `--exclude` (below).
+
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
   other language (**omits evidence quotes**)
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)
@@ -92,16 +132,6 @@ the LLM sees them. The terminal says where and which rule — never the matched 
 never be allowed. The masked profile is what is written: `profile.json`, the report and the
 cards agree.
 
-## Requirements
-
-- Node.js ≥ 22, or the standalone executable (no Node.js needed)
-- [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex)
-  (`codex`) installed and logged in
-- **No API key needed**: the analysis runs your own logged-in `claude -p` or `codex exec` in the
-  background and **uses your subscription quota**. The base call estimate is shown
-  before confirmation. Intermediate merges and up to two retries per call can add calls;
-  use `--max-calls` to set a hard limit on CLI invocations, including retries.
-
 ## Usage
 
 ```bash
@@ -132,6 +162,10 @@ Looks and `--card-hide` only change how the report and card are drawn: no new an
 LLM calls, and the original report is kept. `--card-hide` changes the share card only; the
 private report and `profile.json` still contain everything, including quotes. The card never
 contains quotes or project names in any look.
+
+Languages: without `--lang`, a Chinese system locale gives a Traditional Chinese report with an
+English switch (`zh-TW,en`); any other locale gives English. The profile is written in English
+and then translated, one extra CLI call per extra language; quotes stay as you wrote them.
 
 Exit codes: `0` success · `1` error · `2` usage / needs `--yes` · `3` no data · `4` no usable LLM
 CLI · `5` rate limited · `130` interrupted (a re-run resumes from the cache).
@@ -181,10 +215,6 @@ the package. The one exception is the Chinese share card: on first use it downlo
 (about 11 MB, from a pinned GitHub commit), checks its SHA-256 and caches it; no prompt data is
 sent. The borrowed CLI manages its own network requests and provider data retention.
 
-Languages: without `--lang`, a Chinese system locale gives a Traditional Chinese report with an
-English switch (`zh-TW,en`); any other locale gives English. The profile is written in English
-and then translated, one extra CLI call per extra language; quotes stay as you wrote them.
-
 ## FAQ
 
 **How much quota does it use?** By default at most 30 chunks (about 40,000 characters each) are
@@ -207,8 +237,8 @@ commands of sessions that contain nothing else (scripts and tools) are excluded.
 how many were excluded.
 
 **My prompts are not in English.** That is fine: prompts in any language are analysed (Chinese
-gets extra handling for acknowledgements and corrections). The report is written in English;
-quotes stay in their original language.
+gets extra handling for acknowledgements and corrections). The report comes in English and
+Traditional Chinese (`--lang`, see [Usage](#usage)); quotes stay in their original language.
 
 prompt-profile is not affiliated with or endorsed by Anthropic or OpenAI.
 

@@ -20,8 +20,10 @@ npm / GitHub setup is not done. This section records where things stand.
 
 ### Still to do when the release resumes
 
-1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
-2. Regenerate the README sample card/report if the product changed since (plans 13–18).
+1. ~~Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1)~~ — done
+   2026-10-24 (second pass; `claude -p` with a subscription is explicitly allowed).
+2. ~~Regenerate the README sample card/report if the product changed since (plans 13–18)~~ —
+   done 2026-10-24: re-rendered from `docs/sample-profile.json`, identical to the committed files.
 3. ~~Confirm CI passes on GitHub~~ — done: CI is green on `main` since 2026-10-24.
 4. ~~Replace release-please with the tag-triggered workflow below~~ — done 2026-10-24
    (`release.yml`, `scripts/release-version.ts`, `test/scripts/release-version.test.ts`).
@@ -37,8 +39,8 @@ Publish to npm so users can run `npm i -g prompt-profile` or `npx prompt-profile
 
 ## Pre-release checks
 
-- [ ] **Re-check the terms of service**: read the latest Anthropic (Claude Code / Claude consumer terms) and OpenAI (Codex / ChatGPT terms) versions, confirm that "a third-party CLI calling the user's own logged-in `claude` / `codex` on the user's machine" is allowed, and record the conclusion in `docs/terms-check.md`.
-- [ ] Confirm the name `prompt-profile` is available on npm (`npm view prompt-profile`); if not, use a scope (e.g. `@erictsai83/prompt-profile`) and keep the `bin` name `prompt-profile`.
+- [x] **Re-check the terms of service**: read the latest Anthropic (Claude Code / Claude consumer terms) and OpenAI (Codex / ChatGPT terms) versions, confirm that "a third-party CLI calling the user's own logged-in `claude` / `codex` on the user's machine" is allowed, and record the conclusion in `docs/terms-check.md`.
+- [ ] Confirm the name `prompt-profile` is available on npm (`npm view prompt-profile`); if not, use a scope (e.g. `@ericts/prompt-profile`, the owner's npm username) and keep the `bin` name `prompt-profile`.
 - [ ] README: one-sentence description, screenshots (report and card), installation, **privacy notes** (which files are read, what is sent to the LLM, what never leaves the machine), requirements (Node ≥ 22, logged in to Claude Code or Codex), FAQ.
 - [ ] LICENSE (MIT).
 - [ ] `npm pack --dry-run` confirms the package contains only `dist/` and necessary files (including `map.md` / `reduce.md`, the embedded Latin font, the resvg wasm), and no fixtures, plans or tests.
