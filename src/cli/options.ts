@@ -1,4 +1,5 @@
 import { DateTime, Effect } from "effect"
+import { CARD_PARTS, type CardPart, type LookId, type RenderOptions } from "../report/looks.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */
@@ -22,4 +23,17 @@ export const parseSince = (
   ]
   const since = DateTime.toEpochMillis(DateTime.subtract(now, parts))
   return Effect.succeed(Number.isFinite(since) && since >= 0 ? DateTime.makeUnsafe(since) : null)
+}
+
+/** `--look` and `--card-hide` (a comma list of CARD_PARTS) as render options. */
+export const parseRenderOptions = (
+  look: LookId,
+  cardHide: string | undefined,
+): Effect.Effect<RenderOptions, InvalidArgument> => {
+  if (cardHide === undefined) return Effect.succeed({ look, cardHide: [] })
+  const parts = cardHide.split(",").map((p) => p.trim())
+  const isPart = (p: string): p is CardPart => (CARD_PARTS as ReadonlyArray<string>).includes(p)
+  return parts.every(isPart)
+    ? Effect.succeed({ look, cardHide: parts })
+    : Effect.fail(new InvalidArgument({ flag: "--card-hide", value: cardHide }))
 }

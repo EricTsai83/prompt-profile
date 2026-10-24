@@ -7,9 +7,11 @@ import { LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
 import { withCallBudget } from "../../llm/budget.ts"
 import { withRetry } from "../../llm/retry.ts"
 import { Environment } from "../../platform/Environment.ts"
+import type { LookId } from "../../report/looks.ts"
 import { VERSION } from "../../version.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, type Messages } from "../messages.ts"
+import { parseRenderOptions } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
   readSources,
@@ -31,6 +33,9 @@ export interface MainOptions {
   readonly cache: boolean
   readonly yes: boolean
   readonly dryRun: boolean
+  /** Render-only: the report/card look and the card parts to hide (default: classic, none). */
+  readonly look?: LookId
+  readonly cardHide?: string | undefined
 }
 
 /** `--dry-run`: the chunks that would be sent, plus plan.json. Never calls an LLM. */
@@ -93,6 +98,7 @@ export const runMain = (options: MainOptions) =>
     ) {
       return yield* new InvalidArgument({ flag: "--max-calls", value: options.maxCalls! })
     }
+    const renderOptions = yield* parseRenderOptions(options.look ?? "classic", options.cardHide)
     const env = yield* Environment
     const out = yield* Output
     const outDir = yield* resolveOut(options.out)
@@ -154,7 +160,7 @@ export const runMain = (options: MainOptions) =>
       Effect.onInterrupt(() => out.error(`\n${t.interrupted}`)),
     )
 
-    const files = yield* writeReportFiles(profile, outDir)
+    const files = yield* writeReportFiles(profile, outDir, renderOptions)
     const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
     yield* out.line("")
     yield* out.line(t.done)

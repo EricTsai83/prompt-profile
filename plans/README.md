@@ -18,7 +18,7 @@ prompt-profile
 | Data sources (MVP) | Claude Code, Codex |
 | Privacy | Everything is processed locally; sensitive information is redacted before being sent to the LLM; analysis calls are not written to the user's history |
 | Output | `profile.json` (the core format) → HTML report + PNG share card |
-| Customization | As little as possible; only the necessary options |
+| Customization | As little as possible; only the necessary options. Render-only looks and share-card hiding added in plan 12 |
 | Not doing (for now) | skills / plugins, web share links, accounts, API-key mode |
 
 ## Tech Stack
@@ -93,6 +93,7 @@ There are three independent version numbers. Bump them whenever the correspondin
 | `Profile.schemaVersion` | `domain/Profile.ts` | The `profile.json` format changes (`render` must be able to reject versions it does not understand) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | `map.md` / `reduce.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | clean / redact rules change (part of the cache key) |
+| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | A look's design or the `render.json` format changes (render only; not part of any cache key) |
 
 ## Execution order
 
@@ -110,6 +111,8 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute `pla
 | 08 | [Report output](./08-report.md) | HTML report + PNG card | 02 |
 | 09 | [CLI integration and UX](./09-cli.md) | The complete `prompt-profile` command | 05, 07, 08 |
 | 10 | [Release](./10-release.md) | npm package + CI | 09 |
+| 11 | [Profile customization UX](./11-profile-customization-ux.md) | Research: looks, stories, model comparison | 09 |
+| 12 | [Looks and share-card privacy](./12-looks-and-share-card.md) | `--look`, `--card-hide`, `render` variants | 11 |
 
 **06 goes first**: "borrowing the user's `claude` / `codex` to produce structured JSON" is the biggest technical risk of the whole product (Schema compatibility, hooks / MCP interference, history pollution). Finish the 06 smoke test first and confirm both CLIs accept the JSON Schema produced by plan 02 before investing in other plans. If 06 shows that one of the CLIs is not viable, go back and adjust the LLM Schema in 02.
 

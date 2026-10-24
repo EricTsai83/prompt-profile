@@ -56,14 +56,14 @@ footer p{margin:4px 0}
       <body>
         <main>
           <section class="hero">
-            <p class="eyebrow">My AI collaboration profile</p>
-            <h1>A perfectionist who argues with AI about naming at midnight</h1>
-            <p class="archetype">The Midnight Architect</p>
-            <p>Ships features by day, refactors by night.</p>
-            <p class="meta">
-              Period: Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions
-            </p>
-          </section>
+                  <p class="eyebrow">My AI collaboration profile</p>
+                  <h1>A perfectionist who argues with AI about naming at midnight</h1>
+                  <p class="archetype">The Midnight Architect</p>
+                  <p>Ships features by day, refactors by night.</p>
+                  <p class="meta">
+    Period: Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions
+  </p>
+                </section>
 
           <h2>Numbers</h2>
           <section class="stats">

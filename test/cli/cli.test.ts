@@ -156,6 +156,56 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("render --look writes a new variant folder and keeps the original report", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const profile = join(h.root, "profile.json")
+      writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
+      expect((yield* h.run(["render", profile])).code).toBe(0)
+      const original = readFileSync(join(h.root, "report.html"), "utf8")
+      const originalCard = readFileSync(join(h.root, "card.png"))
+
+      const r = yield* h.run(["render", profile, "--look", "signal", "--card-hide", "stats"])
+      expect(r.code).toBe(0)
+      expect(r.stdout).toContain("No new analysis, no LLM calls")
+      const variant = join(h.root, "variants", "signal-no-stats")
+      expect(readFileSync(join(variant, "report.html"), "utf8")).toContain('data-look="signal"')
+      expect(existsSync(join(variant, "card.png"))).toBe(true)
+      expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
+        look: "signal",
+        cardHidden: ["stats"],
+        source: "../../profile.json",
+      })
+      expect(readFileSync(join(h.root, "report.html"), "utf8")).toBe(original)
+      expect(readFileSync(join(h.root, "card.png"))).toEqual(originalCard)
+      expect(h.fakes.length).toBe(0)
+    }),
+  )
+
+  it.effect("render rejects an unknown look or card part", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const profile = join(h.root, "profile.json")
+      writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
+      expect((yield* h.run(["render", profile, "--look", "neon"])).code).toBe(2)
+      const r = yield* h.run(["render", profile, "--card-hide", "stats,quotes"])
+      expect(r.code).toBe(2)
+      expect(r.stderr).toContain("--card-hide")
+      expect(r.stderr).toContain("traits, stats, graphic")
+    }),
+  )
+
+  it.effect("the main command renders in the chosen look", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const out = join(h.root, "studio")
+      const r = yield* h.run(["--yes", "--since", "all", "--look", "studio", "--out", out])
+      expect(r.code).toBe(0)
+      expect(readFileSync(join(out, "report.html"), "utf8")).toContain('data-look="studio"')
+      expect(existsSync(join(out, "render.json"))).toBe(true)
+    }),
+  )
+
   it.effect("cache clear deletes the analysis cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()

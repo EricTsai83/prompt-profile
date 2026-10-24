@@ -17,6 +17,7 @@ import { runMain } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
+import { LOOK_IDS } from "../report/looks.ts"
 import { DEFAULT_OUT } from "./options.ts"
 import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
@@ -32,6 +33,15 @@ const out = Flag.String("out").pipe(
 const verbose = Flag.Boolean("verbose").pipe(
   Flag.withDescription("Show full errors and LLM call timings"),
   Flag.withDefault(false),
+)
+
+const look = Flag.Literals("look", LOOK_IDS).pipe(
+  Flag.withDescription("Report and card design (render only; no extra LLM calls)"),
+  Flag.withDefault("classic" as const),
+)
+const cardHide = Flag.String("card-hide").pipe(
+  Flag.withDescription("Leave parts out of the share card: comma list of traits, stats, graphic"),
+  Flag.optional,
 )
 
 const optional = <A>(o: Option.Option<A>): A | undefined => Option.getOrUndefined(o)
@@ -82,12 +92,25 @@ const renderCommand = Command.make(
       Argument.withDescription("A profile.json produced earlier"),
     ),
     out: Flag.String("out").pipe(
-      Flag.withDescription("Output folder (default: next to profile.json)"),
+      Flag.withDescription(
+        "Output folder (default: next to profile.json; with --look / --card-hide, variants/<name>/)",
+      ),
       Flag.optional,
     ),
+    look,
+    cardHide,
     verbose,
   },
-  (f) => handle(runRender({ file: f.file, out: optional(f.out) }), f),
+  (f) =>
+    handle(
+      runRender({
+        file: f.file,
+        out: optional(f.out),
+        look: f.look,
+        cardHide: optional(f.cardHide),
+      }),
+      f,
+    ),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
 
 const cacheClearCommand = Command.make("clear", { verbose }, (f) =>
@@ -116,6 +139,8 @@ export const command = Command.make(
       Flag.optional,
     ),
     out,
+    look,
+    cardHide,
     full: Flag.Boolean("full").pipe(
       Flag.withDescription("Analyse everything, no sampling (slower, uses more quota)"),
       Flag.withDefault(false),
@@ -150,6 +175,8 @@ export const command = Command.make(
           cache: f.cache,
           yes: f.yes,
           dryRun: f.dryRun,
+          look: f.look,
+          cardHide: optional(f.cardHide),
         }),
       ),
       f,

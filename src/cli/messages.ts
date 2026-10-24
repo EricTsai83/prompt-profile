@@ -69,6 +69,7 @@ export const messages = {
     ].join("\n"),
   statsWritten: (p: string) => `✔ Stats written to ${p}`,
   rendered: (p: string) => `✔ Report re-rendered: ${p}`,
+  renderedNoAnalysis: "  No new analysis, no LLM calls.",
   cacheCleared: (p: string) => `✔ Analysis cache deleted: ${p}`,
   sinceLabel: (since: string) => (since === "all" ? "all time" : `last ${since}`),
   /** Exclusion rule → label in the "Skipped …" line. */

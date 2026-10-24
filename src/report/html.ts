@@ -1,7 +1,16 @@
 import { DateTime } from "effect"
 import type { Dimension, Evidence, Profile, Trait } from "../domain/Profile.ts"
 import { peakHour, type Stats } from "../domain/Stats.ts"
+import { displayFontDataUrl } from "./fonts.ts"
+import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
+import {
+  DEFAULT_RENDER_OPTIONS,
+  lookOf,
+  type Look,
+  type RenderOptions,
+  type ReportTokens,
+} from "./looks.ts"
 import { messages, type Messages } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
@@ -157,8 +166,59 @@ footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--border);color
 footer p{margin:4px 0}
 `
 
+const tokens = (t: ReportTokens) =>
+  `--bg:${t.bg};--fg:${t.fg};--muted:${t.muted};--card:${t.card};--border:${t.border};--accent:${t.accent};--accent-soft:${t.accentSoft};--warn:${t.warn};--empty:${t.empty}`
+
+/** A look's overrides on top of STYLE: colors, the embedded display font, the identity hero. */
+const lookStyle = (look: Look): string => {
+  const id = look.identity
+  return `
+@font-face{font-family:Bricolage;src:url(${displayFontDataUrl()}) format("woff");font-weight:800}
+:root{${tokens(look.light)}}
+@media (prefers-color-scheme:dark){:root{${tokens(look.dark)}}}
+h1,h2{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-weight:800;letter-spacing:-.02em}
+.identity{position:relative;overflow:hidden;background:${id.background};color:${id.text};border-radius:24px;padding:40px;margin-top:8px}
+.identity .split{position:absolute;right:0;top:0;bottom:0;width:34%;background:${id.split ?? "transparent"}}
+.identity .copy{position:relative;max-width:62%}
+.identity .eyebrow,.identity .meta,.identity .headline{color:${id.muted}}
+.identity h1{font-size:clamp(34px,6vw,64px);line-height:1;margin:12px 0 16px}
+.identity .headline{font-size:19px}
+.identity .graphic{position:absolute;right:32px;top:50%;transform:translateY(-50%);width:min(30%,300px);height:auto}
+@media (max-width:640px){.identity{padding:28px 22px}.identity .copy{max-width:none}.identity .graphic{position:static;transform:none;display:block;width:60%;margin:20px 0 0 auto}.identity .split{display:none}}
+`
+}
+
+const meta = (profile: Profile, t: Messages, period: string | null): Raw => {
+  const c = profile.coverage
+  return html`<p class="meta">
+    ${period}${period ? " · " : ""}${t.coverage(c.promptsAnalyzed, c.sessionsAnalyzed)}${
+      c.sampled ? html` · ${t.sampled(c.chunksAnalyzed, c.chunksTotal)}` : ""
+    }
+  </p>`
+}
+
+/** The first section of a look: archetype first, on the look's identity colors. */
+const identityHero = (profile: Profile, look: Look, t: Messages, period: string | null): Raw => {
+  const g = graphicSvg(look.identity.graphic, profile.stats.hourHistogram, look.identity)
+  return html`<section class="hero identity">
+    ${look.identity.split ? html`<div class="split"></div>` : ""}
+    <div class="copy">
+      <p class="eyebrow">${t.title}</p>
+      <h1>${profile.archetype.name}</h1>
+      <p class="headline">${profile.headline}</p>
+      <p>${profile.archetype.description}</p>
+      ${meta(profile, t, period)}
+    </div>
+    <img class="graphic" src="${svgDataUrl(g.svg)}" alt="${t.graphicAlt}" />
+  </section>`
+}
+
 /** Render a self-contained, offline HTML report (no external requests, no JavaScript). */
-export const renderHtml = (profile: Profile): string => {
+export const renderHtml = (
+  profile: Profile,
+  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+): string => {
+  const look = lookOf(options.look)
   const t = messages
   const s = profile.stats
   const tz = s.timezone
@@ -168,33 +228,33 @@ export const renderHtml = (profile: Profile): string => {
     ? t.period(formatDate(s.dateRange.from, tz), formatDate(s.dateRange.to, tz))
     : null
   const page = html`<!doctype html>
-    <html lang="${LANG}">
+    <html lang="${LANG}"${look ? raw(` data-look="${look.id}"`) : ""}>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="referrer" content="no-referrer" />
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"
+          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${look ? "; font-src data:" : ""}"
         />
         <title>${t.title} · ${profile.archetype.name}</title>
         <style>
-          ${raw(STYLE)}
+          ${raw(STYLE)}${look ? raw(lookStyle(look)) : ""}
         </style>
       </head>
       <body>
         <main>
-          <section class="hero">
-            <p class="eyebrow">${t.title}</p>
-            <h1>${profile.headline}</h1>
-            <p class="archetype">${profile.archetype.name}</p>
-            <p>${profile.archetype.description}</p>
-            <p class="meta">
-              ${period}${period ? " · " : ""}${t.coverage(c.promptsAnalyzed, c.sessionsAnalyzed)}${
-                c.sampled ? html` · ${t.sampled(c.chunksAnalyzed, c.chunksTotal)}` : ""
-              }
-            </p>
-          </section>
+          ${
+            look
+              ? identityHero(profile, look, t, period)
+              : html`<section class="hero">
+                  <p class="eyebrow">${t.title}</p>
+                  <h1>${profile.headline}</h1>
+                  <p class="archetype">${profile.archetype.name}</p>
+                  <p>${profile.archetype.description}</p>
+                  ${meta(profile, t, period)}
+                </section>`
+          }
 
           <h2>${t.numbers}</h2>
           <section class="stats">

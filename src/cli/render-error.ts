@@ -15,6 +15,13 @@ export type AppError =
   | UnsupportedProfileVersion
   | InvalidProfile
 
+/** How to fix an InvalidArgument, per flag. */
+const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
+  "--since": "--since accepts 1m, 3m, 6m, 1y or all.",
+  "--max-calls": "Use a positive safe integer.",
+  "--card-hide": "Use a comma list of traits, stats, graphic.",
+}
+
 export const EXIT = {
   ok: 0,
   error: 1,
@@ -105,7 +112,7 @@ const RENDERERS: Renderers = {
   }),
   InvalidArgument: (e) => ({
     code: EXIT.usage,
-    message: `Unrecognised value "${e.value}" for ${e.flag}. ${e.flag === "--max-calls" ? "Use a positive safe integer." : "--since accepts 1m, 3m, 6m, 1y or all."}`,
+    message: `Unrecognised value "${e.value}" for ${e.flag}. ${ARGUMENT_HINTS[e.flag] ?? ARGUMENT_HINTS["--since"]}`,
   }),
   FileError: (e) => ({
     code: EXIT.error,

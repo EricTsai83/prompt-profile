@@ -49,6 +49,8 @@ try {
     "fonts/Inter-Regular.woff",
     "fonts/Inter-Bold.woff",
     "fonts/Inter-OFL.txt",
+    "fonts/BricolageGrotesque-ExtraBold.woff",
+    "fonts/BricolageGrotesque-OFL.txt",
   ]) {
     assert.ok(statSync(join(installed, "dist", file)).size > 0, `Missing package asset: ${file}`)
   }
@@ -74,8 +76,14 @@ try {
     assert.ok(existsSync(join(output, file)))
     if (process.platform !== "win32") assert.equal(statSync(join(output, file)).mode & 0o777, 0o600)
   }
+  // A non-default look reads the display font from the installed package.
+  run(process.execPath, [bin, "render", input, "--look", "signal", "--out", join(root, "signal")])
+  const signalCard = readFileSync(join(root, "signal", "card.png"))
+  assert.equal(signalCard.readUInt32BE(16), 1200)
+  assert.match(readFileSync(join(root, "signal", "report.html"), "utf8"), /data-look="signal"/)
+  assert.ok(existsSync(join(root, "signal", "render.json")))
   console.log(
-    "Installed-package check passed: version, help, prompts, fonts, HTML, JSON and 1200x630 PNG.",
+    "Installed-package check passed: version, help, prompts, fonts, HTML, JSON, 1200x630 PNG and a look.",
   )
 } finally {
   rmSync(root, { recursive: true, force: true })

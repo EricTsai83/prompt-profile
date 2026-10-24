@@ -30,6 +30,10 @@ export interface Messages {
   readonly privacy: string
   readonly project: string
   readonly none: string
+  readonly madeFrom: string
+  readonly cardPrompts: string
+  readonly cardStreak: string
+  readonly graphicAlt: string
 }
 
 /** Every text of the report and the card. */
@@ -72,4 +76,8 @@ export const messages: Messages = {
     "Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.",
   project: "prompt-profile",
   none: "—",
+  madeFrom: "Made from my prompts.",
+  cardPrompts: "prompts",
+  cardStreak: "longest streak",
+  graphicAlt: "Prompts by hour of day",
 }

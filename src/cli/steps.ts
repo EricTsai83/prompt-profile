@@ -6,7 +6,7 @@ import { processRecords, type PipelineReport } from "../pipeline/index.ts"
 import { Environment } from "../platform/Environment.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
-import { writeReport } from "../report/index.ts"
+import { writeReport, type RenderOptions } from "../report/index.ts"
 import { FileError, NoData } from "./errors.ts"
 import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
@@ -140,7 +140,12 @@ export const writeFileOrFail = (file: string, data: string) =>
   })
 
 /** report.html, profile.json and card.png in `outDir` (a card failure is not an error). */
-export const writeReportFiles = (profile: Profile, outDir: string) =>
-  writeReport(profile, outDir).pipe(
+export const writeReportFiles = (
+  profile: Profile,
+  outDir: string,
+  options?: RenderOptions,
+  source?: string | null,
+) =>
+  writeReport(profile, outDir, options, source).pipe(
     Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
   )

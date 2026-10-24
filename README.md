@@ -45,11 +45,21 @@ prompt-profile --no-cache      # do not read the analysis cache
 prompt-profile --yes           # skip the confirmation (required in non-interactive sessions)
 prompt-profile --dry-run       # write what would be sent to the LLM into --out, call nothing
 prompt-profile --verbose       # full errors and LLM call timings
+prompt-profile --look signal   # classic (default) / signal / afterhours / studio
+prompt-profile --card-hide stats,graphic  # leave traits / stats / graphic out of card.png
 
 prompt-profile stats                  # statistics only, no LLM (free and fast)
 prompt-profile render profile.json    # re-create the report from an existing profile.json
 prompt-profile cache clear            # delete the analysis cache
+
+prompt-profile render profile.json --look studio --card-hide stats
+                                      # a new look, written to variants/studio-no-stats/
 ```
+
+Looks and `--card-hide` only change how the report and card are drawn: no new analysis and no
+LLM calls, and the original report is kept. `--card-hide` changes the share card only; the
+private report and `profile.json` still contain everything, including quotes. The card never
+contains quotes or project names in any look.
 
 Exit codes: `0` success · `1` error · `2` usage / needs `--yes` · `3` no data · `4` no usable LLM
 CLI · `5` rate limited · `130` interrupted (a re-run resumes from the cache).

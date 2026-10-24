@@ -4,8 +4,10 @@ import satori from "satori"
 import { createRequire } from "node:module"
 import { readFileSync } from "node:fs"
 import type { Profile } from "../domain/Profile.ts"
-import type { FontData } from "./fonts.ts"
+import { DISPLAY_FONT, type FontData } from "./fonts.ts"
 import { peakHour } from "../domain/Stats.ts"
+import { graphicSvg, svgDataUrl } from "./graphic.ts"
+import { DEFAULT_RENDER_OPTIONS, lookOf, type Look, type RenderOptions } from "./looks.ts"
 import { messages } from "./messages.ts"
 
 export const CARD_WIDTH = 1200
@@ -14,7 +16,13 @@ export const CARD_HEIGHT = 630
 /** satori element tree without JSX (one less dependency). */
 interface Node {
   readonly type: string
-  readonly props: { readonly style?: Record<string, unknown>; readonly children?: unknown }
+  readonly props: {
+    readonly style?: Record<string, unknown>
+    readonly children?: unknown
+    readonly src?: string
+    readonly width?: number
+    readonly height?: number
+  }
 }
 const h = (type: string, style: Record<string, unknown>, children?: unknown): Node => ({
   type,
@@ -41,11 +49,8 @@ export const clip = (s: string, max: number): string => {
   return `${chars.slice(0, end).join("").trimEnd()}…`
 }
 
-/**
- * Card content: archetype, headline, up to 3 trait names and a few numbers.
- * **Never any prompt text** — the card is meant to be shared publicly.
- */
-export const cardTree = (profile: Profile): Node => {
+/** Today's card. `hide` can only remove the trait or number rows. */
+const classicTree = (profile: Profile, hide: RenderOptions["cardHide"]): Node => {
   const t = messages
   const s = profile.stats
   const peak = peakHour(s)
@@ -87,7 +92,7 @@ export const cardTree = (profile: Profile): Node => {
       h(
         "div",
         { display: "flex", gap: 12, flexWrap: "wrap" },
-        profile.traits.slice(0, 3).map((tr) =>
+        (hide.includes("traits") ? [] : profile.traits.slice(0, 3)).map((tr) =>
           h(
             "div",
             {
@@ -105,7 +110,7 @@ export const cardTree = (profile: Profile): Node => {
         h(
           "div",
           { display: "flex", gap: 48 },
-          numbers.map(([label, value]) =>
+          (hide.includes("stats") ? [] : numbers).map(([label, value]) =>
             h("div", { display: "flex", flexDirection: "column" }, [
               h("div", { fontSize: 40, fontWeight: 700 }, value),
               h("div", { fontSize: 18, color: "#b9b9ff" }, label),
@@ -116,6 +121,152 @@ export const cardTree = (profile: Profile): Node => {
       ]),
     ],
   )
+}
+
+/** Archetype size steps: long names get smaller type instead of overflowing. */
+const titleSize = (name: string) => (name.length > 44 ? 58 : name.length > 26 ? 72 : 96)
+
+/** A share-first look: identity colors, display type and the activity graphic. */
+const lookTree = (profile: Profile, look: Look, hide: RenderOptions["cardHide"]): Node => {
+  const t = messages
+  const s = profile.stats
+  const id = look.identity
+  const name = clip(profile.archetype.name, 56)
+  const showGraphic = !hide.includes("graphic")
+  const graphic = graphicSvg(id.graphic, s.hourHistogram, id)
+  const box = { bars: [56, 168, 340], orbit: [56, 110, 370], fold: [70, 190, 290] }[id.graphic]
+  const [right, top, width] = box as [number, number, number]
+  const metrics: Array<[string, string]> = [
+    [t.cardPrompts, s.totalPrompts.toLocaleString("en")],
+    [t.cardStreak, t.days(s.longestStreakDays)],
+  ]
+  return h(
+    "div",
+    {
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      boxSizing: "border-box",
+      display: "flex",
+      position: "relative",
+      backgroundColor: id.background,
+      color: id.text,
+      fontFamily: "Inter",
+    },
+    [
+      id.split
+        ? h("div", {
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: Math.round(CARD_WIDTH * 0.34),
+            height: CARD_HEIGHT,
+            backgroundColor: id.split,
+          })
+        : null,
+      showGraphic
+        ? {
+            type: "img",
+            props: {
+              src: svgDataUrl(graphic.svg),
+              width,
+              height: Math.round((width * graphic.height) / graphic.width),
+              style: { position: "absolute", right, top },
+            },
+          }
+        : null,
+      h(
+        "div",
+        {
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          // Absolute like the layers below it, so it is painted on top of them.
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: CARD_WIDTH,
+          height: CARD_HEIGHT,
+          padding: "52px 60px",
+          boxSizing: "border-box",
+        },
+        [
+          h("div", { display: "flex", justifyContent: "space-between", fontSize: 18 }, [
+            h("div", { fontFamily: DISPLAY_FONT, fontWeight: 800, fontSize: 24 }, t.project),
+            h("div", { color: id.muted }, t.madeFrom),
+          ]),
+          h(
+            "div",
+            { display: "flex", flexDirection: "column", maxWidth: showGraphic ? 700 : 1000 },
+            [
+              h(
+                "div",
+                {
+                  fontFamily: DISPLAY_FONT,
+                  fontWeight: 800,
+                  fontSize: titleSize(name),
+                  lineHeight: 0.98,
+                  letterSpacing: -2,
+                },
+                name,
+              ),
+              h(
+                "div",
+                { fontSize: 24, lineHeight: 1.4, marginTop: 20, color: id.muted },
+                clip(profile.headline, 120),
+              ),
+              hide.includes("traits")
+                ? null
+                : h(
+                    "div",
+                    { display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 },
+                    profile.traits.slice(0, 3).map((tr) =>
+                      h(
+                        "div",
+                        {
+                          display: "flex",
+                          fontSize: 18,
+                          padding: "6px 16px",
+                          borderRadius: 999,
+                          border: `1.5px solid ${id.chipBorder}`,
+                          backgroundColor: id.chipBackground,
+                        },
+                        clip(tr.name, 32),
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+          h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
+            h(
+              "div",
+              { display: "flex", gap: 44 },
+              (hide.includes("stats") ? [] : metrics).map(([label, value]) =>
+                h("div", { display: "flex", flexDirection: "column" }, [
+                  h("div", { fontFamily: DISPLAY_FONT, fontWeight: 800, fontSize: 40 }, value),
+                  h("div", { fontSize: 16, color: id.muted }, label),
+                ]),
+              ),
+            ),
+            h("div", { fontSize: 18, color: id.split ? id.text : id.muted }, "npx prompt-profile"),
+          ]),
+        ],
+      ),
+    ].filter((x) => x !== null),
+  )
+}
+
+/**
+ * Card content: archetype, headline, up to 3 trait names and a few numbers.
+ * **Never any prompt text** — the card is meant to be shared publicly.
+ */
+export const cardTree = (
+  profile: Profile,
+  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+): Node => {
+  const look = lookOf(options.look)
+  return look === null
+    ? classicTree(profile, options.cardHide)
+    : lookTree(profile, look, options.cardHide)
 }
 
 let wasmReady: Promise<void> | null = null
@@ -131,10 +282,11 @@ const ensureWasm = (): Promise<void> => {
 export const renderCard = (
   profile: Profile,
   fonts: ReadonlyArray<FontData>,
+  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
 ): Effect.Effect<Uint8Array, Error> =>
   Effect.tryPromise({
     try: async () => {
-      const svg = await satori(cardTree(profile) as never, {
+      const svg = await satori(cardTree(profile, options) as never, {
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         fonts: fonts.map((f) => ({
