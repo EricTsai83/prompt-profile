@@ -1,7 +1,7 @@
 import { Effect, FileSystem, Path } from "effect"
-import type { SKILL_ORIGINS } from "../../domain/Techniques.ts"
+import type { SkillOrigin } from "../../domain/SourceAdapter.ts"
 
-export type SkillOrigin = (typeof SKILL_ORIGINS)[number]
+export type { SkillOrigin }
 
 export interface SkillInfo {
   readonly description: string | null
@@ -80,6 +80,8 @@ export const readSkillCatalog = (input: {
   readonly names: ReadonlyArray<string>
   /** Descriptions recorded in transcripts (preferred over SKILL.md: no file access needed). */
   readonly listed?: Readonly<Record<string, string>>
+  /** Origins recorded in transcripts (Codex lists file paths); used when no file is found. */
+  readonly listedOrigins?: Readonly<Record<string, SkillOrigin>>
 }): Effect.Effect<ReadonlyMap<string, SkillInfo>, never, FileSystem.FileSystem | Path.Path> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
@@ -136,7 +138,8 @@ export const readSkillCatalog = (input: {
                 ? { description: BUILTIN_SKILLS[folder]!, origin: "builtin" }
                 : undefined
       const listed = input.listed?.[name] ?? input.listed?.[folder]
-      const found = info ?? { description: null, origin: "unknown" as const }
+      const listedOrigin = input.listedOrigins?.[name] ?? input.listedOrigins?.[folder]
+      const found: SkillInfo = info ?? { description: null, origin: listedOrigin ?? "unknown" }
       catalog.set(name, listed === undefined ? found : { ...found, description: listed })
     }
     return catalog

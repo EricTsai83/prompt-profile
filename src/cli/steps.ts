@@ -4,6 +4,7 @@ import { decodeProfile, type Profile } from "../domain/Profile.ts"
 import { snapshotOf } from "../domain/Progress.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import type { TechniqueEvent } from "../domain/Techniques.ts"
+import type { SkillOrigin } from "../domain/SourceAdapter.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
 import { withSkillCatalog } from "../pipeline/techniques.ts"
 import { readSkillCatalog } from "../adapters/claude-code/skills.ts"
@@ -63,6 +64,7 @@ export interface Collected {
   readonly slashCommands: Record<string, number>
   readonly events: ReadonlyArray<TechniqueEvent>
   readonly skillDescriptions: Readonly<Record<string, string>>
+  readonly skillOrigins: Readonly<Record<string, SkillOrigin>>
 }
 
 /** Read every source and print one line per source. No records at all → `NoData`. */
@@ -76,6 +78,7 @@ export const readSources = Effect.gen(function* () {
   const slashCommands: Record<string, number> = {}
   const events: Array<TechniqueEvent> = []
   const skillDescriptions: Record<string, string> = {}
+  const skillOrigins: Record<string, SkillOrigin> = {}
   for (const source of yield* readAdapters(adapters)) {
     const { adapter, diagnostics: diag } = source
     locations.push(...adapter.locations)
@@ -84,6 +87,7 @@ export const readSources = Effect.gen(function* () {
     for (const r of source.records) records.push(r)
     for (const e of source.events) events.push(e)
     Object.assign(skillDescriptions, source.skillDescriptions ?? {})
+    Object.assign(skillOrigins, source.skillOrigins ?? {})
     const sessions = new Set(source.records.map((r) => r.sessionId)).size
     yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
     yield* out.debug(
@@ -91,7 +95,14 @@ export const readSources = Effect.gen(function* () {
     )
   }
   if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
-  return { records, locations, slashCommands, events, skillDescriptions } satisfies Collected
+  return {
+    records,
+    locations,
+    slashCommands,
+    events,
+    skillDescriptions,
+    skillOrigins,
+  } satisfies Collected
 })
 
 /** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
@@ -137,6 +148,7 @@ export const runPipelineStep = (collected: Collected, since: string) =>
         ],
         names: techniques.details.skills.map((x) => x.name),
         listed: collected.skillDescriptions,
+        listedOrigins: collected.skillOrigins,
       })
       return {
         ...result,

@@ -1,7 +1,9 @@
 import type { Effect } from "effect"
 import type { PromptRecord } from "./PromptRecord.ts"
 import type { SourceId } from "./Source.ts"
-import type { TechniqueEvent } from "./Techniques.ts"
+import type { SKILL_ORIGINS, TechniqueEvent } from "./Techniques.ts"
+
+export type SkillOrigin = (typeof SKILL_ORIGINS)[number]
 
 export interface AdapterDiagnostics {
   readonly filesRead: number
@@ -26,6 +28,8 @@ export interface SourceRead {
    * Code `skill_listing`). Only names and descriptions, never a skill's body or arguments.
    */
   readonly skillDescriptions?: Readonly<Record<string, string>>
+  /** Skill name → where it comes from, when the listing says so (Codex lists file paths). */
+  readonly skillOrigins?: Readonly<Record<string, SkillOrigin>>
 }
 
 export interface SourceAdapter {

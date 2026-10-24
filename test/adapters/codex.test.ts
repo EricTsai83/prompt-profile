@@ -113,6 +113,62 @@ describe("Codex adapter (fixture)", () => {
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
+  it.effect("reports skills read through SKILL.md, the skill listing and models", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-codex-"))
+      const day = join(root, "sessions", "2026", "09", "03")
+      mkdirSync(day, { recursive: true })
+      const id = "cccccccc-cccc-4ccc-8ccc-cccccccccccc"
+      const line = (timestamp: string, type: string, payload: object) =>
+        JSON.stringify({ timestamp, type, payload })
+      const listing = [
+        "## Skills",
+        "- deploy-check: Check a release before deploying (file: /home/dev/.codex/skills/deploy-check/SKILL.md)",
+        "- openai-docs: Look up OpenAI docs (file: /home/dev/.codex/skills/.system/openai-docs/SKILL.md)",
+      ].join("\n")
+      const lines = [
+        line("2026-09-03T15:00:00.000Z", "session_meta", {
+          id,
+          source: "cli",
+          cwd: "/home/dev/app",
+        }),
+        line("2026-09-03T15:00:01.000Z", "turn_context", {
+          model: "gpt-6.1-sol",
+          effort: "medium",
+        }),
+        line("2026-09-03T15:00:02.000Z", "response_item", {
+          type: "message",
+          role: "developer",
+          content: [{ type: "input_text", text: listing }],
+        }),
+        line("2026-09-03T15:00:03.000Z", "response_item", {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "please check the release" }],
+        }),
+        line("2026-09-03T15:00:04.000Z", "response_item", {
+          type: "custom_tool_call",
+          name: "exec",
+          input: "cat /home/dev/.codex/skills/deploy-check/SKILL.md && echo SECRET_TOKEN=abc",
+        }),
+        line("2026-09-03T15:00:05.000Z", "turn_context", { model: "gpt-6.1-sol" }),
+      ]
+      writeFileSync(join(day, `rollout-2026-09-03T15-00-00-${id}.jsonl`), lines.join("\n"))
+      const read = yield* (yield* makeCodexAdapter(root)).read
+      expect(read.events.map((e) => [e.kind, e.detail ?? null])).toEqual([
+        ["transcript", null],
+        ["model", "gpt-6.1-sol"],
+        ["skills", "deploy-check"],
+      ])
+      expect(read.skillDescriptions).toEqual({
+        "deploy-check": "Check a release before deploying",
+        "openai-docs": "Look up OpenAI docs",
+      })
+      expect(read.skillOrigins).toEqual({ "deploy-check": "personal", "openai-docs": "builtin" })
+      expect(JSON.stringify(read)).not.toContain("SECRET_TOKEN")
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
   it.effect("missing directory → empty stream; CODEX_HOME override", () =>
     Effect.gen(function* () {
       const adapter = yield* makeCodexAdapter("/definitely/not/here")

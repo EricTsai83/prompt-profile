@@ -7,6 +7,39 @@ import { findFiles } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
 import { techniqueOfTool } from "../common/techniques.ts"
 import type { TechniqueEvent, ToolTechnique } from "../../domain/Techniques.ts"
+import type { SkillOrigin } from "../../domain/SourceAdapter.ts"
+import { clipDescription } from "../claude-code/skills.ts"
+
+/** `- name: description (file: …/SKILL.md)` lines of the skills section Codex adds. */
+export const parseCodexSkillListing = (
+  text: string,
+): Array<{ name: string; description: string; file: string }> =>
+  [...text.matchAll(/^- ([\w.:-]{1,80}): (.+?)\s*\(file: ([^)\n]+\/SKILL\.md)\)\s*$/gm)].map(
+    (m) => ({
+      name: m[1]!,
+      description: clipDescription(m[2]!.trim()),
+      file: m[3]!,
+    }),
+  )
+
+/** Names of skills whose SKILL.md an exec input reads; nothing else of the input is kept. */
+export const skillsReadIn = (input: string): Array<string> => [
+  ...new Set(
+    [...input.matchAll(/\/skills\/(?:[\w.-]+\/)*?([\w.-]{1,80})\/SKILL\.md/g)].map((m) => m[1]!),
+  ),
+]
+
+/** Where a listed skill file lives: Codex system skills, the user's, a plugin's or a project's. */
+export const originOfSkillPath = (file: string, cwd: string | null): SkillOrigin =>
+  file.includes("/.codex/skills/.system/")
+    ? "builtin"
+    : file.includes("/plugins/")
+      ? "plugin"
+      : cwd !== null && file.startsWith(`${cwd}/`)
+        ? "project"
+        : /\/\.(?:codex|agents)\/skills\//.test(file)
+          ? "personal"
+          : "project"
 import { firstMatch } from "../common/rules.ts"
 import {
   codexOrigin,
@@ -66,20 +99,24 @@ export const makeCodexAdapter = (
       ids: ReadonlyArray<string>
       records: ReadonlyArray<{ readonly dedupKey: string; readonly record: PromptRecord }>
       events: ReadonlyArray<TechniqueEvent>
+      skills: ReadonlyArray<{ name: string; description: string; origin: SkillOrigin }>
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
         const records: Array<{ dedupKey: string; record: PromptRecord }> = []
+        const listed: Array<{ name: string; description: string; file: string }> = []
         // Only user messages are kept while streaming: rollouts are mostly large tool output.
         const userLines: Array<{
           ts: string | undefined
           ordinal: number
           content: UserMessage["content"]
         }> = []
-        // Tool names only (plan 17): never their input or output.
-        const tools: Array<{ ms: number; kind: ToolTechnique }> = []
+        // Tool names only (plan 17): never their input or output — except that an exec input
+        // is matched against a SKILL.md path to learn which skill was read (only the name is kept).
+        const tools: Array<{ ms: number; kind: ToolTechnique; detail?: string }> = []
+        const models = new Map<string, number>()
         yield* readJsonl(fs, file, jsonlCallbacks(diag)).pipe(
           Stream.runForEach(({ value, lineNumber }) =>
             Effect.sync(() => {
@@ -89,9 +126,50 @@ export const makeCodexAdapter = (
                 return
               }
               const { type, payload, timestamp, ordinal } = outer.value
+              const lineMs = timestamp === undefined ? Number.NaN : Date.parse(timestamp)
               if (type === "session_meta" && meta === undefined) {
                 meta = Option.getOrUndefined(decodeMeta(payload))
+              } else if (type === "turn_context") {
+                const model = (payload as { model?: unknown } | undefined)?.model
+                if (typeof model === "string" && !models.has(model) && !Number.isNaN(lineMs))
+                  models.set(model, lineMs)
               } else if (type === "response_item") {
+                const item = payload as
+                  | {
+                      type?: unknown
+                      role?: unknown
+                      content?: unknown
+                      input?: unknown
+                      arguments?: unknown
+                    }
+                  | undefined
+                if (
+                  item?.type === "message" &&
+                  item.role === "developer" &&
+                  Array.isArray(item.content)
+                ) {
+                  const text = item.content
+                    .map((x) =>
+                      typeof (x as { text?: unknown }).text === "string"
+                        ? (x as { text: string }).text
+                        : "",
+                    )
+                    .join("\n")
+                  for (const entry of parseCodexSkillListing(text)) listed.push(entry)
+                }
+                if (
+                  (item?.type === "function_call" || item?.type === "custom_tool_call") &&
+                  !Number.isNaN(lineMs)
+                ) {
+                  const input =
+                    typeof item.input === "string"
+                      ? item.input
+                      : typeof item.arguments === "string"
+                        ? item.arguments
+                        : ""
+                  for (const name of skillsReadIn(input))
+                    tools.push({ ms: lineMs, kind: "skills", detail: name })
+                }
                 const call = payload as { type?: unknown; name?: unknown } | undefined
                 if (
                   (call?.type === "function_call" || call?.type === "custom_tool_call") &&
@@ -116,9 +194,10 @@ export const makeCodexAdapter = (
         )
         const sessionId = meta?.id ?? fileId
         const ids = [meta?.id, meta?.session_id, fileId].filter((x): x is string => x !== undefined)
-        if (sessionId === undefined) return { ids, records, events: [] }
+        if (sessionId === undefined) return { ids, records, events: [], skills: [] }
         const sessionRule = meta ? firstMatch(SESSION_RULES, meta) : undefined
         const firstMs = [
+          ...models.values(),
           ...userLines.map((l) => (l.ts ? Date.parse(l.ts) : Number.NaN)),
           ...tools.map((t) => t.ms),
         ]
@@ -129,11 +208,19 @@ export const makeCodexAdapter = (
             ? []
             : [
                 { source: SOURCE, sessionId, timestampMs: firstMs, kind: "transcript" },
+                ...[...models].map(([model, ms]) => ({
+                  source: SOURCE,
+                  sessionId,
+                  timestampMs: ms,
+                  kind: "model" as const,
+                  detail: model,
+                })),
                 ...tools.map((t) => ({
                   source: SOURCE,
                   sessionId,
                   timestampMs: t.ms,
                   kind: t.kind,
+                  ...(t.detail === undefined ? {} : { detail: t.detail }),
                 })),
               ]
         for (const line of userLines) {
@@ -169,7 +256,12 @@ export const makeCodexAdapter = (
             },
           })
         }
-        return { ids, records, events }
+        const skills = listed.map((entry) => ({
+          name: entry.name,
+          description: entry.description,
+          origin: originOfSkillPath(entry.file, meta?.cwd ?? null),
+        }))
+        return { ids, records, events, skills }
       })
 
     const fromHistory = (
@@ -229,11 +321,13 @@ export const makeCodexAdapter = (
       // cross-file dedup is deterministic (the oldest file's).
       const seen = new Set<string>()
       const allEvents: Array<TechniqueEvent> = []
+      const listings: Array<{ name: string; description: string; origin: SkillOrigin }> = []
       const rollouts = Stream.fromIterable(files).pipe(
         Stream.mapEffect((file) => readRollout(file, diag), { concurrency: READ_CONCURRENCY }),
-        Stream.flatMap(({ ids, records, events }) => {
+        Stream.flatMap(({ ids, records, events, skills }) => {
           for (const id of ids) known.add(id)
           allEvents.push(...events)
+          listings.push(...skills)
           const fresh: Array<PromptRecord> = []
           for (const { dedupKey, record } of records) {
             if (seen.has(dedupKey)) {
@@ -261,7 +355,13 @@ export const makeCodexAdapter = (
         ),
       )
       const records = yield* Stream.runCollect(Stream.concat(rollouts, history))
-      return { records, diagnostics: diag.snapshot(), events: allEvents }
+      return {
+        records,
+        diagnostics: diag.snapshot(),
+        events: allEvents,
+        skillDescriptions: Object.fromEntries(listings.map((l) => [l.name, l.description])),
+        skillOrigins: Object.fromEntries(listings.map((l) => [l.name, l.origin])),
+      }
     })
 
     return {

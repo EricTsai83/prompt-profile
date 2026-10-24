@@ -25,6 +25,19 @@ sessions as the denominator, months without transcripts are drawn as "no data", 
 <month>" is only shown when a technique started after the data did. On the owner's data, May–July
 have prompts but no transcripts.
 
+## Claude Code and Codex record different things
+
+| | Claude Code | Codex |
+| --- | --- | --- |
+| Skill use | `Skill` tool call (name) | The agent reads `…/skills/<name>/SKILL.md` through exec; only the name is matched from the exec input, nothing else is kept |
+| Skill descriptions | `skill_listing` attachment: `- name: description` | Skills section of the developer instructions: `- name: description (file: path)`; the path also gives the origin (`.codex/skills/.system` = built-in) |
+| Subagents, plan mode, MCP, web, background, worktrees, PRs | Tool names and line types | Not recorded in a comparable way (collaboration mode is always `default`) |
+| Asking the user | `AskUserQuestion` | `request_user_input*` |
+| Models | Assistant `message.model` | `turn_context.model` |
+
+On the owner's data Codex adds 28 skill reads and its models; most Codex sessions are
+`codex exec` runs, which the filters exclude, so its share of the workflow is small.
+
 ## Rules
 
 - Never read tool inputs or outputs, PR URLs or MCP server names into the profile; only
