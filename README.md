@@ -5,27 +5,27 @@ personal profile.
 
 ![Synthetic sample share card](docs/sample-card.png)
 
-[Sample HTML report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/sample-report.html)
+[Sample HTML report](https://erictsai83.github.io/prompt-profile/sample-report.html)
 · [Sample profile JSON](docs/sample-profile.json) (all sample data is hand-written and fictional).
 
 ### A real report
 
 The author's own report, from about 1,700 real prompts over six months, published as written:
 
-- [Full report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/full/report.html): what you see on your own machine, with quotes from
+- [Full report](https://erictsai83.github.io/prompt-profile/demo/full/report.html): what you see on your own machine, with quotes from
   real prompts, suggested rewrites, project names, exact dates and fun facts.
-- [Shareable report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/without-personal/report.html): the same profile rendered with
+- [Shareable report](https://erictsai83.github.io/prompt-profile/demo/without-personal/report.html): the same profile rendered with
   `--exclude personal`: no quotes, rewrites or fun facts, projects shown as "Project A, B…",
   dates by month. This is what you would post publicly.
 
 The share card is the same for both: it never contains quotes or project names. The full report
 in every look (`--look`; render only, no new analysis):
 
-| [Classic](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/full/report.html) (default) | [Signal](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/signal/report.html) |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| ![Classic card](docs/demo/card.png)                                                                                                   | ![Signal card](docs/demo/signal/card.png)                                                                                    |
-| [Afterhours](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/afterhours/report.html)  | [Studio](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/studio/report.html) |
-| ![Afterhours card](docs/demo/afterhours/card.png)                                                                                     | ![Studio card](docs/demo/studio/card.png)                                                                                    |
+| [Classic](https://erictsai83.github.io/prompt-profile/demo/full/report.html) (default) | [Signal](https://erictsai83.github.io/prompt-profile/demo/signal/report.html) |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Classic card](docs/demo/card.png)                                                    | ![Signal card](docs/demo/signal/card.png)                                     |
+| [Afterhours](https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html)  | [Studio](https://erictsai83.github.io/prompt-profile/demo/studio/report.html) |
+| ![Afterhours card](docs/demo/afterhours/card.png)                                      | ![Studio card](docs/demo/studio/card.png)                                     |
 
 ## Quick start
 
