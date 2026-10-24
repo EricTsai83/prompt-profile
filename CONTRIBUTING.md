@@ -65,3 +65,29 @@ mv tmp/sample-preview/card.png docs/sample-card.png
 mv tmp/sample-preview/profile.json docs/sample-profile.json
 pnpm format
 ```
+
+## Releasing (maintainer)
+
+A pushed `vX.Y.Z` tag releases; pushes to `main` never do.
+
+```sh
+npm version patch   # or minor / major / 0.2.0-beta.1; bumps package.json and tags vX.Y.Z
+git push --follow-tags
+```
+
+[`release.yml`](.github/workflows/release.yml) then checks that the tag equals the
+`package.json` version, runs every check, packs and tests the tarball, builds the standalone
+binaries, creates the GitHub Release (generated notes, tarball, binaries, `SHA256SUMS`) and
+only then publishes to npm through the Trusted Publisher, with provenance. A suffixed version is
+a prerelease on the npm dist-tag `next`. If any job fails, nothing is published: fix it on
+`main`, move the tag (`git push origin :refs/tags/vX.Y.Z`, `git tag -f vX.Y.Z`, push it again)
+as long as neither the GitHub Release nor npm has the version. If only `npm-publish` failed,
+use "Re-run failed jobs": it publishes the tarball that was tested.
+
+npm accepts a publish with `202` and may need a few minutes before `npm view` shows it.
+
+## Upstream CLI changes
+
+After a major Claude Code or Codex release, run `pnpm test:smoke` and look for sudden changes in
+the filter rules' exclusion counts, then `pnpm test:smoke:llm` (uses subscription quota) to
+confirm the CLI invocation and output format still work.
