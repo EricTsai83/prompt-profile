@@ -240,6 +240,33 @@ describe("Claude Code adapter (fixture)", () => {
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
+  it.effect("collects skill descriptions from the skill listings in transcripts", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-claude-"))
+      mkdirSync(join(root, "projects", "p"), { recursive: true })
+      const listing = (content: string) => ({
+        type: "attachment",
+        sessionId: "s1",
+        timestamp: "2026-09-03T15:00:00.000Z",
+        attachment: { type: "skill_listing", names: [], content },
+      })
+      const lines = [
+        listing("- code-review: Review a diff for bugs\n- my-skill: Old description"),
+        listing("- my-skill: Newer description of my skill\n- broken line without colon"),
+      ]
+      writeFileSync(
+        join(root, "projects", "p", "s1.jsonl"),
+        lines.map((l) => JSON.stringify(l)).join("\n"),
+      )
+      const read = yield* (yield* makeClaudeCodeAdapter(root)).read
+      // the latest listing wins
+      expect(read.skillDescriptions).toEqual({
+        "code-review": "Review a diff for bugs",
+        "my-skill": "Newer description of my skill",
+      })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
   it.effect("missing directory → empty stream", () =>
     Effect.gen(function* () {
       const adapter = yield* makeClaudeCodeAdapter("/definitely/not/here")

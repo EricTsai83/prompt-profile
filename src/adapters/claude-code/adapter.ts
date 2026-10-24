@@ -7,6 +7,7 @@ import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { listDir } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
 import { techniqueOfTool, toolDetail } from "../common/techniques.ts"
+import { parseSkillListing } from "./skills.ts"
 import type { TechniqueEvent } from "../../domain/Techniques.ts"
 import { createHash } from "node:crypto"
 import { firstMatch, slashCommandName } from "../common/rules.ts"
@@ -81,10 +82,17 @@ interface ReadState {
   readonly worktreeSessions: Set<string>
   readonly transcriptSessions: Set<string>
   readonly modelSessions: Set<string>
+  readonly skillDescriptions: Map<string, { ms: number; description: string }>
 }
 
 /** Lines that can carry a workflow technique; everything else is skipped unparsed. */
-const TECHNIQUE_NEEDLES = ['"tool_use"', '"pr-link"', '"worktree-state"', '"permissionMode"']
+const TECHNIQUE_NEEDLES = [
+  '"tool_use"',
+  '"pr-link"',
+  '"worktree-state"',
+  '"permissionMode"',
+  '"skill_listing"',
+]
 
 /**
  * Workflow techniques of one line: tool names, plan mode, PR links, worktrees. Subagent
@@ -103,6 +111,19 @@ const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state
       kind,
       ...(detail === undefined ? {} : { detail }),
     })
+  // skill names and descriptions the agent was offered; the latest listing wins
+  const att = line.attachment as { type?: unknown; content?: unknown } | undefined
+  if (
+    line.type === "attachment" &&
+    att?.type === "skill_listing" &&
+    typeof att.content === "string"
+  ) {
+    for (const [name, description] of parseSkillListing(att.content)) {
+      const seen = state.skillDescriptions.get(name)
+      if (seen === undefined || seen.ms <= file.lastMs)
+        state.skillDescriptions.set(name, { ms: file.lastMs, description })
+    }
+  }
   // the session has a transcript with metadata: it counts in the workflow denominator
   if (!state.transcriptSessions.has(line.sessionId)) {
     state.transcriptSessions.add(line.sessionId)
@@ -296,6 +317,7 @@ export const makeClaudeCodeAdapter = (
         worktreeSessions: new Set(),
         transcriptSessions: new Set(),
         modelSessions: new Set(),
+        skillDescriptions: new Map(),
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right
@@ -351,7 +373,14 @@ export const makeClaudeCodeAdapter = (
         ),
       )
       countSlashCommands(state)
-      return { records, diagnostics: diag.snapshot(), events: state.events }
+      return {
+        records,
+        diagnostics: diag.snapshot(),
+        events: state.events,
+        skillDescriptions: Object.fromEntries(
+          [...state.skillDescriptions].map(([name, x]) => [name, x.description]),
+        ),
+      }
     })
 
     return {

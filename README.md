@@ -29,7 +29,8 @@ Output (in `./prompt-profile-report/` by default):
   as frequent corrections or very short follow-ups), **how you work with AI** (a capability map
   — plan, delegate, extend, verify, ship — with the skills you used and what each does, subagent
   types, MCP servers, models, pull requests, parallel sessions and prompt-writing habits; counted
-  from tool metadata and skill descriptions, never tool inputs, outputs or skill arguments), what
+  from tool metadata and the skill descriptions recorded in your transcripts, never tool inputs,
+  outputs or skill arguments), what
   changed since your last report, a daily
   calendar and a weekday ×
   hour heatmap (hover or tap for the count and main projects), project chapters, the five

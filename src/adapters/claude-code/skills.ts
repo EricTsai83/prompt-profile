@@ -32,6 +32,16 @@ export const BUILTIN_SKILLS: Readonly<Record<string, string>> = {
 
 const MAX_DESCRIPTION = 220
 
+export const clipDescription = (value: string): string =>
+  value.length > MAX_DESCRIPTION ? `${value.slice(0, MAX_DESCRIPTION - 1).trimEnd()}…` : value
+
+/** `- name: description` lines of a Claude Code skill listing. */
+export const parseSkillListing = (content: string): Array<[name: string, description: string]> =>
+  [...content.matchAll(/^- ([\w.:@/-]{1,80}):\s*(\S.*)$/gm)].map((m) => [
+    m[1]!,
+    clipDescription(m[2]!.trim()),
+  ])
+
 /** The `description` of a SKILL.md front matter (plain, quoted or folded); null if none. */
 export const frontMatterDescription = (text: string): string | null => {
   const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1]
@@ -68,6 +78,8 @@ export const readSkillCatalog = (input: {
   readonly agentsRoot?: string
   readonly projectDirs: ReadonlyArray<string>
   readonly names: ReadonlyArray<string>
+  /** Descriptions recorded in transcripts (preferred over SKILL.md: no file access needed). */
+  readonly listed?: Readonly<Record<string, string>>
 }): Effect.Effect<ReadonlyMap<string, SkillInfo>, never, FileSystem.FileSystem | Path.Path> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
@@ -123,7 +135,9 @@ export const readSkillCatalog = (input: {
               : BUILTIN_SKILLS[folder] !== undefined
                 ? { description: BUILTIN_SKILLS[folder]!, origin: "builtin" }
                 : undefined
-      catalog.set(name, info ?? { description: null, origin: "unknown" })
+      const listed = input.listed?.[name] ?? input.listed?.[folder]
+      const found = info ?? { description: null, origin: "unknown" as const }
+      catalog.set(name, listed === undefined ? found : { ...found, description: listed })
     }
     return catalog
   })

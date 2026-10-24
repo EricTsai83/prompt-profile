@@ -62,6 +62,7 @@ export interface Collected {
   readonly locations: ReadonlyArray<string>
   readonly slashCommands: Record<string, number>
   readonly events: ReadonlyArray<TechniqueEvent>
+  readonly skillDescriptions: Readonly<Record<string, string>>
 }
 
 /** Read every source and print one line per source. No records at all → `NoData`. */
@@ -74,6 +75,7 @@ export const readSources = Effect.gen(function* () {
   const locations: Array<string> = []
   const slashCommands: Record<string, number> = {}
   const events: Array<TechniqueEvent> = []
+  const skillDescriptions: Record<string, string> = {}
   for (const source of yield* readAdapters(adapters)) {
     const { adapter, diagnostics: diag } = source
     locations.push(...adapter.locations)
@@ -81,6 +83,7 @@ export const readSources = Effect.gen(function* () {
       slashCommands[k] = (slashCommands[k] ?? 0) + v
     for (const r of source.records) records.push(r)
     for (const e of source.events) events.push(e)
+    Object.assign(skillDescriptions, source.skillDescriptions ?? {})
     const sessions = new Set(source.records.map((r) => r.sessionId)).size
     yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
     yield* out.debug(
@@ -88,7 +91,7 @@ export const readSources = Effect.gen(function* () {
     )
   }
   if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
-  return { records, locations, slashCommands, events } satisfies Collected
+  return { records, locations, slashCommands, events, skillDescriptions } satisfies Collected
 })
 
 /** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
@@ -133,6 +136,7 @@ export const runPipelineStep = (collected: Collected, since: string) =>
           ...new Set(collected.records.flatMap((r) => (r.project === null ? [] : [r.project]))),
         ],
         names: techniques.details.skills.map((x) => x.name),
+        listed: collected.skillDescriptions,
       })
       return {
         ...result,

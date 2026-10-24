@@ -21,6 +21,11 @@ export interface SourceRead {
   readonly diagnostics: AdapterDiagnostics
   /** Workflow technique uses found in agent metadata (plan 17); never any content. */
   readonly events: ReadonlyArray<TechniqueEvent>
+  /**
+   * Skill name → its one-line description, from the skill listings the agent records (Claude
+   * Code `skill_listing`). Only names and descriptions, never a skill's body or arguments.
+   */
+  readonly skillDescriptions?: Readonly<Record<string, string>>
 }
 
 export interface SourceAdapter {

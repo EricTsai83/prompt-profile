@@ -17,6 +17,7 @@ export const ClaudeLine = Schema.Struct({
   origin: Schema.optional(Schema.Unknown),
   permissionMode: Schema.optional(Schema.Unknown),
   prUrl: Schema.optional(Schema.Unknown),
+  attachment: Schema.optional(Schema.Unknown),
   message: Schema.optional(
     Schema.Struct({
       content: Schema.optional(Schema.Unknown),

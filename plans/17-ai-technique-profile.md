@@ -41,10 +41,14 @@ have prompts but no transcripts.
 An adoption timeline, then five stages — plan, delegate, extend, verify, ship — each with its
 measures and a named breakdown:
 
-- **Skills:** name, origin (built-in, plugin, personal, project), the skill's own description
-  from its `SKILL.md` front matter (or the built-in list), looked up in `~/.claude/skills`,
-  `~/.agents/skills`, `~/.claude/plugins/**`, and `.claude/skills` / `.agents/skills` of every
-  project the user worked in, sessions and first–last use. Only the front
+- **Skills:** name, origin (built-in, plugin, personal, project), and the skill's own
+  description. The description comes first from the transcripts themselves: Claude Code records
+  a `skill_listing` attachment (`- name: description` lines) in each session, so no repository
+  has to be read; on the owner's data this describes all 6 skills used. Only if a skill is not
+  listed is its `SKILL.md` front matter (or the built-in list) used. The origin always comes
+  from where the skill's folder is found — `~/.claude/skills`, `~/.agents/skills`,
+  `~/.claude/plugins/**`, or `.claude/skills` / `.agents/skills` of a project the user worked
+  in — because it decides what the share page may show; sessions and first–last use. Only the front
   matter is kept: the skill body is never stored, and the arguments it was called with are never
   read.
 - **Subagent types**, **MCP servers** (from `mcp__<server>__…` tool names) and **models**, with

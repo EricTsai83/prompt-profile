@@ -86,4 +86,27 @@ describe("skill catalog", () => {
       expect(JSON.stringify([...catalog])).not.toContain("SECRET")
     }).pipe(Effect.provide(NodeServices.layer)),
   )
+
+  it.effect("descriptions recorded in transcripts win; files still decide the origin", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-skills-"))
+      const claude = join(root, ".claude")
+      skill(join(claude, "skills"), "my-review", "description: From the file")
+      const catalog = yield* readSkillCatalog({
+        claudeRoot: claude,
+        projectDirs: [],
+        names: ["my-review", "gone-skill"],
+        listed: { "my-review": "From the transcript", "gone-skill": "A skill whose repo is gone" },
+      })
+      expect(catalog.get("my-review")).toEqual({
+        description: "From the transcript",
+        origin: "personal",
+      })
+      // no file anywhere: described, but its origin is unknown (so the share page only counts it)
+      expect(catalog.get("gone-skill")).toEqual({
+        description: "A skill whose repo is gone",
+        origin: "unknown",
+      })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
 })
