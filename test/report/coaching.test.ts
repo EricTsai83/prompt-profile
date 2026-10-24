@@ -62,4 +62,20 @@ describe("prompt coaching", () => {
       expect(out.split(p.improvements[0]!.rewrite!.after).length - 1).toBe(1)
     }),
   )
+
+  it.effect("since the last report: habits and moved techniques, private only", () =>
+    Effect.gen(function* () {
+      const p = englishOnly(yield* sample())
+      const out = renderHtml(p)
+      expect(out).toContain("Since your last report")
+      // corrections went from 16% to 12%: an improvement
+      expect(out).toMatch(
+        /class="chg good">\s*<span>Prompts that correct the AI<\/span>\s*<b>16% → 12%<\/b>/,
+      )
+      expect(out).toContain("Delegates to subagents")
+      expect(out).toContain("Suggested last time: State the expected result first")
+      expect(renderShareHtml(p)).not.toContain("Since your last report")
+      expect(renderHtml({ ...p, previous: null })).not.toContain("Since your last report")
+    }),
+  )
 })

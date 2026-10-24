@@ -89,7 +89,8 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "languages": [
     "en",
   ],
-  "schemaVersion": 7,
+  "previous": null,
+  "schemaVersion": 8,
   "stats": {
     "activeDays": 0,
     "activity": {

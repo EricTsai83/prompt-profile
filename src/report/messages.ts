@@ -109,6 +109,11 @@ export interface Messages {
   readonly unitSessions: string
   readonly unitPrompts: string
   readonly growing: string
+  readonly sinceLast: (date: string) => string
+  readonly lastSuggestions: string
+  readonly correctionsShare: string
+  readonly terseLabel: string
+  readonly nightLabel: string
   readonly toolNames: Record<ToolTechnique, readonly [name: string, definition: string]>
   readonly promptNames: Record<PromptTechnique, readonly [name: string, definition: string]>
   readonly signal: {
@@ -244,6 +249,11 @@ const en: Messages = {
   unitSessions: "share of sessions",
   unitPrompts: "share of prompts",
   growing: "growing fastest",
+  sinceLast: (d) => `Since your last report (${d})`,
+  lastSuggestions: "Suggested last time",
+  correctionsShare: "Prompts that correct the AI",
+  terseLabel: "Very short prompts",
+  nightLabel: "Prompts at night",
   toolNames: {
     subagents: [
       "Delegates to subagents",
@@ -411,6 +421,11 @@ const zhTW: Messages = {
   unitSessions: "佔 session 的比例",
   unitPrompts: "佔 prompt 的比例",
   growing: "成長最快",
+  sinceLast: (d) => `跟上次報告比（${d}）`,
+  lastSuggestions: "上次的建議",
+  correctionsShare: "糾正 AI 的 prompt",
+  terseLabel: "太短的 prompt",
+  nightLabel: "深夜的 prompt",
   toolNames: {
     subagents: ["委派子代理", "agent 啟動子代理（Agent / Task 工具）的 session"],
     skills: ["使用 skills", "呼叫了 Claude Code skill 的 session"],

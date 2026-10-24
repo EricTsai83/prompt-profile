@@ -248,6 +248,23 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("a new analysis compares with the previous report in the same folder", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const out = join(h.root, "again")
+      expect((yield* h.run(["--yes", "--since", "all", "--out", out])).code).toBe(0)
+      const first = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      expect(first.previous).toBeNull()
+      expect((yield* h.run(["--yes", "--since", "all", "--out", out, "--no-cache"])).code).toBe(0)
+      const second = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      expect(second.previous.generatedAt).toBe(first.generatedAt)
+      expect(second.previous.improvements).toEqual(
+        first.improvements.map((i: { title: string }) => i.title),
+      )
+      expect(readFileSync(join(out, "report.html"), "utf8")).toContain("Since your last report")
+    }),
+  )
+
   it.effect("cache clear deletes the analysis cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()

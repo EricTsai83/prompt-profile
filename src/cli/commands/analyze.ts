@@ -14,6 +14,7 @@ import { messages, type Messages } from "../messages.ts"
 import { parseLanguages, parseRenderOptions } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
+  previousSnapshot,
   readSources,
   resolveOut,
   runPipelineStep,
@@ -166,7 +167,9 @@ export const runMain = (options: MainOptions) =>
       Effect.onInterrupt(() => out.error(`\n${t.interrupted}`)),
     )
 
-    const files = yield* writeReportFiles(profile, outDir, renderOptions)
+    // The report in this folder before this run, if any: "since your last report".
+    const previous = yield* previousSnapshot(outDir)
+    const files = yield* writeReportFiles({ ...profile, previous }, outDir, renderOptions)
     const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
     yield* out.line("")
     yield* out.line(t.done)

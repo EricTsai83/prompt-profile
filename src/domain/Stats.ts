@@ -108,3 +108,11 @@ export const peakHour = (stats: Pick<Stats, "hourHistogram">): number | null => 
   const max = Math.max(...stats.hourHistogram)
   return max > 0 ? stats.hourHistogram.indexOf(max) : null
 }
+
+const NIGHT_HOURS = [22, 23, 0, 1, 2, 3, 4]
+
+/** Share of prompts sent 22:00–04:59 (0 without prompts). */
+export const nightShare = (s: Pick<Stats, "hourHistogram">): number => {
+  const total = s.hourHistogram.reduce((a, b) => a + b, 0)
+  return total === 0 ? 0 : NIGHT_HOURS.reduce((n, h) => n + s.hourHistogram[h]!, 0) / total
+}

@@ -26,6 +26,7 @@ import {
 } from "./looks.ts"
 import { MESSAGES, type Messages } from "./messages.ts"
 import { triggeredSignals } from "./signals.ts"
+import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
@@ -283,6 +284,77 @@ const signalRow = (p: Profile, loc: Loc): Raw | null => {
   </ul>`
 }
 
+/** One "before → now" row; `better` says which direction is an improvement, if any. */
+const change = (label: Raw, before: number, now: number, better: "down" | "up" | null): Raw => {
+  const delta = Math.round(now * 100) - Math.round(before * 100)
+  const tone =
+    better === null || delta === 0 ? "flat" : delta < 0 === (better === "down") ? "good" : "bad"
+  return html`<li class="chg ${tone}">
+    <span>${label}</span>
+    <b>${Math.round(before * 100)}% → ${Math.round(now * 100)}%</b>
+    <i>${delta === 0 ? "=" : delta > 0 ? `▲ ${delta}` : `▼ ${-delta}`}</i>
+  </li>`
+}
+
+/** "Since your last report": habits and the techniques that moved most. */
+const progressBlock = (p: Profile, loc: Loc): Raw | null => {
+  const prev = p.previous
+  if (prev === null) return null
+  const s = p.stats
+  const t = s.techniques
+  const movers =
+    t === null
+      ? []
+      : [
+          ...TOOL_TECHNIQUES.map((k) => ({
+            label: loc.text((m) => m.toolNames[k][0]),
+            before: prev.toolShares[k],
+            now: s.totalSessions === 0 ? 0 : Math.min(1, t.tools[k].sessions / s.totalSessions),
+          })),
+          ...PROMPT_TECHNIQUES.map((k) => ({
+            label: loc.text((m) => m.promptNames[k][0]),
+            before: prev.promptShares[k],
+            now: t.prompts[k],
+          })),
+        ]
+          .filter((x) => Math.abs(x.now - x.before) >= 0.03)
+          .toSorted((a, b) => Math.abs(b.now - b.before) - Math.abs(a.now - a.before))
+          .slice(0, 4)
+  return html`<div class="progress">
+    <h3 class="sub-h">
+      ${loc.text((m) => m.sinceLast(formatDate(prev.generatedAt, s.timezone, m.locale)))}
+    </h3>
+    <ul class="changes">
+      ${change(
+        loc.text((m) => m.correctionsShare),
+        prev.correctionRate,
+        s.correctionRate,
+        "down",
+      )}
+      ${change(
+        loc.text((m) => m.terseLabel),
+        prev.terseShare,
+        s.promptHabits.terseShare,
+        "down",
+      )}
+      ${change(
+        loc.text((m) => m.nightLabel),
+        prev.nightShare,
+        nightShare(s),
+        null,
+      )}
+      ${movers.map((x) => change(x.label, x.before, x.now, null))}
+    </ul>
+    ${
+      prev.improvements.length > 0
+        ? html`<p class="last-tips">
+            ${loc.text((m) => m.lastSuggestions)}: ${prev.improvements.join(" · ")}
+          </p>`
+        : ""
+    }
+  </div>`
+}
+
 const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
   html`<div class="sig tip ${i === 0 ? "tip-l" : i === 3 ? "tip-r" : ""}" ${tip} tabindex="-1">
     <b>${value}</b><span>${label}</span>
@@ -474,6 +546,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .signals{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .signals li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
 .signals b{font-size:14px}.signals span{font-size:13px;color:var(--muted)}
+.changes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}
+.chg{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);font-size:13px}
+.chg b{font-variant-numeric:tabular-nums}.chg i{font-style:normal;font-size:12px;color:var(--muted);min-width:3em;text-align:right}
+.chg.good i{color:#1f9d55}.chg.bad i{color:var(--warn)}
+.last-tips{margin-top:10px;font-size:13px;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
@@ -573,6 +650,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
   const minor = order.slice(3)
   const every = correctionEvery(s)
   const signals = isPrivate ? signalRow(profile, loc) : null
+  const progress = isPrivate ? progressBlock(profile, loc) : null
   const tech = techniquesSection(s, loc, options.techniques ?? "bars")
   const perSession = promptsPerSession(s)
   const graphic = look
@@ -726,7 +804,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
           }
 
           ${
-            isPrivate && (profile.improvements.length > 0 || signals !== null)
+            isPrivate && (profile.improvements.length > 0 || signals !== null || progress !== null)
               ? html`<section class="coaching">
                   <div class="section-head">
                     <h2>${loc.text((m) => m.coaching)}</h2>
@@ -741,6 +819,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                           ${signals}`
                       : ""
                   }
+                  ${progress ?? ""}
                 </section>`
               : ""
           }

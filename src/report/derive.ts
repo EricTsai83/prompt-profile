@@ -5,13 +5,8 @@ import type { Stats } from "../domain/Stats.ts"
  * the reader. No scores, percentiles or comparisons with other people (there is no baseline).
  */
 
-const NIGHT_HOURS = [22, 23, 0, 1, 2, 3, 4]
-
 /** Share of prompts sent 22:00–04:59 (0 without prompts). */
-export const nightShare = (s: Pick<Stats, "hourHistogram">): number => {
-  const total = s.hourHistogram.reduce((a, b) => a + b, 0)
-  return total === 0 ? 0 : NIGHT_HOURS.reduce((n, h) => n + s.hourHistogram[h]!, 0) / total
-}
+export { nightShare } from "../domain/Stats.ts"
 
 /** The busiest four consecutive hours (wrapping past midnight); `end` is exclusive. */
 export const chronotype = (

@@ -132,6 +132,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .signals{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .signals li{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
 .signals b{font-size:14px}.signals span{font-size:13px;color:var(--muted)}
+.changes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}
+.chg{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);font-size:13px}
+.chg b{font-variant-numeric:tabular-nums}.chg i{font-style:normal;font-size:12px;color:var(--muted);min-width:3em;text-align:right}
+.chg.good i{color:#1f9d55}.chg.bad i{color:var(--warn)}
+.last-tips{margin-top:10px;font-size:13px;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
@@ -599,6 +604,48 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <span><span data-l="en" lang="en">If you type these yourself, save them as a slash command, a skill or a CLAUDE.md / AGENTS.md note.</span><span data-l="zh-TW" lang="zh-Hant-TW">如果這些是你自己打的，把它們存成 slash command、skill，或寫進 CLAUDE.md / AGENTS.md。</span></span>
         </li>
   </ul>
+                  <div class="progress">
+    <h3 class="sub-h">
+      <span data-l="en" lang="en">Since your last report (Sep 24, 2026)</span><span data-l="zh-TW" lang="zh-Hant-TW">跟上次報告比（2026年9月24日）</span>
+    </h3>
+    <ul class="changes">
+      <li class="chg good">
+    <span><span data-l="en" lang="en">Prompts that correct the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">糾正 AI 的 prompt</span></span>
+    <b>16% → 12%</b>
+    <i>▼ 4</i>
+  </li>
+      <li class="chg good">
+    <span><span data-l="en" lang="en">Very short prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">太短的 prompt</span></span>
+    <b>38% → 31%</b>
+    <i>▼ 7</i>
+  </li>
+      <li class="chg flat">
+    <span><span data-l="en" lang="en">Prompts at night</span><span data-l="zh-TW" lang="zh-Hant-TW">深夜的 prompt</span></span>
+    <b>21% → 19%</b>
+    <i>▼ 2</i>
+  </li>
+      <li class="chg flat">
+    <span><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
+    <b>6% → 15%</b>
+    <i>▲ 9</i>
+  </li><li class="chg flat">
+    <span><span data-l="en" lang="en">States constraints</span><span data-l="zh-TW" lang="zh-Hant-TW">說明限制</span></span>
+    <b>31% → 36%</b>
+    <i>▲ 5</i>
+  </li><li class="chg flat">
+    <span><span data-l="en" lang="en">Defines done</span><span data-l="zh-TW" lang="zh-Hant-TW">定義完成</span></span>
+    <b>7% → 12%</b>
+    <i>▲ 5</i>
+  </li><li class="chg flat">
+    <span><span data-l="en" lang="en">Asks for verification</span><span data-l="zh-TW" lang="zh-Hant-TW">要求驗證</span></span>
+    <b>19% → 24%</b>
+    <i>▲ 5</i>
+  </li>
+    </ul>
+    <p class="last-tips">
+            <span data-l="en" lang="en">Suggested last time</span><span data-l="zh-TW" lang="zh-Hant-TW">上次的建議</span>: State the expected result first · Paste the error line
+          </p>
+  </div>
                 </section>
 
           <section>

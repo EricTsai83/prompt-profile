@@ -1,6 +1,7 @@
 import { Clock, DateTime, Effect, FileSystem, Path } from "effect"
 import { makeAdapters, readSources as readAdapters } from "../adapters/registry.ts"
-import type { Profile } from "../domain/Profile.ts"
+import { decodeProfile, type Profile } from "../domain/Profile.ts"
+import { snapshotOf } from "../domain/Progress.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import type { TechniqueEvent } from "../domain/Techniques.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
@@ -156,5 +157,21 @@ export const writeReportFiles = (
     const cjk = fonts.cjk(yield* cacheDirOf)
     return yield* writeReport(profile, outDir, options, source, cjk).pipe(
       Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
+    )
+  })
+
+/** The key numbers of `<outDir>/profile.json`, if it exists and decodes; otherwise null. */
+export const previousSnapshot = (outDir: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const text = yield* fs
+      .readFileString(path.join(outDir, "profile.json"))
+      .pipe(Effect.orElseSucceed(() => null))
+    if (text === null) return null
+    return yield* Effect.try(() => JSON.parse(text) as unknown).pipe(
+      Effect.flatMap(decodeProfile),
+      Effect.map(snapshotOf),
+      Effect.orElseSucceed(() => null),
     )
   })

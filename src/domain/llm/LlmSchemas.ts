@@ -139,5 +139,6 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     evidence: i.evidence.map(toEvidence),
     rewrite: i.rewrite.promptId === "" || i.rewrite.after.trim() === "" ? null : i.rewrite,
   })),
+  previous: null,
   stats: extras.stats,
 })
