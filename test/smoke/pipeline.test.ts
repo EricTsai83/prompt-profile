@@ -31,6 +31,7 @@ describe.skipIf(!hasData)("pipeline (real data)", () => {
         timezone,
         username: userInfo().username,
         slashCommands,
+        events: sources.flatMap((s) => s.events),
       })
       console.log("[smoke] PipelineReport", JSON.stringify(result.report, null, 2))
       const stats = Schema.encodeSync(Stats)(result.stats)

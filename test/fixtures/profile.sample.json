@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "languages": [
     "en",
     "zh-TW"
@@ -2966,6 +2966,258 @@
         "openings": 2,
         "sessions": 14
       }
+    },
+    "techniques": {
+      "tools": {
+        "subagents": {
+          "count": 235,
+          "sessions": 47
+        },
+        "skills": {
+          "count": 72,
+          "sessions": 18
+        },
+        "planMode": {
+          "count": 56,
+          "sessions": 14
+        },
+        "mcp": {
+          "count": 80,
+          "sessions": 20
+        },
+        "web": {
+          "count": 66,
+          "sessions": 22
+        },
+        "background": {
+          "count": 52,
+          "sessions": 13
+        },
+        "askUser": {
+          "count": 28,
+          "sessions": 14
+        },
+        "worktrees": {
+          "count": 18,
+          "sessions": 9
+        },
+        "pullRequests": {
+          "count": 144,
+          "sessions": 48
+        }
+      },
+      "prompts": {
+        "planFirst": 0.22,
+        "context": 0.31,
+        "filePaths": 0.27,
+        "constraints": 0.36,
+        "acceptance": 0.12,
+        "examples": 0.09,
+        "verification": 0.24,
+        "structured": 0.14,
+        "whyExplain": 0.18,
+        "outputFormat": 0.07
+      },
+      "monthly": [
+        {
+          "month": "2026-04",
+          "sessions": 8,
+          "prompts": 60,
+          "tools": {
+            "subagents": 0,
+            "skills": 0,
+            "planMode": 2,
+            "mcp": 0,
+            "web": 1,
+            "background": 0,
+            "askUser": 0,
+            "worktrees": 0,
+            "pullRequests": 1
+          },
+          "techniques": {
+            "planFirst": 9,
+            "context": 13,
+            "filePaths": 11,
+            "constraints": 15,
+            "acceptance": 5,
+            "examples": 4,
+            "verification": 10,
+            "structured": 6,
+            "whyExplain": 8,
+            "outputFormat": 3
+          }
+        },
+        {
+          "month": "2026-05",
+          "sessions": 46,
+          "prompts": 280,
+          "tools": {
+            "subagents": 0,
+            "skills": 0,
+            "planMode": 3,
+            "mcp": 1,
+            "web": 2,
+            "background": 0,
+            "askUser": 1,
+            "worktrees": 0,
+            "pullRequests": 2
+          },
+          "techniques": {
+            "planFirst": 49,
+            "context": 69,
+            "filePaths": 60,
+            "constraints": 81,
+            "acceptance": 27,
+            "examples": 20,
+            "verification": 54,
+            "structured": 31,
+            "whyExplain": 40,
+            "outputFormat": 16
+          }
+        },
+        {
+          "month": "2026-06",
+          "sessions": 44,
+          "prompts": 260,
+          "tools": {
+            "subagents": 1,
+            "skills": 0,
+            "planMode": 2,
+            "mcp": 2,
+            "web": 3,
+            "background": 0,
+            "askUser": 1,
+            "worktrees": 0,
+            "pullRequests": 4
+          },
+          "techniques": {
+            "planFirst": 51,
+            "context": 73,
+            "filePaths": 63,
+            "constraints": 84,
+            "acceptance": 28,
+            "examples": 21,
+            "verification": 56,
+            "structured": 33,
+            "whyExplain": 42,
+            "outputFormat": 16
+          }
+        },
+        {
+          "month": "2026-07",
+          "sessions": 41,
+          "prompts": 240,
+          "tools": {
+            "subagents": 4,
+            "skills": 1,
+            "planMode": 3,
+            "mcp": 2,
+            "web": 3,
+            "background": 1,
+            "askUser": 2,
+            "worktrees": 0,
+            "pullRequests": 6
+          },
+          "techniques": {
+            "planFirst": 53,
+            "context": 74,
+            "filePaths": 65,
+            "constraints": 86,
+            "acceptance": 29,
+            "examples": 22,
+            "verification": 58,
+            "structured": 34,
+            "whyExplain": 43,
+            "outputFormat": 17
+          }
+        },
+        {
+          "month": "2026-08",
+          "sessions": 49,
+          "prompts": 300,
+          "tools": {
+            "subagents": 9,
+            "skills": 3,
+            "planMode": 2,
+            "mcp": 4,
+            "web": 4,
+            "background": 2,
+            "askUser": 3,
+            "worktrees": 1,
+            "pullRequests": 9
+          },
+          "techniques": {
+            "planFirst": 73,
+            "context": 102,
+            "filePaths": 89,
+            "constraints": 119,
+            "acceptance": 40,
+            "examples": 30,
+            "verification": 79,
+            "structured": 46,
+            "whyExplain": 59,
+            "outputFormat": 23
+          }
+        },
+        {
+          "month": "2026-09",
+          "sessions": 52,
+          "prompts": 320,
+          "tools": {
+            "subagents": 15,
+            "skills": 6,
+            "planMode": 1,
+            "mcp": 5,
+            "web": 4,
+            "background": 4,
+            "askUser": 3,
+            "worktrees": 3,
+            "pullRequests": 12
+          },
+          "techniques": {
+            "planFirst": 84,
+            "context": 119,
+            "filePaths": 104,
+            "constraints": 138,
+            "acceptance": 46,
+            "examples": 35,
+            "verification": 92,
+            "structured": 54,
+            "whyExplain": 69,
+            "outputFormat": 27
+          }
+        },
+        {
+          "month": "2026-10",
+          "sessions": 40,
+          "prompts": 232,
+          "tools": {
+            "subagents": 18,
+            "skills": 8,
+            "planMode": 1,
+            "mcp": 6,
+            "web": 5,
+            "background": 6,
+            "askUser": 4,
+            "worktrees": 5,
+            "pullRequests": 14
+          },
+          "techniques": {
+            "planFirst": 66,
+            "context": 93,
+            "filePaths": 81,
+            "constraints": 109,
+            "acceptance": 36,
+            "examples": 27,
+            "verification": 72,
+            "structured": 42,
+            "whyExplain": 54,
+            "outputFormat": 21
+          }
+        }
+      ],
+      "maxParallel": 4,
+      "parallelDays": 31
     }
   }
 }

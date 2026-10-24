@@ -6,9 +6,10 @@ import { Stats } from "./Stats.ts"
  * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
- * 6: `improvements` and `stats.promptHabits`. Versions 2–5 are migrated on decode.
+ * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. Versions 2–6 are
+ * migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 6 as const
+export const PROFILE_SCHEMA_VERSION = 7 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -213,7 +214,7 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5].includes(found as number)) {
+    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6].includes(found as number)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.

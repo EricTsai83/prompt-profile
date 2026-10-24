@@ -6,6 +6,7 @@ import { cleanRecords, truncateMiddle } from "./clean.ts"
 import type { Counts } from "./counts.ts"
 import { filterRecords } from "./filter.ts"
 import { makeRules, projectName, redact } from "./redact.ts"
+import type { TechniqueEvent } from "../domain/Techniques.ts"
 import { computeStats } from "./stats.ts"
 
 export interface PipelineOptions {
@@ -16,6 +17,8 @@ export interface PipelineOptions {
   /** OS username to redact; `null` disables the rule. */
   readonly username: string | null
   readonly slashCommands?: Readonly<Record<string, number>>
+  /** Workflow technique uses reported by the adapters (no content). */
+  readonly events?: ReadonlyArray<TechniqueEvent>
   readonly delegationPatterns?: ReadonlyArray<RegExp>
 }
 
@@ -76,6 +79,7 @@ export const processRecords = (
     cleaned: cleaned.prompts.map((c) => ({ ...c, text: truncateMiddle(c.text).text })),
     projectNames,
     slashCommands: options.slashCommands ?? {},
+    events: options.events ?? [],
     since: options.since,
     now: options.now,
     timezone: options.timezone,

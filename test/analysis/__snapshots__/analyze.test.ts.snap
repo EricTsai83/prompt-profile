@@ -89,7 +89,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "languages": [
     "en",
   ],
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "stats": {
     "activeDays": 0,
     "activity": {
@@ -858,6 +858,61 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "promptLength": {
       "median": 0,
       "p90": 0,
+    },
+    "techniques": {
+      "maxParallel": 0,
+      "monthly": [],
+      "parallelDays": 0,
+      "prompts": {
+        "acceptance": 0,
+        "constraints": 0,
+        "context": 0,
+        "examples": 0,
+        "filePaths": 0,
+        "outputFormat": 0,
+        "planFirst": 0,
+        "structured": 0,
+        "verification": 0,
+        "whyExplain": 0,
+      },
+      "tools": {
+        "askUser": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "background": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "mcp": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "planMode": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "pullRequests": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "skills": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "subagents": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "web": {
+          "count": 0,
+          "sessions": 0,
+        },
+        "worktrees": {
+          "count": 0,
+          "sessions": 0,
+        },
+      },
     },
     "timezone": "Asia/Taipei",
     "topProjects": [],

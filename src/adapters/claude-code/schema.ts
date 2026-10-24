@@ -15,6 +15,8 @@ export const ClaudeLine = Schema.Struct({
   promptSource: Schema.optional(Schema.Unknown),
   turnOrigin: Schema.optional(Schema.Unknown),
   origin: Schema.optional(Schema.Unknown),
+  permissionMode: Schema.optional(Schema.Unknown),
+  prUrl: Schema.optional(Schema.Unknown),
   message: Schema.optional(
     Schema.Struct({
       content: Schema.optional(Schema.Unknown),

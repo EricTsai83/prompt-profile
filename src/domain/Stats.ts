@@ -1,6 +1,7 @@
 import { Effect, Schema } from "effect"
 import { ORIGINS, SOURCE_IDS } from "./Source.ts"
 import { isTimeZone } from "./timezone.ts"
+import { Techniques } from "./Techniques.ts"
 
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
 const Ratio = Schema.Finite.check(Schema.isBetween({ minimum: 0, maximum: 1 }))
@@ -91,6 +92,8 @@ export const Stats = Schema.Struct({
   latestTime: Schema.NullOr(Schema.String),
   /** Missing in profiles before schema version 4. */
   activity: Activity.pipe(Schema.withDecodingDefaultKey(Effect.succeed(EMPTY_ACTIVITY))),
+  /** Null in profiles before schema version 7 (the report then leaves techniques out). */
+  techniques: Schema.NullOr(Techniques).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   /** Missing in profiles before schema version 6. */
   promptHabits: PromptHabits.pipe(
     Schema.withDecodingDefaultKey(Effect.succeed(EMPTY_PROMPT_HABITS)),

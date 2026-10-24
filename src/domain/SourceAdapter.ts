@@ -1,6 +1,7 @@
 import type { Effect } from "effect"
 import type { PromptRecord } from "./PromptRecord.ts"
 import type { SourceId } from "./Source.ts"
+import type { TechniqueEvent } from "./Techniques.ts"
 
 export interface AdapterDiagnostics {
   readonly filesRead: number
@@ -18,6 +19,8 @@ export interface AdapterDiagnostics {
 export interface SourceRead {
   readonly records: ReadonlyArray<PromptRecord>
   readonly diagnostics: AdapterDiagnostics
+  /** Workflow technique uses found in agent metadata (plan 17); never any content. */
+  readonly events: ReadonlyArray<TechniqueEvent>
 }
 
 export interface SourceAdapter {

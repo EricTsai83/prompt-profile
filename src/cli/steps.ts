@@ -2,6 +2,7 @@ import { Clock, DateTime, Effect, FileSystem, Path } from "effect"
 import { makeAdapters, readSources as readAdapters } from "../adapters/registry.ts"
 import type { Profile } from "../domain/Profile.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
+import type { TechniqueEvent } from "../domain/Techniques.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
 import { Environment } from "../platform/Environment.ts"
 import { writePrivateFile } from "../platform/files.ts"
@@ -56,6 +57,7 @@ export interface Collected {
   readonly records: ReadonlyArray<PromptRecord>
   readonly locations: ReadonlyArray<string>
   readonly slashCommands: Record<string, number>
+  readonly events: ReadonlyArray<TechniqueEvent>
 }
 
 /** Read every source and print one line per source. No records at all → `NoData`. */
@@ -67,12 +69,14 @@ export const readSources = Effect.gen(function* () {
   const records: Array<PromptRecord> = []
   const locations: Array<string> = []
   const slashCommands: Record<string, number> = {}
+  const events: Array<TechniqueEvent> = []
   for (const source of yield* readAdapters(adapters)) {
     const { adapter, diagnostics: diag } = source
     locations.push(...adapter.locations)
     for (const [k, v] of Object.entries(diag.slashCommands))
       slashCommands[k] = (slashCommands[k] ?? 0) + v
     for (const r of source.records) records.push(r)
+    for (const e of source.events) events.push(e)
     const sessions = new Set(source.records.map((r) => r.sessionId)).size
     yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
     yield* out.debug(
@@ -80,7 +84,7 @@ export const readSources = Effect.gen(function* () {
     )
   }
   if (records.length === 0) return yield* new NoData({ reason: "empty", locations })
-  return { records, locations, slashCommands } satisfies Collected
+  return { records, locations, slashCommands, events } satisfies Collected
 })
 
 /** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
@@ -96,6 +100,7 @@ export const runPipelineStep = (collected: Collected, since: string) =>
       timezone: env.timezone,
       username: env.username,
       slashCommands: collected.slashCommands,
+      events: collected.events,
     })
     const excluded = { ...result.report.filterExcluded, ...result.report.cleanExcluded }
     yield* out.line(t.cleaning)

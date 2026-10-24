@@ -25,8 +25,8 @@ describe("readJsonl", () => {
       writeFileSync(file, '{"a":1}\n\nnot json\n{"a":2}\n')
       const { lines, counts } = yield* collect(file)
       expect(lines).toEqual([
-        { value: { a: 1 }, lineNumber: 1 },
-        { value: { a: 2 }, lineNumber: 4 },
+        { value: { a: 1 }, raw: `{"a":1}`, lineNumber: 1 },
+        { value: { a: 2 }, raw: `{"a":2}`, lineNumber: 4 },
       ])
       expect(counts).toEqual({ bad: 2, unreadable: 0 })
     }),

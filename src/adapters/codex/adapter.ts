@@ -5,6 +5,8 @@ import { isAnalysisPrompt } from "../../domain/markers.ts"
 import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { findFiles } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
+import { techniqueOfTool } from "../common/techniques.ts"
+import type { TechniqueEvent, ToolTechnique } from "../../domain/Techniques.ts"
 import { firstMatch } from "../common/rules.ts"
 import {
   codexOrigin,
@@ -63,6 +65,7 @@ export const makeCodexAdapter = (
     ): Effect.Effect<{
       ids: ReadonlyArray<string>
       records: ReadonlyArray<{ readonly dedupKey: string; readonly record: PromptRecord }>
+      events: ReadonlyArray<TechniqueEvent>
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
@@ -75,6 +78,8 @@ export const makeCodexAdapter = (
           ordinal: number
           content: UserMessage["content"]
         }> = []
+        // Tool names only (plan 17): never their input or output.
+        const tools: Array<{ ms: number; kind: ToolTechnique }> = []
         yield* readJsonl(fs, file, jsonlCallbacks(diag)).pipe(
           Stream.runForEach(({ value, lineNumber }) =>
             Effect.sync(() => {
@@ -87,6 +92,15 @@ export const makeCodexAdapter = (
               if (type === "session_meta" && meta === undefined) {
                 meta = Option.getOrUndefined(decodeMeta(payload))
               } else if (type === "response_item") {
+                const call = payload as { type?: unknown; name?: unknown } | undefined
+                if (
+                  (call?.type === "function_call" || call?.type === "custom_tool_call") &&
+                  typeof call.name === "string"
+                ) {
+                  const kind = techniqueOfTool(call.name)
+                  const ms = timestamp === undefined ? Number.NaN : Date.parse(timestamp)
+                  if (kind && !Number.isNaN(ms)) tools.push({ ms, kind })
+                }
                 const msg = decodeUser(payload)
                 // assistant / developer / tool items are skipped
                 if (Option.isSome(msg)) {
@@ -102,8 +116,11 @@ export const makeCodexAdapter = (
         )
         const sessionId = meta?.id ?? fileId
         const ids = [meta?.id, meta?.session_id, fileId].filter((x): x is string => x !== undefined)
-        if (sessionId === undefined) return { ids, records }
+        if (sessionId === undefined) return { ids, records, events: [] }
         const sessionRule = meta ? firstMatch(SESSION_RULES, meta) : undefined
+        const events: ReadonlyArray<TechniqueEvent> = sessionRule
+          ? []
+          : tools.map((t) => ({ source: SOURCE, sessionId, timestampMs: t.ms, kind: t.kind }))
         for (const line of userLines) {
           if (sessionRule) {
             diag.exclude(sessionRule.name)
@@ -137,7 +154,7 @@ export const makeCodexAdapter = (
             },
           })
         }
-        return { ids, records }
+        return { ids, records, events }
       })
 
     const fromHistory = (
@@ -196,10 +213,12 @@ export const makeCodexAdapter = (
       // Files are read concurrently but processed in path order, so the copy kept by the
       // cross-file dedup is deterministic (the oldest file's).
       const seen = new Set<string>()
+      const allEvents: Array<TechniqueEvent> = []
       const rollouts = Stream.fromIterable(files).pipe(
         Stream.mapEffect((file) => readRollout(file, diag), { concurrency: READ_CONCURRENCY }),
-        Stream.flatMap(({ ids, records }) => {
+        Stream.flatMap(({ ids, records, events }) => {
           for (const id of ids) known.add(id)
+          allEvents.push(...events)
           const fresh: Array<PromptRecord> = []
           for (const { dedupKey, record } of records) {
             if (seen.has(dedupKey)) {
@@ -227,7 +246,7 @@ export const makeCodexAdapter = (
         ),
       )
       const records = yield* Stream.runCollect(Stream.concat(rollouts, history))
-      return { records, diagnostics: diag.snapshot() }
+      return { records, diagnostics: diag.snapshot(), events: allEvents }
     })
 
     return {

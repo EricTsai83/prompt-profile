@@ -151,6 +151,66 @@ describe("Claude Code adapter (fixture)", () => {
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
+  it.effect("reports workflow techniques from metadata, never from content", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-claude-"))
+      mkdirSync(join(root, "projects", "p"), { recursive: true })
+      const base = { sessionId: "s1", isSidechain: false }
+      const tool = (name: string, ts: string, extra: object = {}) => ({
+        ...base,
+        ...extra,
+        type: "assistant",
+        timestamp: ts,
+        message: { content: [{ type: "tool_use", id: "t", name, input: { prompt: "secret" } }] },
+      })
+      const lines = [
+        {
+          ...base,
+          type: "user",
+          uuid: "u1",
+          timestamp: "2026-09-03T15:00:00.000Z",
+          permissionMode: "plan",
+          message: { content: "plan the change" },
+        },
+        tool("Agent", "2026-09-03T15:01:00.000Z"),
+        tool("Bash", "2026-09-03T15:02:00.000Z"),
+        tool("Skill", "2026-09-03T15:03:00.000Z", { isSidechain: true }),
+        tool("mcp__linear__create_issue", "2026-09-03T15:04:00.000Z"),
+        {
+          ...base,
+          type: "pr-link",
+          prUrl: "https://example.test/pr/1",
+          timestamp: "2026-09-03T15:05:00.000Z",
+        },
+        {
+          ...base,
+          type: "pr-link",
+          prUrl: "https://example.test/pr/1",
+          timestamp: "2026-09-03T15:06:00.000Z",
+        },
+        { ...base, type: "worktree-state", worktreeSession: {} },
+        { ...base, type: "worktree-state", worktreeSession: null },
+      ]
+      writeFileSync(
+        join(root, "projects", "p", "s1.jsonl"),
+        lines.map((l) => JSON.stringify(l)).join("\n"),
+      )
+      const read = yield* (yield* makeClaudeCodeAdapter(root)).read
+      expect(
+        read.events.map((e) => [e.kind, new Date(e.timestampMs).toISOString().slice(11, 16)]),
+      ).toEqual([
+        ["planMode", "15:00"],
+        ["subagents", "15:01"],
+        ["mcp", "15:04"],
+        ["pullRequests", "15:05"],
+        // no timestamp of its own: the last one seen in the file
+        ["worktrees", "15:06"],
+      ])
+      expect(JSON.stringify(read.events)).not.toContain("secret")
+      expect(JSON.stringify(read.events)).not.toContain("example.test")
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
   it.effect("missing directory → empty stream", () =>
     Effect.gen(function* () {
       const adapter = yield* makeClaudeCodeAdapter("/definitely/not/here")

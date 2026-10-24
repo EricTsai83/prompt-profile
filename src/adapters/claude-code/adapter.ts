@@ -6,6 +6,9 @@ import { isAnalysisPrompt } from "../../domain/markers.ts"
 import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { listDir } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
+import { techniqueOfTool } from "../common/techniques.ts"
+import type { TechniqueEvent, ToolTechnique } from "../../domain/Techniques.ts"
+import { createHash } from "node:crypto"
 import { firstMatch, slashCommandName } from "../common/rules.ts"
 import { CLAUDE_RULES, type ClaudeCandidate } from "./rules.ts"
 import { ClaudeLine, HistoryLine } from "./schema.ts"
@@ -72,6 +75,54 @@ interface ReadState {
   /** Slash commands per session; counted at the end, for sessions with a prompt only. */
   readonly slashCommands: Map<string, Array<string>>
   readonly sessionsWithPrompts: Set<string>
+  /** Workflow technique uses (plan 17), and pull requests already counted (by URL hash). */
+  readonly events: Array<TechniqueEvent>
+  readonly seenPullRequests: Set<string>
+  readonly worktreeSessions: Set<string>
+}
+
+/** Lines that can carry a workflow technique; everything else is skipped unparsed. */
+const TECHNIQUE_NEEDLES = ['"tool_use"', '"pr-link"', '"worktree-state"', '"permissionMode"']
+
+/**
+ * Workflow techniques of one line: tool names, plan mode, PR links, worktrees. Subagent
+ * (sidechain) lines are the agent's own steps, not the user's workflow, and are skipped.
+ * `file.lastMs` gives lines without a timestamp the last one seen in the same file.
+ */
+const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state: ReadState) => {
+  const ms = line.timestamp === undefined ? null : Date.parse(line.timestamp)
+  if (ms !== null && !Number.isNaN(ms)) file.lastMs = ms
+  if (line.isSidechain === true || line.sessionId === undefined || file.lastMs === null) return
+  const push = (kind: ToolTechnique) =>
+    state.events.push({
+      source: SOURCE,
+      sessionId: line.sessionId!,
+      timestampMs: file.lastMs!,
+      kind,
+    })
+  if (line.type === "user" && line.permissionMode === "plan") push("planMode")
+  if (line.type === "pr-link" && typeof line.prUrl === "string") {
+    const key = createHash("sha256").update(line.prUrl).digest("hex")
+    if (!state.seenPullRequests.has(key)) {
+      state.seenPullRequests.add(key)
+      push("pullRequests")
+    }
+  }
+  // repeated on every state change: once per session
+  if (line.type === "worktree-state" && !state.worktreeSessions.has(line.sessionId)) {
+    state.worktreeSessions.add(line.sessionId)
+    push("worktrees")
+  }
+  const content = line.message?.content
+  if (line.type === "assistant" && Array.isArray(content)) {
+    for (const item of content as ReadonlyArray<unknown>) {
+      if (item && typeof item === "object" && (item as { type?: unknown }).type === "tool_use") {
+        const name = (item as { name?: unknown }).name
+        const kind = typeof name === "string" ? techniqueOfTool(name) : undefined
+        if (kind) push(kind)
+      }
+    }
+  }
 }
 
 const noteSlashCommand = (state: ReadState, sessionId: string, name: string): void => {
@@ -214,6 +265,9 @@ export const makeClaudeCodeAdapter = (
         seenUuids: new Set(),
         slashCommands: new Map(),
         sessionsWithPrompts: new Set(),
+        events: [],
+        seenPullRequests: new Set(),
+        worktreeSessions: new Set(),
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right
@@ -223,8 +277,17 @@ export const makeClaudeCodeAdapter = (
         Stream.mapEffect(
           (file) => {
             diag.filesRead++
-            return readJsonl(fs, file, { ...jsonlCallbacks(diag), prefilter: '"user"' }).pipe(
-              Stream.map((l) => fromProjectLine(l.value, state)),
+            const fileState = { lastMs: null as number | null }
+            return readJsonl(fs, file, {
+              ...jsonlCallbacks(diag),
+              prefilter: ['"user"', ...TECHNIQUE_NEEDLES],
+            }).pipe(
+              Stream.map((l) => {
+                const decoded = decodeLine(l.value)
+                if (Option.isSome(decoded)) noteTechniques(decoded.value, fileState, state)
+                // prompts (and known sessions) come only from lines mentioning "user", as before
+                return l.raw.includes('"user"') ? fromProjectLine(l.value, state) : undefined
+              }),
               Stream.filter((c) => c !== undefined),
               Stream.runCollect,
             )
@@ -260,7 +323,7 @@ export const makeClaudeCodeAdapter = (
         ),
       )
       countSlashCommands(state)
-      return { records, diagnostics: diag.snapshot() }
+      return { records, diagnostics: diag.snapshot(), events: state.events }
     })
 
     return {

@@ -1173,6 +1173,90 @@ exports[`stats > computes stats from filtered and cleaned data 1`] = `
     "median": 25,
     "p90": 33,
   },
+  "techniques": {
+    "maxParallel": 1,
+    "monthly": [
+      {
+        "month": "2026-09",
+        "prompts": 6,
+        "sessions": 3,
+        "techniques": {
+          "acceptance": 0,
+          "constraints": 0,
+          "context": 0,
+          "examples": 0,
+          "filePaths": 0,
+          "outputFormat": 0,
+          "planFirst": 0,
+          "structured": 0,
+          "verification": 1,
+          "whyExplain": 0,
+        },
+        "tools": {
+          "askUser": 0,
+          "background": 0,
+          "mcp": 0,
+          "planMode": 0,
+          "pullRequests": 0,
+          "skills": 0,
+          "subagents": 0,
+          "web": 0,
+          "worktrees": 0,
+        },
+      },
+    ],
+    "parallelDays": 0,
+    "prompts": {
+      "acceptance": 0,
+      "constraints": 0,
+      "context": 0,
+      "examples": 0,
+      "filePaths": 0,
+      "outputFormat": 0,
+      "planFirst": 0,
+      "structured": 0,
+      "verification": 0.1667,
+      "whyExplain": 0,
+    },
+    "tools": {
+      "askUser": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "background": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "mcp": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "planMode": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "pullRequests": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "skills": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "subagents": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "web": {
+        "count": 0,
+        "sessions": 0,
+      },
+      "worktrees": {
+        "count": 0,
+        "sessions": 0,
+      },
+    },
+  },
   "timezone": "Asia/Taipei",
   "topProjects": [
     {

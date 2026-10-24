@@ -3,6 +3,8 @@ import type { PromptRecord } from "../domain/PromptRecord.ts"
 import { ORIGINS, SOURCE_IDS } from "../domain/Source.ts"
 import { LONG_SESSION_PROMPTS, MAX_ACTIVITY_PROJECTS, type Stats } from "../domain/Stats.ts"
 import { openingKey } from "./filter.ts"
+import { techniquesOf } from "./techniques.ts"
+import type { TechniqueEvent } from "../domain/Techniques.ts"
 
 /** Corrections addressed to the AI (case-insensitive; matched anywhere in the prompt). */
 export const CORRECTION_PATTERNS: ReadonlyArray<RegExp> = [
@@ -125,6 +127,7 @@ export interface StatsInput {
   /** Redacted project folder names, keyed by raw project path. */
   readonly projectNames: ReadonlyMap<string, string | null>
   readonly slashCommands: Readonly<Record<string, number>>
+  readonly events: ReadonlyArray<TechniqueEvent>
   readonly since: DateTime.Utc | null
   readonly now: DateTime.Utc
   readonly timezone: string
@@ -280,5 +283,20 @@ export const computeStats = (input: StatsInput): Stats => {
     latestTime: latest?.label ?? null,
     activity,
     promptHabits,
+    techniques: techniquesOf({
+      filtered,
+      cleanedTexts: cleaned,
+      events: input.events,
+      sinceMs: input.since === null ? null : DateTime.toEpochMillis(input.since),
+      untilMs: DateTime.toEpochMillis(input.now),
+      monthOf: (ms) => {
+        const p = local(DateTime.makeUnsafe(ms))
+        return `${p.year}-${pad(p.month)}`
+      },
+      dayOf: (ms) =>
+        new Date(logicalDay(local(DateTime.makeUnsafe(ms))) * 86_400_000)
+          .toISOString()
+          .slice(0, 10),
+    }),
   }
 }
