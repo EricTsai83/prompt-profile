@@ -20,7 +20,10 @@ export const DELEGATION_PATTERNS: ReadonlyArray<RegExp> = []
  * `pnpm test:smoke` prints, so a session can be excluded without its text in the repository.
  * `pnpm inspect:openings` shows the owner the text behind each key, locally.
  */
-export const DELEGATION_OPENINGS: ReadonlyArray<string> = []
+export const DELEGATION_OPENINGS: ReadonlyArray<string> = [
+  // Codex acceptance runs handed off by an implementation skill (confirmed 2026-10-24)
+  "codex_exec dd4ff67f",
+]
 
 /** `<client> <8 hex>`: client and sha256 prefix of a prompt's first 30 characters. */
 export const openingKey = (r: Pick<PromptRecord, "client" | "text">): string =>
