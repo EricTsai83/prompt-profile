@@ -1,0 +1,287 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T06:00:51.561Z",
+  "engine": {
+    "runner": "codex",
+    "model": null,
+    "analysisVersion": "6"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 9,
+    "promptsAnalyzed": 29,
+    "evidenceKept": 31,
+    "evidenceDropped": 0
+  },
+  "headline": "You learn Rust by asking why, building small things yourself, and bringing your code back for a closer look.",
+  "archetype": {
+    "name": "The Hands-On Questioner",
+    "description": "You often ask for an explanation, take a turn implementing it, and return with a focused question about the result. Your prompts move from ownership and CLI practice toward browser games, with recurring interest in mechanisms, trade-offs, and idiomatic code. You give the assistant a clear teaching role while keeping the implementation in your own hands."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Explain, try, review",
+      "summary": "You repeatedly use explanations as a starting point for your own implementation. You set boundaries around how much help you want, then ask for reviews of logic, style, or edge cases.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Short, specific, conversational",
+      "summary": "You usually get straight to the question and include the detail needed to explain your blocker. You also specify the interaction you want, such as waiting for quiz answers or keeping an explanation simple.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:1",
+          "quote": "I thought I only had one mutable reference."
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:2",
+          "quote": "the canvas is blank, what am I doing wrong? I'm calling draw() every frame"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Rust through practical projects",
+      "summary": "You introduce yourself as new to Rust and ask for Python-based explanations. Your practice includes a CLI todo app with serde and clap, followed by questions and implementations around browser games, update loops, and collision detection.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "I'm new to Rust. Can you explain ownership like I'm a Python developer?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-2:1",
+          "quote": "I'm stuck on step 3, how do I serialize a Vec of structs to JSON with serde?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "I rewrote my todo app with clap."
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:0",
+          "quote": "Can I run Rust in the browser? I want to make a small game with WebAssembly"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Mechanisms and correctness",
+      "summary": "You often ask how Rust's abstractions work and what trade-offs they introduce. Your implementation questions also reach beyond compilation to testing, deliberate error handling, and missed edge cases.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "so RefCell moves the borrow check to runtime? that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:1",
+          "quote": "is tokio the only option? what are the trade-offs with smol?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:2",
+          "quote": "I replaced the unwraps with ? and a custom error enum. better?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Practice with feedback",
+      "summary": "You seek structure through exercises, quizzes, notes, and a game development roadmap. You ask for feedback on your attempts and explanations of mistakes; the prompts show active practice without establishing mastery.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:2",
+          "quote": "can you give me 3 small exercises about lifetimes?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:2",
+          "quote": "summarize what I learned today in 5 bullet points so I can put it in my notes"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:2",
+          "quote": "what should I learn next to get better at game dev in Rust? give me a roadmap"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:2",
+          "quote": "what did I get wrong? explain the ones I missed"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "You keep the keyboard",
+      "description": "Across several sessions, you ask for guidance and review while reserving the implementation for yourself.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "don't fix them, just tell me"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        }
+      ]
+    },
+    {
+      "name": "You ask beneath the abstraction",
+      "description": "You repeatedly probe mechanisms and trade-offs, from runtime borrow checking to executors and closure lifetimes.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "so RefCell moves the borrow check to runtime? that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "explain async/await in Rust vs JavaScript. why does Rust need an executor?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:3",
+          "quote": "oh it was the requestAnimationFrame closure being dropped. why does that happen?"
+        }
+      ]
+    },
+    {
+      "name": "You invite a second look",
+      "description": "You often return with your own work and ask whether it is idiomatic, logically sound, or missing an edge case.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:3",
+          "quote": "here's my answer to exercise 1, is it idiomatic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        }
+      ]
+    },
+    {
+      "name": "You give learning a structure",
+      "description": "You use small exercises, summaries, roadmaps, and quizzes to organize practice and surface gaps in your understanding.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:2",
+          "quote": "can you give me 3 small exercises about lifetimes?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:2",
+          "quote": "summarize what I learned today in 5 bullet points so I can put it in my notes"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:2",
+          "quote": "what should I learn next to get better at game dev in Rust? give me a roadmap"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "Your sample contains 29 prompts across 9 sessions: a compact learning trail.",
+    "Your busiest weekday was Thursday, with 13 prompts.",
+    "Your latest recorded prompt was at 21:18 in America/New_York time.",
+    "Your project tally puts rust-playground at 13 prompts, wasm-game at 10, and notes at 6.",
+    "Your recorded prompts were 100% English."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "America/New_York",
+    "totalPrompts": 29,
+    "analyzedPrompts": 29,
+    "totalSessions": 9,
+    "bySource": {
+      "claude-code": 29,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 29,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-02T14:00:00.000Z",
+      "to": "2026-09-16T14:18:00.000Z"
+    },
+    "activeDays": 9,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 3, 0, 0, 0, 0, 0, 4, 3, 3, 3, 0, 0],
+    "weekdayHistogram": [0, 0, 9, 13, 0, 0, 7],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 4, 0, 0, 3, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 74,
+      "p90": 89.4
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "rust-playground",
+        "count": 13
+      },
+      {
+        "name": "wasm-game",
+        "count": 10
+      },
+      {
+        "name": "notes",
+        "count": 6
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.069,
+    "imageRate": 0,
+    "longestStreakDays": 1,
+    "latestTime": "21:18"
+  }
+}

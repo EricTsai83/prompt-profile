@@ -28,6 +28,13 @@ The user message contains two JSON documents: `observations` (each with `dimensi
   `longestStreakDays`, `hourHistogram`, `languageMix`, `correctionRate`). Never make numbers up.
   Ratios in `stats` are 0–1; present them as percentages. `weekdayHistogram` and `activityGrid`
   are keyed by weekday name; `activityGrid` rows and `hourHistogram` are indexed by hour (0–23).
+- Say how often, not "always". Use "every", "always", "never", "all" or "none" only when
+  every relevant prompt supports it; otherwise write "often", "usually" or "in most sessions".
+  A pattern seen once or twice must be described as such ("once", "in one session"), never as
+  a habit, and must not become a trait.
+- Describe what the prompts show, not what the person probably did elsewhere: asking about a
+  tool is not having used it, and asking for a quiz is not having passed it. Do not speculate
+  about habits the prompts never mention.
 - Never infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
 - Address the developer directly in the second person ("you"); never assume their

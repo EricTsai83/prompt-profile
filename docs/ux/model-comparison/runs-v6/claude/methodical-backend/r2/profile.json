@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T06:05:09.431Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "6"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 11,
+    "promptsAnalyzed": 36,
+    "evidenceKept": 38,
+    "evidenceDropped": 0
+  },
+  "headline": "You're a careful Go and PostgreSQL backend engineer who wants a plan, a test and a rollback path before any money moves through your code.",
+  "archetype": {
+    "name": "The Ledger Guardian",
+    "description": "You treat your AI assistant like a sharp junior colleague on a payments team. It has to explain itself, propose options and stay inside the step you've approved. Your sessions follow a steady rhythm: plan, approve, write a small diff, test, document. The work stays on billing and ledger systems, where idempotency, isolation levels and zero-downtime migrations really matter. You'd rather write a runbook than recover from an incident at 3 a.m., and going by your stats, you prefer to finish by mid-afternoon."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Plan, scope, test, repeat",
+      "summary": "You usually ask for a plan, hypotheses or competing approaches before any code is written. Then you approve work one narrow step at a time and often say exactly what not to touch. Tests come early: characterization tests before refactors, property-based tests for invariants and benchmarks for later comparison. Your prompts tend to arrive a few minutes apart, and each one builds on the last.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:0",
+          "quote": "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:0",
+          "quote": "Tests first."
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Brief, polite, decisive",
+      "summary": "Your prompts are short imperatives with no filler. When you agree with the AI, you say so briefly and move on. You often ask for the reasoning before a change, and then you make the call yourself. For documents, you give the exact list of sections you want.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:1",
+          "quote": "Can you explain why before changing anything?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:2",
+          "quote": "Agreed, use SELECT ... FOR UPDATE. Show me the diff only."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:0",
+          "quote": "Sections: context, goals, non-goals, design, alternatives, rollout."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:1",
+          "quote": "Good. Now refactor"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Go + Postgres, finance-grade",
+      "summary": "You work in Go and PostgreSQL on billing and ledger services. You know concurrency, transaction isolation and online index builds well. Your preferred tools are sqlc instead of an ORM, plus rapid for property-based tests. The finance-specific edge cases come up explicitly in your prompts.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-4:2",
+          "quote": "Explain how this behaves under READ COMMITTED versus SERIALIZABLE."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-5:2",
+          "quote": "Write the migration with CREATE INDEX CONCURRENTLY and a check that it is valid afterwards."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:1",
+          "quote": "Please don't use an ORM here, plain sqlc queries."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:2",
+          "quote": "leap years, currency rounding, negative line items."
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Correctness, reliability, paper trails",
+      "summary": "You care about delivery guarantees, idempotent replays and operations with zero downtime. You also care about the process around the code: ADRs, runbooks, convincing PR test sections and assigning reviewers by risk. Observability comes up before launches, not after them.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-6:1",
+          "quote": "Add a section about exactly-once vs at-least-once delivery and how consumers should deduplicate."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:3",
+          "quote": "Document the decision in an ADR."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-8:1",
+          "quote": "Suggest which reviewers should look at which files, based on risk."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:0",
+          "quote": "What observability do we need before turning on the ledger in production? Make a checklist."
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Asking for the why",
+      "summary": "In several sessions you asked the AI to walk through trade-offs and how it reached a conclusion, especially on concurrency and alerting. This looks like deliberately building judgment, not just collecting code.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:1",
+          "quote": "What are the trade-offs between using a mutex here and a channel?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:0",
+          "quote": "Explain your reasoning step by step."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:1",
+          "quote": "Add alerting thresholds and explain how you chose them."
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Plan-first gatekeeper",
+      "description": "You usually ask for a plan, hypotheses or competing approaches before the AI writes code, and you approve each step before it goes ahead.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:0",
+          "quote": "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-5:0",
+          "quote": "Help me form hypotheses before we look at code."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:0",
+          "quote": "Propose two approaches and compare them."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:1",
+          "quote": "refactor in small commits, one concern per commit, and tell me the commit messages first."
+        }
+      ]
+    },
+    {
+      "name": "Scope fencer",
+      "description": "You keep changes small and spell out what is off-limits, down to line counts and PR-sized slices.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:1",
+          "quote": "Let's start with step 1 only: the database migration."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:0",
+          "quote": "Keep it under 80 lines and add tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:2",
+          "quote": "Now break the rollout into PR-sized steps."
+        }
+      ]
+    },
+    {
+      "name": "Test-first safety netter",
+      "description": "Tests, benchmarks and characterization tests come early in your workflow, often before the change itself.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-7:0",
+          "quote": "Tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:2",
+          "quote": "Add a test that proves the webhook is not written when the transaction rolls back."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:2",
+          "quote": "Add a benchmark so we can compare later."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        }
+      ]
+    },
+    {
+      "name": "Reasoning seeker",
+      "description": "You often ask the AI to explain its reasoning or the trade-offs before you decide.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:1",
+          "quote": "Can you explain why before changing anything?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:1",
+          "quote": "What are the trade-offs between using a mutex here and a channel?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:1",
+          "quote": "Add alerting thresholds and explain how you chose them."
+        }
+      ]
+    },
+    {
+      "name": "Documentation-minded operator",
+      "description": "You ask for ADRs, runbooks, design docs and changelogs, and you specify their structure.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-4:3",
+          "quote": "Document the decision in an ADR."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:1",
+          "quote": "Write a runbook in docs/runbooks/rotate-db-creds.md."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-8:2",
+          "quote": "Write a short summary for the changelog."
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "None of your 36 prompts falls on a Friday, Saturday or Sunday. Monday through Thursday get all of them.",
+    "Your busiest hours are 9:00 and 10:00, with 13 prompts each. Nothing shows up after the 14:00 hour.",
+    "Your correction rate is 0%, so you never had to walk back a request.",
+    "billing-service accounts for 29 of your 36 prompts. ledger gets the other 7.",
+    "Your longest streak is 2 days, so your work comes in focused bursts rather than marathons."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Europe/Berlin",
+    "totalPrompts": 36,
+    "analyzedPrompts": 36,
+    "totalSessions": 11,
+    "bySource": {
+      "claude-code": 36,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 36,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T07:30:00.000Z",
+      "to": "2026-09-15T08:38:00.000Z"
+    },
+    "activeDays": 11,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13, 6, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [10, 13, 7, 6, 0, 0, 0],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 85,
+      "p90": 112
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "billing-service",
+        "count": 29
+      },
+      {
+        "name": "ledger",
+        "count": 7
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null
+  }
+}

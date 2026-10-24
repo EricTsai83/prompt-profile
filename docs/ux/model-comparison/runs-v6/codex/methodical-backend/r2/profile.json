@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T06:06:15.863Z",
+  "engine": {
+    "runner": "codex",
+    "model": null,
+    "analysisVersion": "6"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 11,
+    "promptsAnalyzed": 36,
+    "evidenceKept": 30,
+    "evidenceDropped": 0
+  },
+  "headline": "You approach backend changes through small steps, explicit reasoning, and tests that make failure modes visible.",
+  "archetype": {
+    "name": "The Rollback Architect",
+    "description": "You often steer work from a plan into a narrowly scoped implementation, then ask for evidence that it behaves correctly. Your prompts return to transactions, concurrency, and production rollouts, with runbooks and decision records alongside code. You give the assistant precise boundaries and ask it to explain the trade-offs before you choose a direction."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Small steps, checked carefully",
+      "summary": "You often plan before implementation and break changes into reviewable pieces. You request tests before risky changes, including characterization tests before refactoring. When behavior is unclear, you ask for an explanation before edits.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:0",
+          "quote": "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:0",
+          "quote": "Implement step 1 of the outbox rollout: the outbox table and the transactional write. Tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Precise instructions",
+      "summary": "Your prompts are usually concise and directive, specifying scope, format, or implementation constraints. You ask for deeper reasoning when it helps assess a decision, while keeping routine outputs brief.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Write the migration and a rollback. Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:2",
+          "quote": "Agreed, use SELECT ... FOR UPDATE. Show me the diff only."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:1",
+          "quote": "Add alerting thresholds and explain how you chose them."
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Backend correctness",
+      "summary": "Your requests center on Go, PostgreSQL, and billing or ledger systems. You specify concrete database mechanisms and SQL tooling, and examine race conditions, transaction behavior, and financial calculation edge cases.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:0",
+          "quote": "Review this Go function for race conditions. Explain your reasoning step by step."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:1",
+          "quote": "Please don't use an ORM here, plain sqlc queries."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:2",
+          "quote": "Run through the edge cases again: leap years, currency rounding, negative line items."
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Failure modes and production readiness",
+      "summary": "You repeatedly explore how systems behave during concurrency, delivery failures, and operational changes. Your requests include rollback paths, staged verification, observability, and written engineering decisions. Review quality also appears in one session devoted to PR descriptions and reviewer allocation.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:1",
+          "quote": "Add a section about exactly-once vs at-least-once delivery and how consumers should deduplicate."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:0",
+          "quote": "What observability do we need before turning on the ledger in production? Make a checklist."
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Reason before choosing",
+      "summary": "You use the assistant to examine alternatives and strengthen your understanding before selecting an approach. Your questions ask how mechanisms differ and why unexpected behavior occurs, rather than merely requesting a fix.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:1",
+          "quote": "What are the trade-offs between using a mutex here and a channel?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:2",
+          "quote": "Explain how this behaves under READ COMMITTED versus SERIALIZABLE."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-5:0",
+          "quote": "The p99 latency of /invoices went from 120ms to 900ms after the last deploy. Help me form hypotheses before we look at code."
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Scope setter",
+      "description": "You often make progress reviewable by limiting the next step and specifying how changes should be divided.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:1",
+          "quote": "Good plan. Let's start with step 1 only: the database migration."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:2",
+          "quote": "Now break the rollout into PR-sized steps."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:1",
+          "quote": "Now refactor in small commits, one concern per commit, and tell me the commit messages first."
+        }
+      ]
+    },
+    {
+      "name": "Tests before trust",
+      "description": "You repeatedly request tests before implementation or refactoring, with attention to behavior that could otherwise be easy to miss.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:0",
+          "quote": "Step 2: implement the middleware that checks the idempotency key. Keep it under 80 lines and add tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:2",
+          "quote": "Add a test that proves the webhook is not written when the transaction rolls back."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        }
+      ]
+    },
+    {
+      "name": "Failure-mode investigator",
+      "description": "You often probe what happens under contention, failed delivery, or operational change, and request concrete safeguards.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:0",
+          "quote": "We need to rotate the database credentials without downtime. Propose two approaches and compare them."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-5:2",
+          "quote": "Write the migration with CREATE INDEX CONCURRENTLY and a check that it is valid afterwards."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:1",
+          "quote": "Add a section about exactly-once vs at-least-once delivery and how consumers should deduplicate."
+        }
+      ]
+    },
+    {
+      "name": "Reasoning requester",
+      "description": "You repeatedly ask for explanations and comparisons so you can assess the mechanism behind a proposed change.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:1",
+          "quote": "The test for concurrent requests is flaky. Can you explain why before changing anything?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:1",
+          "quote": "What are the trade-offs between using a mutex here and a channel?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:2",
+          "quote": "Explain how this behaves under READ COMMITTED versus SERIALIZABLE."
+        }
+      ]
+    },
+    {
+      "name": "Documentation finisher",
+      "description": "You often carry technical work into durable artifacts, including runbooks, decision records, and design documents.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:1",
+          "quote": "Go with the dual-credential approach. Write a runbook in docs/runbooks/rotate-db-creds.md."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:3",
+          "quote": "Document the decision in an ADR."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:0",
+          "quote": "Write a design doc for moving webhooks to an outbox pattern. Sections: context, goals, non-goals, design, alternatives, rollout."
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "Your recorded sample contains 36 prompts across 11 sessions.",
+    "Your median prompt length is 85 characters: compact instructions for fairly involved backend work.",
+    "Your busiest recorded hours are tied: 09:00 and 10:00 each contain 13 prompts in Europe/Berlin time.",
+    "Your project split is 29 prompts for billing-service and 7 for ledger.",
+    "Your recorded prompts are 100% English."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Europe/Berlin",
+    "totalPrompts": 36,
+    "analyzedPrompts": 36,
+    "totalSessions": 11,
+    "bySource": {
+      "claude-code": 36,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 36,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T07:30:00.000Z",
+      "to": "2026-09-15T08:38:00.000Z"
+    },
+    "activeDays": 11,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13, 6, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [10, 13, 7, 6, 0, 0, 0],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 85,
+      "p90": 112
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "billing-service",
+        "count": 29
+      },
+      {
+        "name": "ledger",
+        "count": 7
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null
+  }
+}

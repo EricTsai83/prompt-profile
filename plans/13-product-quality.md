@@ -14,7 +14,7 @@ the owner sees it. Every item comes from a finding in plans 11–12 or an open e
 | --- | --- | --- | --- | --- |
 | 1 | Persona fixes: correct curious-learner's "late nights" expectation; add a fourth, larger bilingual persona (≥80 prompts) | Stage 3 review; RISKS 15 | – | Done: expectation corrected; `weekend-data-engineer` added (82 prompts) |
 | 2 | Rubric check for over-generalisation: universal quantifiers ("every", "always", "never", "all of your") in generated claims | Stage 3 review | – | Done: `overgeneralisations` in the score, optional `maxOvergeneralisations`. Baseline on the stage-3 runs: Claude 1–4 per profile (14 total), Codex 0 |
-| 3 | Reduce rule against unsupported universal claims and stat misreadings; bump `ANALYSIS_VERSION` | Stage 3 review | Quota for a budgeted before/after run | |
+| 3 | Reduce rule against unsupported universal claims and stat misreadings; bump `ANALYSIS_VERSION` | Stage 3 review | Quota for a budgeted before/after run | Done: `ANALYSIS_VERSION` 6; 16 persona runs (56 of 70 calls), all rubrics pass; 8 of 10 reviewed overreaches gone ([results](../docs/ux/model-comparison/README.md#follow-up-analysis-version-6-plan-13)) |
 | 4 | Smoke test prints the slash-command count; correct the stale RISKS 2 note (the CLI already counts them) | RISKS 2 | – | Done: smoke prints 5; RISKS 2 corrected |
 | 5 | Report and looks checked in WebKit (Safari engine), light and dark | RISKS 16 | – | Done: WebKit 26.5, every look, light/dark, 1440/390 px |
 | 6 | Share-card rule for long text: keep word-boundary clipping (archetype 56, trait 32 characters); document it | Plan 11 stage 2, finding 4 | – | Done: recorded in plan 12 |

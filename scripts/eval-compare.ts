@@ -1,6 +1,6 @@
 /**
  * Controlled model comparison (plan 11, stage 3):
- * `pnpm eval:compare [--engines claude,codex] [--repeats 2] [--budget 60]`.
+ * `pnpm eval:compare [--engines claude,codex] [--repeats 2] [--budget 60] [--out dir]`.
  * Runs the full analysis on every persona in test/eval/personas/, once per engine per repeat,
  * and writes docs/ux/model-comparison/runs/<engine>/<persona>/r<n>/ with profile.json and
  * run.json (provenance). Every CLI attempt, including retries, counts against one shared
@@ -33,6 +33,7 @@ const { values } = parseArgs({
     engines: { type: "string", default: "claude,codex" },
     repeats: { type: "string", default: "2" },
     budget: { type: "string", default: "60" },
+    out: { type: "string", default: join("docs", "ux", "model-comparison", "runs") },
   },
 })
 const ENGINES = { claude: "claude-code", codex: "codex" } as const
@@ -46,7 +47,7 @@ if (!Number.isSafeInteger(repeats) || repeats < 1) throw new Error("--repeats mu
 if (!Number.isSafeInteger(budget) || budget < 1) throw new Error("--budget must be >= 1")
 
 const root = new URL("../test/eval/personas/", import.meta.url).pathname
-const outRoot = join("docs", "ux", "model-comparison", "runs")
+const outRoot = values.out
 const now = DateTime.makeUnsafe("2026-10-24T00:00:00Z")
 
 const cliVersion = (bin: string) => {

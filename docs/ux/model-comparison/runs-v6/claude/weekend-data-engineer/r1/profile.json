@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T06:10:48.755Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "6"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 20,
+    "promptsAnalyzed": 82,
+    "evidenceKept": 37,
+    "evidenceDropped": 0
+  },
+  "headline": "You're a weekend data engineer who wants to see the test go red before any code is written, keeps PII out of every log and alert, and has grown a CSV parser into a full dbt + Dagster stack.",
+  "archetype": {
+    "name": "The Weekend Red-Green Steward",
+    "description": "You treat your Saturday and Sunday mornings like a careful sprint. Tests come first, a design comes before code, and every secret goes into an environment variable. Over about two months your prompts moved from a Decimal-safe CSV parser to a layered dbt warehouse, Dagster orchestration and strict CI, and now to onboarding docs for new teammates. You keep the AI on a short leash: list the errors before fixing them, show the failing case before it gets blocked, and never send a real Slack message from a test. You write politely and briefly, in Traditional Chinese with English technical terms mixed in."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Test first, design first, small steps",
+      "summary": "In many sessions you ask for the test before the code, and you say outright that this is your habit. You usually ask for a design or a layer plan before any code gets written, then hand off the work in small steps. Weekday lunch breaks are for quick questions, and the real building happens on weekend mornings.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:4",
+          "quote": "先寫 test 再寫 asset，這是我的習慣，麻煩照這個順序"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:1",
+          "quote": "test 先跑一次確認會 fail，我想看到 red 再改 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:0",
+          "quote": "先設計不要寫 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-14:3",
+          "quote": "好，先記下來，週末再做"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Brief, polite, precise",
+      "summary": "Your prompts are short (median 46 characters) and written in Traditional Chinese, with English technical terms and openers like 'quick one' mixed in. You give exact specs, such as allowed currencies or phone number formats, and you add constraints one at a time in follow-up messages. You often ask for documentation in English.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-3:4",
+          "quote": "currency 只會有 TWD、USD、JPY，其他值要讓 test fail"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:2",
+          "quote": "手機號碼台灣格式 09xx-xxx-xxx，只留最後三碼，其他換成 *"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:3",
+          "quote": "這個 parser 可以不要用 float 嗎？金額一定要 Decimal，謝謝"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-15:0",
+          "quote": "幫我寫一份 README，說明本機怎麼跑 Dagster、怎麼跑 test、環境變數有哪些，英文"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Modern data stack, strictly configured",
+      "summary": "You work in Python with pandas, pytest, uv, ruff and mypy, build dbt models (layers, incremental models, snapshots, macros, custom tests) and use Dagster (assets, sensors, resources, asset checks). GitHub Actions CI runs it all across Python 3.12 and 3.13.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-4:4",
+          "quote": "改用 incremental model，unique_key 用 account_id + date，is_incremental 的條件幫我寫清楚"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-7:3",
+          "quote": "sensor 的 test 也要，用 build_sensor_context 模擬新檔案進來"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-10:3",
+          "quote": "CI 用 GitHub Actions 跑 ruff、mypy 跟 pytest，matrix 跑 3.12 和 3.13"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-18:1",
+          "quote": "CI 改成 uv sync --frozen"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Privacy, correctness, guardrails",
+      "summary": "PII protection comes up again and again: masking, clean logs, alerts with no customer data, and a macro that fails the build. You also care about financial correctness, like exact Decimal amounts, idempotent loads and clearly stated units, and you prefer automated checks to convention.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:4",
+          "quote": "能不能確認 log 裡面不會印出原始 email？我不想 PII 出現在任何 log"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:3",
+          "quote": "寫一個 macro 掃描 meta pii: true 的欄位，如果出現在 mart 層就讓 build fail"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-7:4",
+          "quote": "如果同一個檔案被丟兩次，要 idempotent，不能重複寫入"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:4",
+          "quote": "通知內容不要帶任何客戶資料，只有 table 名稱和數量"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "From parser to platform",
+      "summary": "You learn while you build. You ask how ephemeral and view materializations differ, how Dagster assets map to dbt models, and which snapshot strategy fits. In one session you looked back on two months of work and asked for an architecture overview for new colleagues.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-3:5",
+          "quote": "麻煩解釋一下 dbt 的 ephemeral 跟 view materialization 差在哪裡"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:1",
+          "quote": "Dagster 的 asset 概念跟 dbt model 怎麼對應？畫個簡單的對照表"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-16:0",
+          "quote": "dbt snapshot 的 timestamp 跟 check strategy 差在哪？"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-19:0",
+          "quote": "回顧一下這兩個月：從 CSV parser 到 dbt 到 Dagster，幫我整理成一頁的架構說明，給新同事看"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Red before green",
+      "description": "You often ask for tests before the implementation and want to watch them fail first. You also use tests to hunt down data bugs.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:1",
+          "quote": "test 先跑一次確認會 fail，我想看到 red 再改 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:3",
+          "quote": "先寫 test case 覆蓋 masking 的每一條規則，再實作"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-12:0",
+          "quote": "幫我寫一個 dbt test 抓出 transaction_id 重複但 amount 不同的情況"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:4",
+          "quote": "我想要先看到它擋下一個故意放錯的 model"
+        }
+      ]
+    },
+    {
+      "name": "PII gatekeeper",
+      "description": "Customer data stays out of logs, alerts, docs and the mart layer, and secrets stay in environment variables.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:4",
+          "quote": "能不能確認 log 裡面不會印出原始 email？我不想 PII 出現在任何 log"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-8:1",
+          "quote": "再幫我把 connection string 改成從環境變數讀，不要寫死在 code 裡"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:1",
+          "quote": "dim_customer 不能有 email 原文，只能有 masked 的版本"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-15:1",
+          "quote": "範例值不要放真的 secret"
+        }
+      ]
+    },
+    {
+      "name": "Design before code",
+      "description": "You usually ask for a plan, a comparison or a concept explanation first, then make the decision and hand off the implementation.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-3:0",
+          "quote": "先不要寫 model，幫我列出 staging / intermediate / mart 三層要放什麼"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:0",
+          "quote": "先比較一下 Airflow、Dagster、Prefect，我比較在意本機開發體驗跟測試"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-16:1",
+          "quote": "我們的 source 沒有可靠的 updated_at，所以用 check strategy，幫我寫"
+        }
+      ]
+    },
+    {
+      "name": "Show me before you change it",
+      "description": "You keep the AI on a short leash: list the problems first, prove it's safe first, then act.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-10:4",
+          "quote": "mypy 設 strict，有錯誤的地方先列出來給我看，不要直接改"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-9:2",
+          "quote": "改 scope 之前先寫一個 test 確認 test 之間不會互相污染資料"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-4:0",
+          "quote": "先寫 expected output 的 seed 給我看"
+        }
+      ]
+    },
+    {
+      "name": "Standards keeper",
+      "description": "You care about strict tooling and consistent conventions across the codebase: typing style, ruff rules and coverage thresholds.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-11:1",
+          "quote": "用 Optional[Decimal] 還是 Decimal | None？我們規範要統一"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-10:2",
+          "quote": "pytest 設定放進 pyproject，coverage 門檻設 90%"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-11:3",
+          "quote": "ruff 的 rule set 建議開哪些？我想嚴格一點但不要太吵"
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "64 of your 82 prompts were sent on a Saturday or Sunday, and Wednesday is the only weekday that shows up at all, with 18 prompts at lunchtime.",
+    "Every prompt arrived at 9:00, 10:00 or 12:00 Taipei time. Nothing in the afternoon, nothing at night.",
+    "Your correction rate is 0%: you never had to tell the AI it got something wrong.",
+    "About 95% of your prompts are in Chinese and about 5% are mixed. None are purely in English, even though you usually ask for docs in English.",
+    "You sent 30 prompts to your busiest project, dbt-warehouse, just ahead of ledger-etl (28) and orchestrator (24)."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 82,
+    "analyzedPrompts": 82,
+    "totalSessions": 20,
+    "bySource": {
+      "claude-code": 82,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 82,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-07-04T01:20:00.000Z",
+      "to": "2026-08-15T01:43:00.000Z"
+    },
+    "activeDays": 19,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 30, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [0, 0, 18, 0, 0, 33, 31],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 46,
+      "p90": 69.9
+    },
+    "languageMix": {
+      "zh": 0.9512,
+      "en": 0,
+      "mixed": 0.0488
+    },
+    "topProjects": [
+      {
+        "name": "dbt-warehouse",
+        "count": 30
+      },
+      {
+        "name": "ledger-etl",
+        "count": 28
+      },
+      {
+        "name": "orchestrator",
+        "count": 24
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null
+  }
+}

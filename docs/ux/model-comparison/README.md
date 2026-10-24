@@ -97,3 +97,42 @@ The committed comparison profiles were produced with analysis version 4, before 
   per engine and two repeats were run.
 - Codex's model is unknown (not reported by `codex exec --json`).
 - The rubric and the review measure profile text, not whether people find a profile useful.
+
+## Follow-up: analysis version 6 (plan 13)
+
+`reduce.md` gained two rules after this comparison: say how often instead of "always", and
+describe what the prompts show rather than what the person probably did elsewhere. A
+before/after run on the personas checked whether the rules help:
+`pnpm eval:compare --repeats 2 --budget 70 --out docs/ux/model-comparison/runs-v6`
+([outputs](runs-v6/)). 16 analyses (four personas, including the new `weekend-data-engineer`),
+56 of 70 calls, no retries. All 16 passed the persona rubrics.
+
+| Universal claims (rubric count)                  | v4 (above) | v6  |
+| ------------------------------------------------ | ---------- | --- |
+| Claude Code, original three personas, 6 profiles | 14         | 9   |
+| Codex, original three personas, 6 profiles       | 0          | 0   |
+| Claude Code, weekend-data-engineer, 2 profiles   | –          | 9   |
+| Codex, weekend-data-engineer, 2 profiles         | –          | 0   |
+
+Read individually, almost every remaining v6 universal claim is true and comes from the
+statistics: "every prompt between 22:00 and 02:59", "0% correction rate, so you never had to walk
+the AI back", "none of your prompts on Friday–Sunday". The count is a rough signal, not a
+defect count, so the rubric records it without a threshold.
+
+The overreaches the blind review found in the v4 Claude profiles, checked one by one in v6:
+
+| v4 claim                                            | v6                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------- |
+| "Every change starts with a plan"                   | gone                                                                      |
+| "fits someone who doesn't deploy on Fridays"        | gone                                                                      |
+| "a rollback test for every write path"              | gone                                                                      |
+| "You never send prompts on Fridays" (wrong weekday) | gone (also fixed in v5)                                                   |
+| "you skip pleasantries"                             | gone                                                                      |
+| "often keep going past 2 a.m."                      | gone                                                                      |
+| "static export … keep breaking your build"          | gone                                                                      |
+| "covered async with tokio and smol"                 | now "tokio vs smol", which matches the prompts                            |
+| "quiz answers show you understand dispatch"         | softened to "a growing intermediate grasp of dispatch" in one of two runs |
+| Tailwind in the stack                               | still listed in both runs                                                 |
+
+No second blind review was run. The evidence is the rubric, the counts and the claim-by-claim
+check above, all on synthetic personas.
