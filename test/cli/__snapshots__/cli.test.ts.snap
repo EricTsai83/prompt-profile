@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes report.html, card.png and profile.json > stdout 1`] = `
-"◆ prompt-profile v0.1.0
+"◆ prompt-profile v<version>
 
 ● Reading data
   Claude Code        9 prompts · 3 sessions

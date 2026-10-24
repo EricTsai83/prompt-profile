@@ -7,8 +7,12 @@ import { NotLoggedIn, RateLimited } from "../../src/llm/LlmRunner.ts"
 import { VERSION } from "../../src/version.ts"
 import { fixture, makeHarness, ok } from "./harness.ts"
 
+// The version changes on every release; snapshots must not
 const scrub = (s: string, root: string) =>
-  s.replaceAll(root, "<tmp>").replaceAll(fixture(""), "<fixtures>/")
+  s
+    .replaceAll(root, "<tmp>")
+    .replaceAll(fixture(""), "<fixtures>/")
+    .replaceAll(`v${VERSION}`, "v<version>")
 
 describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("--version", () =>
