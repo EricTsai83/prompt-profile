@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T05:22:34.884Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "4"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 9,
+    "promptsAnalyzed": 29,
+    "evidenceKept": 32,
+    "evidenceDropped": 0
+  },
+  "headline": "You're a Python developer learning Rust and using the AI as a strict tutor: you ask for the concept, write the code yourself, then come back asking \"is it idiomatic?\"",
+  "archetype": {
+    "name": "The Self-Taught Apprentice",
+    "description": "You treat your AI assistant like a patient mentor, not a code vending machine. You ask for explanations, often framed in Python or JavaScript terms. You ask for exercises, quizzes and ASCII diagrams. Then you write the code yourself and bring it back for review. In about six weeks you went from asking what the borrow checker was complaining about to working out spatial hashing for a browser game with roughly 500 entities. Your sessions are short and focused, your prompts are lowercase and curious, and you seem to care more about understanding why something works than just getting it to compile."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Explain, attempt, review, repeat",
+      "summary": "You run a tight learning loop: get the concept, do the work yourself, then ask for a check. You tell the AI outright not to write or fix your code. Sessions are short, with a new prompt every few minutes, and you debug on your own before coming back to find the root cause.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:2",
+          "quote": "I replaced the unwraps with ? and a custom error enum. better?"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Lowercase, curious, openly excited",
+      "summary": "Your prompts are short, casual questions. You often say what you currently think, which makes it easy to correct a misunderstanding. When something works, it shows in the double exclamation marks. You also add useful constraints like a question count or an entity count.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:1",
+          "quote": "I thought I only had one mutable reference."
+        },
+        {
+          "promptId": "claude-code:curious-learner-2:2",
+          "quote": "it compiles now!! next step: how do I write tests for the CLI?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "From Python to Rust and WASM",
+      "summary": "You come from Python and know some JavaScript, and Rust is your current focus. You've covered smart pointers, serde, clap, error handling and async with tokio and smol. Now you're building a game in your wasm-game project with wasm-bindgen and wasm-pack.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "explain ownership like I'm a Python developer"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "explain async/await in Rust vs JavaScript. why does Rust need an executor?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:1",
+          "quote": "what's the difference between wasm-bindgen and wasm-pack?"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "The why behind the how",
+      "summary": "You want idiomatic code and the reasoning behind design decisions, not just something that works. You ask about trade-offs, and you're getting into core game-engine topics: update loops, collision detection and spatial partitioning.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-3:1",
+          "quote": "is tokio the only option? what are the trade-offs with smol?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:1",
+          "quote": "why is unwrap considered bad? when is it ok?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:0",
+          "quote": "fixed timestep vs variable?"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Concepts first, then a game",
+      "summary": "You moved steadily from ownership basics to a CLI todo app, then to refactoring with clap and custom errors, and then to a WebAssembly game that has to scale. You build in your own feedback: quizzes, explanations of what you got wrong, and a roadmap.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "I'm new to Rust. Can you explain ownership like I'm a Python developer?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "I rewrote my todo app with clap."
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:2",
+          "quote": "what did I get wrong? explain the ones I missed"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:2",
+          "quote": "give me a roadmap"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Tutor, not ghostwriter",
+      "description": "You explicitly stop the AI from doing the work for you. You want steps and hints, and you write the code yourself.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "don't fix them, just tell me"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        }
+      ]
+    },
+    {
+      "name": "Review-seeker",
+      "description": "After you implement something, you bring it back to ask whether it's idiomatic, correct or missing an edge case.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:3",
+          "quote": "here's my answer to exercise 1, is it idiomatic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:2",
+          "quote": "I replaced the unwraps with ? and a custom error enum. better?"
+        }
+      ]
+    },
+    {
+      "name": "Relentless why-asker",
+      "description": "Getting the fix isn't enough for you. You want to know why the error happened and why the language works the way it does.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:1",
+          "quote": "Why does this borrow checker error happen?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:3",
+          "quote": "oh it was the requestAnimationFrame closure being dropped. why does that happen?"
+        }
+      ]
+    },
+    {
+      "name": "Self-quizzer",
+      "description": "You turn the AI into a study partner by asking for exercises and quizzes, and you keep notes on what you learn.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:2",
+          "quote": "can you give me 3 small exercises about lifetimes?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:2",
+          "quote": "summarize what I learned today in 5 bullet points so I can put it in my notes"
+        }
+      ]
+    },
+    {
+      "name": "Learns through comparison",
+      "description": "You anchor new ideas in languages you already know, or ask for diagrams to make them concrete.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "explain ownership like I'm a Python developer"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "explain async/await in Rust vs JavaScript. why does Rust need an executor?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-1:1",
+          "quote": "Draw me an ASCII diagram of what Rc<RefCell<T>> looks like in memory"
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "Thursday is your big Rust day with 13 of your 29 prompts. You never wrote a single prompt on a Monday, Tuesday, Friday or Saturday.",
+    "You have two learning windows: late morning (10–12) and evening (18–21). Your latest prompt came in at 21:18, so these aren't midnight borrow-checker battles.",
+    "Your correction rate is just 6.9%. That's about what you'd expect from someone who asks the AI not to write the code in the first place.",
+    "rust-playground is your top project with 13 prompts, followed by wasm-game with 10 and notes with 6. Yes, your notes got their own project.",
+    "Your longest streak is 1 day: 9 active days, 9 sessions, each one a focused lesson."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "America/New_York",
+    "totalPrompts": 29,
+    "analyzedPrompts": 29,
+    "totalSessions": 9,
+    "bySource": {
+      "claude-code": 29,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 29,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-02T14:00:00.000Z",
+      "to": "2026-09-16T14:18:00.000Z"
+    },
+    "activeDays": 9,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 3, 0, 0, 0, 0, 0, 4, 3, 3, 3, 0, 0],
+    "weekdayHistogram": [0, 0, 9, 13, 0, 0, 7],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 4, 0, 0, 3, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 74,
+      "p90": 89.4
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "rust-playground",
+        "count": 13
+      },
+      {
+        "name": "wasm-game",
+        "count": 10
+      },
+      {
+        "name": "notes",
+        "count": 6
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.069,
+    "imageRate": 0,
+    "longestStreakDays": 1,
+    "latestTime": "21:18"
+  }
+}

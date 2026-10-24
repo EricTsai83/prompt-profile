@@ -1,0 +1,154 @@
+{
+  "budget": 60,
+  "used": 40,
+  "versions": {
+    "claude": "2.1.309 (Claude Code)",
+    "codex": "codex-cli 0.164.0"
+  },
+  "rows": [
+    {
+      "persona": "curious-learner",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Self-Taught Rustacean",
+      "seconds": 38
+    },
+    {
+      "persona": "curious-learner",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 4,
+      "emptyDimensions": 0,
+      "archetype": "The Hands-On Investigator",
+      "seconds": 51
+    },
+    {
+      "persona": "curious-learner",
+      "engine": "claude",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Self-Taught Apprentice",
+      "seconds": 39
+    },
+    {
+      "persona": "curious-learner",
+      "engine": "codex",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 4,
+      "emptyDimensions": 0,
+      "archetype": "The Hands-On Questioner",
+      "seconds": 64
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 6,
+      "emptyDimensions": 0,
+      "archetype": "The Ledger Keeper",
+      "seconds": 47
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Rollback Architect",
+      "seconds": 60
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "claude",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Ledger Guardian",
+      "seconds": 43
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "codex",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Rollback Architect",
+      "seconds": 61
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Midnight Pixel Tuner",
+      "seconds": 48
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Midnight UI Editor",
+      "seconds": 61
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "claude",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "archetype": "The Midnight Pixel Medic",
+      "seconds": 45
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "codex",
+      "repeat": 2,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 4,
+      "emptyDimensions": 0,
+      "archetype": "The Midnight UI Refiner",
+      "seconds": 56
+    }
+  ]
+}

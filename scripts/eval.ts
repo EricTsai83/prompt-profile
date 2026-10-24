@@ -13,22 +13,13 @@ import { memoryCacheLayer } from "../src/analysis/cache.ts"
 import { analyze } from "../src/analysis/index.ts"
 import { silentProgressLayer } from "../src/analysis/progress.ts"
 import { encodeProfile } from "../src/domain/Profile.ts"
-import type { PromptRecord } from "../src/domain/PromptRecord.ts"
 import { makeRunner } from "../src/llm/detect.ts"
 import { LlmRunner } from "../src/llm/LlmRunner.ts"
 import { withRetry } from "../src/llm/retry.ts"
 import { writePrivateFile } from "../src/platform/files.ts"
+import { toRecords, type Persona } from "./eval-personas.ts"
 import { scoreProfile, type QualityRubric } from "./eval-quality.ts"
 import { processRecords } from "../src/pipeline/index.ts"
-
-interface Persona {
-  readonly timezone: string
-  readonly sessions: ReadonlyArray<{
-    start: string
-    project: string
-    prompts: ReadonlyArray<string>
-  }>
-}
 
 const { values } = parseArgs({
   options: {
@@ -46,22 +37,6 @@ const personas = readdirSync(root).filter(
 )
 
 if (personas.length === 0) throw new Error("No matching persona")
-
-const toRecords = (name: string, persona: Persona): Array<PromptRecord> =>
-  persona.sessions.flatMap((s, si) =>
-    s.prompts.map((text, pi) => ({
-      id: `claude-code:${name}-${si}:${pi}`,
-      source: "claude-code" as const,
-      sessionId: `${name}-${si}`,
-      timestamp: DateTime.makeUnsafe(Date.parse(s.start) + pi * 4 * 60_000),
-      project: s.project,
-      gitBranch: null,
-      text,
-      hasImage: false,
-      origin: "interactive" as const,
-      client: "eval",
-    })),
-  )
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem

@@ -1,0 +1,75 @@
+{
+  "persona": "curious-learner",
+  "engine": "claude-code",
+  "repeat": 1,
+  "requestedModel": null,
+  "cliVersion": "2.1.309 (Claude Code)",
+  "analysisVersion": "4",
+  "pipelineVersion": "4",
+  "input": {
+    "personaSha256": "51cead259a79238ec23ade1740ebc1d471f169e404da9cd0d93621c02abcd6ea",
+    "chunkIds": [
+      "0518d37d57a4aae04835cf5b16b222d925515a2d6133b125609e52961baabc11",
+      "c75241965480caee1a6fd4c3b6e6b472d18c60e4ca1ddbe845dc04dec6c986e1",
+      "7126f864efd647a6172b72582bc030463c9466e7fa930ecaf8c13d532a9f4e32"
+    ],
+    "selectedPromptIds": [
+      "claude-code:curious-learner-0:0",
+      "claude-code:curious-learner-0:1",
+      "claude-code:curious-learner-0:2",
+      "claude-code:curious-learner-0:3",
+      "claude-code:curious-learner-1:0",
+      "claude-code:curious-learner-1:1",
+      "claude-code:curious-learner-1:2",
+      "claude-code:curious-learner-2:0",
+      "claude-code:curious-learner-2:1",
+      "claude-code:curious-learner-2:2",
+      "claude-code:curious-learner-3:0",
+      "claude-code:curious-learner-3:1",
+      "claude-code:curious-learner-3:2",
+      "claude-code:curious-learner-4:0",
+      "claude-code:curious-learner-4:1",
+      "claude-code:curious-learner-4:2",
+      "claude-code:curious-learner-5:0",
+      "claude-code:curious-learner-5:1",
+      "claude-code:curious-learner-5:2",
+      "claude-code:curious-learner-5:3",
+      "claude-code:curious-learner-6:0",
+      "claude-code:curious-learner-6:1",
+      "claude-code:curious-learner-6:2",
+      "claude-code:curious-learner-7:0",
+      "claude-code:curious-learner-7:1",
+      "claude-code:curious-learner-7:2",
+      "claude-code:curious-learner-8:0",
+      "claude-code:curious-learner-8:1",
+      "claude-code:curious-learner-8:2"
+    ],
+    "sampling": "full: every weekly chunk, no sampling; cache disabled"
+  },
+  "status": "ok",
+  "reportedModel": "claude-opus-5-5",
+  "calls": {
+    "attempts": 4,
+    "failedAttempts": 0,
+    "errors": [],
+    "reportedModels": ["claude-opus-5-5"]
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 9,
+    "promptsAnalyzed": 29,
+    "evidenceKept": 33,
+    "evidenceDropped": 1
+  },
+  "quality": {
+    "passed": true,
+    "failures": [],
+    "evidenceRetention": 0.9705882352941176,
+    "emptyDimensions": 0
+  },
+  "seconds": 38
+}

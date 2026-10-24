@@ -72,6 +72,12 @@ and keyboard-focus captures with a reproducible Playwright script and manifest. 
 checks that evidence, confidence, statistics and warnings are unchanged and that the card has
 no quotes. The stage 1 files above are unchanged.
 
+## Model comparison (stage 3)
+
+The [model comparison](model-comparison/README.md) ran 12 analyses (3 synthetic personas ×
+Claude Code / Codex × 2 repeats, 40 of a 60-call budget) with full provenance, the persona
+rubrics and a blind review. It found one analysis defect (weekday order), which is now fixed.
+
 ## Historical first study
 
 The [initial gallery](initial-study-gallery.html), [initial prototype](profile-customization-prototype.html)

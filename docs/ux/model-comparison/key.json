@@ -1,0 +1,50 @@
+{
+  "curious-learner/A": {
+    "engine": "claude",
+    "repeat": "r2"
+  },
+  "curious-learner/B": {
+    "engine": "claude",
+    "repeat": "r1"
+  },
+  "curious-learner/C": {
+    "engine": "codex",
+    "repeat": "r2"
+  },
+  "curious-learner/D": {
+    "engine": "codex",
+    "repeat": "r1"
+  },
+  "methodical-backend/A": {
+    "engine": "codex",
+    "repeat": "r1"
+  },
+  "methodical-backend/B": {
+    "engine": "claude",
+    "repeat": "r1"
+  },
+  "methodical-backend/C": {
+    "engine": "claude",
+    "repeat": "r2"
+  },
+  "methodical-backend/D": {
+    "engine": "codex",
+    "repeat": "r2"
+  },
+  "night-owl-frontend/A": {
+    "engine": "claude",
+    "repeat": "r2"
+  },
+  "night-owl-frontend/B": {
+    "engine": "codex",
+    "repeat": "r1"
+  },
+  "night-owl-frontend/C": {
+    "engine": "codex",
+    "repeat": "r2"
+  },
+  "night-owl-frontend/D": {
+    "engine": "claude",
+    "repeat": "r1"
+  }
+}

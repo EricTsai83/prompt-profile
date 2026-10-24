@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-24T05:29:42.777Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "4"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 12,
+    "promptsAnalyzed": 51,
+    "evidenceKept": 34,
+    "evidenceDropped": 0
+  },
+  "headline": "You're a late-night frontend perfectionist who fixes things a pixel and an aria-label at a time, and you usually know the real root cause before the AI does.",
+  "archetype": {
+    "name": "The Midnight Pixel Medic",
+    "description": "You turn up around 22:00 and often keep going past 2 a.m. In that time you make a long string of small, precise fixes: gap 12px, a lighter shadow, a 44px touch target, a focus ring in the brand color. Your prompts are short Traditional Chinese with English technical terms mixed in. When the AI's diagnosis is wrong, you say 不對 and name the actual cause, like touch-action, iOS rubber band scroll or a CSS background image. You care a lot about accessibility and performance, you prefer native CSS to adding another library, and when a fix keeps failing you're happy to ship a simpler workaround and come back to it later."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Four-minute feedback loops after dark",
+      "summary": "You work in quick cycles: ask for something small, check how it looks, then send a specific correction. Each follow-up adds one requirement. When something stays stuck, you switch to a simpler approach that works and leave the full fix for later. Almost all of this happens between late evening and the early morning.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:1",
+          "quote": "不對，間距太大了，gap 改成 12px"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-0:3",
+          "quote": "OK 這樣可以。順便把 hover 加個陰影"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-2:4",
+          "quote": "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "好，那先用原生 img，我之後再處理"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Blunt, short and focused on root causes",
+      "summary": "Your prompts are very short Traditional Chinese with English technical terms mixed in. You don't soften corrections. You say 不對 or 還是錯, and you usually follow with the exact fix or the real cause. You often throw out the AI's generic diagnosis and replace it with your own.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-11:1",
+          "quote": "不是效能問題，是 touch-action 沒設"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:2",
+          "quote": "不是這個問題，hero 圖是 CSS background，不會被 preload"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-1:2",
+          "quote": "錯了，category 是陣列，不是字串"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:1",
+          "quote": "還是錯，你改到桌機版了"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Detail-oriented React frontend developer",
+      "summary": "You work with React, Next.js, React Query, zod, cva and Storybook, and you use Tailwind conventions. You know browser CSS well, including sticky vs fixed positioning, touch-action and font-display. You prefer native, lightweight solutions to pulling in another dependency.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:1",
+          "quote": "幫我寫一個 useProducts hook，支援分頁跟 category filter"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:0",
+          "quote": "variant 用 cva 管理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:2",
+          "quote": "不要用 framer-motion，用 CSS + IntersectionObserver 就好"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:3",
+          "quote": "font-display 用 swap"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Accessibility, performance and polish",
+      "summary": "You keep asking for accessibility features: WCAG AA contrast, prefers-reduced-motion, aria-labels, keyboard navigation, visible focus rings and 44px touch targets. You also track LCP and font payload size. You care about small finishing touches like a badge that bounces at the end of an animation, and you want design tokens and automated checks instead of hard-coded values.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-3:2",
+          "quote": "不對不對，對比度不夠，文字要符合 WCAG AA"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:3",
+          "quote": "focus ring 不要拿掉，改成品牌色"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:0",
+          "quote": "Lighthouse 的 LCP 是 4.2 秒，幫我看看怎麼降"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-3:3",
+          "quote": "幫我寫個 script 檢查所有 token 組合的對比度"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Unfinished fight with Next.js static export",
+      "summary": "Next.js static export and its Image component keep breaking your build. For now you've switched to a plain img tag and noted that you'll fix it later. Coming back to that, and to the font subsetting that's still 800KB, would be a good next step.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-9:1",
+          "quote": "還是不行，build 的時候報錯"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "我之後再處理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:1",
+          "quote": "subset 之後還是 800KB，太大了"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Root-cause corrector",
+      "description": "When the AI suggests a generic fix, you reject it and name the actual cause yourself.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-2:1",
+          "quote": "不是這樣，問題是 iOS 的 rubber band scroll"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:1",
+          "quote": "不是效能問題，是 touch-action 沒設"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:2",
+          "quote": "不是這個問題，hero 圖是 CSS background，不會被 preload"
+        }
+      ]
+    },
+    {
+      "name": "Accessibility advocate",
+      "description": "Contrast, focus states, aria-labels, reduced motion and touch-target size come up regularly in your requests.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-8:2",
+          "quote": "不對，icon-only 的按鈕要有 aria-label"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:3",
+          "quote": "加上 prefers-reduced-motion 的處理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:0",
+          "quote": "購物車的數量按鈕在手機上太小了，至少 44px"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-4:3",
+          "quote": "送出的時候沒有 focus 到第一個錯誤欄位"
+        }
+      ]
+    },
+    {
+      "name": "Pragmatic workaround picker",
+      "description": "If a fix keeps failing, you drop it, ship something simpler that works, and plan to come back to it.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-2:4",
+          "quote": "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "好，那先用原生 img，我之後再處理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:2",
+          "quote": "那改用系統字型 fallback，標題才用 webfont"
+        }
+      ]
+    },
+    {
+      "name": "Pixel-level iterator",
+      "description": "You adjust the UI one small, specific change at a time until it looks right.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:1",
+          "quote": "不對，間距太大了，gap 改成 12px"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-0:2",
+          "quote": "還是不行，卡片高度不一致，用 flex 讓按鈕貼底"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-0:4",
+          "quote": "陰影太重了，淡一點，像 tailwind 的 shadow-sm"
+        }
+      ]
+    },
+    {
+      "name": "Lightweight, maintainable choices",
+      "description": "You prefer native CSS and browser APIs, design tokens and automated checks to extra dependencies and hard-coded values.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-5:2",
+          "quote": "不要用 framer-motion，用 CSS + IntersectionObserver 就好"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-3:0",
+          "quote": "dark mode 的顏色幫我從 design token 產生，不要寫死"
+        }
+      ]
+    }
+  ],
+  "funFacts": [
+    "Midnight is your busiest hour, with 13 prompts. Your latest one was sent at 02:36, and you sent nothing at all between 3 a.m. and 10 p.m.",
+    "96.08% of your prompts are in Chinese, with a median length of just 27 characters.",
+    "19.61% of your prompts correct the AI, which works out to about one 不對 in every five messages.",
+    "shop-web accounts for 43 of your 51 prompts. Your portfolio got the other 8.",
+    "You never send prompts on Saturday, but Thursday is your busiest day with 13."
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 51,
+    "analyzedPrompts": 51,
+    "totalSessions": 12,
+    "bySource": {
+      "claude-code": 51,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 51,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T14:40:00.000Z",
+      "to": "2026-09-14T16:02:00.000Z"
+    },
+    "activeDays": 12,
+    "hourHistogram": [13, 11, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 11],
+    "weekdayHistogram": [12, 1, 8, 13, 5, 0, 12],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]
+    ],
+    "promptLength": {
+      "median": 27,
+      "p90": 41
+    },
+    "languageMix": {
+      "zh": 0.9608,
+      "en": 0,
+      "mixed": 0.0392
+    },
+    "topProjects": [
+      {
+        "name": "shop-web",
+        "count": 43
+      },
+      {
+        "name": "portfolio",
+        "count": 8
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.1961,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": "02:36"
+  }
+}

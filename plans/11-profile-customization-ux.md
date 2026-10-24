@@ -1,7 +1,8 @@
 # Profile customization UX research plan
 
-Status: stages 1 (plan and baseline) and 2 (presentation experiment) done; stages 3–6 not
-started. Production customization is not implemented by this plan.
+Status: stages 1–3, 5 and 6 done. Stage 4 (participant study) was skipped by the owner's
+decision on 2026-10-24, so the go/no-go criteria below are **untested**. Production work is
+limited to render-only looks and share-card hiding ([plan 12](./12-looks-and-share-card.md)).
 
 ## Goal
 
@@ -215,13 +216,15 @@ These initial screens establish experiment scope; they are not completed partici
    Results: [presentation experiment](../docs/ux/presentation/README.md). Work mirror works as
    presentation alone; Share story belongs in the share preview; Growth journal needs dated
    evidence (a schema and analysis change), so it is deferred.
-3. **Controlled analysis experiment:** bounded preset instructions only where necessary, followed
+3. **Controlled analysis experiment (done):** bounded preset instructions only where necessary, followed
    by the controlled model comparison. Record actual provenance, budgets and failures.
-4. **Usability review:** complete tasks, annotate screenshots with observed confusion, record
+   Results: [model comparison](../docs/ux/model-comparison/README.md). No preset
+   instructions were needed: the chosen scope has no content stories.
+4. **Usability review (skipped by the owner):** complete tasks, annotate screenshots with observed confusion, record
    preferences and reject options that do not justify their complexity.
-5. **Implementation proposal:** choose one default, a small preset set and advanced controls;
+5. **Implementation proposal (done, [plan 12](./12-looks-and-share-card.md)):** choose one default, a small preset set and advanced controls;
    specify syntax, metadata/cache compatibility, failure states, tests and migration requirements.
-6. **Implementation after plan review:** TDD for behavior; HTML/card screenshot verification;
+6. **Implementation after plan review (done, plan 12):** TDD for behavior; HTML/card screenshot verification;
    full type/lint/format/unit/package checks; real CLI smoke only if CLI invocation changes.
 
 Recommended starting order: render-only design choices and safe share previews, then bounded
