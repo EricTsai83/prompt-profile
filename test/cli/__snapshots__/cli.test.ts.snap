@@ -23,7 +23,10 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   Report <tmp>/out/report.html
   Card   <tmp>/out/card.png
   Data   <tmp>/out/profile.json
-  Check  no secrets or personal data found"
+  Contains  8 quotes · 4 project names · exact dates · 1 improvement · 1 fun fact
+  Check  no secrets or personal data found
+  Before sharing, skim the quotes yourself: the check is rule-based.
+  To leave parts out: prompt-profile render <tmp>/out/profile.json --exclude personal"
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `

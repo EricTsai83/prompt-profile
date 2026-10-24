@@ -1,6 +1,6 @@
 # 18 · One report, chosen parts and a final output check
 
-Status: in progress (2026-10-24). Replaces the share page of [plan 15](./15-profile-storytelling.md).
+Status: implemented (2026-10-24). Replaces the share page of [plan 15](./15-profile-storytelling.md).
 
 ## Problem
 
@@ -84,10 +84,10 @@ A config file, an interactive per-item review, changes to the analysis prompts (
 
 ## Acceptance
 
-- [ ] No `share.html` is written, and an old one is removed.
-- [ ] Each part of `--exclude` removes exactly its content; `personal` leaves out everything the
+- [x] No `share.html` is written, and an old one is removed.
+- [x] Each part of `--exclude` removes exactly its content; `personal` leaves out everything the
       old share page did (its privacy test is kept for `--exclude personal`).
-- [ ] A secret in generated text is masked under every `--check` mode and cannot be allowed.
-- [ ] `--check strict` writes nothing when a personal finding exists; `warn` keeps the text.
-- [ ] The terminal never prints a matched value.
-- [ ] On the owner's real profile the check reports no false positive in normal text.
+- [x] A secret in generated text is masked under every `--check` mode and cannot be allowed.
+- [x] `--check strict` writes nothing when a personal finding exists; `warn` keeps the text.
+- [x] The terminal never prints a matched value.
+- [x] On the owner's real profile the check reports no false positive in normal text.

@@ -254,6 +254,32 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("after writing, lists what the report contains and how to leave parts out", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const profile = join(h.root, "profile.json")
+      writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
+      const r = yield* h.run(["render", profile])
+      expect(r.stdout).toContain(
+        "Contains  11 quotes · 3 project names · exact dates · 2 improvements · 2 fun facts",
+      )
+      expect(r.stdout).toContain("skim the quotes yourself")
+      expect(r.stdout).toContain(`prompt-profile render ${profile} --exclude personal`)
+    }),
+  )
+
+  it.effect("with --exclude personal there is nothing personal to point out", () =>
+    Effect.gen(function* () {
+      const h2 = makeHarness()
+      const profile2 = join(h2.root, "profile.json")
+      writeFileSync(profile2, readFileSync(fixture("profile.sample.json")))
+      const r2 = yield* h2.run(["render", profile2, "--exclude", "personal"])
+      expect(r2.stdout).toContain("Contains  no quotes, project names or exact dates")
+      expect(r2.stdout).not.toContain("skim the quotes")
+      expect(r2.stdout).not.toContain("--exclude personal")
+    }),
+  )
+
   it.effect("the final check reports a clean profile", () =>
     Effect.gen(function* () {
       const h = makeHarness()

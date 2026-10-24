@@ -211,7 +211,7 @@ export const writeReportFiles = (
     const files = yield* writeReport(result.profile, outDir, options, source, cjk).pipe(
       Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
     )
-    return { ...files, findings: result.findings }
+    return { ...files, findings: result.findings, profile: result.profile }
   })
 
 /** The key numbers of `<outDir>/profile.json`, if it exists and decodes; otherwise null. */

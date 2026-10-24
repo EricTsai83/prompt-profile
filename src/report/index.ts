@@ -18,6 +18,7 @@ import {
 export { renderHtml } from "./html.ts"
 export { renderCard } from "./card.ts"
 export * from "./looks.ts"
+export { reportContents, type ReportContents } from "./visibility.ts"
 
 export interface CardFile {
   readonly language: Language

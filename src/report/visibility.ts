@@ -76,3 +76,29 @@ export const scrubIdentity = (p: Profile, scrub: Scrub, lang: Language): Profile
           },
   }
 }
+
+/** What a rendered report shows, for the CLI's "Contains" line. */
+export interface ReportContents {
+  readonly quotes: number
+  /** Distinct real project names (0 when shown as "Project A"…). */
+  readonly projects: number
+  readonly exactDates: boolean
+  readonly improvements: number
+  readonly funFacts: number
+}
+
+export const reportContents = (p: Profile, options: RenderOptions): ReportContents => {
+  const v = visibilityOf(options)
+  const evidence = (xs: ReadonlyArray<{ readonly evidence: ReadonlyArray<unknown> }>) =>
+    xs.reduce((sum, x) => sum + x.evidence.length, 0)
+  const names = new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)])
+  return {
+    quotes: v.quotes
+      ? evidence(p.traits) + evidence(p.dimensions) + (v.coaching ? evidence(p.improvements) : 0)
+      : 0,
+    projects: v.projects ? names.size : 0,
+    exactDates: v.dates,
+    improvements: v.coaching ? p.improvements.length : 0,
+    funFacts: v.funFacts ? p.funFacts.length : 0,
+  }
+}

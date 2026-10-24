@@ -10,6 +10,7 @@ import {
   LOOK_IDS,
   REPORT_PARTS,
   renderHtml,
+  reportContents,
   writeReport,
   type LookId,
   type ReportPart,
@@ -139,5 +140,32 @@ describe("--exclude", () => {
       expect(existsSync(join(dir, "report.html"))).toBe(true)
       expect(existsSync(join(dir, "share.html"))).toBe(false)
     }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("reportContents counts what the report shows", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      expect(reportContents(p, { look: "classic", cardHide: [] })).toEqual({
+        quotes: 11,
+        projects: 3,
+        exactDates: true,
+        improvements: 2,
+        funFacts: 2,
+      })
+      expect(reportContents(p, { look: "classic", cardHide: [], exclude: ["coaching"] })).toEqual({
+        quotes: 9,
+        projects: 3,
+        exactDates: true,
+        improvements: 0,
+        funFacts: 2,
+      })
+      expect(reportContents(p, { look: "classic", cardHide: [], exclude: REPORT_PARTS })).toEqual({
+        quotes: 0,
+        projects: 0,
+        exactDates: false,
+        improvements: 0,
+        funFacts: 0,
+      })
+    }),
   )
 })

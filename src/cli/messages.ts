@@ -1,4 +1,5 @@
 import type { Finding } from "../pipeline/audit.ts"
+import type { ReportContents } from "../report/visibility.ts"
 
 const n = (x: number) => x.toLocaleString("en")
 
@@ -64,6 +65,9 @@ export const messages = {
     `  Card   (${language}) not created: ${reason}`,
   dataLine: (p: string) => `  Data   ${p}`,
   checkClean: "  Check  no secrets or personal data found",
+  skimHint: "  Before sharing, skim the quotes yourself: the check is rule-based.",
+  excludeHint: (profile: string) =>
+    `  To leave parts out: prompt-profile render ${profile} --exclude personal`,
   checkMasked: (count: number, groups: string) => `  Check  ${count} masked: ${groups}`,
   checkKept: (count: number, groups: string) => `  Check  ${count} kept (--check warn): ${groups}`,
   skippedChunks: (k: number) => `  ${k} chunk(s) failed and were skipped (noted in the report)`,
@@ -113,3 +117,30 @@ export const checkLines = (findings: ReadonlyArray<Finding>): Array<string> => {
     ...(kept.length > 0 ? [messages.checkKept(total(kept), findingGroups(kept).join(", "))] : []),
   ]
 }
+
+const count = (k: number, one: string, many: string) => `${n(k)} ${k === 1 ? one : many}`
+
+/** "Contains …": what the written report shows. */
+export const containsLine = (c: ReportContents): string => {
+  const parts = [
+    c.quotes > 0 ? count(c.quotes, "quote", "quotes") : null,
+    c.projects > 0 ? count(c.projects, "project name", "project names") : null,
+    c.exactDates ? "exact dates" : null,
+    c.improvements > 0 ? count(c.improvements, "improvement", "improvements") : null,
+    c.funFacts > 0 ? count(c.funFacts, "fun fact", "fun facts") : null,
+  ].filter((x) => x !== null)
+  const personal = c.quotes > 0 || c.projects > 0 || c.exactDates
+  return `  Contains  ${personal ? parts.join(" · ") : ["no quotes, project names or exact dates", ...parts].join(" · ")}`
+}
+
+/** The lines after the file list: contents, the final check, and how to share safely. */
+export const summaryLines = (
+  c: ReportContents,
+  findings: ReadonlyArray<Finding>,
+  profile: string,
+): Array<string> => [
+  containsLine(c),
+  ...checkLines(findings),
+  ...(c.quotes > 0 ? [messages.skimHint] : []),
+  ...(c.quotes > 0 || c.projects > 0 || c.exactDates ? [messages.excludeHint(profile)] : []),
+]

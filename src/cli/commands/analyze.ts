@@ -11,7 +11,8 @@ import type { CheckMode } from "../../pipeline/audit.ts"
 import type { LookId } from "../../report/looks.ts"
 import { VERSION } from "../../version.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
-import { checkLines, messages, type Messages } from "../messages.ts"
+import { messages, summaryLines, type Messages } from "../messages.ts"
+import { reportContents } from "../../report/index.ts"
 import { parseAllow, parseLanguages, parseRenderOptions } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
@@ -191,7 +192,12 @@ export const runMain = (options: MainOptions) =>
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
     yield* out.line(t.dataLine(files.profileJson))
-    for (const line of checkLines(files.findings)) yield* out.line(line)
+    for (const line of summaryLines(
+      reportContents(files.profile, renderOptions),
+      files.findings,
+      files.profileJson,
+    ))
+      yield* out.line(line)
     if (profile.coverage.chunksFailed > 0)
       yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))
   })

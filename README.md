@@ -60,6 +60,27 @@ prompt-profile render prompt-profile-report/profile.json --exclude personal
 # → prompt-profile-report/variants/classic-without-personal/report.html; the full report is kept
 ```
 
+### The final check
+
+Before anything is written, every displayed text of the profile (generated text, quotes,
+rewrites, names, skill descriptions) is checked with the same rules that redact prompts before
+the LLM sees them. The terminal says where and which rule — never the matched text:
+
+```
+  Contains  34 quotes · 8 project names · exact dates · 4 improvements · 3 fun facts
+  Check  2 masked: email (Traits › 2), home-path (Fun facts › 1)
+  Before sharing, skim the quotes yourself: the check is rule-based.
+```
+
+|               | Rules                                                                                                   | `--check mask` (default) | `--check warn` | `--check strict`         |
+| ------------- | ------------------------------------------------------------------------------------------------------- | ------------------------ | -------------- | ------------------------ |
+| Secrets       | private keys, API tokens, JWTs, bearer tokens, connection strings, `password=`… , random-looking tokens | masked                   | masked         | nothing written (exit 1) |
+| Personal data | email, home path, username, internal URL, phone, Taiwan ID, credit card                                 | masked                   | kept, listed   | nothing written (exit 1) |
+
+`--allow email,phone` skips personal rules (e.g. a public address you want shown); secrets can
+never be allowed. The masked profile is what is written: `profile.json`, the report and the
+cards agree.
+
 ## Requirements
 
 - Node.js ≥ 22

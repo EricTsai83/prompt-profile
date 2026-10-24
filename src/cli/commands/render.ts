@@ -3,7 +3,8 @@ import type { CheckMode } from "../../pipeline/audit.ts"
 import { decodeProfile } from "../../domain/Profile.ts"
 import { Environment } from "../../platform/Environment.ts"
 import { FileError } from "../errors.ts"
-import { checkLines, messages } from "../messages.ts"
+import { messages, summaryLines } from "../messages.ts"
+import { reportContents } from "../../report/index.ts"
 import { Output } from "../services.ts"
 import { isDefaultRender, variantName, type LookId } from "../../report/looks.ts"
 import { parseAllow, parseRenderOptions } from "../options.ts"
@@ -55,5 +56,10 @@ export const runRender = (options: {
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
-    for (const line of checkLines(files.findings)) yield* out.line(line)
+    for (const line of summaryLines(
+      reportContents(files.profile, renderOptions),
+      files.findings,
+      input,
+    ))
+      yield* out.line(line)
   })
