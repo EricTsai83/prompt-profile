@@ -1,8 +1,8 @@
 # 15 · From activity dashboard to a profile that says who you are
 
-Status: proposal (2026-10-24), written after the owner asked for a full review of what the
-report shows, whether each form is the best one, and how a profile should be shown to others.
-Nothing here is implemented yet.
+Status: implemented (2026-10-24) after the owner chose the full scope and kept the rule that
+shared artifacts never contain quotes. Not done: share-page visibility flags (`--share-show`);
+the share page always hides project names, quotes and exact dates.
 
 ## Diagnosis of the current report (plan 14)
 

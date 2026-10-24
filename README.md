@@ -5,7 +5,7 @@ personal profile.
 
 ![Synthetic sample share card](docs/sample-card.png)
 
-[Sample HTML report](docs/sample-report.html) · [Sample profile JSON](docs/sample-profile.json)
+[Sample HTML report](docs/sample-report.html) · [Sample share page](docs/sample-share.html) · [Sample profile JSON](docs/sample-profile.json)
 (all sample data is hand-written and fictional).
 
 The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
@@ -22,11 +22,15 @@ npm i -g prompt-profile && prompt-profile
 
 Output (in `./prompt-profile-report/` by default):
 
-- `report.html`: a single-file report that works offline — a daily calendar, prompts by hour,
-  weekday and project (hover or tap any square or bar for the count and main projects), language
-  and habit charts, traits, five dimensions and fun facts, with verified quotes behind collapsible
-  sections, and a language switch when the report has more than one language. It shows your
-  project folder names: keep it private (the card never shows them)
+- `report.html`: your private, single-file report that works offline — who you are (archetype,
+  a 24-hour clock of your busiest hours), four measured habits with their definitions, your top
+  traits with a quote each and how widely they are supported, a daily calendar and a weekday ×
+  hour heatmap (hover or tap for the count and main projects), project chapters, the five
+  dimensions, and how it was measured; a language switch when there is more than one language.
+  It contains quotes and project folder names: keep it private
+- `share.html`: the page to show other people — identity, measured habits, rhythm and project
+  chapters, with **no quotes, no project names** (shown as "Project A, B…", also inside the
+  generated text) **and no exact dates**
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
   other language (**omits evidence quotes**)
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)

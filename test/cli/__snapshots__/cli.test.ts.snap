@@ -21,6 +21,7 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 
 ✔ Done!
   Report <tmp>/out/report.html
+  Share  <tmp>/out/share.html (no quotes or project names; for other people)
   Card   <tmp>/out/card.png
   Data   <tmp>/out/profile.json"
 `;

@@ -4,7 +4,7 @@ import { encodeProfile, LANGUAGES, type Language, type Profile } from "../domain
 import { writePrivateFile } from "../platform/files.ts"
 import { renderCard } from "./card.ts"
 import { CJK_LANGUAGES, embeddedFonts, FontUnavailable, type FontData } from "./fonts.ts"
-import { renderHtml } from "./html.ts"
+import { renderHtml, renderShareHtml } from "./html.ts"
 import {
   DEFAULT_RENDER_OPTIONS,
   hiddenParts,
@@ -14,7 +14,7 @@ import {
   type RenderOptions,
 } from "./looks.ts"
 
-export { renderHtml } from "./html.ts"
+export { renderHtml, renderShareHtml } from "./html.ts"
 export { renderCard } from "./card.ts"
 export * from "./looks.ts"
 
@@ -27,6 +27,8 @@ export interface CardFile {
 
 export interface ReportFiles {
   readonly html: string
+  /** The page for other people: no quotes, project names or exact dates. */
+  readonly share: string
   readonly profileJson: string
   /** The default language's card (`card.png`). */
   readonly card: string | null
@@ -82,6 +84,8 @@ export const writeReport = (
     const profileText = `${JSON.stringify(encodeProfile(profile), null, 2)}\n`
     yield* write(profileJson, profileText)
     yield* write(html, renderHtml(profile, options))
+    const share = path.join(outDir, "share.html")
+    yield* write(share, renderShareHtml(profile, options))
     if (!isDefaultRender(options)) {
       const manifest = {
         renderVersion: RENDER_MANIFEST_VERSION,
@@ -116,5 +120,5 @@ export const writeReport = (
       )
     }
     const first = cards[0]!
-    return { html, profileJson, card: first.file, cardError: first.error, cards }
+    return { html, share, profileJson, card: first.file, cardError: first.error, cards }
   })

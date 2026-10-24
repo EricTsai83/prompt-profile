@@ -74,7 +74,7 @@ try {
     JSON.parse(readFileSync(join(output, "profile.json"), "utf8")).languages,
     JSON.parse(readFileSync(input, "utf8")).languages,
   )
-  for (const file of ["report.html", "profile.json", "card.png"]) {
+  for (const file of ["report.html", "share.html", "profile.json", "card.png"]) {
     assert.ok(existsSync(join(output, file)))
     if (process.platform !== "win32") assert.equal(statSync(join(output, file)).mode & 0o777, 0o600)
   }

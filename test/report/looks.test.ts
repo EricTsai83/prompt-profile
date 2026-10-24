@@ -130,7 +130,8 @@ describe("looks: card", () => {
   it.effect("hidden parts are absent; the archetype always stays", () =>
     Effect.gen(function* () {
       const p = yield* sample()
-      const prompts = p.stats.totalPrompts.toLocaleString("en")
+      // the card's first number is the busiest four hours
+      const prompts = "–"
       for (const options of ALL_OPTIONS) {
         const tree = cardTree(p, options)
         const text = texts(tree).join("\n")

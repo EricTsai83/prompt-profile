@@ -5,10 +5,10 @@ import { createRequire } from "node:module"
 import { readFileSync } from "node:fs"
 import type { Profile } from "../domain/Profile.ts"
 import { DISPLAY_FONT, type FontData } from "./fonts.ts"
-import { peakHour } from "../domain/Stats.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, lookOf, type Look, type RenderOptions } from "./looks.ts"
 import { contentIn } from "./content.ts"
+import { chronotype, nightShare } from "./derive.ts"
 import { MESSAGES } from "./messages.ts"
 import type { Language } from "../domain/Profile.ts"
 
@@ -51,19 +51,29 @@ export const clip = (s: string, max: number): string => {
   return `${chars.slice(0, end).join("").trimEnd()}…`
 }
 
+/**
+ * The card's numbers, as on the report's signature: the busiest four hours, the night share
+ * and the longest streak (the first `n`). Never prompt text.
+ */
+const cardMetrics = (profile: Profile, lang: Language, n: number): Array<[string, string]> => {
+  const t = MESSAGES[lang]
+  const s = profile.stats
+  const window = chronotype(s)
+  const hh = (hour: number) => `${String(hour).padStart(2, "0")}:00`
+  return (
+    [
+      [t.cardActive, window === null ? t.none : `${hh(window.start)}–${hh(window.end)}`],
+      [t.nightShare, `${Math.round(nightShare(s) * 100)}%`],
+      [t.cardStreak, t.days(s.longestStreakDays)],
+    ] as Array<[string, string]>
+  ).slice(0, n)
+}
+
 /** Today's card. `hide` can only remove the trait or number rows. */
 const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: Language): Node => {
   const t = MESSAGES[lang]
   const c = contentIn(profile, lang)
-  const s = profile.stats
-  const peak = peakHour(s)
-  const numbers: Array<[string, string]> = [
-    [t.totalPrompts, s.totalPrompts.toLocaleString("en")],
-    [t.longestStreak, t.days(s.longestStreakDays)],
-    s.latestTime
-      ? [t.cardLatest, s.latestTime]
-      : [t.peakHour, peak === null ? t.none : `${String(peak).padStart(2, "0")}:00`],
-  ]
+  const numbers = cardMetrics(profile, lang, 3)
   return h(
     "div",
     {
@@ -145,10 +155,7 @@ const lookTree = (
   const graphic = graphicSvg(id.graphic, s.hourHistogram, id)
   const box = { bars: [56, 168, 340], orbit: [56, 110, 370], fold: [70, 190, 290] }[id.graphic]
   const [right, top, width] = box as [number, number, number]
-  const metrics: Array<[string, string]> = [
-    [t.cardPrompts, s.totalPrompts.toLocaleString("en")],
-    [t.cardStreak, t.days(s.longestStreakDays)],
-  ]
+  const metrics = cardMetrics(profile, lang, 2)
   return h(
     "div",
     {

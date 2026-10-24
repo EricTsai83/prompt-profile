@@ -88,6 +88,7 @@ export interface Messages {
   readonly support: (sessions: number, weeks: number, quotes: number) => string
   readonly howMeasured: string
   readonly projectAnon: string
+  readonly cardActive: string
 }
 
 const plural = (n: number, one: string, many: string) =>
@@ -195,6 +196,7 @@ const en: Messages = {
     `${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "week", "weeks")}`,
   howMeasured: "How this was measured",
   projectAnon: "Project",
+  cardActive: "most active",
 }
 
 const zhTW: Messages = {
@@ -292,6 +294,7 @@ const zhTW: Messages = {
   support: (se, w, q) => `${q} 段引文，來自 ${se} 個 session、${w} 週`,
   howMeasured: "這份報告怎麼量的",
   projectAnon: "專案",
+  cardActive: "最活躍時段",
 }
 
 /** Every text of the report and the card, per language. */

@@ -212,6 +212,8 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(report).toContain("譯 The Fixer")
       expect(existsSync(join(out, "card.png"))).toBe(true)
       expect(existsSync(join(out, "card.en.png"))).toBe(true)
+      expect(existsSync(join(out, "share.html"))).toBe(true)
+      expect(r.stdout).toContain("Share  ")
       const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
       expect(profile.languages).toEqual(["zh-TW", "en"])
       // one translation call on top of the map and reduce calls

@@ -171,6 +171,7 @@ export const runMain = (options: MainOptions) =>
     yield* out.line("")
     yield* out.line(t.done)
     yield* out.line(t.reportLine(files.html, opened))
+    yield* out.line(t.shareLine(files.share))
     for (const card of files.cards)
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
