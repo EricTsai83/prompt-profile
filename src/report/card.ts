@@ -9,6 +9,7 @@ import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, lookOf, type Look, type RenderOptions } from "./looks.ts"
 import { contentIn } from "./content.ts"
 import { chronotype, nightShare } from "./derive.ts"
+import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { MESSAGES } from "./messages.ts"
 import type { Language } from "../domain/Profile.ts"
 
@@ -281,9 +282,11 @@ export const cardTree = (
   lang: Language = profile.languages[0],
 ): Node => {
   const look = lookOf(options.look)
+  const v = visibilityOf(options)
+  const p = v.projects ? profile : scrubIdentity(profile, makeScrub(profile, v), lang)
   return look === null
-    ? classicTree(profile, options.cardHide, lang)
-    : lookTree(profile, look, options.cardHide, lang)
+    ? classicTree(p, options.cardHide, lang)
+    : lookTree(p, look, options.cardHide, lang)
 }
 
 let wasmReady: Promise<void> | null = null

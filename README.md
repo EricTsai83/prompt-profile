@@ -5,7 +5,7 @@ personal profile.
 
 ![Synthetic sample share card](docs/sample-card.png)
 
-[Sample HTML report](docs/sample-report.html) · [Sample share page](docs/sample-share.html) · [Sample profile JSON](docs/sample-profile.json)
+[Sample HTML report](docs/sample-report.html) · [Sample profile JSON](docs/sample-profile.json)
 (all sample data is hand-written and fictional).
 
 The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
@@ -35,15 +35,30 @@ Output (in `./prompt-profile-report/` by default):
   calendar and a weekday ×
   hour heatmap (hover or tap for the count and main projects), project chapters, the five
   dimensions, and how it was measured; a language switch when there is more than one language.
-  It contains quotes and project folder names: keep it private
-- `share.html`: the page to show other people — identity, measured habits, how you work with AI
-  (built-in and plugin skills by name; your own skills and private MCP servers only counted),
-  rhythm and project
-  chapters, with **no quotes, no project names** (shown as "Project A, B…", also inside the
-  generated text) **and no exact dates**
+  It shows everything by default, quotes and project folder names included. To share it, leave
+  parts out with `--exclude` (below)
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
   other language (**omits evidence quotes**)
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)
+
+### Leaving parts out
+
+`--exclude` (on the main command and on `render`) takes a comma list:
+
+| Part           | Left out                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| `quotes`       | Evidence quotes and the before / after rewrites                                                      |
+| `projects`     | Project names, shown as "Project A, B…", also inside the generated text and on the card              |
+| `dates`        | Exact dates: no daily calendar, the data period by month                                             |
+| `coaching`     | "Improve your prompts" and "since your last report"                                                  |
+| `funfacts`     | Fun facts                                                                                            |
+| `custom-names` | Names and descriptions of your own skills, custom agent types and private MCP servers (only counted) |
+| `personal`     | All of the above                                                                                     |
+
+```bash
+prompt-profile render prompt-profile-report/profile.json --exclude personal
+# → prompt-profile-report/variants/classic-without-personal/report.html; the full report is kept
+```
 
 ## Requirements
 

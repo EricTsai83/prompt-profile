@@ -61,6 +61,9 @@ describe("render options", () => {
     expect(variantName({ look: "studio", cardHide: ["graphic", "stats"] })).toBe(
       "studio-no-stats-graphic",
     )
+    expect(
+      variantName({ look: "signal", cardHide: ["traits"], exclude: ["dates", "quotes"] }),
+    ).toBe("signal-no-traits-without-quotes-dates")
   })
 })
 
@@ -185,10 +188,11 @@ describe("looks: writeReport", () => {
       expect(statSync(manifest).mode & 0o777).toBe(0o600)
       const render = JSON.parse(readFileSync(manifest, "utf8"))
       expect(render).toMatchObject({
-        renderVersion: 1,
+        renderVersion: 2,
         look: "afterhours",
         lookVersion: 1,
         cardHidden: ["stats"],
+        excluded: [],
         source: "../profile.json",
       })
       expect(render.profileSha256).toBe(

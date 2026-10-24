@@ -175,6 +175,31 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
+  it.effect("render --exclude writes a variant without those parts and records them", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const profile = join(h.root, "profile.json")
+      writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
+      const r = yield* h.run(["render", profile, "--exclude", "personal"])
+      expect(r.code).toBe(0)
+      const variant = join(h.root, "variants", "classic-without-personal")
+      const report = readFileSync(join(variant, "report.html"), "utf8")
+      expect(report).not.toContain("<blockquote")
+      expect(existsSync(join(variant, "share.html"))).toBe(false)
+      expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
+        renderVersion: 2,
+        excluded: ["quotes", "projects", "dates", "coaching", "funfacts", "custom-names"],
+      })
+      const r2 = yield* h.run(["render", profile, "--exclude", "dates,quotes"])
+      expect(r2.code).toBe(0)
+      expect(existsSync(join(h.root, "variants", "classic-without-quotes-dates"))).toBe(true)
+      const bad = yield* h.run(["render", profile, "--exclude", "quotes,secrets"])
+      expect(bad.code).toBe(2)
+      expect(bad.stderr).toContain("--exclude")
+      expect(bad.stderr).toContain("personal")
+    }),
+  )
+
   it.effect("render rejects an unknown look or card part", () =>
     Effect.gen(function* () {
       const h = makeHarness()
@@ -212,8 +237,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(report).toContain("譯 The Fixer")
       expect(existsSync(join(out, "card.png"))).toBe(true)
       expect(existsSync(join(out, "card.en.png"))).toBe(true)
-      expect(existsSync(join(out, "share.html"))).toBe(true)
-      expect(r.stdout).toContain("Share  ")
+      expect(existsSync(join(out, "share.html"))).toBe(false)
       const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
       expect(profile.languages).toEqual(["zh-TW", "en"])
       // one translation call on top of the map and reduce calls

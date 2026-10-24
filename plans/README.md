@@ -114,7 +114,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute `pla
 | 12 | [Looks and share-card privacy](./12-looks-and-share-card.md) | `--look`, `--card-hide`, `render` variants | 11 |
 | 13 | [Product quality](./13-product-quality.md) | Grounded profiles, real-data checks, polish | 12 |
 | 14 | [Report redesign and languages](./14-report-redesign-and-languages.md) | Charts, en / zh-TW switch, activity by project | 13 |
-| 15 | [Profile storytelling](./15-profile-storytelling.md) | Identity-first report, share page | 14 |
+| 15 | [Profile storytelling](./15-profile-storytelling.md) | Identity-first report (share page later replaced by 18) | 14 |
 | 16 | [Prompt coaching](./16-prompt-coaching.md) | Verified improvements and signals | 15 |
 | 17 | [AI technique profile](./17-ai-technique-profile.md) | How I work with AI, progress since last report | 16 |
 | 18 | [One report and output check](./18-unified-report-and-output-check.md) | `--exclude` parts, final secret / personal-data check | 17 |

@@ -3,7 +3,7 @@ import { Effect } from "effect"
 import { readFileSync } from "node:fs"
 import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { escapeHtml } from "../../src/report/html-template.ts"
-import { renderHtml, renderShareHtml } from "../../src/report/index.ts"
+import { renderHtml } from "../../src/report/index.ts"
 import { SIGNALS, triggeredSignals } from "../../src/report/signals.ts"
 
 const SAMPLE = new URL("../fixtures/profile.sample.json", import.meta.url)
@@ -42,10 +42,10 @@ describe("prompt coaching", () => {
     }),
   )
 
-  it.effect("the share page never shows improvements, rewrites or signals", () =>
+  it.effect("--exclude coaching leaves out improvements, rewrites and signals", () =>
     Effect.gen(function* () {
       const p = yield* sample()
-      const out = renderShareHtml(p)
+      const out = renderHtml(p, { look: "classic", cardHide: [], exclude: ["coaching"] })
       for (const i of p.improvements) {
         expect(out).not.toContain(i.title)
         if (i.rewrite) expect(out).not.toContain(i.rewrite.after)
@@ -63,7 +63,7 @@ describe("prompt coaching", () => {
     }),
   )
 
-  it.effect("since the last report: habits and moved techniques, private only", () =>
+  it.effect("since the last report: habits and moved techniques, part of coaching", () =>
     Effect.gen(function* () {
       const p = englishOnly(yield* sample())
       const out = renderHtml(p)
@@ -74,7 +74,9 @@ describe("prompt coaching", () => {
       )
       expect(out).toContain("Delegates to subagents")
       expect(out).toContain("Suggested last time: State the expected result first")
-      expect(renderShareHtml(p)).not.toContain("Since your last report")
+      expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["coaching"] })).not.toContain(
+        "Since your last report",
+      )
       expect(renderHtml({ ...p, previous: null })).not.toContain("Since your last report")
     }),
   )

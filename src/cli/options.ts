@@ -1,6 +1,14 @@
 import { DateTime, Effect } from "effect"
 import { LANGUAGES, type Language } from "../domain/Profile.ts"
-import { CARD_PARTS, type CardPart, type LookId, type RenderOptions } from "../report/looks.ts"
+import {
+  CARD_PARTS,
+  EXCLUDE_GROUPS,
+  REPORT_PARTS,
+  type CardPart,
+  type LookId,
+  type RenderOptions,
+  type ReportPart,
+} from "../report/looks.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */
@@ -26,18 +34,31 @@ export const parseSince = (
   return Effect.succeed(Number.isFinite(since) && since >= 0 ? DateTime.makeUnsafe(since) : null)
 }
 
-/** `--look` and `--card-hide` (a comma list of CARD_PARTS) as render options. */
+/**
+ * `--look`, `--card-hide` (a comma list of CARD_PARTS) and `--exclude` (a comma list of
+ * REPORT_PARTS or EXCLUDE_GROUPS) as render options.
+ */
 export const parseRenderOptions = (
   look: LookId,
   cardHide: string | undefined,
-): Effect.Effect<RenderOptions, InvalidArgument> => {
-  if (cardHide === undefined) return Effect.succeed({ look, cardHide: [] })
-  const parts = cardHide.split(",").map((p) => p.trim())
-  const isPart = (p: string): p is CardPart => (CARD_PARTS as ReadonlyArray<string>).includes(p)
-  return parts.every(isPart)
-    ? Effect.succeed({ look, cardHide: parts })
-    : Effect.fail(new InvalidArgument({ flag: "--card-hide", value: cardHide }))
-}
+  exclude?: string | undefined,
+): Effect.Effect<RenderOptions, InvalidArgument> =>
+  Effect.gen(function* () {
+    const list = (value: string | undefined) =>
+      value === undefined ? [] : value.split(",").map((p) => p.trim())
+    const hide = list(cardHide)
+    const isPart = (p: string): p is CardPart => (CARD_PARTS as ReadonlyArray<string>).includes(p)
+    if (!hide.every(isPart))
+      return yield* new InvalidArgument({ flag: "--card-hide", value: cardHide! })
+    const parts: Array<ReportPart> = []
+    for (const p of list(exclude)) {
+      const group = EXCLUDE_GROUPS[p]
+      if (group) parts.push(...group)
+      else if ((REPORT_PARTS as ReadonlyArray<string>).includes(p)) parts.push(p as ReportPart)
+      else return yield* new InvalidArgument({ flag: "--exclude", value: exclude! })
+    }
+    return { look, cardHide: hide, exclude: REPORT_PARTS.filter((p) => parts.includes(p)) }
+  })
 
 /** A Chinese locale gets a Traditional Chinese report with English; anything else English. */
 export const defaultLanguages = (locale: string): Array<Language> =>

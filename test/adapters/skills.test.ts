@@ -102,7 +102,7 @@ describe("skill catalog", () => {
         description: "From the transcript",
         origin: "personal",
       })
-      // no file anywhere: described, but its origin is unknown (so the share page only counts it)
+      // no file anywhere: described, but its origin is unknown (so `--exclude custom-names` only counts it)
       expect(catalog.get("gone-skill")).toEqual({
         description: "A skill whose repo is gone",
         origin: "unknown",

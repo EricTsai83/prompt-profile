@@ -66,7 +66,7 @@ measures and a named breakdown:
   read.
 - **Subagent types**, **MCP servers** (from `mcp__<server>__…` tool names) and **models**, with
   session counts; background and worktree runs of subagents count under their techniques.
-- **Share page:** built-in and plugin skills, built-in subagent types, well-known MCP servers and
+- **`--exclude custom-names`** (the share page until [plan 18](./18-unified-report-and-output-check.md)): built-in and plugin skills, built-in subagent types, well-known MCP servers and
   model names are shown; personal and project skills, custom agent types and other servers are
   only counted ("2 custom skills"), and their descriptions are not shown. Lists in
   `report/techniques.ts`.

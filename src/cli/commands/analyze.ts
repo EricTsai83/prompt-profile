@@ -39,6 +39,7 @@ export interface MainOptions {
   /** Render-only: the report/card look and the card parts to hide (default: classic, none). */
   readonly look?: LookId
   readonly cardHide?: string | undefined
+  readonly exclude?: string | undefined
 }
 
 /** `--dry-run`: the chunks that would be sent, plus plan.json. Never calls an LLM. */
@@ -103,7 +104,11 @@ export const runMain = (options: MainOptions) =>
     ) {
       return yield* new InvalidArgument({ flag: "--max-calls", value: options.maxCalls! })
     }
-    const renderOptions = yield* parseRenderOptions(options.look ?? "classic", options.cardHide)
+    const renderOptions = yield* parseRenderOptions(
+      options.look ?? "classic",
+      options.cardHide,
+      options.exclude,
+    )
     const env = yield* Environment
     const languages = yield* parseLanguages(options.lang, env.locale)
     const out = yield* Output
@@ -174,7 +179,6 @@ export const runMain = (options: MainOptions) =>
     yield* out.line("")
     yield* out.line(t.done)
     yield* out.line(t.reportLine(files.html, opened))
-    yield* out.line(t.shareLine(files.share))
     for (const card of files.cards)
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),

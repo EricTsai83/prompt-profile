@@ -46,7 +46,13 @@ const lang = Flag.String("lang").pipe(
   Flag.optional,
 )
 const cardHide = Flag.String("card-hide").pipe(
-  Flag.withDescription("Leave parts out of the share card: comma list of traits, stats, graphic"),
+  Flag.withDescription("Leave parts out of the card: comma list of traits, stats, graphic"),
+  Flag.optional,
+)
+const exclude = Flag.String("exclude").pipe(
+  Flag.withDescription(
+    "Leave parts out of the report: comma list of quotes, projects, dates, coaching, funfacts, custom-names, or personal (all of them)",
+  ),
   Flag.optional,
 )
 
@@ -99,12 +105,13 @@ const renderCommand = Command.make(
     ),
     out: Flag.String("out").pipe(
       Flag.withDescription(
-        "Output folder (default: next to profile.json; with --look / --card-hide, variants/<name>/)",
+        "Output folder (default: next to profile.json; with --look / --card-hide / --exclude, variants/<name>/)",
       ),
       Flag.optional,
     ),
     look,
     cardHide,
+    exclude,
     verbose,
   },
   (f) =>
@@ -114,6 +121,7 @@ const renderCommand = Command.make(
         out: optional(f.out),
         look: f.look,
         cardHide: optional(f.cardHide),
+        exclude: optional(f.exclude),
       }),
       f,
     ),
@@ -148,6 +156,7 @@ export const command = Command.make(
     lang,
     look,
     cardHide,
+    exclude,
     full: Flag.Boolean("full").pipe(
       Flag.withDescription("Analyse everything, no sampling (slower, uses more quota)"),
       Flag.withDefault(false),
@@ -185,6 +194,7 @@ export const command = Command.make(
           lang: optional(f.lang),
           look: f.look,
           cardHide: optional(f.cardHide),
+          exclude: optional(f.exclude),
         }),
       ),
       f,

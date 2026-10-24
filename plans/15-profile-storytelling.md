@@ -4,6 +4,9 @@ Status: implemented (2026-10-24) after the owner chose the full scope and kept t
 shared artifacts never contain quotes. Not done: share-page visibility flags (`--share-show`);
 the share page always hides project names, quotes and exact dates.
 
+> Superseded by [plan 18](./18-unified-report-and-output-check.md): one report, with parts left
+> out through `--exclude`; there is no separate share page any more.
+
 ## Diagnosis of the current report (plan 14)
 
 The report is now a good **activity dashboard**, but most of it would look the same for any

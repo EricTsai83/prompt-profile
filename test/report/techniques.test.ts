@@ -2,7 +2,7 @@ import { describe, expect, it } from "@effect/vitest"
 import { Effect } from "effect"
 import { readFileSync } from "node:fs"
 import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
-import { renderHtml, renderShareHtml } from "../../src/report/index.ts"
+import { renderHtml } from "../../src/report/index.ts"
 
 const SAMPLE = new URL("../fixtures/profile.sample.json", import.meta.url)
 const sample = () => decodeProfile(JSON.parse(readFileSync(SAMPLE, "utf8")))
@@ -36,10 +36,14 @@ describe("How I work with AI: the capability map", () => {
     }),
   )
 
-  it.effect("the share page shows public names and counts custom ones, and has no quotes", () =>
+  it.effect("--exclude custom-names shows public names and counts custom ones", () =>
     Effect.gen(function* () {
       const p = yield* sample()
-      const out = renderShareHtml(englishOnly(p))
+      const out = renderHtml(englishOnly(p), {
+        look: "classic",
+        cardHide: [],
+        exclude: ["custom-names"],
+      })
       for (const name of [
         "code-review",
         "vercel:deploy",
@@ -60,10 +64,6 @@ describe("How I work with AI: the capability map", () => {
       expect(out).toContain("2 custom skills")
       expect(out).toContain("1 custom agent type")
       expect(out).toContain("1 private server")
-      for (const q of [...p.traits, ...p.dimensions, ...p.improvements].flatMap((x) =>
-        x.evidence.map((e) => e.quote),
-      ))
-        expect(out.includes(q)).toBe(false)
     }),
   )
 

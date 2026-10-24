@@ -53,7 +53,7 @@ describe("renderHtml", () => {
   it.effect("states the data period, its length and when the report was generated", () =>
     Effect.gen(function* () {
       const out = renderHtml(yield* sample())
-      const facts = /<dl class="facts">([\s\S]*?)<\/dl>/.exec(out)?.[1] ?? ""
+      const facts = /<dl class="report-facts">([\s\S]*?)<\/dl>/.exec(out)?.[1] ?? ""
       for (const part of [
         "Data period",
         "Apr 25, 2026 – Oct 23, 2026",

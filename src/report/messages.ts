@@ -12,6 +12,7 @@ export interface Messages {
   readonly dataPeriod: string
   readonly generated: string
   readonly analyzed: string
+  readonly leftOut: (parts: string) => string
   readonly months: (n: number) => string
   readonly coverage: (prompts: number, sessions: number) => string
   readonly sampled: (analyzed: number, total: number) => string
@@ -157,6 +158,7 @@ const en: Messages = {
   dataPeriod: "Data period",
   generated: "Generated",
   analyzed: "Analyzed",
+  leftOut: (parts) => `Left out: ${parts}`,
   months: (n) => plural(n, "month", "months"),
   coverage: (p, s) => `${p.toLocaleString("en")} prompts · ${s.toLocaleString("en")} sessions`,
   sampled: (a, t) => `${a} of ${t} weeks sampled`,
@@ -367,6 +369,7 @@ const zhTW: Messages = {
   dataPeriod: "資料區間",
   generated: "產生時間",
   analyzed: "分析內容",
+  leftOut: (parts) => `未列入：${parts}`,
   months: (n) => `${n} 個月`,
   coverage: (p, s) =>
     `${p.toLocaleString("zh-TW")} 則 prompt · ${s.toLocaleString("zh-TW")} 個 session`,

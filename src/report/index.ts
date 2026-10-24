@@ -4,9 +4,10 @@ import { encodeProfile, LANGUAGES, type Language, type Profile } from "../domain
 import { writePrivateFile } from "../platform/files.ts"
 import { renderCard } from "./card.ts"
 import { CJK_LANGUAGES, embeddedFonts, FontUnavailable, type FontData } from "./fonts.ts"
-import { renderHtml, renderShareHtml } from "./html.ts"
+import { renderHtml } from "./html.ts"
 import {
   DEFAULT_RENDER_OPTIONS,
+  excludedParts,
   hiddenParts,
   isDefaultRender,
   lookOf,
@@ -14,7 +15,7 @@ import {
   type RenderOptions,
 } from "./looks.ts"
 
-export { renderHtml, renderShareHtml } from "./html.ts"
+export { renderHtml } from "./html.ts"
 export { renderCard } from "./card.ts"
 export * from "./looks.ts"
 
@@ -27,8 +28,6 @@ export interface CardFile {
 
 export interface ReportFiles {
   readonly html: string
-  /** The page for other people: no quotes, project names or exact dates. */
-  readonly share: string
   readonly profileJson: string
   /** The default language's card (`card.png`). */
   readonly card: string | null
@@ -73,25 +72,25 @@ export const writeReport = (
       )
 
     // Remove the previous cards before publishing any new data. A failed card render or
-    // interrupted run must never leave a share card belonging to an older profile.
-    const oldCards = ["card.png", ...LANGUAGES.map((l) => cardFileName(l, false))]
-    for (const name of oldCards) {
+    // interrupted run must never leave a card belonging to an older profile. `share.html` is
+    // the separate share page of older versions (plan 18): never leave a stale one behind.
+    const oldFiles = ["card.png", ...LANGUAGES.map((l) => cardFileName(l, false)), "share.html"]
+    for (const name of oldFiles) {
       const file = path.join(outDir, name)
       yield* fs
         .remove(file, { force: true })
-        .pipe(Effect.mapError((e) => new Error(`cannot remove old card ${file}: ${e.message}`)))
+        .pipe(Effect.mapError((e) => new Error(`cannot remove old ${file}: ${e.message}`)))
     }
     const profileText = `${JSON.stringify(encodeProfile(profile), null, 2)}\n`
     yield* write(profileJson, profileText)
     yield* write(html, renderHtml(profile, options))
-    const share = path.join(outDir, "share.html")
-    yield* write(share, renderShareHtml(profile, options))
     if (!isDefaultRender(options)) {
       const manifest = {
         renderVersion: RENDER_MANIFEST_VERSION,
         look: options.look,
         lookVersion: lookOf(options.look)?.version ?? 1,
         cardHidden: hiddenParts(options),
+        excluded: excludedParts(options),
         profileSha256: createHash("sha256").update(profileText).digest("hex"),
         source,
       }
@@ -120,5 +119,5 @@ export const writeReport = (
       )
     }
     const first = cards[0]!
-    return { html, share, profileJson, card: first.file, cardError: first.error, cards }
+    return { html, profileJson, card: first.file, cardError: first.error, cards }
   })

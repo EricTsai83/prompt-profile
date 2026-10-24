@@ -1,0 +1,143 @@
+import { NodeServices } from "@effect/platform-node"
+import { describe, expect, it } from "@effect/vitest"
+import { Effect } from "effect"
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
+import { escapeHtml } from "../../src/report/html-template.ts"
+import {
+  LOOK_IDS,
+  REPORT_PARTS,
+  renderHtml,
+  writeReport,
+  type LookId,
+  type ReportPart,
+} from "../../src/report/index.ts"
+
+const SAMPLE = new URL("../fixtures/profile.sample.json", import.meta.url)
+const sample = () => decodeProfile(JSON.parse(readFileSync(SAMPLE, "utf8")))
+const without = (p: Profile, exclude: ReadonlyArray<ReportPart>, look: LookId = "classic") =>
+  renderHtml(p, { look, cardHide: [], exclude })
+/** As they appear in the HTML. */
+const quotesOf = (p: Profile) =>
+  [
+    ...[...p.traits, ...p.dimensions, ...p.improvements].flatMap((x) =>
+      x.evidence.map((e) => e.quote),
+    ),
+    ...p.improvements.flatMap((i) => (i.rewrite ? [i.rewrite.after] : [])),
+  ].map(escapeHtml)
+
+/** A profile whose generated text mentions a project by name, as models sometimes do. */
+const mentioning = (p: Profile): Profile => ({
+  ...p,
+  headline: "Builds drawstuff at midnight",
+  translations: {
+    "zh-TW": { ...p.translations["zh-TW"]!, headline: "半夜在做 drawstuff" },
+  },
+})
+
+const forbidden = (p: Profile) => [
+  ...[...p.traits, ...p.dimensions, ...p.improvements].flatMap((x) =>
+    x.evidence.map((e) => e.quote),
+  ),
+  ...p.improvements.flatMap((i) => (i.rewrite ? [i.rewrite.after] : [])),
+  ...p.stats.activity.projects.filter((n) => n !== "prompt-profile"),
+  ...p.stats.topProjects.map((x) => x.name).filter((n) => n !== "prompt-profile"),
+]
+
+describe("--exclude", () => {
+  it.effect("personal leaves out quotes, project names and exact dates, in any look", () =>
+    Effect.gen(function* () {
+      const p = mentioning(yield* sample())
+      for (const look of LOOK_IDS) {
+        const out = without(p, REPORT_PARTS, look)
+        for (const f of forbidden(p))
+          expect({ look, leaked: out.includes(f) }).toEqual({ look, leaked: false })
+        expect(out).not.toMatch(/\d{4}-\d{2}-\d{2}/)
+        expect(out).not.toContain("<blockquote")
+        expect(out).not.toContain('class="cal"')
+        expect(out).not.toContain('class="coaching"')
+        expect(out).toContain("Project A")
+        expect(out).toContain("專案 A")
+        expect(out).toContain("Builds Project A at midnight")
+      }
+    }),
+  )
+
+  it.effect("by default everything is shown", () =>
+    Effect.gen(function* () {
+      const p = mentioning(yield* sample())
+      const out = renderHtml(p)
+      for (const q of quotesOf(p)) expect(out).toContain(q)
+      expect(out).toContain("Builds drawstuff at midnight")
+      for (const part of ['class="cal"', 'class="coaching"', "How this was measured"])
+        expect(out).toContain(part)
+    }),
+  )
+
+  it.effect("quotes: no quotes or rewrites, everything else kept", () =>
+    Effect.gen(function* () {
+      const p = mentioning(yield* sample())
+      const out = without(p, ["quotes"])
+      for (const q of quotesOf(p))
+        expect({ q, shown: out.includes(q) }).toEqual({ q, shown: false })
+      expect(out).not.toContain("<blockquote")
+      expect(out).toContain("Builds drawstuff at midnight")
+      expect(out).toContain('class="coaching"')
+      expect(out).toContain(p.improvements[0]!.title)
+    }),
+  )
+
+  it.effect("projects: names replaced everywhere, quotes kept", () =>
+    Effect.gen(function* () {
+      const p = mentioning(yield* sample())
+      const out = without(p, ["projects"])
+      for (const f of forbidden(p).filter((x) => !quotesOf(p).includes(escapeHtml(x))))
+        expect({ f, shown: out.includes(f) }).toEqual({ f, shown: false })
+      expect(out).toContain("Builds Project A at midnight")
+      expect(out).toContain("<blockquote")
+    }),
+  )
+
+  it.effect("dates: no calendar, the data period by month", () =>
+    Effect.gen(function* () {
+      const out = without(yield* sample(), ["dates"])
+      expect(out).not.toContain('class="cal"')
+      expect(out).toContain("Apr 2026 – Oct 2026 · 6 months")
+      expect(out).toContain("2026年4月 – 2026年10月 · 6 個月")
+      expect(out).not.toContain("Apr 25, 2026")
+      expect(out).toContain("<blockquote")
+    }),
+  )
+
+  it.effect("coaching and funfacts each remove only their section", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const noCoaching = without(p, ["coaching"])
+      expect(noCoaching).not.toContain('class="coaching"')
+      expect(noCoaching).toContain(p.funFacts[0]!)
+      const noFacts = without(p, ["funfacts"])
+      expect(noFacts).not.toContain(p.funFacts[0]!)
+      expect(noFacts).toContain('class="coaching"')
+    }),
+  )
+
+  it.effect("the parts left out are listed under How this was measured", () =>
+    Effect.gen(function* () {
+      const out = without(yield* sample(), ["quotes", "dates"])
+      expect(out).toContain("Left out: quotes, dates")
+      expect(renderHtml(yield* sample())).not.toContain("Left out:")
+    }),
+  )
+
+  it.effect("writeReport writes one report and removes an old share page", () =>
+    Effect.gen(function* () {
+      const dir = mkdtempSync(join(tmpdir(), "pp-one-"))
+      writeFileSync(join(dir, "share.html"), "old")
+      yield* writeReport(yield* sample(), dir)
+      expect(existsSync(join(dir, "report.html"))).toBe(true)
+      expect(existsSync(join(dir, "share.html"))).toBe(false)
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+})

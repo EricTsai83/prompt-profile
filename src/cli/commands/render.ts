@@ -17,9 +17,10 @@ export const runRender = (options: {
   readonly out: string | undefined
   readonly look: LookId
   readonly cardHide: string | undefined
+  readonly exclude?: string | undefined
 }) =>
   Effect.gen(function* () {
-    const renderOptions = yield* parseRenderOptions(options.look, options.cardHide)
+    const renderOptions = yield* parseRenderOptions(options.look, options.cardHide, options.exclude)
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const env = yield* Environment
@@ -43,7 +44,6 @@ export const runRender = (options: {
     const t = messages
     yield* out.line(t.rendered(files.html))
     yield* out.line(t.renderedNoAnalysis)
-    yield* out.line(t.shareLine(files.share))
     for (const card of files.cards)
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),

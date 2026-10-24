@@ -78,7 +78,7 @@ const MonthTechniques = Schema.Struct({
   techniques: countsOf(PROMPT_TECHNIQUES, Count),
 })
 
-/** Where a skill comes from; decides whether the share page may show its name. */
+/** Where a skill comes from; decides whether `--exclude custom-names` hides its name. */
 export const SKILL_ORIGINS = ["builtin", "plugin", "personal", "project", "unknown"] as const
 
 const NamedUse = Schema.Struct({

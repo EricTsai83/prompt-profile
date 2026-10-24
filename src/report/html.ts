@@ -5,11 +5,10 @@ import {
   chapterStrip,
   chartStyle,
   heatmap,
-  PRIVATE_VIEW,
   projectRanking,
   projectWeeks,
   radialClock,
-  SHARE_VIEW,
+  type ChartView,
 } from "./charts.ts"
 import { chapters, chronotype, correctionEvery, nightShare, promptsPerSession } from "./derive.ts"
 import { LANG_TAGS, makeLoc, type Loc } from "./loc.ts"
@@ -18,6 +17,7 @@ import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
 import {
   DEFAULT_RENDER_OPTIONS,
+  excludedParts,
   lookOf,
   type Identity,
   type Look,
@@ -28,6 +28,7 @@ import { MESSAGES, type Messages } from "./messages.ts"
 import { triggeredSignals } from "./signals.ts"
 import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
+import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibility.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -151,9 +152,6 @@ const ring = (value: number, label: Raw): Raw =>
 
 // ---- profile sections ---------------------------------------------------------------------
 
-/** Who sees the page: the private report, or the share page (no quotes, projects or dates). */
-export type Audience = "private" | "share"
-
 const quotes = (evidence: ReadonlyArray<Evidence>): Raw =>
   html`<ul class="evidence">
     ${evidence.map((e) => html`<li><blockquote>${e.quote}</blockquote></li>`)}
@@ -178,7 +176,7 @@ const supportLine = (t: Trait, loc: Loc): Raw =>
       </p>`
 
 /** A signature trait: one quote shown in the private report, the rest one click away. */
-const signatureTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scrub: Scrub): Raw => {
+const signatureTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
   const t = p.traits[i]!
   return html`<article class="trait">
     <header>
@@ -186,10 +184,10 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scr
       ${meter(t, loc)}
     </header>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
-    ${audience === "private" && t.evidence[0] ? html`<blockquote class="lead-quote">${t.evidence[0].quote}</blockquote>` : ""}
+    ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${t.evidence[0].quote}</blockquote>` : ""}
     ${supportLine(t, loc)}
     ${
-      audience === "private" && t.evidence.length > 1
+      v.quotes && t.evidence.length > 1
         ? html`<details>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
             ${quotes(t.evidence.slice(1))}
@@ -199,7 +197,7 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scr
   </article>`
 }
 
-const minorTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scrub: Scrub): Raw => {
+const minorTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
   const t = p.traits[i]!
   return html`<li class="minor">
     <div class="minor-head">
@@ -207,7 +205,7 @@ const minorTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scrub: 
     </div>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
     ${
-      audience === "private" && t.evidence.length > 0
+      v.quotes && t.evidence.length > 0
         ? html`<details>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
             ${quotes(t.evidence)}
@@ -221,7 +219,7 @@ const dimensionRow = (
   p: Profile,
   key: DimensionKey,
   loc: Loc,
-  audience: Audience,
+  v: Visibility,
   scrub: Scrub,
 ): Raw => {
   const d = p.dimensions.find((x) => x.key === key)!
@@ -235,7 +233,7 @@ const dimensionRow = (
         ? html`<span class="badge warn">${loc.text((m) => m.noEvidence)}</span>`
         : html`<span class="badge">${loc.text((m) => m.evidenceCount(d.evidence.length))}</span>`
     }`
-  if (audience === "share") return html`<div class="dimension static">${head}</div>`
+  if (!v.quotes) return html`<div class="dimension static">${head}</div>`
   return html`<details class="dimension">
     <summary>${head}</summary>
     <div class="dim-body">
@@ -248,17 +246,18 @@ const dimensionRow = (
   </details>`
 }
 
-const improvementCard = (p: Profile, i: number, loc: Loc): Raw => {
+const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
   const imp = p.improvements[i]!
-  const before = imp.rewrite
-    ? imp.evidence.find((e) => e.promptId === imp.rewrite!.promptId)
-    : undefined
-  const others = imp.evidence.filter((e) => e !== before)
+  const before =
+    v.quotes && imp.rewrite
+      ? imp.evidence.find((e) => e.promptId === imp.rewrite!.promptId)
+      : undefined
+  const others = v.quotes ? imp.evidence.filter((e) => e !== before) : []
   return html`<article class="improve">
-    <header><span class="improve-n">${i + 1}</span><h3>${loc.text((_m, c) => c.improvement(i).title)}</h3></header>
-    <p class="improve-pattern">${loc.text((_m, c) => c.improvement(i).pattern)}</p>
-    <p class="improve-impact">${loc.text((_m, c) => c.improvement(i).impact)}</p>
-    <p class="improve-tip">${loc.text((_m, c) => c.improvement(i).suggestion)}</p>
+    <header><span class="improve-n">${i + 1}</span><h3>${loc.text((_m, c, l) => scrub(c.improvement(i).title, l))}</h3></header>
+    <p class="improve-pattern">${loc.text((_m, c, l) => scrub(c.improvement(i).pattern, l))}</p>
+    <p class="improve-impact">${loc.text((_m, c, l) => scrub(c.improvement(i).impact, l))}</p>
+    <p class="improve-tip">${loc.text((_m, c, l) => scrub(c.improvement(i).suggestion, l))}</p>
     ${
       before && imp.rewrite
         ? html`<div class="rewrite">
@@ -314,7 +313,7 @@ const change = (label: Raw, before: number, now: number, better: "down" | "up" |
 }
 
 /** "Since your last report": habits and the techniques that moved most. */
-const progressBlock = (p: Profile, loc: Loc): Raw | null => {
+const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
   const prev = p.previous
   if (prev === null) return null
   const s = p.stats
@@ -339,7 +338,9 @@ const progressBlock = (p: Profile, loc: Loc): Raw | null => {
           .slice(0, 4)
   return html`<div class="progress">
     <h3 class="sub-h">
-      ${loc.text((m) => m.sinceLast(formatDate(prev.generatedAt, s.timezone, m.locale)))}
+      ${loc.text((m) =>
+        m.sinceLast((v.dates ? formatDate : formatMonth)(prev.generatedAt, s.timezone, m.locale)),
+      )}
     </h3>
     <ul class="changes">
       ${change(
@@ -365,7 +366,10 @@ const progressBlock = (p: Profile, loc: Loc): Raw | null => {
     ${
       prev.improvements.length > 0
         ? html`<p class="last-tips">
-            ${loc.text((m) => m.lastSuggestions)}: ${prev.improvements.join(" · ")}
+            ${loc.text(
+              (m, _c, l) =>
+                `${m.lastSuggestions}: ${prev.improvements.map((x) => scrub(x, l)).join(" · ")}`,
+            )}
           </p>`
         : ""
     }
@@ -376,27 +380,6 @@ const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
   html`<div class="sig tip ${i === 0 ? "tip-l" : i === 3 ? "tip-r" : ""}" ${tip} tabindex="-1">
     <b>${value}</b><span>${label}</span>
   </div>`
-
-/**
- * Replaces project names in generated text on the share page (the model may mention them).
- * Identity on the private report.
- */
-type Scrub = (text: string, lang: Language) => string
-
-const makeScrub = (p: Profile, audience: Audience): Scrub => {
-  if (audience === "private") return (text) => text
-  const names = [
-    ...new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)]),
-  ].toSorted((a, b) => b.length - a.length)
-  return (text, lang) =>
-    names.reduce((out, name, i) => {
-      const index = p.stats.activity.projects.indexOf(name)
-      const label = `${MESSAGES[lang].projectAnon} ${"ABCDEFGHIJ"[index === -1 ? i : index] ?? "?"}`
-      return name.length < 3
-        ? out
-        : out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), label)
-    }, text)
-}
 
 // ---- styles -------------------------------------------------------------------------------
 
@@ -463,7 +446,7 @@ p{margin:0}
 .hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
-.hero .facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
+.hero .report-facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .report-facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .report-facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
 .hero:has(.hero-clock){min-height:270px}
 .hero-clock{position:absolute;right:32px;top:50%;transform:translateY(-50%);width:min(28%,210px)}
 .hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
@@ -625,27 +608,14 @@ h1,section>h2,.sig b{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Seg
 // ---- page ---------------------------------------------------------------------------------
 
 /** Render a self-contained, offline HTML report (no external requests, no JavaScript). */
-export const renderHtml = (
-  profile: Profile,
-  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
-): string => renderPage(profile, options, "private")
-
-/**
- * The page meant for other people: identity, measured signature, rhythm and chapters, with no
- * quotes, no project names ("Project A"), no exact dates and no fun facts.
- */
-export const renderShareHtml = (
-  profile: Profile,
-  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
-): string => renderPage(profile, options, "share")
-
-const renderPage = (profile: Profile, options: RenderOptions, audience: Audience): string => {
+export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RENDER_OPTIONS) => {
   const look = lookOf(options.look)
   const identity = look?.identity ?? CLASSIC_IDENTITY
   const loc = makeLoc(profile)
-  const scrub = makeScrub(profile, audience)
-  const view = audience === "share" ? SHARE_VIEW : PRIVATE_VIEW
-  const isPrivate = audience === "private"
+  const v = visibilityOf(options)
+  const scrub = makeScrub(profile, v)
+  const view: ChartView = { anonymizeProjects: !v.projects, showDates: v.dates }
+  const excluded = excludedParts(options)
   const s = profile.stats
   const tz = s.timezone
   const c = profile.coverage
@@ -655,7 +625,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
     window === null ? m.none : m.chronotype(hh(window.start), hh(window.end)),
   )
   const period = s.dateRange
-  const cal = isPrivate ? calendar(s, loc, view) : null
+  const cal = v.dates ? calendar(s, loc, view) : null
   const ranking = projectRanking(s, loc, view)
   const weekly = projectWeeks(s, loc, view)
   const strip = chapterStrip(s, chapters(s), loc, view)
@@ -666,9 +636,9 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
   const signature = order.slice(0, 3)
   const minor = order.slice(3)
   const every = correctionEvery(s)
-  const signals = isPrivate ? signalRow(profile, loc) : null
-  const progress = isPrivate ? progressBlock(profile, loc) : null
-  const tech = techniquesSection(s, loc, audience)
+  const signals = v.coaching ? signalRow(profile, loc) : null
+  const progress = v.coaching ? progressBlock(profile, loc, v, scrub) : null
+  const tech = techniquesSection(s, loc, v)
   const perSession = promptsPerSession(s)
   const graphic = look
     ? graphicSvg(identity.graphic, s.hourHistogram, {
@@ -733,14 +703,14 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
               <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
               <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
               ${look ? html`<p class="chrono">${windowText}</p>` : ""}
-              <dl class="facts">
+              <dl class="report-facts">
                 <div>
                   <dt>${loc.text((m) => m.dataPeriod)}</dt>
                   <dd>
                     ${loc.text((m) => {
                       if (period === null) return m.none
                       const days = daysBetween(period.from, period.to, tz)
-                      return isPrivate
+                      return v.dates
                         ? `${m.period(formatDate(period.from, tz, m.locale), formatDate(period.to, tz, m.locale))} · ${m.days(days)}`
                         : `${m.period(formatMonth(period.from, tz, m.locale), formatMonth(period.to, tz, m.locale))} · ${days < 45 ? m.days(days) : m.months(Math.round(days / 30.44))}`
                     })}
@@ -750,30 +720,26 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                   <dt>${loc.text((m) => m.generated)}</dt>
                   <dd>
                     ${loc.text((m) =>
-                      isPrivate
+                      v.dates
                         ? formatDateTime(profile.generatedAt, tz, m.locale)
                         : formatDate(profile.generatedAt, tz, m.locale),
                     )}
                   </dd>
                 </div>
-                ${
-                  isPrivate
-                    ? html`<div>
-                        <dt>${loc.text((m) => m.analyzed)}</dt>
-                        <dd>
-                          ${loc.text((m) =>
-                            [
-                              m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
-                              c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
-                              c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
-                            ]
-                              .filter((x) => x !== null)
-                              .join(" · "),
-                          )}
-                        </dd>
-                      </div>`
-                    : ""
-                }
+                <div>
+                  <dt>${loc.text((m) => m.analyzed)}</dt>
+                  <dd>
+                    ${loc.text((m) =>
+                      [
+                        m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
+                        c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
+                        c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
+                      ]
+                        .filter((x) => x !== null)
+                        .join(" · "),
+                    )}
+                  </dd>
+                </div>
               </dl>
             </div>
             ${
@@ -817,13 +783,13 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
           <section>
             <h2>${loc.text((m) => m.traits)}</h2>
             <div class="traits">
-              ${signature.map((i) => signatureTrait(profile, i, loc, audience, scrub))}
+              ${signature.map((i) => signatureTrait(profile, i, loc, v, scrub))}
             </div>
             ${
               minor.length > 0
                 ? html`<h3 class="sub-h">${loc.text((m) => m.moreTraits)}</h3>
                     <ul class="minors">
-                      ${minor.map((i) => minorTrait(profile, i, loc, audience, scrub))}
+                      ${minor.map((i) => minorTrait(profile, i, loc, v, scrub))}
                     </ul>`
                 : ""
             }
@@ -842,14 +808,14 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
           }
 
           ${
-            isPrivate && (profile.improvements.length > 0 || signals !== null || progress !== null)
+            v.coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
               ? html`<section class="coaching">
                   <div class="section-head">
                     <h2>${loc.text((m) => m.coaching)}</h2>
                     <p class="note">${loc.text((m) => m.coachingNote)}</p>
                   </div>
                   <div class="improves">
-                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc))}
+                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc, v, scrub))}
                   </div>
                   ${
                     signals
@@ -901,7 +867,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                     <article class="panel">
                       <h3>${loc.text((m) => m.projects)}</h3>
                       ${ranking}
-                      ${isPrivate ? html`<p class="note">${loc.text((m) => m.projectsNote)}</p>` : ""}
+                      ${v.projects ? html`<p class="note">${loc.text((m) => m.projectsNote)}</p>` : ""}
                     </article>
                     <article class="panel">
                       ${strip}
@@ -916,27 +882,25 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
           <section>
             <h2>${loc.text((m) => m.dimensions)}</h2>
             <div class="dims">
-              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, audience, scrub))}
+              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
             </div>
           </section>
 
           ${
-            isPrivate && profile.funFacts.length > 0
+            v.funFacts && profile.funFacts.length > 0
               ? html`<section>
                   <h2>${loc.text((m) => m.funFacts)}</h2>
                   <ul class="facts">
                     ${profile.funFacts.map(
                       (_f, i) =>
-                        html`<li class="fact">${loc.text((_m, ct) => ct.funFacts[i]!)}</li>`,
+                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
                     )}
                   </ul>
                 </section>`
               : ""
           }
 
-          ${
-            isPrivate
-              ? html`<details class="about">
+          <details class="about">
                   <summary>${loc.text((m) => m.howMeasured)}</summary>
                   <div class="grid g-3 measured">
                     <article class="panel">
@@ -981,16 +945,16 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                               ["p90", s.promptLength.p90],
                             ] as const
                           ).map(
-                            ([k, v]) =>
+                            ([k, n]) =>
                               html`<li>
                                 <span class="share-label">${loc.text((m) => m[k])}</span>
                                 <span class="share-track"
                                   ><span
                                     class="share-fill"
-                                    style="width:${(100 * v) / Math.max(1, s.promptLength.p90)}%"
+                                    style="width:${(100 * n) / Math.max(1, s.promptLength.p90)}%"
                                   ></span
                                 ></span>
-                                <b>${loc.text((m) => m.characters(Math.round(v)))}</b>
+                                <b>${loc.text((m) => m.characters(Math.round(n)))}</b>
                               </li>`,
                           )}
                         </ul>
@@ -1000,7 +964,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                   <p>
                     ${loc.text(
                       (m) =>
-                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt(formatDateTime(profile.generatedAt, tz, m.locale))}`,
+                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt((v.dates ? formatDateTime : formatDate)(profile.generatedAt, tz, m.locale))}`,
                     )}
                   </p>
                   <p>
@@ -1009,10 +973,9 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                         `${m.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? ` · ${m.chunksSkipped(c.chunksFailed)}` : ""}`,
                     )}
                   </p>
+                  ${excluded.length > 0 ? html`<p>${loc.text((m) => m.leftOut(excluded.join(", ")))}</p>` : ""}
                   <p>${loc.text((m) => m.privacy)}</p>
-                </details>`
-              : ""
-          }
+                </details>
           <footer class="foot">prompt-profile · npx prompt-profile</footer>
         </div>
       </body>

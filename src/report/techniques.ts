@@ -9,17 +9,19 @@ import {
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"
+import type { Visibility } from "./visibility.ts"
 
 /**
  * "How I work with AI" as a capability map (plan 17, the owner's choice): an adoption
  * timeline, then five stages — plan, delegate, extend, verify, ship — each with its measures
  * and a named breakdown (skills with their description, subagent types, MCP servers, models).
- * Counts and names only. On the share page, custom names are counted, not shown.
+ * Counts and names only. With `--exclude custom-names`, custom names are counted, not shown.
  */
 
-export type Audience = "private" | "share"
-
-/** Names the share page may show (an extensible data list): built-in or widely used ones. */
+/**
+ * Names shown even with `--exclude custom-names` (an extensible data list): built-in or widely
+ * used ones.
+ */
 export const PUBLIC_SUBAGENT_TYPES: ReadonlySet<string> = new Set([
   "general-purpose",
   "Explore",
@@ -149,20 +151,24 @@ const named = (title: Raw, items: ReadonlyArray<Raw>, hidden: Raw | null): Raw |
         ${hidden ? html`<p class="cap-hidden">${hidden}</p>` : ""}
       </div>`
 
-const skillItem = (s: SkillUse, loc: Loc, audience: Audience): Raw =>
+const skillItem = (s: SkillUse, loc: Loc, v: Visibility): Raw =>
   html`<li class="cap-item">
     <div class="ci-head">
       <b>${s.name}</b><span class="ci-tag">${loc.text((m) => m.origin[s.origin])}</span>
     </div>
     <p>
       ${
-        s.description !== null && (audience === "private" || isPublicSkill(s))
+        s.description !== null && (v.customNames || isPublicSkill(s))
           ? s.description
           : loc.text((m) => m.noDescription)
       }
     </p>
     <span class="ci-when"
-      >${loc.text((m) => m.usedRange(s.sessions, dayName(s.first, m), dayName(s.last, m)))}</span
+      >${loc.text((m) =>
+        v.dates
+          ? m.usedRange(s.sessions, dayName(s.first, m), dayName(s.last, m))
+          : m.sessionsUsed(s.sessions),
+      )}</span
     >
   </li>`
 
@@ -171,9 +177,9 @@ const chip = (name: string, sessions: number, loc: Loc): Raw =>
     ${name} <b>${sessions}</b>
   </li>`
 
-const stageDetails = (stage: Stage, t: Techniques, loc: Loc, audience: Audience): Array<Raw> => {
+const stageDetails = (stage: Stage, t: Techniques, loc: Loc, v: Visibility): Array<Raw> => {
   const d = t.details
-  const share = audience === "share"
+  const share = !v.customNames
   const blocks: Array<Raw | null> = []
   if (stage === "delegate") {
     const shown = d.subagentTypes.filter((x) => !share || PUBLIC_SUBAGENT_TYPES.has(x.name))
@@ -194,7 +200,7 @@ const stageDetails = (stage: Stage, t: Techniques, loc: Loc, audience: Audience)
     blocks.push(
       named(
         loc.text((m) => m.skillsUsed),
-        skills.map((x) => skillItem(x, loc, audience)),
+        skills.map((x) => skillItem(x, loc, v)),
         hiddenSkills > 0 ? loc.text((m) => m.customSkills(hiddenSkills)) : null,
       ),
       named(
@@ -219,7 +225,7 @@ const stageCard = (
   stage: (typeof STAGES)[number],
   t: Techniques,
   loc: Loc,
-  audience: Audience,
+  v: Visibility,
 ): Raw | null => {
   const tools = stage.tools
     .filter((k) => t.tools[k].count > 0)
@@ -241,7 +247,7 @@ const stageCard = (
         loc.tip((m) => `${m.promptNames[k][1]} · ${m.ofPrompts(pct(t.prompts[k]))}`),
       ),
     )
-  const extra = stageDetails(stage.id, t, loc, audience)
+  const extra = stageDetails(stage.id, t, loc, v)
   const parallel =
     stage.id === "delegate" && t.maxParallel >= 2
       ? html`<p class="tech-callout">${loc.text((m) => m.parallel(t.maxParallel, t.parallelDays))}</p>`
@@ -259,10 +265,10 @@ const stageCard = (
 }
 
 /** The section body; null without technique data. */
-export const techniquesSection = (s: Stats, loc: Loc, audience: Audience): Raw | null => {
+export const techniquesSection = (s: Stats, loc: Loc, v: Visibility): Raw | null => {
   const t = s.techniques
   if (t === null) return null
-  const cards = STAGES.map((stage) => stageCard(stage, t, loc, audience)).filter(
+  const cards = STAGES.map((stage) => stageCard(stage, t, loc, v)).filter(
     (x): x is Raw => x !== null,
   )
   if (cards.length === 0) return null

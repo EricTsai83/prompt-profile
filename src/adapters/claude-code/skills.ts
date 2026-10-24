@@ -9,8 +9,8 @@ export interface SkillInfo {
 }
 
 /**
- * Skills that ship with Claude Code (no SKILL.md on disk). Public names: the share page may
- * show them. An extensible data list.
+ * Skills that ship with Claude Code (no SKILL.md on disk). Public names: shown even with
+ * `--exclude custom-names`. An extensible data list.
  */
 export const BUILTIN_SKILLS: Readonly<Record<string, string>> = {
   "code-review":

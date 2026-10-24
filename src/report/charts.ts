@@ -13,16 +13,15 @@ import type { Chapter } from "./derive.ts"
 
 const hh = (h: number) => `${String(h).padStart(2, "0")}:00`
 
-/** What a chart may reveal: the share page hides project names and exact dates. */
+/** What a chart may reveal: `--exclude projects` / `dates` hide names and exact dates. */
 export interface ChartView {
   readonly anonymizeProjects: boolean
   readonly showDates: boolean
 }
 
 export const PRIVATE_VIEW: ChartView = { anonymizeProjects: false, showDates: true }
-export const SHARE_VIEW: ChartView = { anonymizeProjects: true, showDates: false }
 
-/** "Project A", "Project B"… in place of folder names on the share page. */
+/** "Project A", "Project B"… in place of folder names. */
 const ANON = "ABCDEFGHIJ"
 const pct = (n: number, max: number) => (max <= 0 ? 0 : (100 * n) / max).toFixed(1)
 

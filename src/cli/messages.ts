@@ -58,7 +58,6 @@ export const messages = {
   reportLine: (p: string, opened: boolean) =>
     `  Report ${p}${opened ? " (opened in your browser)" : ""}`,
   cardLine: (p: string) => `  Card   ${p}`,
-  shareLine: (p: string) => `  Share  ${p} (no quotes or project names; for other people)`,
   cardSkipped: (language: string, reason: string) =>
     `  Card   (${language}) not created: ${reason}`,
   dataLine: (p: string) => `  Data   ${p}`,
