@@ -99,8 +99,8 @@ There are three independent version numbers. Bump them whenever the correspondin
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–09, 11, 12 and 14–18 are
-done and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
+in the change that finishes it; it stays in git history. Plans 01–09 and 11–18 are done and
+deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
 
@@ -109,8 +109,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 13 | [Product quality](./13-product-quality.md) | Grounded profiles, real-data checks, polish | – | Done except item 8 (**owner**) |
-| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | 13 item 8 | **Pending**: tag-triggered workflow in place; publishing waits for the owner |
+| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | – | **Pending**: tag-triggered workflow in place; publishing waits for the owner |
 
 ## Shared rules for every plan
 
@@ -125,11 +124,9 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 ## What is left, in order
 
-1. **Owner: read a real report** (plan 13 item 8): `prompt-profile-report/report.html` from a
-   fresh run, or `tmp/p18/report.html`. Findings become a new plan (prompt or rule changes bump
-   `ANALYSIS_VERSION` / `PIPELINE_VERSION`). Then plan 13 is done and deleted.
-2. **Owner: decide the product is ready to publish.**
-3. **Plan 10, Release**, in its listed order: terms re-check, samples, first manual publish +
+1. **Owner: decide the product is ready to publish.** The real-report read (plan 13 item 8) is
+   done: accepted for now on 2026-10-24.
+2. **Plan 10, Release**, in its listed order: terms re-check, samples, first manual publish +
    Trusted Publisher, then a release through the tag-triggered workflow and the
    clean-environment check (which also covers plan 09's built-binary run).
 

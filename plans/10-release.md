@@ -1,8 +1,8 @@
 # 10 · Release
 
-**Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done
-(see [plan 13](./13-product-quality.md)); it is the last open plan. Publishing resumes only when
-the owner judges the product good enough. On 2026-10-24 the owner had the code part done ahead
+**Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done;
+it is the last open plan. Plan 13 (product quality) is done: the owner read a real report on
+2026-10-24 and accepted it for now. Publishing resumes only when the owner decides to publish. On 2026-10-24 the owner had the code part done ahead
 of time (item 4: the tag-triggered workflow); nothing is published or tagged, and the owner's
 npm / GitHub setup is not done. This section records where things stand.
 
@@ -21,7 +21,7 @@ npm / GitHub setup is not done. This section records where things stand.
 ### Still to do when the release resumes
 
 1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
-2. Regenerate the README sample card/report if the product changed since (plan 13).
+2. Regenerate the README sample card/report if the product changed since (plans 13–18).
 3. ~~Confirm CI passes on GitHub~~ — done: CI is green on `main` since 2026-10-24.
 4. ~~Replace release-please with the tag-triggered workflow below~~ — done 2026-10-24
    (`release.yml`, `scripts/release-version.ts`, `test/scripts/release-version.test.ts`).

@@ -17,10 +17,10 @@ Sorted by severity.
    - Other users' orchestrators may write different openings; `DELEGATION_PATTERNS` stays empty until such a pattern is known.
    - `topSlashCommands` works in the CLI (5 commands on the owner's data, 2026-10-24).
 
-3. **Profile quality needs your own assessment** (plan 07's manual acceptance, plan 13 item 8)
+3. **Profile quality: accepted by the owner for now** (plan 07's manual acceptance, plan 13 item 8)
    - Full 6-month runs on your real data with Claude (v6, v9 bilingual): every chunk succeeded and every quote passed verification; persona evals ran on both engines.
-     The latest render is `tmp/p18/report.html` (git-ignored). **Please read it and judge whether it is accurate**; prompt changes go into
-     `src/analysis/prompts/map.md` / `reduce.md` with an `ANALYSIS_VERSION` bump.
+   - On 2026-10-24 the owner read the real report (`tmp/p18/report.html`, git-ignored) and accepted it as good enough for now.
+     Read a fresh report again after any change to `src/analysis/prompts/map.md` / `reduce.md` (which also bumps `ANALYSIS_VERSION`).
 
 4. **The release has not been exercised yet**
    - CI (`.github/workflows/ci.yml`) is green on `main`. `release.yml` now runs only on a pushed `vX.Y.Z` tag (plan 10) and has never run: the first tag will be its first real test.
