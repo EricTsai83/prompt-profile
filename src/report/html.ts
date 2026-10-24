@@ -1,16 +1,18 @@
 import { DateTime } from "effect"
-import type { DimensionKey, Evidence, Language, Profile } from "../domain/Profile.ts"
+import type { DimensionKey, Evidence, Language, Profile, Trait } from "../domain/Profile.ts"
 import {
   calendar,
+  chapterStrip,
   chartStyle,
   heatmap,
-  hourChart,
+  PRIVATE_VIEW,
   projectRanking,
   projectWeeks,
-  weekdayChart,
+  radialClock,
+  SHARE_VIEW,
 } from "./charts.ts"
+import { chapters, chronotype, correctionEvery, nightShare, promptsPerSession } from "./derive.ts"
 import { LANG_TAGS, makeLoc, type Loc } from "./loc.ts"
-import { peakHour } from "../domain/Stats.ts"
 import { displayFontDataUrl } from "./fonts.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
@@ -129,51 +131,94 @@ const ring = (value: number, label: Raw): Raw =>
 
 // ---- profile sections ---------------------------------------------------------------------
 
+/** Who sees the page: the private report, or the share page (no quotes, projects or dates). */
+export type Audience = "private" | "share"
+
 const quotes = (evidence: ReadonlyArray<Evidence>): Raw =>
   html`<ul class="evidence">
     ${evidence.map((e) => html`<li><blockquote>${e.quote}</blockquote></li>`)}
   </ul>`
 
+const CONFIDENCE_RANK = { high: 0, medium: 1, low: 2 } as const
 const CONFIDENCE_LEVEL = { high: 3, medium: 2, low: 1 } as const
 
-const traitCard = (p: Profile, i: number, loc: Loc): Raw => {
-  const trait = p.traits[i]!
-  const level = CONFIDENCE_LEVEL[trait.confidence]
+const meter = (t: Trait, loc: Loc): Raw =>
+  html`<span class="meter ${t.confidence}"
+    >${[1, 2, 3].map((n) => html`<i class="${n <= CONFIDENCE_LEVEL[t.confidence] ? "on" : ""}"></i>`)}<span
+      class="meter-label"
+      >${loc.text((m) => m.confidence[t.confidence])}</span
+    ></span
+  >`
+
+const supportLine = (t: Trait, loc: Loc): Raw =>
+  t.support === null
+    ? html``
+    : html`<p class="support">
+        ${loc.text((m) => m.support(t.support!.sessions, t.support!.weeks, t.evidence.length))}
+      </p>`
+
+/** A signature trait: one quote shown in the private report, the rest one click away. */
+const signatureTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scrub: Scrub): Raw => {
+  const t = p.traits[i]!
   return html`<article class="trait">
     <header>
-      <h3>${loc.text((_m, c) => c.trait(i).name)}</h3>
-      <span class="meter ${trait.confidence}" title="${loc.attr((m) => m.confidence[trait.confidence])}"
-        >${[1, 2, 3].map((n) => html`<i class="${n <= level ? "on" : ""}"></i>`)}<span class="meter-label"
-          >${loc.text((m) => m.confidence[trait.confidence])}</span
-        ></span
-      >
+      <h3>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h3>
+      ${meter(t, loc)}
     </header>
-    <p>${loc.text((_m, c) => c.trait(i).description)}</p>
+    <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
+    ${audience === "private" && t.evidence[0] ? html`<blockquote class="lead-quote">${t.evidence[0].quote}</blockquote>` : ""}
+    ${supportLine(t, loc)}
     ${
-      trait.evidence.length === 0
-        ? html`<p class="warning">${loc.text((m) => m.insufficientEvidence)}</p>`
-        : html`<details>
-            <summary>${loc.text((m) => m.showEvidence(trait.evidence.length))}</summary>
-            ${quotes(trait.evidence)}
+      audience === "private" && t.evidence.length > 1
+        ? html`<details>
+            <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
+            ${quotes(t.evidence.slice(1))}
           </details>`
+        : ""
     }
   </article>`
 }
 
-const dimensionRow = (p: Profile, key: DimensionKey, loc: Loc): Raw => {
+const minorTrait = (p: Profile, i: number, loc: Loc, audience: Audience, scrub: Scrub): Raw => {
+  const t = p.traits[i]!
+  return html`<li class="minor">
+    <div class="minor-head">
+      <b>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</b>${meter(t, loc)}
+    </div>
+    <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
+    ${
+      audience === "private" && t.evidence.length > 0
+        ? html`<details>
+            <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
+            ${quotes(t.evidence)}
+          </details>`
+        : ""
+    }
+  </li>`
+}
+
+const dimensionRow = (
+  p: Profile,
+  key: DimensionKey,
+  loc: Loc,
+  audience: Audience,
+  scrub: Scrub,
+): Raw => {
   const d = p.dimensions.find((x) => x.key === key)!
+  const head = html`<span class="dim-name">${loc.text((m) => m.dimensionNames[key])}</span>
+    <span class="dim-main">
+      <span class="dim-title">${loc.text((_m, c, l) => scrub(c.dimension(key).title, l))}</span>
+      <span class="dim-summary">${loc.text((_m, c, l) => scrub(c.dimension(key).summary, l))}</span>
+    </span>
+    ${
+      d.evidence.length === 0
+        ? html`<span class="badge warn">${loc.text((m) => m.noEvidence)}</span>`
+        : html`<span class="badge">${loc.text((m) => m.evidenceCount(d.evidence.length))}</span>`
+    }`
+  if (audience === "share") return html`<div class="dimension static">${head}</div>`
   return html`<details class="dimension">
-    <summary>
-      <span class="dim-name">${loc.text((m) => m.dimensionNames[key])}</span>
-      <span class="dim-title">${loc.text((_m, c) => c.dimension(key).title)}</span>
-      ${
-        d.evidence.length === 0
-          ? html`<span class="badge warn">${loc.text((m) => m.noEvidence)}</span>`
-          : html`<span class="badge">${loc.text((m) => m.evidenceCount(d.evidence.length))}</span>`
-      }
-    </summary>
+    <summary>${head}</summary>
     <div class="dim-body">
-      <p>${loc.text((_m, c) => c.dimension(key).summary)}</p>
       ${
         d.evidence.length === 0
           ? html`<p class="warning">${loc.text((m) => m.insufficientEvidence)}</p>`
@@ -183,10 +228,31 @@ const dimensionRow = (p: Profile, key: DimensionKey, loc: Loc): Raw => {
   </details>`
 }
 
-const kpi = (value: Raw, label: Raw): Raw =>
-  html`<div class="kpi">
+const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
+  html`<div class="sig tip ${i === 0 ? "tip-l" : i === 3 ? "tip-r" : ""}" ${tip} tabindex="-1">
     <b>${value}</b><span>${label}</span>
   </div>`
+
+/**
+ * Replaces project names in generated text on the share page (the model may mention them).
+ * Identity on the private report.
+ */
+type Scrub = (text: string, lang: Language) => string
+
+const makeScrub = (p: Profile, audience: Audience): Scrub => {
+  if (audience === "private") return (text) => text
+  const names = [
+    ...new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)]),
+  ].toSorted((a, b) => b.length - a.length)
+  return (text, lang) =>
+    names.reduce((out, name, i) => {
+      const index = p.stats.activity.projects.indexOf(name)
+      const label = `${MESSAGES[lang].projectAnon} ${"ABCDEFGHIJ"[index === -1 ? i : index] ?? "?"}`
+      return name.length < 3
+        ? out
+        : out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), label)
+    }, text)
+}
 
 // ---- styles -------------------------------------------------------------------------------
 
@@ -254,12 +320,15 @@ p{margin:0}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
 .hero .meta{margin-top:16px;font-size:12.5px;color:var(--id-muted)}
+.hero-clock{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:min(30%,250px)}
+.hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
 .hero .graphic{position:absolute;right:36px;top:28px;bottom:28px;height:calc(100% - 56px);width:auto;max-width:30%;object-fit:contain}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
-.kpi,.panel,.trait,.dimension,.fact,.about{background:var(--card);border:1px solid var(--border);border-radius:18px}
-.kpi{padding:16px 18px}
-.kpi b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.1}
-.kpi>span{color:var(--muted);font-size:12.5px}
+.sigs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.sig,.panel,.trait,.dimension,.fact,.about,.minor{background:var(--card);border:1px solid var(--border);border-radius:18px}
+.sig{position:relative;padding:16px 18px;outline:none}
+.sig b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.15}
+.sig>span{color:var(--muted);font-size:12.5px}
+.sig:hover,.sig:focus{border-color:var(--accent)}
 .grid{display:grid;gap:12px;margin-bottom:12px}
 .g-2{grid-template-columns:2fr 1fr}
 .g-3{grid-template-columns:repeat(3,1fr)}
@@ -268,7 +337,7 @@ p{margin:0}
 .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .panel-head h2{margin-bottom:0}.panel-head .note{margin-top:0}
 .panel{padding:18px 20px}
-.panel h2{font-size:14px;margin-bottom:10px}
+.panel h3{font-size:14px;margin-bottom:10px}
 .panel .note{color:var(--muted);font-size:12px;margin-top:6px}
 .axis{fill:var(--muted);font-size:11px}
 .donut{display:flex;align-items:center;gap:16px}
@@ -296,6 +365,7 @@ p{margin:0}
 .length .shares li{grid-template-columns:84px 1fr 78px}
 details summary{cursor:pointer}
 section>h2{font-size:20px;margin:36px 0 14px}
+section .panel{margin-bottom:12px}
 .traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .trait{padding:18px 20px}
 .trait header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
@@ -305,7 +375,15 @@ section>h2{font-size:20px;margin:36px 0 14px}
 .meter i{width:14px;height:6px;border-radius:3px;background:var(--empty)}
 .meter i.on{background:var(--accent)}
 .meter-label{font-size:11px;color:var(--muted);margin-left:6px;white-space:nowrap}
-.trait details{margin-top:10px}
+.trait details{margin-top:8px}
+.lead-quote{margin-top:12px}
+.support{margin-top:10px;font-size:12px;color:var(--muted)}
+.sub-h{font-size:14px;color:var(--muted);margin:22px 0 10px}
+.minors{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.minor{padding:12px 16px}
+.minor-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.minor p{font-size:13px;color:var(--muted);margin-top:4px}
+.minor details{margin-top:6px}
 .trait summary,.dim-body summary{font-size:13px;color:var(--accent)}
 .evidence li{margin:8px 0 0}
 blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:var(--muted);font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -315,7 +393,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .dimension>summary::after{content:"+";margin-left:12px;color:var(--muted);font-size:18px;line-height:1}
 .dimension[open]>summary::after{content:"–"}
 .dim-name{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;min-width:120px}
-.dim-title{font-weight:600;flex:1}
+.dim-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dim-title{font-weight:600}
+.dim-summary{font-size:13.5px;color:var(--muted);font-weight:400}
+.dimension.static{display:flex;align-items:center;gap:12px;padding:14px 18px}
 .badge{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 .badge.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
 .dim-body{padding:0 18px 16px}
@@ -324,15 +405,21 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
+.measured{margin-top:14px}
+.measured .panel{background:var(--bg)}
+.foot{margin-top:28px;text-align:center;font-size:12px;color:var(--muted)}
 .about summary{color:var(--fg);font-weight:600}
 .about p{margin-top:8px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 @media (max-width:1000px){.g-3{grid-template-columns:repeat(2,1fr)}.g-2r{grid-template-columns:1fr}}
 @media (max-width:760px){
 .hero{padding:26px 22px}.hero .copy{max-width:none}.hero .split{display:none}
+.hero-clock{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:min(30%,250px)}
+.hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
 .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
-.kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
-.dim-name{min-width:0}.dimension>summary{flex-wrap:wrap;gap:6px 12px}
+.hero-clock{position:static;transform:none;width:70%;margin:18px auto 0}
+.sigs{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
+.dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
 `
 
@@ -364,7 +451,7 @@ ${identityVars(CLASSIC_IDENTITY)}`
 @media (prefers-color-scheme:dark){:root{${tokens(look.dark)}}}
 ${identityVars(look.identity)}
 .hero{border:0}
-h1,section>h2,.kpi b{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC",sans-serif;font-weight:800}`
+h1,section>h2,.sig b{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC",sans-serif;font-weight:800}`
 }
 
 // ---- page ---------------------------------------------------------------------------------
@@ -373,24 +460,51 @@ h1,section>h2,.kpi b{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Seg
 export const renderHtml = (
   profile: Profile,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
-): string => {
+): string => renderPage(profile, options, "private")
+
+/**
+ * The page meant for other people: identity, measured signature, rhythm and chapters, with no
+ * quotes, no project names ("Project A"), no exact dates and no fun facts.
+ */
+export const renderShareHtml = (
+  profile: Profile,
+  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+): string => renderPage(profile, options, "share")
+
+const renderPage = (profile: Profile, options: RenderOptions, audience: Audience): string => {
   const look = lookOf(options.look)
   const identity = look?.identity ?? CLASSIC_IDENTITY
   const loc = makeLoc(profile)
+  const scrub = makeScrub(profile, audience)
+  const view = audience === "share" ? SHARE_VIEW : PRIVATE_VIEW
+  const isPrivate = audience === "private"
   const s = profile.stats
   const tz = s.timezone
   const c = profile.coverage
-  const peak = peakHour(s)
   const multi = loc.langs.length > 1
-  const graphic = graphicSvg(identity.graphic, s.hourHistogram, {
-    graphicColor: identity.graphicColor,
-    graphicDetail: identity.graphicDetail,
-  })
+  const window = chronotype(s)
+  const windowText = loc.text((m) =>
+    window === null ? m.none : m.chronotype(hh(window.start), hh(window.end)),
+  )
   const period = s.dateRange
-  const n = (x: number) => html`${x.toLocaleString("en")}`
-  const cal = calendar(s, loc)
-  const ranking = projectRanking(s, loc)
-  const weekly = projectWeeks(s, loc)
+  const cal = isPrivate ? calendar(s, loc, view) : null
+  const ranking = projectRanking(s, loc, view)
+  const weekly = projectWeeks(s, loc, view)
+  const strip = chapterStrip(s, chapters(s), loc, view)
+  const order = profile.traits
+    .map((t, i) => ({ t, i }))
+    .toSorted((a, b) => CONFIDENCE_RANK[a.t.confidence] - CONFIDENCE_RANK[b.t.confidence])
+    .map((x) => x.i)
+  const signature = order.slice(0, 3)
+  const minor = order.slice(3)
+  const every = correctionEvery(s)
+  const perSession = promptsPerSession(s)
+  const graphic = look
+    ? graphicSvg(identity.graphic, s.hourHistogram, {
+        graphicColor: identity.graphicColor,
+        graphicDetail: identity.graphicDetail,
+      })
+    : null
 
   const page = html`<!doctype html>
     <html lang="${LANG_TAGS[loc.langs[0]!]}"${look ? raw(` data-look="${look.id}"`) : ""}>
@@ -402,7 +516,7 @@ export const renderHtml = (
           http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${look ? "; font-src data:" : ""}"
         />
-        <title>${profile.archetype.name} · prompt-profile</title>
+        <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
           ${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(lookStyle(look))}${raw(
             languageStyle(loc.langs),
@@ -444,180 +558,145 @@ export const renderHtml = (
           <section class="hero">
             ${identity.split ? html`<div class="split"></div>` : ""}
             <div class="copy">
-              <h1>${loc.text((_m, ct) => ct.archetype.name)}</h1>
-              <p class="tagline">${loc.text((_m, ct) => ct.headline)}</p>
-              <p class="desc">${loc.text((_m, ct) => ct.archetype.description)}</p>
-              <p class="meta">
-                ${loc.text((m) =>
-                  [
-                    period
-                      ? m.period(
-                          formatDate(period.from, tz, m.locale),
-                          formatDate(period.to, tz, m.locale),
-                        )
-                      : null,
-                    m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
-                    c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
-                    c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
-                  ]
-                    .filter((x) => x !== null)
-                    .join(" · "),
-                )}
-              </p>
+              <h1>${loc.text((_m, ct, l) => scrub(ct.archetype.name, l))}</h1>
+              <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
+              <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
+              ${look ? html`<p class="chrono">${windowText}</p>` : ""}
+              ${
+                isPrivate
+                  ? html`<p class="meta">
+                      ${loc.text((m) =>
+                        [
+                          period
+                            ? m.period(
+                                formatDate(period.from, tz, m.locale),
+                                formatDate(period.to, tz, m.locale),
+                              )
+                            : null,
+                          m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
+                          c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
+                          c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
+                        ]
+                          .filter((x) => x !== null)
+                          .join(" · "),
+                      )}
+                    </p>`
+                  : ""
+              }
             </div>
-            <img
-              class="graphic"
-              src="${svgDataUrl(graphic.svg)}"
-              alt="${loc.attr((m) => m.graphicAlt)}"
-            />
+            ${
+              graphic
+                ? html`<img
+                    class="graphic"
+                    src="${svgDataUrl(graphic.svg)}"
+                    alt="${loc.attr((m) => m.graphicAlt)}"
+                  />`
+                : html`<div class="hero-clock">${radialClock(s, window, windowText)}</div>`
+            }
           </section>
 
-          <section class="kpis">
-            ${kpi(
-              n(s.totalPrompts),
-              loc.text((m) => m.totalPrompts),
+          <section class="sigs" aria-label="${loc.attr((m) => m.signature)}">
+            ${signatureTile(
+              html`${percent(nightShare(s))}%`,
+              loc.text((m) => m.nightShare),
+              loc.tip((m) => m.nightShareDef),
+              0,
             )}
-            ${kpi(
-              n(s.activeDays),
-              loc.text((m) => m.activeDays),
+            ${signatureTile(
+              loc.text((m) => m.characters(Math.round(s.promptLength.median))),
+              loc.text((m) => m.medianPrompt),
+              loc.tip((m) => m.medianPromptDef),
+              1,
             )}
-            ${kpi(
-              loc.text((m) => m.days(s.longestStreakDays)),
-              loc.text((m) => m.longestStreak),
+            ${signatureTile(
+              loc.text((m) => m.corrections(every)),
+              loc.text((m) => m.correctionsLabel),
+              loc.tip((m) => m.correctionsDef),
+              2,
             )}
-            ${kpi(
-              html`${peak === null ? "—" : hh(peak)}`,
-              loc.text((m) => m.peakHour),
+            ${signatureTile(
+              html`${perSession === null ? "—" : perSession}`,
+              loc.text((m) => m.perSession),
+              loc.tip((m) => m.perSessionDef),
+              3,
             )}
           </section>
-
-          ${
-            cal
-              ? html`<article class="panel wide">
-                  <div class="panel-head">
-                    <h2>${loc.text((m) => m.daily)}</h2>
-                    <p class="note">${loc.text((m) => m.dailyNote)}</p>
-                  </div>
-                  ${cal}
-                </article>`
-              : ""
-          }
-
-          <div class="grid g-2">
-            <article class="panel">
-              <h2>${loc.text((m) => m.byHour)}</h2>
-              ${hourChart(s, loc)}
-              <p class="note">
-                ${loc.text((m) =>
-                  m.byHourNote(peak === null ? m.none : hh(peak), s.latestTime ?? m.none),
-                )}
-              </p>
-            </article>
-            <article class="panel">
-              <h2>${loc.text((m) => m.byWeekday)}</h2>
-              ${weekdayChart(s, loc)}
-            </article>
-          </div>
-
-          <article class="panel wide">
-            <div class="panel-head">
-              <h2>${loc.text((m) => m.heatmap)}</h2>
-              <p class="note">${loc.text((m) => m.heatmapNote)}</p>
-            </div>
-            ${heatmap(s, loc)}
-          </article>
-
-          ${
-            ranking && weekly
-              ? html`<div class="grid g-2r">
-                  <article class="panel">
-                    <h2>${loc.text((m) => m.projects)}</h2>
-                    ${ranking}
-                    <p class="note">${loc.text((m) => m.projectsNote)}</p>
-                  </article>
-                  <article class="panel">
-                    <h2>${loc.text((m) => m.projectsByWeek)}</h2>
-                    ${weekly}
-                  </article>
-                </div>`
-              : ""
-          }
-
-          <div class="grid g-3">
-            <article class="panel">
-              <h2>${loc.text((m) => m.languageMix)}</h2>
-              ${donut([
-                { value: s.languageMix.zh, label: loc.text((m) => m.languageNames.zh) },
-                { value: s.languageMix.en, label: loc.text((m) => m.languageNames.en) },
-                { value: s.languageMix.mixed, label: loc.text((m) => m.languageNames.mixed) },
-              ])}
-            </article>
-            <article class="panel">
-              <h2>${loc.text((m) => m.sources)}</h2>
-              ${shareBars(
-                Object.entries(s.bySource).map(([id, count]) => ({
-                  label: html`${RUNNER_NAMES[id as keyof typeof RUNNER_NAMES] ?? id}`,
-                  n: count,
-                })),
-              )}
-              <p class="sub">${loc.text((m) => m.origins)}</p>
-              ${shareBars(
-                (["interactive", "sdk", "exec", "unknown"] as const).map((o) => ({
-                  label: loc.text((m) => m.originNames[o]),
-                  n: s.byOrigin[o],
-                })),
-              )}
-            </article>
-            <article class="panel">
-              <h2>${loc.text((m) => m.habits)}</h2>
-              <div class="rings">
-                ${ring(
-                  s.correctionRate,
-                  loc.text((m) => m.correctionRate),
-                )}
-                ${ring(
-                  s.imageRate,
-                  loc.text((m) => m.imageRate),
-                )}
-              </div>
-              <div class="length">
-                <p class="sub">${loc.text((m) => m.promptLength)}</p>
-                <ul class="shares">
-                  ${(
-                    [
-                      ["median", s.promptLength.median],
-                      ["p90", s.promptLength.p90],
-                    ] as const
-                  ).map(
-                    ([k, v]) =>
-                      html`<li>
-                        <span class="share-label">${loc.text((m) => m[k])}</span>
-                        <span class="share-track"
-                          ><span
-                            class="share-fill"
-                            style="width:${(100 * v) / Math.max(1, s.promptLength.p90)}%"
-                          ></span
-                        ></span>
-                        <b>${loc.text((m) => m.characters(Math.round(v)))}</b>
-                      </li>`,
-                  )}
-                </ul>
-              </div>
-            </article>
-          </div>
 
           <section>
             <h2>${loc.text((m) => m.traits)}</h2>
-            <div class="traits">${profile.traits.map((_t, i) => traitCard(profile, i, loc))}</div>
+            <div class="traits">
+              ${signature.map((i) => signatureTrait(profile, i, loc, audience, scrub))}
+            </div>
+            ${
+              minor.length > 0
+                ? html`<h3 class="sub-h">${loc.text((m) => m.moreTraits)}</h3>
+                    <ul class="minors">
+                      ${minor.map((i) => minorTrait(profile, i, loc, audience, scrub))}
+                    </ul>`
+                : ""
+            }
           </section>
 
           <section>
-            <h2>${loc.text((m) => m.dimensions)}</h2>
-            <div class="dims">${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc))}</div>
+            <h2>${loc.text((m) => m.rhythm)}</h2>
+            ${
+              cal
+                ? html`<article class="panel wide">
+                    <div class="panel-head">
+                      <h3>${loc.text((m) => m.daily)}</h3>
+                      <p class="note">
+                        ${loc.text((m) => m.volume(s.totalPrompts, s.activeDays, s.longestStreakDays))}
+                      </p>
+                    </div>
+                    ${cal}
+                  </article>`
+                : ""
+            }
+            <article class="panel wide">
+              <div class="panel-head">
+                <h3>${loc.text((m) => m.heatmap)}</h3>
+                <p class="note">${loc.text((m) => m.heatmapNote)}</p>
+              </div>
+              ${heatmap(s, loc, view)}
+              ${
+                window
+                  ? html`<p class="note">
+                      ${windowText} · ${loc.text((m) => m.chronotypeShare(percent(window.share)))}
+                    </p>`
+                  : ""
+              }
+            </article>
           </section>
 
           ${
-            profile.funFacts.length > 0
+            ranking && weekly && strip
+              ? html`<section>
+                  <h2>${loc.text((m) => m.chapters)}</h2>
+                  <div class="grid g-2r">
+                    <article class="panel">
+                      <h3>${loc.text((m) => m.projects)}</h3>
+                      ${ranking}
+                      ${isPrivate ? html`<p class="note">${loc.text((m) => m.projectsNote)}</p>` : ""}
+                    </article>
+                    <article class="panel">
+                      ${strip}
+                      <h3>${loc.text((m) => m.projectsByWeek)}</h3>
+                      ${weekly}
+                    </article>
+                  </div>
+                </section>`
+              : ""
+          }
+
+          <section>
+            <h2>${loc.text((m) => m.dimensions)}</h2>
+            <div class="dims">
+              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, audience, scrub))}
+            </div>
+          </section>
+
+          ${
+            isPrivate && profile.funFacts.length > 0
               ? html`<section>
                   <h2>${loc.text((m) => m.funFacts)}</h2>
                   <ul class="facts">
@@ -630,23 +709,86 @@ export const renderHtml = (
               : ""
           }
 
-          <details class="about">
-            <summary>${loc.text((m) => m.about)}</summary>
-            <p>
-              ${loc.text(
-                (m) =>
-                  `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt(formatDateTime(profile.generatedAt, tz, m.locale))}`,
-              )}
-            </p>
-            <p>
-              ${loc.text(
-                (m) =>
-                  `${m.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? ` · ${m.chunksSkipped(c.chunksFailed)}` : ""}`,
-              )}
-            </p>
-            <p>${loc.text((m) => m.privacy)}</p>
-            <p>prompt-profile · npx prompt-profile</p>
-          </details>
+          ${
+            isPrivate
+              ? html`<details class="about">
+                  <summary>${loc.text((m) => m.howMeasured)}</summary>
+                  <div class="grid g-3 measured">
+                    <article class="panel">
+                      <h3>${loc.text((m) => m.languageMix)}</h3>
+                      ${donut([
+                        { value: s.languageMix.zh, label: loc.text((m) => m.languageNames.zh) },
+                        { value: s.languageMix.en, label: loc.text((m) => m.languageNames.en) },
+                        {
+                          value: s.languageMix.mixed,
+                          label: loc.text((m) => m.languageNames.mixed),
+                        },
+                      ])}
+                    </article>
+                    <article class="panel">
+                      <h3>${loc.text((m) => m.sources)}</h3>
+                      ${shareBars(
+                        Object.entries(s.bySource).map(([id, count]) => ({
+                          label: html`${RUNNER_NAMES[id as keyof typeof RUNNER_NAMES] ?? id}`,
+                          n: count,
+                        })),
+                      )}
+                      <p class="sub">${loc.text((m) => m.origins)}</p>
+                      ${shareBars(
+                        (["interactive", "sdk", "exec", "unknown"] as const).map((o) => ({
+                          label: loc.text((m) => m.originNames[o]),
+                          n: s.byOrigin[o],
+                        })),
+                      )}
+                    </article>
+                    <article class="panel">
+                      <h3>${loc.text((m) => m.habits)}</h3>
+                      <div class="rings">${ring(
+                        s.imageRate,
+                        loc.text((m) => m.imageRate),
+                      )}</div>
+                      <div class="length">
+                        <p class="sub">${loc.text((m) => m.promptLength)}</p>
+                        <ul class="shares">
+                          ${(
+                            [
+                              ["median", s.promptLength.median],
+                              ["p90", s.promptLength.p90],
+                            ] as const
+                          ).map(
+                            ([k, v]) =>
+                              html`<li>
+                                <span class="share-label">${loc.text((m) => m[k])}</span>
+                                <span class="share-track"
+                                  ><span
+                                    class="share-fill"
+                                    style="width:${(100 * v) / Math.max(1, s.promptLength.p90)}%"
+                                  ></span
+                                ></span>
+                                <b>${loc.text((m) => m.characters(Math.round(v)))}</b>
+                              </li>`,
+                          )}
+                        </ul>
+                      </div>
+                    </article>
+                  </div>
+                  <p>
+                    ${loc.text(
+                      (m) =>
+                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt(formatDateTime(profile.generatedAt, tz, m.locale))}`,
+                    )}
+                  </p>
+                  <p>
+                    ${loc.text(
+                      (m) =>
+                        `${m.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? ` · ${m.chunksSkipped(c.chunksFailed)}` : ""}`,
+                    )}
+                  </p>
+                  <p>${loc.text((m) => m.privacy)}</p>
+                </details>`
+              : ""
+          }
+          <footer class="foot">prompt-profile · npx prompt-profile</footer>
         </div>
       </body>
     </html> `

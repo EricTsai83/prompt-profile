@@ -3,6 +3,7 @@ import { peakHour } from "../domain/Stats.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"
+import type { Chapter } from "./derive.ts"
 
 /**
  * Charts drawn from `stats` only, as HTML/CSS so they reflow on small screens. Hover (or tap)
@@ -11,25 +12,47 @@ import type { Messages } from "./messages.ts"
  */
 
 const hh = (h: number) => `${String(h).padStart(2, "0")}:00`
+
+/** What a chart may reveal: the share page hides project names and exact dates. */
+export interface ChartView {
+  readonly anonymizeProjects: boolean
+  readonly showDates: boolean
+}
+
+export const PRIVATE_VIEW: ChartView = { anonymizeProjects: false, showDates: true }
+export const SHARE_VIEW: ChartView = { anonymizeProjects: true, showDates: false }
+
+/** "Project A", "Project B"… in place of folder names on the share page. */
+const ANON = "ABCDEFGHIJ"
 const pct = (n: number, max: number) => (max <= 0 ? 0 : (100 * n) / max).toFixed(1)
 
 /** Tooltip anchor: `tabindex="-1"` makes it tappable without adding a Tab stop. */
 const tipClass = (i: number, n: number) => (i < 2 ? "tip tip-l" : i >= n - 2 ? "tip tip-r" : "tip")
 
 /** Project name for slot `i` (the last slot is "other"). */
-const projectName = (s: Stats, i: number, m: Messages) => s.activity.projects[i] ?? m.other
+export const projectName = (s: Stats, i: number, m: Messages, view: ChartView = PRIVATE_VIEW) =>
+  i >= s.activity.projects.length
+    ? m.other
+    : view.anonymizeProjects
+      ? `${m.projectAnon} ${ANON[i]}`
+      : s.activity.projects[i]!
 
 const slotColor = (s: Stats, i: number) =>
   i < s.activity.projects.length ? `var(--p${i})` : "var(--po)"
 
 /** "drawstuff 8 · dotfiles 3": the two biggest non-zero slots. */
-const topProjects = (s: Stats, counts: ReadonlyArray<number>, m: Messages): string =>
+const topProjects = (
+  s: Stats,
+  counts: ReadonlyArray<number>,
+  m: Messages,
+  view: ChartView = PRIVATE_VIEW,
+): string =>
   counts
     .map((n, i) => ({ n, i }))
     .filter((x) => x.n > 0)
     .toSorted((a, b) => b.n - a.n)
     .slice(0, 2)
-    .map((x) => `${projectName(s, x.i, m)} ${x.n}`)
+    .map((x) => `${projectName(s, x.i, m, view)} ${x.n}`)
     .join(" · ")
 
 /** Format `YYYY-MM-DD` (a calendar date, not an instant) in a language. */
@@ -101,15 +124,34 @@ export const weekdayChart = (s: Stats, loc: Loc): Raw => {
 const level = (n: number, max: number) =>
   n === 0 ? 0 : Math.min(4, Math.max(1, Math.ceil(4 * Math.sqrt(n / max))))
 
-export const heatmap = (s: Stats, loc: Loc): Raw => {
+/**
+ * Weekday × hour with marginal totals: hour bars on top, weekday bars on the right. One chart
+ * instead of separate hour, weekday and heatmap panels.
+ */
+export const heatmap = (s: Stats, loc: Loc, view: ChartView = PRIVATE_VIEW): Raw => {
   const max = Math.max(1, ...s.activityGrid.flat())
+  const hourMax = Math.max(1, ...s.hourHistogram)
+  const dayMax = Math.max(1, ...s.weekdayHistogram)
+  const peak = peakHour(s)
   const split = s.activity.gridByProject
   return html`<div class="heat" role="img" aria-label="${loc.attr((m) => m.heatmap)}">
+    <span></span>
+    ${s.hourHistogram.map(
+      (n, h) =>
+        html`<span
+          class="heat-top ${tipClass(h, 24)}"
+          ${loc.tip((m) => m.hourTip(hh(h), n))}
+          tabindex="-1"
+          ><i class="${h === peak ? "peak" : ""}" style="height:${n === 0 ? 0 : pct(n, hourMax)}%"></i
+        ></span>`,
+    )}
+    <span></span>
     <span></span>
     ${Array.from(
       { length: 24 },
       (_, h) => html`<span class="heat-h">${h % 3 === 0 ? String(h).padStart(2, "0") : ""}</span>`,
     )}
+    <span></span>
     ${s.activityGrid.map(
       (row, w) =>
         html`<span class="heat-d">${loc.text((m) => m.weekdays[w]!)}</span>${row.map(
@@ -120,16 +162,87 @@ export const heatmap = (s: Stats, loc: Loc): Raw => {
                   [
                     m.cellTip(m.weekdays[w]!, hh(h)),
                     m.prompts(n),
-                    split[w]?.[h] ? topProjects(s, split[w]![h]!, m) : "",
+                    split[w]?.[h] ? topProjects(s, split[w]![h]!, m, view) : "",
                   ]
                     .filter((x) => x !== "")
                     .join(" · "),
                 )}
                 tabindex="-1"
               ></span>`,
-        )}`,
+        )}<span
+            class="heat-side tip tip-r"
+            ${loc.tip((m) => `${m.weekdays[w]} · ${m.prompts(s.weekdayHistogram[w]!)}`)}
+            tabindex="-1"
+            ><i style="width:${pct(s.weekdayHistogram[w]!, dayMax)}%"></i
+          ></span>`,
     )}
   </div>`
+}
+
+/** 24 radial bars around a dial; the busiest four hours are drawn in full colour. */
+export const radialClock = (
+  s: Stats,
+  window: { readonly start: number; readonly end: number } | null,
+  label: Raw,
+): Raw => {
+  const max = Math.max(1, ...s.hourHistogram)
+  const inWindow = (h: number) =>
+    window !== null && (h - window.start + 24) % 24 < (window.end - window.start + 24) % 24
+  const bars = s.hourHistogram.map((n, h) => {
+    const a = (h / 24) * Math.PI * 2 - Math.PI / 2
+    const r0 = 62
+    const r1 = r0 + 4 + (54 * n) / max
+    const p = (r: number) =>
+      `${(130 + Math.cos(a) * r).toFixed(1)} ${(130 + Math.sin(a) * r).toFixed(1)}`
+    return html`<path d="M${p(r0)}L${p(r1)}" class="${inWindow(h) ? "clock-bar on" : "clock-bar"}" />`
+  })
+  const ticks = [0, 6, 12, 18].map((h) => {
+    const a = (h / 24) * Math.PI * 2 - Math.PI / 2
+    return html`<text
+      x="${(130 + Math.cos(a) * 50).toFixed(1)}"
+      y="${(134 + Math.sin(a) * 50).toFixed(1)}"
+      text-anchor="middle"
+      class="clock-tick"
+      >${String(h).padStart(2, "0")}</text
+    >`
+  })
+  return html`<figure class="clock">
+    <svg viewBox="0 0 260 260" aria-hidden="true">
+      <circle cx="130" cy="130" r="60" class="clock-dial" />
+      ${bars}${ticks}
+    </svg>
+    <figcaption>${label}</figcaption>
+  </figure>`
+}
+
+/** The chapter strip: one segment per chapter, width by months, coloured by project. */
+export const chapterStrip = (
+  s: Stats,
+  list: ReadonlyArray<Chapter>,
+  loc: Loc,
+  view: ChartView = PRIVATE_VIEW,
+): Raw | null => {
+  if (list.length === 0) return null
+  const months = (c: Chapter) => {
+    const [fy, fm] = c.from.split("-").map(Number) as [number, number]
+    const [ty, tm] = c.to.split("-").map(Number) as [number, number]
+    return (ty - fy) * 12 + (tm - fm) + 1
+  }
+  const monthName = (ym: string, m: Messages) =>
+    formatDay(`${ym}-01`, m, { month: "short", ...(view.showDates ? {} : {}) })
+  return html`<ol class="chapters">
+    ${list.map(
+      (c) =>
+        html`<li style="flex:${months(c)};--c:${slotColor(s, c.slot)}">
+          <span class="ch-bar"></span>
+          <span class="ch-name">${loc.text((m) => projectName(s, c.slot, m, view))}</span>
+          <span class="ch-when"
+            >${loc.text((m) => m.chapterRange(monthName(c.from, m), monthName(c.to, m)))} ·
+            ${loc.text((m) => m.prompts(c.prompts))}</span
+          >
+        </li>`,
+    )}
+  </ol>`
 }
 
 const legend = (loc: Loc): Raw =>
@@ -141,7 +254,7 @@ const legend = (loc: Loc): Raw =>
 
 // ---- calendar: one square per day ---------------------------------------------------------
 
-export const calendar = (s: Stats, loc: Loc): Raw | null => {
+export const calendar = (s: Stats, loc: Loc, view: ChartView = PRIVATE_VIEW): Raw | null => {
   const days = s.activity.days
   if (days.length === 0) return null
   const byDate = new Map(days.map((d) => [d.date, d]))
@@ -178,7 +291,7 @@ export const calendar = (s: Stats, loc: Loc): Raw | null => {
                   weekday: "short",
                 }),
                 m.prompts(d?.count ?? 0),
-                d ? topProjects(s, d.byProject, m) : "",
+                d ? topProjects(s, d.byProject, m, view) : "",
               ]
                 .filter((x) => x !== "")
                 .join(" · "),
@@ -202,7 +315,7 @@ const projectTotals = (s: Stats): Array<number> => {
   return totals
 }
 
-export const projectRanking = (s: Stats, loc: Loc): Raw | null => {
+export const projectRanking = (s: Stats, loc: Loc, view: ChartView = PRIVATE_VIEW): Raw | null => {
   if (s.activity.projects.length === 0) return null
   const totals = projectTotals(s)
   const sum = Math.max(
@@ -216,11 +329,9 @@ export const projectRanking = (s: Stats, loc: Loc): Raw | null => {
       (r) =>
         html`<li>
           <span class="rank-name"
-            ><i class="dot" style="background:${slotColor(s, r.i)}"></i>${
-              r.i < s.activity.projects.length
-                ? html`${s.activity.projects[r.i]}`
-                : loc.text((m) => m.other)
-            }</span
+            ><i class="dot" style="background:${slotColor(s, r.i)}"></i>${loc.text((m) =>
+              projectName(s, r.i, m, view),
+            )}</span
           >
           <span class="share-track"
             ><span
@@ -234,7 +345,7 @@ export const projectRanking = (s: Stats, loc: Loc): Raw | null => {
   </ul>`
 }
 
-export const projectWeeks = (s: Stats, loc: Loc): Raw | null => {
+export const projectWeeks = (s: Stats, loc: Loc, view: ChartView = PRIVATE_VIEW): Raw | null => {
   const days = s.activity.days
   if (days.length === 0 || s.activity.projects.length === 0) return null
   const slots = s.activity.projects.length + 1
@@ -257,9 +368,11 @@ export const projectWeeks = (s: Stats, loc: Loc): Raw | null => {
         class="stack-w ${tipClass(wi, entries.length)}"
         ${loc.tip((m) =>
           [
-            m.weekOf(formatDay(monday, m, { month: "short", day: "numeric" })),
+            view.showDates
+              ? m.weekOf(formatDay(monday, m, { month: "short", day: "numeric" }))
+              : formatDay(monday, m, { month: "short" }),
             m.prompts(total),
-            topProjects(s, counts, m),
+            topProjects(s, counts, m, view),
           ]
             .filter((x) => x !== "")
             .join(" · "),
@@ -284,7 +397,25 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity .15s}
 .col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
 .col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
-.heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr));gap:3px;margin-top:12px}
+.heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
+.heat-top{position:relative;height:56px;display:flex;align-items:flex-end;outline:none}
+.heat-top i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.35}
+.heat-top i.peak,.heat-top:hover i,.heat-top:focus i{opacity:1}
+.heat-side{position:relative;display:flex;align-items:center;outline:none}
+.heat-side i{display:block;height:60%;border-radius:0 3px 3px 0;background:var(--accent);opacity:.45}
+.heat-side:hover i,.heat-side:focus i{opacity:1}
+.clock{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.clock svg{width:100%;max-width:240px;height:auto}
+.clock-dial{fill:none;stroke:var(--id-muted,var(--muted));stroke-opacity:.25}
+.clock-bar{stroke:var(--id-accent,var(--accent));stroke-width:7;stroke-linecap:round;stroke-opacity:.35}
+.clock-bar.on{stroke-opacity:1}
+.clock-tick{fill:var(--id-muted,var(--muted));font-size:11px}
+.clock figcaption{font-size:13px;color:var(--id-muted,var(--muted));text-align:center}
+.chapters{display:flex;gap:6px;list-style:none;margin:6px 0 18px;padding:0}
+.chapters li{min-width:0;display:flex;flex-direction:column;gap:4px}
+.ch-bar{height:10px;border-radius:5px;background:var(--c)}
+.ch-name{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-when{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .heat-h{font-size:10px;color:var(--muted);text-align:left}
 .heat-d{font-size:11px;color:var(--muted);align-self:center}
 .heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none}
@@ -327,7 +458,9 @@ ${
 @media (max-width:640px){
 .cal-w:nth-last-child(n+19){display:none}
 .cols{height:140px}.hours{gap:2px}
-.heat{grid-template-columns:20px repeat(24,minmax(0,1fr));gap:2px}
+.heat{grid-template-columns:20px repeat(24,minmax(0,1fr)) 28px;gap:2px}
+.heat-top{height:34px}
+.chapters{flex-direction:column}
 .heat-c{height:14px}
 .heat-h{font-size:9px}
 .stack{height:140px;gap:2px}

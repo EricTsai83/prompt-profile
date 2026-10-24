@@ -33,12 +33,15 @@ p{margin:0}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
 .hero .meta{margin-top:16px;font-size:12.5px;color:var(--id-muted)}
+.hero-clock{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:min(30%,250px)}
+.hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
 .hero .graphic{position:absolute;right:36px;top:28px;bottom:28px;height:calc(100% - 56px);width:auto;max-width:30%;object-fit:contain}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
-.kpi,.panel,.trait,.dimension,.fact,.about{background:var(--card);border:1px solid var(--border);border-radius:18px}
-.kpi{padding:16px 18px}
-.kpi b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.1}
-.kpi>span{color:var(--muted);font-size:12.5px}
+.sigs{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.sig,.panel,.trait,.dimension,.fact,.about,.minor{background:var(--card);border:1px solid var(--border);border-radius:18px}
+.sig{position:relative;padding:16px 18px;outline:none}
+.sig b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.15}
+.sig>span{color:var(--muted);font-size:12.5px}
+.sig:hover,.sig:focus{border-color:var(--accent)}
 .grid{display:grid;gap:12px;margin-bottom:12px}
 .g-2{grid-template-columns:2fr 1fr}
 .g-3{grid-template-columns:repeat(3,1fr)}
@@ -47,7 +50,7 @@ p{margin:0}
 .panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .panel-head h2{margin-bottom:0}.panel-head .note{margin-top:0}
 .panel{padding:18px 20px}
-.panel h2{font-size:14px;margin-bottom:10px}
+.panel h3{font-size:14px;margin-bottom:10px}
 .panel .note{color:var(--muted);font-size:12px;margin-top:6px}
 .axis{fill:var(--muted);font-size:11px}
 .donut{display:flex;align-items:center;gap:16px}
@@ -75,6 +78,7 @@ p{margin:0}
 .length .shares li{grid-template-columns:84px 1fr 78px}
 details summary{cursor:pointer}
 section>h2{font-size:20px;margin:36px 0 14px}
+section .panel{margin-bottom:12px}
 .traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
 .trait{padding:18px 20px}
 .trait header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
@@ -84,7 +88,15 @@ section>h2{font-size:20px;margin:36px 0 14px}
 .meter i{width:14px;height:6px;border-radius:3px;background:var(--empty)}
 .meter i.on{background:var(--accent)}
 .meter-label{font-size:11px;color:var(--muted);margin-left:6px;white-space:nowrap}
-.trait details{margin-top:10px}
+.trait details{margin-top:8px}
+.lead-quote{margin-top:12px}
+.support{margin-top:10px;font-size:12px;color:var(--muted)}
+.sub-h{font-size:14px;color:var(--muted);margin:22px 0 10px}
+.minors{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.minor{padding:12px 16px}
+.minor-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.minor p{font-size:13px;color:var(--muted);margin-top:4px}
+.minor details{margin-top:6px}
 .trait summary,.dim-body summary{font-size:13px;color:var(--accent)}
 .evidence li{margin:8px 0 0}
 blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:var(--muted);font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -94,7 +106,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .dimension>summary::after{content:"+";margin-left:12px;color:var(--muted);font-size:18px;line-height:1}
 .dimension[open]>summary::after{content:"–"}
 .dim-name{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;min-width:120px}
-.dim-title{font-weight:600;flex:1}
+.dim-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dim-title{font-weight:600}
+.dim-summary{font-size:13.5px;color:var(--muted);font-weight:400}
+.dimension.static{display:flex;align-items:center;gap:12px;padding:14px 18px}
 .badge{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
 .badge.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
 .dim-body{padding:0 18px 16px}
@@ -103,15 +118,21 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
 .about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
+.measured{margin-top:14px}
+.measured .panel{background:var(--bg)}
+.foot{margin-top:28px;text-align:center;font-size:12px;color:var(--muted)}
 .about summary{color:var(--fg);font-weight:600}
 .about p{margin-top:8px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 @media (max-width:1000px){.g-3{grid-template-columns:repeat(2,1fr)}.g-2r{grid-template-columns:1fr}}
 @media (max-width:760px){
 .hero{padding:26px 22px}.hero .copy{max-width:none}.hero .split{display:none}
+.hero-clock{position:absolute;right:28px;top:50%;transform:translateY(-50%);width:min(30%,250px)}
+.hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
 .hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
-.kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
-.dim-name{min-width:0}.dimension>summary{flex-wrap:wrap;gap:6px 12px}
+.hero-clock{position:static;transform:none;width:70%;margin:18px auto 0}
+.sigs{grid-template-columns:repeat(2,1fr)}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
+.dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
 
 .cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
@@ -120,7 +141,25 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity .15s}
 .col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
 .col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
-.heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr));gap:3px;margin-top:12px}
+.heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
+.heat-top{position:relative;height:56px;display:flex;align-items:flex-end;outline:none}
+.heat-top i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.35}
+.heat-top i.peak,.heat-top:hover i,.heat-top:focus i{opacity:1}
+.heat-side{position:relative;display:flex;align-items:center;outline:none}
+.heat-side i{display:block;height:60%;border-radius:0 3px 3px 0;background:var(--accent);opacity:.45}
+.heat-side:hover i,.heat-side:focus i{opacity:1}
+.clock{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.clock svg{width:100%;max-width:240px;height:auto}
+.clock-dial{fill:none;stroke:var(--id-muted,var(--muted));stroke-opacity:.25}
+.clock-bar{stroke:var(--id-accent,var(--accent));stroke-width:7;stroke-linecap:round;stroke-opacity:.35}
+.clock-bar.on{stroke-opacity:1}
+.clock-tick{fill:var(--id-muted,var(--muted));font-size:11px}
+.clock figcaption{font-size:13px;color:var(--id-muted,var(--muted));text-align:center}
+.chapters{display:flex;gap:6px;list-style:none;margin:6px 0 18px;padding:0}
+.chapters li{min-width:0;display:flex;flex-direction:column;gap:4px}
+.ch-bar{height:10px;border-radius:5px;background:var(--c)}
+.ch-name{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-when{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .heat-h{font-size:10px;color:var(--muted);text-align:left}
 .heat-d{font-size:11px;color:var(--muted);align-self:center}
 .heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none}
@@ -155,7 +194,9 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 @media (max-width:640px){
 .cal-w:nth-last-child(n+19){display:none}
 .cols{height:140px}.hours{gap:2px}
-.heat{grid-template-columns:20px repeat(24,minmax(0,1fr));gap:2px}
+.heat{grid-template-columns:20px repeat(24,minmax(0,1fr)) 28px;gap:2px}
+.heat-top{height:34px}
+.chapters{flex-direction:column}
 .heat-c{height:14px}
 .heat-h{font-size:9px}
 .stack{height:140px;gap:2px}
@@ -199,38 +240,135 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
               <h1><span data-l="en" lang="en">The Midnight Architect</span><span data-l="zh-TW" lang="zh-Hant-TW">午夜架構師</span></h1>
               <p class="tagline"><span data-l="en" lang="en">A perfectionist who argues with AI about naming at midnight</span><span data-l="zh-TW" lang="zh-Hant-TW">半夜跟 AI 爭論命名的完美主義者</span></p>
               <p class="desc"><span data-l="en" lang="en">Ships features by day, refactors by night.</span><span data-l="zh-TW" lang="zh-Hant-TW">白天出貨，晚上重構。</span></p>
+              
               <p class="meta">
-                <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
-              </p>
+                      <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
+                    </p>
             </div>
-            <img
-              class="graphic"
-              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMjEwIj48cmVjdCB4PSIwLjAiIHk9IjEzMC44IiB3aWR0aD0iNy40IiBoZWlnaHQ9IjU0LjIiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTEuNyIgeT0iMTQ3LjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMzcuOSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIyMy40IiB5PSIxNTguOCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIyNi4yIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNCIvPjxyZWN0IHg9IjM1LjEiIHk9IjE2NC4zIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjIwLjciIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC40Ii8+PHJlY3QgeD0iNDYuOCIgeT0iMTY3LjAiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTguMCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjQiLz48cmVjdCB4PSI1OC41IiB5PSIxNjcuMCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxOC4wIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNCIvPjxyZWN0IHg9IjcwLjIiIHk9IjE2Ni4xIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjE4LjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC40Ii8+PHJlY3QgeD0iODEuOSIgeT0iMTYzLjQiIHdpZHRoPSI3LjQiIGhlaWdodD0iMjEuNiIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjQiLz48cmVjdCB4PSI5My42IiB5PSIxNDguOSIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIzNi4xIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjEwNS4zIiB5PSIxMTEuNyIgd2lkdGg9IjcuNCIgaGVpZ2h0PSI3My4zIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNiIvPjxyZWN0IHg9IjExNy4wIiB5PSI3OC4yIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjEwNi44IiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNyIvPjxyZWN0IHg9IjEyOC43IiB5PSI1OC4zIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjEyNi43IiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuOCIvPjxyZWN0IHg9IjE0MC40IiB5PSI5NC41IiB3aWR0aD0iNy40IiBoZWlnaHQ9IjkwLjUiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC43Ii8+PHJlY3QgeD0iMTUyLjEiIHk9IjY3LjQiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTE3LjYiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iMTYzLjgiIHk9IjQwLjIiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTQ0LjgiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTc1LjUiIHk9IjMxLjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTUzLjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTg3LjIiIHk9IjQ0LjciIHdpZHRoPSI3LjQiIGhlaWdodD0iMTQwLjMiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTk4LjkiIHk9IjYwLjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTI0LjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iMjEwLjYiIHk9Ijg1LjUiIHdpZHRoPSI3LjQiIGhlaWdodD0iOTkuNSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjciLz48cmVjdCB4PSIyMjIuMyIgeT0iNzYuNCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMDguNiIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIyMzQuMCIgeT0iNDkuMiIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMzUuOCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjkiLz48cmVjdCB4PSIyNDUuNyIgeT0iMjIuMSIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxNjIuOSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIxLjAiLz48cmVjdCB4PSIyNTcuNCIgeT0iMTMuMCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxNzIuMCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIxLjAiLz48cmVjdCB4PSIyNjkuMSIgeT0iNTguMyIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMjYuNyIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIwIiB5PSIxOTkiIHdpZHRoPSIyODAiIGhlaWdodD0iMS41IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuMzUiLz48L3N2Zz4="
-              alt="Prompts by hour of day"
-            />
+            <div class="hero-clock"><figure class="clock">
+    <svg viewBox="0 0 260 260" aria-hidden="true">
+      <circle cx="130" cy="130" r="60" class="clock-dial" />
+      <path d="M130.0 68.0L130.0 51.3" class="clock-bar" /><path d="M146.0 70.1L148.9 59.5" class="clock-bar" /><path d="M161.0 76.3L164.4 70.4" class="clock-bar" /><path d="M173.8 86.2L177.3 82.7" class="clock-bar" /><path d="M183.7 99.0L187.2 97.0" class="clock-bar" /><path d="M189.9 114.0L193.8 112.9" class="clock-bar" /><path d="M192.0 130.0L196.3 130.0" class="clock-bar" /><path d="M189.9 146.0L195.0 147.4" class="clock-bar" /><path d="M183.7 161.0L192.7 166.2" class="clock-bar" /><path d="M173.8 173.8L190.4 190.4" class="clock-bar" /><path d="M161.0 183.7L178.6 214.1" class="clock-bar" /><path d="M146.0 189.9L156.9 230.6" class="clock-bar" /><path d="M130.0 192.0L130.0 221.4" class="clock-bar" /><path d="M114.0 189.9L103.9 227.5" class="clock-bar" /><path d="M99.0 183.7L74.8 225.7" class="clock-bar" /><path d="M86.2 173.8L49.6 210.4" class="clock-bar" /><path d="M76.3 161.0L35.7 184.4" class="clock-bar" /><path d="M70.1 146.0L30.0 156.8" class="clock-bar" /><path d="M68.0 130.0L35.4 130.0" class="clock-bar" /><path d="M70.1 114.0L35.6 104.7" class="clock-bar" /><path d="M76.3 99.0L37.1 76.4" class="clock-bar on" /><path d="M86.2 86.2L47.4 47.4" class="clock-bar on" /><path d="M99.0 76.3L70.0 26.1" class="clock-bar on" /><path d="M114.0 70.1L103.1 29.4" class="clock-bar on" /><text
+      x="130.0"
+      y="84.0"
+      text-anchor="middle"
+      class="clock-tick"
+      >00</text
+    ><text
+      x="180.0"
+      y="134.0"
+      text-anchor="middle"
+      class="clock-tick"
+      >06</text
+    ><text
+      x="130.0"
+      y="184.0"
+      text-anchor="middle"
+      class="clock-tick"
+      >12</text
+    ><text
+      x="80.0"
+      y="134.0"
+      text-anchor="middle"
+      class="clock-tick"
+      >18</text
+    >
+    </svg>
+    <figcaption><span data-l="en" lang="en">Most active 20:00–00:00</span><span data-l="zh-TW" lang="zh-Hant-TW">最活躍在 20:00–00:00</span></figcaption>
+  </figure></div>
           </section>
 
-          <section class="kpis">
-            <div class="kpi">
-    <b>1,980</b><span><span data-l="en" lang="en">Prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 數</span></span>
+          <section class="sigs" aria-label="Measured signature">
+            <div class="sig tip tip-l" data-tip-en="Share of prompts sent between 22:00 and 04:59" data-tip-zh-TW="22:00 到 04:59 之間送出的 prompt 比例" tabindex="-1">
+    <b>19%</b><span><span data-l="en" lang="en">at night</span><span data-l="zh-TW" lang="zh-Hant-TW">在深夜</span></span>
   </div>
-            <div class="kpi">
-    <b>141</b><span><span data-l="en" lang="en">Active days</span><span data-l="zh-TW" lang="zh-Hant-TW">活躍天數</span></span>
+            <div class="sig tip " data-tip-en="Median prompt length in characters, after cleaning" data-tip-zh-TW="清理後 prompt 長度的中位數（字元）" tabindex="-1">
+    <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b><span><span data-l="en" lang="en">typical prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">典型 prompt 長度</span></span>
   </div>
-            <div class="kpi">
-    <b><span data-l="en" lang="en">23 days</span><span data-l="zh-TW" lang="zh-Hant-TW">23 天</span></b><span><span data-l="en" lang="en">Longest streak</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續</span></span>
+            <div class="sig tip " data-tip-en="Prompts that push back on the AI&#39;s answer (e.g. &quot;no, that&#39;s wrong&quot;)" data-tip-zh-TW="反駁 AI 回答的 prompt，例如「不對」「錯了」" tabindex="-1">
+    <b><span data-l="en" lang="en">1 in 8</span><span data-l="zh-TW" lang="zh-Hant-TW">每 8 則</span></b><span><span data-l="en" lang="en">prompts corrects the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 就有一次糾正 AI</span></span>
   </div>
-            <div class="kpi">
-    <b>22:00</b><span><span data-l="en" lang="en">Peak hour</span><span data-l="zh-TW" lang="zh-Hant-TW">最活躍時段</span></span>
+            <div class="sig tip tip-r" data-tip-en="Average number of prompts in one conversation" data-tip-zh-TW="一次對話平均有幾則 prompt" tabindex="-1">
+    <b>6.3</b><span><span data-l="en" lang="en">prompts per session</span><span data-l="zh-TW" lang="zh-Hant-TW">每個 session 的 prompt 數</span></span>
   </div>
           </section>
 
-          <article class="panel wide">
-                  <div class="panel-head">
-                    <h2><span data-l="en" lang="en">Every day</span><span data-l="zh-TW" lang="zh-Hant-TW">每一天</span></h2>
-                    <p class="note"><span data-l="en" lang="en">One square per day; darker = more prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">每格代表一天，顏色越深代表 prompt 越多</span></p>
-                  </div>
-                  <div class="cal" role="img" aria-label="Every day">
+          <section>
+            <h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2>
+            <div class="traits">
+              <article class="trait">
+    <header>
+      <h3><span data-l="en" lang="en">Plan first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></h3>
+      <span class="meter high"
+    ><i class="on"></i><i class="on"></i><i class="on"></i><span
+      class="meter-label"
+      ><span data-l="en" lang="en">High confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">高信心</span></span
+    ></span
+  >
+    </header>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
+    <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
+    <p class="support">
+        <span data-l="en" lang="en">2 quotes from 4 sessions in 3 weeks</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文，來自 4 個 session、3 週</span>
+      </p>
+    <details>
+            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
+  </ul>
+          </details>
+  </article><article class="trait">
+    <header>
+      <h3><span data-l="en" lang="en">Straight talker</span><span data-l="zh-TW" lang="zh-Hant-TW">直來直往</span></h3>
+      <span class="meter medium"
+    ><i class="on"></i><i class="on"></i><i class=""></i><span
+      class="meter-label"
+      ><span data-l="en" lang="en">Medium confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">中信心</span></span
+    ></span
+  >
+    </header>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
+    <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
+    <p class="support">
+        <span data-l="en" lang="en">2 quotes from 2 sessions in 2 weeks</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文，來自 2 個 session、2 週</span>
+      </p>
+    <details>
+            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+          </details>
+  </article><article class="trait">
+    <header>
+      <h3><span data-l="en" lang="en">Type purist</span><span data-l="zh-TW" lang="zh-Hant-TW">型別潔癖</span></h3>
+      <span class="meter low"
+    ><i class="on"></i><i class=""></i><i class=""></i><span
+      class="meter-label"
+      ><span data-l="en" lang="en">Low confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">低信心</span></span
+    ></span
+  >
+    </header>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
+    <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
+    <p class="support">
+        <span data-l="en" lang="en">1 quote from 1 session in 1 week</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文，來自 1 個 session、1 週</span>
+      </p>
+    
+  </article>
+            </div>
+            
+          </section>
+
+          <section>
+            <h2><span data-l="en" lang="en">Rhythm</span><span data-l="zh-TW" lang="zh-Hant-TW">節奏</span></h2>
+            <article class="panel wide">
+                    <div class="panel-head">
+                      <h3><span data-l="en" lang="en">Every day</span><span data-l="zh-TW" lang="zh-Hant-TW">每一天</span></h3>
+                      <p class="note">
+                        <span data-l="en" lang="en">1,980 prompts on 141 days · longest streak 23 days</span><span data-l="zh-TW" lang="zh-Hant-TW">141 天裡寫了 1,980 個 prompt · 最長連續 23 天</span>
+                      </p>
+                    </div>
+                    <div class="cal" role="img" aria-label="Every day">
     <div class="cal-w">
         <span class="cal-m"
           ><span data-l="en" lang="en">May</span><span data-l="zh-TW" lang="zh-Hant-TW">5月</span></span
@@ -1082,224 +1220,139 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
   <div class="scale">
     <span data-l="en" lang="en">Less</span><span data-l="zh-TW" lang="zh-Hant-TW">少</span><i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i><span data-l="en" lang="en">More</span><span data-l="zh-TW" lang="zh-Hant-TW">多</span>
   </div>
-                </article>
-
-          <div class="grid g-2">
-            <article class="panel">
-              <h2><span data-l="en" lang="en">Prompts by hour</span><span data-l="zh-TW" lang="zh-Hant-TW">各時段的 prompt</span></h2>
-              <div role="img" aria-label="Prompts by hour">
-    <div class="cols hours">
-    <div class="col tip tip-l" data-tip-en="00:00 · 40 prompts" data-tip-zh-TW="00:00 · 40 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:23.5%"
-          ></span>
-          <span class="col-label">00</span>
-        </div><div class="col tip tip-l" data-tip-en="01:00 · 22 prompts" data-tip-zh-TW="01:00 · 22 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:12.9%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="02:00 · 9 prompts" data-tip-zh-TW="02:00 · 9 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:5.3%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="03:00 · 3 prompts" data-tip-zh-TW="03:00 · 3 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:1.8%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="04:00 · 0 prompts" data-tip-zh-TW="04:00 · 0 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:2px"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="05:00 · 0 prompts" data-tip-zh-TW="05:00 · 0 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:2px"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="06:00 · 1 prompt" data-tip-zh-TW="06:00 · 1 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:0.6%"
-          ></span>
-          <span class="col-label">06</span>
-        </div><div class="col tip" data-tip-en="07:00 · 4 prompts" data-tip-zh-TW="07:00 · 4 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:2.4%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="08:00 · 20 prompts" data-tip-zh-TW="08:00 · 20 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:11.8%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="09:00 · 61 prompts" data-tip-zh-TW="09:00 · 61 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:35.9%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="10:00 · 98 prompts" data-tip-zh-TW="10:00 · 98 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:57.6%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="11:00 · 120 prompts" data-tip-zh-TW="11:00 · 120 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:70.6%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="12:00 · 80 prompts" data-tip-zh-TW="12:00 · 80 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:47.1%"
-          ></span>
-          <span class="col-label">12</span>
-        </div><div class="col tip" data-tip-en="13:00 · 110 prompts" data-tip-zh-TW="13:00 · 110 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:64.7%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="14:00 · 140 prompts" data-tip-zh-TW="14:00 · 140 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:82.4%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="15:00 · 150 prompts" data-tip-zh-TW="15:00 · 150 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:88.2%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="16:00 · 135 prompts" data-tip-zh-TW="16:00 · 135 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:79.4%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="17:00 · 118 prompts" data-tip-zh-TW="17:00 · 118 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:69.4%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="18:00 · 90 prompts" data-tip-zh-TW="18:00 · 90 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:52.9%"
-          ></span>
-          <span class="col-label">18</span>
-        </div><div class="col tip" data-tip-en="19:00 · 100 prompts" data-tip-zh-TW="19:00 · 100 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:58.8%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="20:00 · 130 prompts" data-tip-zh-TW="20:00 · 130 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:76.5%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip" data-tip-en="21:00 · 160 prompts" data-tip-zh-TW="21:00 · 160 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:94.1%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip tip-r" data-tip-en="22:00 · 170 prompts" data-tip-zh-TW="22:00 · 170 個 prompt" tabindex="-1">
-          <span
-            class="col-fill peak"
-            style="height:100.0%"
-          ></span>
-          <span class="col-label"></span>
-        </div><div class="col tip tip-r" data-tip-en="23:00 · 120 prompts" data-tip-zh-TW="23:00 · 120 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:70.6%"
-          ></span>
-          <span class="col-label"></span>
-        </div>
-  </div>
-  </div>
-              <p class="note">
-                <span data-l="en" lang="en">Busiest at 22:00 · latest 03:12</span><span data-l="zh-TW" lang="zh-Hant-TW">最忙 22:00 · 最晚 03:12</span>
-              </p>
-            </article>
-            <article class="panel">
-              <h2><span data-l="en" lang="en">Prompts by weekday</span><span data-l="zh-TW" lang="zh-Hant-TW">星期分布</span></h2>
-              <div role="img" aria-label="Prompts by weekday">
-    <div class="cols weekdays">
-    <div class="col tip tip-l" data-tip-en="Mon · 320 prompts" data-tip-zh-TW="一 · 320 個 prompt" tabindex="-1">
-          <span
-            class="col-fill peak"
-            style="height:100.0%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Mon</span><span data-l="zh-TW" lang="zh-Hant-TW">一</span></span>
-        </div><div class="col tip tip-l" data-tip-en="Tue · 300 prompts" data-tip-zh-TW="二 · 300 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:93.8%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Tue</span><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span>
-        </div><div class="col tip" data-tip-en="Wed · 310 prompts" data-tip-zh-TW="三 · 310 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:96.9%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Wed</span><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span>
-        </div><div class="col tip" data-tip-en="Thu · 290 prompts" data-tip-zh-TW="四 · 290 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:90.6%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Thu</span><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span>
-        </div><div class="col tip" data-tip-en="Fri · 280 prompts" data-tip-zh-TW="五 · 280 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:87.5%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Fri</span><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span>
-        </div><div class="col tip tip-r" data-tip-en="Sat · 240 prompts" data-tip-zh-TW="六 · 240 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:75.0%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Sat</span><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span>
-        </div><div class="col tip tip-r" data-tip-en="Sun · 240 prompts" data-tip-zh-TW="日 · 240 個 prompt" tabindex="-1">
-          <span
-            class="col-fill"
-            style="height:75.0%"
-          ></span>
-          <span class="col-label"><span data-l="en" lang="en">Sun</span><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span>
-        </div>
-  </div>
-  </div>
-            </article>
-          </div>
-
-          <article class="panel wide">
-            <div class="panel-head">
-              <h2><span data-l="en" lang="en">Weekly rhythm</span><span data-l="zh-TW" lang="zh-Hant-TW">一週節奏</span></h2>
-              <p class="note"><span data-l="en" lang="en">Weekday × hour, darker = more prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">星期 × 時段，顏色越深代表 prompt 越多</span></p>
-            </div>
-            <div class="heat" role="img" aria-label="Weekly rhythm">
+                  </article>
+            <article class="panel wide">
+              <div class="panel-head">
+                <h3><span data-l="en" lang="en">Weekly rhythm</span><span data-l="zh-TW" lang="zh-Hant-TW">一週節奏</span></h3>
+                <p class="note"><span data-l="en" lang="en">Weekday × hour, darker = more prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">星期 × 時段，顏色越深代表 prompt 越多</span></p>
+              </div>
+              <div class="heat" role="img" aria-label="Weekly rhythm">
+    <span></span>
+    <span
+          class="heat-top tip tip-l"
+          data-tip-en="00:00 · 40 prompts" data-tip-zh-TW="00:00 · 40 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:23.5%"></i
+        ></span><span
+          class="heat-top tip tip-l"
+          data-tip-en="01:00 · 22 prompts" data-tip-zh-TW="01:00 · 22 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:12.9%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="02:00 · 9 prompts" data-tip-zh-TW="02:00 · 9 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:5.3%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="03:00 · 3 prompts" data-tip-zh-TW="03:00 · 3 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:1.8%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="04:00 · 0 prompts" data-tip-zh-TW="04:00 · 0 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:0%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="05:00 · 0 prompts" data-tip-zh-TW="05:00 · 0 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:0%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="06:00 · 1 prompt" data-tip-zh-TW="06:00 · 1 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:0.6%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="07:00 · 4 prompts" data-tip-zh-TW="07:00 · 4 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:2.4%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="08:00 · 20 prompts" data-tip-zh-TW="08:00 · 20 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:11.8%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="09:00 · 61 prompts" data-tip-zh-TW="09:00 · 61 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:35.9%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="10:00 · 98 prompts" data-tip-zh-TW="10:00 · 98 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:57.6%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="11:00 · 120 prompts" data-tip-zh-TW="11:00 · 120 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:70.6%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="12:00 · 80 prompts" data-tip-zh-TW="12:00 · 80 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:47.1%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="13:00 · 110 prompts" data-tip-zh-TW="13:00 · 110 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:64.7%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="14:00 · 140 prompts" data-tip-zh-TW="14:00 · 140 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:82.4%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="15:00 · 150 prompts" data-tip-zh-TW="15:00 · 150 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:88.2%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="16:00 · 135 prompts" data-tip-zh-TW="16:00 · 135 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:79.4%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="17:00 · 118 prompts" data-tip-zh-TW="17:00 · 118 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:69.4%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="18:00 · 90 prompts" data-tip-zh-TW="18:00 · 90 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:52.9%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="19:00 · 100 prompts" data-tip-zh-TW="19:00 · 100 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:58.8%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="20:00 · 130 prompts" data-tip-zh-TW="20:00 · 130 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:76.5%"></i
+        ></span><span
+          class="heat-top tip"
+          data-tip-en="21:00 · 160 prompts" data-tip-zh-TW="21:00 · 160 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:94.1%"></i
+        ></span><span
+          class="heat-top tip tip-r"
+          data-tip-en="22:00 · 170 prompts" data-tip-zh-TW="22:00 · 170 個 prompt"
+          tabindex="-1"
+          ><i class="peak" style="height:100.0%"></i
+        ></span><span
+          class="heat-top tip tip-r"
+          data-tip-en="23:00 · 120 prompts" data-tip-zh-TW="23:00 · 120 個 prompt"
+          tabindex="-1"
+          ><i class="" style="height:70.6%"></i
+        ></span>
+    <span></span>
     <span></span>
     <span class="heat-h">00</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">03</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">06</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">09</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">12</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">15</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">18</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">21</span><span class="heat-h"></span><span class="heat-h"></span>
+    <span></span>
     <span class="heat-d"><span data-l="en" lang="en">Mon</span><span data-l="zh-TW" lang="zh-Hant-TW">一</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Mon 00:00 · 7 prompts · Other folders 5 · drawstuff 1" data-tip-zh-TW="週一 00:00 · 7 個 prompt · 其他資料夾 5 · drawstuff 1"
@@ -1396,7 +1449,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l4 tip tip-r"
                 data-tip-en="Mon 23:00 · 20 prompts · Other folders 13 · drawstuff 3" data-tip-zh-TW="週一 23:00 · 20 個 prompt · 其他資料夾 13 · drawstuff 3"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Tue</span><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Mon · 320 prompts" data-tip-zh-TW="一 · 320 個 prompt"
+            tabindex="-1"
+            ><i style="width:100.0%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Tue</span><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Tue 00:00 · 6 prompts · Other folders 5 · drawstuff 1" data-tip-zh-TW="週二 00:00 · 6 個 prompt · 其他資料夾 5 · drawstuff 1"
                 tabindex="-1"
@@ -1492,7 +1550,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l4 tip tip-r"
                 data-tip-en="Tue 23:00 · 19 prompts · Other folders 13 · prompt-profile 3" data-tip-zh-TW="週二 23:00 · 19 個 prompt · 其他資料夾 13 · prompt-profile 3"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Wed</span><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Tue · 300 prompts" data-tip-zh-TW="二 · 300 個 prompt"
+            tabindex="-1"
+            ><i style="width:93.8%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Wed</span><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Wed 00:00 · 7 prompts · Other folders 3 · drawstuff 2" data-tip-zh-TW="週三 00:00 · 7 個 prompt · 其他資料夾 3 · drawstuff 2"
                 tabindex="-1"
@@ -1588,7 +1651,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l4 tip tip-r"
                 data-tip-en="Wed 23:00 · 20 prompts · Other folders 16 · drawstuff 3" data-tip-zh-TW="週三 23:00 · 20 個 prompt · 其他資料夾 16 · drawstuff 3"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Thu</span><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Wed · 310 prompts" data-tip-zh-TW="三 · 310 個 prompt"
+            tabindex="-1"
+            ><i style="width:96.9%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Thu</span><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Thu 00:00 · 6 prompts · drawstuff 3 · Other folders 3" data-tip-zh-TW="週四 00:00 · 6 個 prompt · drawstuff 3 · 其他資料夾 3"
                 tabindex="-1"
@@ -1684,7 +1752,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l4 tip tip-r"
                 data-tip-en="Thu 23:00 · 19 prompts · Other folders 15 · prompt-profile 3" data-tip-zh-TW="週四 23:00 · 19 個 prompt · 其他資料夾 15 · prompt-profile 3"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Fri</span><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Thu · 290 prompts" data-tip-zh-TW="四 · 290 個 prompt"
+            tabindex="-1"
+            ><i style="width:90.6%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Fri</span><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Fri 00:00 · 6 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="週五 00:00 · 6 個 prompt · 其他資料夾 4 · drawstuff 1"
                 tabindex="-1"
@@ -1780,7 +1853,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l4 tip tip-r"
                 data-tip-en="Fri 23:00 · 18 prompts · Other folders 9 · drawstuff 5" data-tip-zh-TW="週五 23:00 · 18 個 prompt · 其他資料夾 9 · drawstuff 5"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Sat</span><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Fri · 280 prompts" data-tip-zh-TW="五 · 280 個 prompt"
+            tabindex="-1"
+            ><i style="width:87.5%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Sat</span><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Sat 00:00 · 5 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="週六 00:00 · 5 個 prompt · 其他資料夾 4 · drawstuff 1"
                 tabindex="-1"
@@ -1876,7 +1954,12 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l3 tip tip-r"
                 data-tip-en="Sat 23:00 · 15 prompts · Other folders 9 · drawstuff 2" data-tip-zh-TW="週六 23:00 · 15 個 prompt · 其他資料夾 9 · drawstuff 2"
                 tabindex="-1"
-              ></span><span class="heat-d"><span data-l="en" lang="en">Sun</span><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span><span
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Sat · 240 prompts" data-tip-zh-TW="六 · 240 個 prompt"
+            tabindex="-1"
+            ><i style="width:75.0%"></i
+          ></span><span class="heat-d"><span data-l="en" lang="en">Sun</span><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span><span
                 class="heat-c l2 tip tip-l"
                 data-tip-en="Sun 00:00 · 5 prompts · Other folders 5" data-tip-zh-TW="週日 00:00 · 5 個 prompt · 其他資料夾 5"
                 tabindex="-1"
@@ -1972,17 +2055,28 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 class="heat-c l3 tip tip-r"
                 data-tip-en="Sun 23:00 · 15 prompts · Other folders 8 · drawstuff 4" data-tip-zh-TW="週日 23:00 · 15 個 prompt · 其他資料夾 8 · drawstuff 4"
                 tabindex="-1"
-              ></span>
+              ></span><span
+            class="heat-side tip tip-r"
+            data-tip-en="Sun · 240 prompts" data-tip-zh-TW="日 · 240 個 prompt"
+            tabindex="-1"
+            ><i style="width:75.0%"></i
+          ></span>
   </div>
-          </article>
+              <p class="note">
+                      <span data-l="en" lang="en">Most active 20:00–00:00</span><span data-l="zh-TW" lang="zh-Hant-TW">最活躍在 20:00–00:00</span> · <span data-l="en" lang="en">31% of prompts in these four hours</span><span data-l="zh-TW" lang="zh-Hant-TW">31% 的 prompt 集中在這四小時</span>
+                    </p>
+            </article>
+          </section>
 
-          <div class="grid g-2r">
-                  <article class="panel">
-                    <h2><span data-l="en" lang="en">Projects</span><span data-l="zh-TW" lang="zh-Hant-TW">專案</span></h2>
-                    <ul class="ranks">
+          <section>
+                  <h2><span data-l="en" lang="en">Chapters</span><span data-l="zh-TW" lang="zh-Hant-TW">章節</span></h2>
+                  <div class="grid g-2r">
+                    <article class="panel">
+                      <h3><span data-l="en" lang="en">Projects</span><span data-l="zh-TW" lang="zh-Hant-TW">專案</span></h3>
+                      <ul class="ranks">
     <li>
           <span class="rank-name"
-            ><i class="dot" style="background:var(--p0)"></i>drawstuff</span
+            ><i class="dot" style="background:var(--p0)"></i><span data-l="en" lang="en">drawstuff</span><span data-l="zh-TW" lang="zh-Hant-TW">drawstuff</span></span
           >
           <span class="share-track"
             ><span
@@ -1993,7 +2087,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <b>21%</b>
         </li><li>
           <span class="rank-name"
-            ><i class="dot" style="background:var(--p1)"></i>prompt-profile</span
+            ><i class="dot" style="background:var(--p1)"></i><span data-l="en" lang="en">prompt-profile</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt-profile</span></span
           >
           <span class="share-track"
             ><span
@@ -2004,7 +2098,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <b>13%</b>
         </li><li>
           <span class="rank-name"
-            ><i class="dot" style="background:var(--p2)"></i>dotfiles</span
+            ><i class="dot" style="background:var(--p2)"></i><span data-l="en" lang="en">dotfiles</span><span data-l="zh-TW" lang="zh-Hant-TW">dotfiles</span></span
           >
           <span class="share-track"
             ><span
@@ -2026,11 +2120,21 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <b>61%</b>
         </li>
   </ul>
-                    <p class="note"><span data-l="en" lang="en">Top projects by prompts (folder names)</span><span data-l="zh-TW" lang="zh-Hant-TW">依 prompt 數排序的專案（資料夾名稱）</span></p>
-                  </article>
-                  <article class="panel">
-                    <h2><span data-l="en" lang="en">Projects by week</span><span data-l="zh-TW" lang="zh-Hant-TW">每週的專案分布</span></h2>
-                    <div class="stack" role="img" aria-label="Projects by week">
+                      <p class="note"><span data-l="en" lang="en">Top projects by prompts (folder names)</span><span data-l="zh-TW" lang="zh-Hant-TW">依 prompt 數排序的專案（資料夾名稱）</span></p>
+                    </article>
+                    <article class="panel">
+                      <ol class="chapters">
+    <li style="flex:7;--c:var(--p0)">
+          <span class="ch-bar"></span>
+          <span class="ch-name"><span data-l="en" lang="en">drawstuff</span><span data-l="zh-TW" lang="zh-Hant-TW">drawstuff</span></span>
+          <span class="ch-when"
+            ><span data-l="en" lang="en">Apr – Oct</span><span data-l="zh-TW" lang="zh-Hant-TW">4月 – 10月</span> ·
+            <span data-l="en" lang="en">1,980 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">1,980 個 prompt</span></span
+          >
+        </li>
+  </ol>
+                      <h3><span data-l="en" lang="en">Projects by week</span><span data-l="zh-TW" lang="zh-Hant-TW">每週的專案分布</span></h3>
+                      <div class="stack" role="img" aria-label="Projects by week">
     <div
         class="stack-w tip tip-l"
         data-tip-en="Week of Apr 27 · 17 prompts · Other folders 11 · drawstuff 4" data-tip-zh-TW="4月27日 那一週 · 17 個 prompt · 其他資料夾 11 · drawstuff 4"
@@ -2241,13 +2345,88 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div>
   </div>
-                  </article>
-                </div>
+                    </article>
+                  </div>
+                </section>
 
-          <div class="grid g-3">
-            <article class="panel">
-              <h2><span data-l="en" lang="en">Prompt language</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 語言</span></h2>
-              <div class="donut">
+          <section>
+            <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>
+            <div class="dims">
+              <details class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge warn"><span data-l="en" lang="en">No verified evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">沒有通過驗證的證據</span></span></summary>
+    <div class="dim-body">
+      <p class="warning"><span data-l="en" lang="en">Insufficient evidence: no quote in this summary passed verification.</span><span data-l="zh-TW" lang="zh-Hant-TW">證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。</span></p>
+    </div>
+  </details>
+            </div>
+          </section>
+
+          <section>
+                  <h2><span data-l="en" lang="en">Fun facts</span><span data-l="zh-TW" lang="zh-Hant-TW">有趣的事實</span></h2>
+                  <ul class="facts">
+                    <li class="fact"><span data-l="en" lang="en">Latest prompt: 03:12 AM.</span><span data-l="zh-TW" lang="zh-Hant-TW">最晚的 prompt：凌晨 03:12。</span></li><li class="fact"><span data-l="en" lang="en">Longest streak: 23 days in a row.</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續天數：23 天。</span></li>
+                  </ul>
+                </section>
+
+          <details class="about">
+                  <summary><span data-l="en" lang="en">How this was measured</span><span data-l="zh-TW" lang="zh-Hant-TW">這份報告怎麼量的</span></summary>
+                  <div class="grid g-3 measured">
+                    <article class="panel">
+                      <h3><span data-l="en" lang="en">Prompt language</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 語言</span></h3>
+                      <div class="donut">
     <svg viewBox="0 0 120 120" aria-hidden="true">
       <circle cx="60" cy="60" r="44" class="track" />
       <circle
@@ -2283,10 +2462,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
       <li><i class="dot s0"></i><span data-l="en" lang="en">Chinese</span><span data-l="zh-TW" lang="zh-Hant-TW">中文</span><b>58%</b></li><li><i class="dot s1"></i><span data-l="en" lang="en">English</span><span data-l="zh-TW" lang="zh-Hant-TW">英文</span><b>27%</b></li><li><i class="dot s2"></i><span data-l="en" lang="en">Mixed</span><span data-l="zh-TW" lang="zh-Hant-TW">混合</span><b>15%</b></li>
     </ul>
   </div>
-            </article>
-            <article class="panel">
-              <h2><span data-l="en" lang="en">Where you prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">在哪裡寫 prompt</span></h2>
-              <ul class="shares">
+                    </article>
+                    <article class="panel">
+                      <h3><span data-l="en" lang="en">Where you prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">在哪裡寫 prompt</span></h3>
+                      <ul class="shares">
     <li>
             <span class="share-label">Claude Code</span>
             <span class="share-track"
@@ -2301,8 +2480,8 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             <b>26%</b>
           </li>
   </ul>
-              <p class="sub"><span data-l="en" lang="en">Client</span><span data-l="zh-TW" lang="zh-Hant-TW">使用的工具</span></p>
-              <ul class="shares">
+                      <p class="sub"><span data-l="en" lang="en">Client</span><span data-l="zh-TW" lang="zh-Hant-TW">使用的工具</span></p>
+                      <ul class="shares">
     <li>
             <span class="share-label"><span data-l="en" lang="en">Terminal</span><span data-l="zh-TW" lang="zh-Hant-TW">終端機</span></span>
             <span class="share-track"
@@ -2329,26 +2508,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             <b>1%</b>
           </li>
   </ul>
-            </article>
-            <article class="panel">
-              <h2><span data-l="en" lang="en">Habits</span><span data-l="zh-TW" lang="zh-Hant-TW">習慣</span></h2>
-              <div class="rings">
-                <div class="ring">
-    <svg viewBox="0 0 64 64" aria-hidden="true">
-      <circle cx="32" cy="32" r="26" class="track" />
-      <circle
-        cx="32"
-        cy="32"
-        r="26"
-        pathLength="100"
-        class="seg s0"
-        stroke-dasharray="12.0 100"
-        stroke-dashoffset="25"
-      />
-    </svg>
-    <div><b>12%</b><span><span data-l="en" lang="en">Corrections</span><span data-l="zh-TW" lang="zh-Hant-TW">糾正 AI</span></span></div>
-  </div>
-                <div class="ring">
+                    </article>
+                    <article class="panel">
+                      <h3><span data-l="en" lang="en">Habits</span><span data-l="zh-TW" lang="zh-Hant-TW">習慣</span></h3>
+                      <div class="rings"><div class="ring">
     <svg viewBox="0 0 64 64" aria-hidden="true">
       <circle cx="32" cy="32" r="26" class="track" />
       <circle
@@ -2362,169 +2525,42 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
       />
     </svg>
     <div><b>4%</b><span><span data-l="en" lang="en">With images</span><span data-l="zh-TW" lang="zh-Hant-TW">附圖片</span></span></div>
-  </div>
-              </div>
-              <div class="length">
-                <p class="sub"><span data-l="en" lang="en">Prompt length</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 長度</span></p>
-                <ul class="shares">
-                  <li>
-                        <span class="share-label"><span data-l="en" lang="en">median</span><span data-l="zh-TW" lang="zh-Hant-TW">中位數</span></span>
-                        <span class="share-track"
-                          ><span
-                            class="share-fill"
-                            style="width:20.87378640776699%"
-                          ></span
-                        ></span>
-                        <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b>
-                      </li><li>
-                        <span class="share-label"><span data-l="en" lang="en">longest 10%</span><span data-l="zh-TW" lang="zh-Hant-TW">最長的 10%</span></span>
-                        <span class="share-track"
-                          ><span
-                            class="share-fill"
-                            style="width:100%"
-                          ></span
-                        ></span>
-                        <b><span data-l="en" lang="en">412 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">412 字</span></b>
-                      </li>
-                </ul>
-              </div>
-            </article>
-          </div>
-
-          <section>
-            <h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2>
-            <div class="traits"><article class="trait">
-    <header>
-      <h3><span data-l="en" lang="en">Plan first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></h3>
-      <span class="meter high" title="High confidence"
-        ><i class="on"></i><i class="on"></i><i class="on"></i><span class="meter-label"
-          ><span data-l="en" lang="en">High confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">高信心</span></span
-        ></span
-      >
-    </header>
-    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
-    <details>
-            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
-            <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
-  </ul>
-          </details>
-  </article><article class="trait">
-    <header>
-      <h3><span data-l="en" lang="en">Straight talker</span><span data-l="zh-TW" lang="zh-Hant-TW">直來直往</span></h3>
-      <span class="meter medium" title="Medium confidence"
-        ><i class="on"></i><i class="on"></i><i class=""></i><span class="meter-label"
-          ><span data-l="en" lang="en">Medium confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">中信心</span></span
-        ></span
-      >
-    </header>
-    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
-    <details>
-            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
-            <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-          </details>
-  </article><article class="trait">
-    <header>
-      <h3><span data-l="en" lang="en">Type purist</span><span data-l="zh-TW" lang="zh-Hant-TW">型別潔癖</span></h3>
-      <span class="meter low" title="Low confidence"
-        ><i class="on"></i><i class=""></i><i class=""></i><span class="meter-label"
-          ><span data-l="en" lang="en">Low confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">低信心</span></span
-        ></span
-      >
-    </header>
-    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
-    <details>
-            <summary><span data-l="en" lang="en">1 quote as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文佐證</span></summary>
-            <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-          </details>
-  </article></div>
-          </section>
-
-          <section>
-            <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>
-            <div class="dims"><details class="dimension">
-    <summary>
-      <span class="dim-name"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
-      <span class="dim-title"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
-      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
-    </summary>
-    <div class="dim-body">
-      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details class="dimension">
-    <summary>
-      <span class="dim-name"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
-      <span class="dim-title"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
-      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
-    </summary>
-    <div class="dim-body">
-      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details class="dimension">
-    <summary>
-      <span class="dim-name"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
-      <span class="dim-title"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
-      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
-    </summary>
-    <div class="dim-body">
-      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details class="dimension">
-    <summary>
-      <span class="dim-name"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
-      <span class="dim-title"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
-      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
-    </summary>
-    <div class="dim-body">
-      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details class="dimension">
-    <summary>
-      <span class="dim-name"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
-      <span class="dim-title"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
-      <span class="badge warn"><span data-l="en" lang="en">No verified evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">沒有通過驗證的證據</span></span>
-    </summary>
-    <div class="dim-body">
-      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
-      <p class="warning"><span data-l="en" lang="en">Insufficient evidence: no quote in this summary passed verification.</span><span data-l="zh-TW" lang="zh-Hant-TW">證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。</span></p>
-    </div>
-  </details></div>
-          </section>
-
-          <section>
-                  <h2><span data-l="en" lang="en">Fun facts</span><span data-l="zh-TW" lang="zh-Hant-TW">有趣的事實</span></h2>
-                  <ul class="facts">
-                    <li class="fact"><span data-l="en" lang="en">Latest prompt: 03:12 AM.</span><span data-l="zh-TW" lang="zh-Hant-TW">最晚的 prompt：凌晨 03:12。</span></li><li class="fact"><span data-l="en" lang="en">Longest streak: 23 days in a row.</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續天數：23 天。</span></li>
-                  </ul>
-                </section>
-
-          <details class="about">
-            <summary><span data-l="en" lang="en">About this report</span><span data-l="zh-TW" lang="zh-Hant-TW">關於這份報告</span></summary>
-            <p>
-              <span data-l="en" lang="en">Engine: Claude Code (claude-opus-5-5) · Generated: Oct 24, 2026, 10:00 AM</span><span data-l="zh-TW" lang="zh-Hant-TW">分析引擎：Claude Code（claude-opus-5-5） · 產生時間：2026年10月24日 上午10:00</span>
-            </p>
-            <p>
-              <span data-l="en" lang="en">41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">已驗證 41 段證據（移除 3 段無效或重複的引文） · 1 段分析失敗，已略過</span>
-            </p>
-            <p><span data-l="en" lang="en">Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。</span></p>
-            <p>prompt-profile · npx prompt-profile</p>
-          </details>
+  </div></div>
+                      <div class="length">
+                        <p class="sub"><span data-l="en" lang="en">Prompt length</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 長度</span></p>
+                        <ul class="shares">
+                          <li>
+                                <span class="share-label"><span data-l="en" lang="en">median</span><span data-l="zh-TW" lang="zh-Hant-TW">中位數</span></span>
+                                <span class="share-track"
+                                  ><span
+                                    class="share-fill"
+                                    style="width:20.87378640776699%"
+                                  ></span
+                                ></span>
+                                <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b>
+                              </li><li>
+                                <span class="share-label"><span data-l="en" lang="en">longest 10%</span><span data-l="zh-TW" lang="zh-Hant-TW">最長的 10%</span></span>
+                                <span class="share-track"
+                                  ><span
+                                    class="share-fill"
+                                    style="width:100%"
+                                  ></span
+                                ></span>
+                                <b><span data-l="en" lang="en">412 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">412 字</span></b>
+                              </li>
+                        </ul>
+                      </div>
+                    </article>
+                  </div>
+                  <p>
+                    <span data-l="en" lang="en">Engine: Claude Code (claude-opus-5-5) · Generated: Oct 24, 2026, 10:00 AM</span><span data-l="zh-TW" lang="zh-Hant-TW">分析引擎：Claude Code（claude-opus-5-5） · 產生時間：2026年10月24日 上午10:00</span>
+                  </p>
+                  <p>
+                    <span data-l="en" lang="en">41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">已驗證 41 段證據（移除 3 段無效或重複的引文） · 1 段分析失敗，已略過</span>
+                  </p>
+                  <p><span data-l="en" lang="en">Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。</span></p>
+                </details>
+          <footer class="foot">prompt-profile · npx prompt-profile</footer>
         </div>
       </body>
     </html> "

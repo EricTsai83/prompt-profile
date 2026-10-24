@@ -68,9 +68,30 @@ export interface Messages {
   readonly weekOf: (date: string) => string
   readonly cellTip: (weekday: string, hour: string) => string
   readonly hourTip: (hour: string, n: number) => string
+  readonly signature: string
+  readonly nightShare: string
+  readonly nightShareDef: string
+  readonly medianPrompt: string
+  readonly medianPromptDef: string
+  readonly corrections: (every: number | null) => string
+  readonly correctionsLabel: string
+  readonly correctionsDef: string
+  readonly perSession: string
+  readonly perSessionDef: string
+  readonly chronotype: (from: string, to: string) => string
+  readonly chronotypeShare: (pct: number) => string
+  readonly rhythm: string
+  readonly volume: (prompts: number, days: number, streak: number) => string
+  readonly chapters: string
+  readonly chapterRange: (from: string, to: string) => string
+  readonly moreTraits: string
+  readonly support: (sessions: number, weeks: number, quotes: number) => string
+  readonly howMeasured: string
+  readonly projectAnon: string
 }
 
-const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+const plural = (n: number, one: string, many: string) =>
+  `${n.toLocaleString("en")} ${n === 1 ? one : many}`
 
 const en: Messages = {
   languageName: "English",
@@ -152,6 +173,28 @@ const en: Messages = {
   weekOf: (d) => `Week of ${d}`,
   cellTip: (w, h) => `${w} ${h}`,
   hourTip: (h, n) => `${h} · ${plural(n, "prompt", "prompts")}`,
+  signature: "Measured signature",
+  nightShare: "at night",
+  nightShareDef: "Share of prompts sent between 22:00 and 04:59",
+  medianPrompt: "typical prompt",
+  medianPromptDef: "Median prompt length in characters, after cleaning",
+  corrections: (e) => (e === null ? "none" : `1 in ${e}`),
+  correctionsLabel: "prompts corrects the AI",
+  correctionsDef: "Prompts that push back on the AI's answer (e.g. \"no, that's wrong\")",
+  perSession: "prompts per session",
+  perSessionDef: "Average number of prompts in one conversation",
+  chronotype: (a, b) => `Most active ${a}–${b}`,
+  chronotypeShare: (p) => `${p}% of prompts in these four hours`,
+  rhythm: "Rhythm",
+  volume: (p, d, st) =>
+    `${p.toLocaleString("en")} prompts on ${plural(d, "day", "days")} · longest streak ${plural(st, "day", "days")}`,
+  chapters: "Chapters",
+  chapterRange: (a, b) => (a === b ? a : `${a} – ${b}`),
+  moreTraits: "More traits",
+  support: (se, w, q) =>
+    `${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "week", "weeks")}`,
+  howMeasured: "How this was measured",
+  projectAnon: "Project",
 }
 
 const zhTW: Messages = {
@@ -229,6 +272,26 @@ const zhTW: Messages = {
   weekOf: (d) => `${d} 那一週`,
   cellTip: (w, h) => `週${w} ${h}`,
   hourTip: (h, n) => `${h} · ${n.toLocaleString("zh-TW")} 個 prompt`,
+  signature: "量出來的特徵",
+  nightShare: "在深夜",
+  nightShareDef: "22:00 到 04:59 之間送出的 prompt 比例",
+  medianPrompt: "典型 prompt 長度",
+  medianPromptDef: "清理後 prompt 長度的中位數（字元）",
+  corrections: (e) => (e === null ? "沒有" : `每 ${e} 則`),
+  correctionsLabel: "prompt 就有一次糾正 AI",
+  correctionsDef: "反駁 AI 回答的 prompt，例如「不對」「錯了」",
+  perSession: "每個 session 的 prompt 數",
+  perSessionDef: "一次對話平均有幾則 prompt",
+  chronotype: (a, b) => `最活躍在 ${a}–${b}`,
+  chronotypeShare: (p) => `${p}% 的 prompt 集中在這四小時`,
+  rhythm: "節奏",
+  volume: (p, d, st) => `${d} 天裡寫了 ${p.toLocaleString("zh-TW")} 個 prompt · 最長連續 ${st} 天`,
+  chapters: "章節",
+  chapterRange: (a, b) => (a === b ? a : `${a} – ${b}`),
+  moreTraits: "其他特質",
+  support: (se, w, q) => `${q} 段引文，來自 ${se} 個 session、${w} 週`,
+  howMeasured: "這份報告怎麼量的",
+  projectAnon: "專案",
 }
 
 /** Every text of the report and the card, per language. */

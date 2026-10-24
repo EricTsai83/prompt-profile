@@ -35,7 +35,7 @@ describe("report languages", () => {
       expect(out).toContain('<span data-l="en" lang="en">The Midnight Architect</span>')
       expect(out).toContain("證據不足")
       expect(out).toContain("Insufficient evidence")
-      expect(out.match(/<blockquote>/g)?.length).toBe(evidenceTotal(p))
+      expect(out.match(/<blockquote[ >]/g)?.length).toBe(evidenceTotal(p))
       expect(out).not.toContain("<script")
     }),
   )
@@ -62,10 +62,12 @@ describe("report languages", () => {
     Effect.gen(function* () {
       const out = renderHtml(englishOnly(yield* sample()))
       expect(out).not.toContain("My AI collaboration profile")
-      expect(out.match(/class="cols /g)?.length).toBe(2)
-      expect(out).toContain('class="donut"')
+      expect(out).toContain('class="clock"')
       expect(out).toContain('class="heat"')
+      expect(out).toContain('class="heat-top')
       expect(out).toContain('class="cal"')
+      expect(out).toContain('class="chapters"')
+      expect(out).toContain('class="donut"')
       expect(out).toMatch(/<details class="dimension">/)
     }),
   )

@@ -82,7 +82,7 @@ describe("looks: report", () => {
         if (look !== "classic") expect(out).toContain(`data-look="${look}"`)
         expect(out).toContain("Insufficient evidence")
         expect(out).toContain("1 chunk failed and was skipped")
-        expect(out.match(/<blockquote>/g)?.length).toBe(base.match(/<blockquote>/g)?.length)
+        expect(out.match(/<blockquote[ >]/g)?.length).toBe(base.match(/<blockquote[ >]/g)?.length)
         for (const t of p.traits) expect(out).toContain(t.name)
         expect(out).toContain("High confidence")
         expect(out).not.toMatch(/https?:\/\/(?!www\.w3\.org)/)
