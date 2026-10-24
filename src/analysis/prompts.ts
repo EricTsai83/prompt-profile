@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 
-export type PromptName = "map" | "merge" | "reduce"
+export type PromptName = "map" | "merge" | "reduce" | "translate"
 
 const cache = new Map<PromptName, string>()
 

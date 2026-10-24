@@ -16,6 +16,7 @@ import type { Chunk } from "./chunk.ts"
 import { AnalysisFailed, type AnalyzeError } from "./errors.ts"
 import { sha256 } from "./hash.ts"
 import { Progress } from "./progress.ts"
+import { addTranslations } from "./translate.ts"
 import {
   capEvidence,
   groupForMerge,
@@ -293,10 +294,12 @@ export const analyze = (input: {
     )
     const dimensions = verifyDimensions(profile.dimensions, texts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)
-    return {
+    const verifiedProfile: Profile = {
       ...profile,
       traits,
       dimensions,
       coverage: { ...profile.coverage, evidenceKept: counts.kept, evidenceDropped: counts.dropped },
     }
+    // ---- translate (verified text only) ---------------------------------------------
+    return yield* addTranslations(verifiedProfile, options.languages ?? ["en"])
   })

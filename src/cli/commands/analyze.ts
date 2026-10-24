@@ -85,6 +85,8 @@ const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressSha
     onReduceStart: out.line(t.reducing),
     onReduceDone: (ms) => out.debug(t.chunkTiming(total, ms)),
     onVerified: (kept, dropped) => out.line(t.verified(kept, kept + dropped)),
+    onTranslated: (language, ok) =>
+      out.line(ok ? t.translated(language) : t.translationFailed(language)),
   }
 }
 

@@ -153,7 +153,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "6",
+        analysisVersion: "7",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -262,6 +262,70 @@ describe("analyze", () => {
       yield* TestClock.adjust("1 second")
       yield* Fiber.interrupt(fiber)
       expect(cache.entries.size).toBe(2)
+    }),
+  )
+
+  /** Fake translation: prefix every string of the text-only profile it receives. */
+  const translating: FakeOptions["respond"] = (input) => {
+    if (input.schemaName !== "LlmTranslation") return respond(input)
+    const text = JSON.parse(/\nprofile:\n(.*)$/s.exec(input.prompt)![1]!)
+    const tr = (x: unknown): unknown =>
+      typeof x === "string"
+        ? `ZH ${x}`
+        : Array.isArray(x)
+          ? x.map(tr)
+          : Object.fromEntries(
+              Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
+            )
+    return tr(text)
+  }
+
+  it.effect("translates generated text into each extra language, keeping evidence once", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({ respond: translating })
+      const profile = yield* run(fake, makeMemoryCache(), {
+        ...options,
+        languages: ["zh-TW", "en"],
+      })
+      expect(profile.languages).toEqual(["zh-TW", "en"])
+      const zh = profile.translations["zh-TW"]!
+      expect(zh.headline).toBe(`ZH ${profile.headline}`)
+      expect(zh.traits.map((t) => t.name)).toEqual(profile.traits.map((t) => `ZH ${t.name}`))
+      expect(zh.dimensions.map((d) => d.key)).toEqual(profile.dimensions.map((d) => d.key))
+      const call = fake.log.find((c) => c.schema === "LlmTranslation")!
+      expect(call.prompt).toContain("language: zh-TW")
+      // quotes never go to the translation call
+      for (const e of profile.traits.flatMap((t) => t.evidence))
+        expect(call.prompt).not.toContain(e.quote)
+      expect(Schema.is(Profile)(profile)).toBe(true)
+    }),
+  )
+
+  it.effect("a malformed or failed translation drops only that language", () =>
+    Effect.gen(function* () {
+      const bad: FakeOptions["respond"] = (input) => {
+        if (input.schemaName !== "LlmTranslation") return respond(input)
+        const t = translating(input) as { traits: Array<unknown> }
+        return { ...t, traits: t.traits.slice(1) }
+      }
+      const profile = yield* run(makeFakeLlmRunner({ respond: bad }), makeMemoryCache(), {
+        ...options,
+        languages: ["zh-TW", "en"],
+      })
+      expect(profile.languages).toEqual(["en"])
+      expect(profile.translations).toEqual({})
+      expect(profile.traits.length).toBeGreaterThan(0)
+    }),
+  )
+
+  it.effect("the call estimate includes one translation per extra language", () =>
+    Effect.gen(function* () {
+      const p = yield* plan({
+        prompts,
+        options: { ...options, languages: ["zh-TW", "en"] },
+        runner: "claude-code",
+      }).pipe(Effect.provideService(AnalysisCache, makeMemoryCache()))
+      expect(p.llmCalls).toBe(p.chunks.length + 2)
     }),
   )
 

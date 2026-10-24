@@ -2,8 +2,16 @@ import { Effect, Schema } from "effect"
 import { SourceId } from "./Source.ts"
 import { Stats } from "./Stats.ts"
 
-/** 2: `language` removed (the report is English-only). */
-export const PROFILE_SCHEMA_VERSION = 2 as const
+/**
+ * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
+ * languages carry translated generated text only). Version 2 files are migrated on decode.
+ */
+export const PROFILE_SCHEMA_VERSION = 3 as const
+
+/** Report languages; the generated profile text is written in English first. */
+export const LANGUAGES = ["en", "zh-TW"] as const
+export const Language = Schema.Literals(LANGUAGES)
+export type Language = typeof Language.Type
 
 export const DIMENSION_KEYS = [
   "work_style",
@@ -76,8 +84,24 @@ const hasEachDimensionOnce = Schema.makeFilter<ReadonlyArray<Dimension>>((dims) 
   )
 })
 
-export const Profile = Schema.Struct({
+/** Generated text in one non-English language, aligned with the English fields. */
+export const Translation = Schema.Struct({
+  headline: Schema.String,
+  archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
+  dimensions: Schema.Array(
+    Schema.Struct({ key: DimensionKey, title: Schema.String, summary: Schema.String }),
+  ),
+  traits: Schema.Array(Schema.Struct({ name: Schema.String, description: Schema.String })),
+  funFacts: Schema.Array(Schema.String),
+})
+export type Translation = typeof Translation.Type
+
+const ProfileFields = Schema.Struct({
   schemaVersion: Schema.Literal(PROFILE_SCHEMA_VERSION),
+  /** Offered languages, the default first. */
+  languages: Schema.NonEmptyArray(Language),
+  /** One entry per non-English language in `languages`. */
+  translations: Schema.Record(Schema.String, Translation),
   generatedAt: Schema.DateTimeUtcFromString,
   engine: Engine,
   coverage: Coverage,
@@ -88,6 +112,30 @@ export const Profile = Schema.Struct({
   funFacts: Schema.Array(Schema.String),
   stats: Stats,
 })
+
+/** Is `t` the same shape as the English text: same dimension keys, trait and fact counts? */
+export const matchesBase = (
+  base: Pick<typeof ProfileFields.Type, "dimensions" | "traits" | "funFacts">,
+  t: Translation,
+): boolean =>
+  t.traits.length === base.traits.length &&
+  t.funFacts.length === base.funFacts.length &&
+  t.dimensions.length === base.dimensions.length &&
+  base.dimensions.every((d) => t.dimensions.some((x) => x.key === d.key))
+
+const consistentLanguages = Schema.makeFilter<typeof ProfileFields.Type>((p) => {
+  if (new Set(p.languages).size !== p.languages.length) return "languages must be unique"
+  const needed = p.languages.filter((l) => l !== "en")
+  const given = Object.keys(p.translations)
+  if (given.length !== needed.length || !needed.every((l) => given.includes(l)))
+    return "translations must cover exactly the non-English languages"
+  return (
+    needed.every((l) => matchesBase(p, p.translations[l]!)) ||
+    "a translation does not match the English dimensions, traits or fun facts"
+  )
+})
+
+export const Profile = ProfileFields.check(consistentLanguages)
 export type Profile = typeof Profile.Type
 export type ProfileEncoded = typeof Profile.Encoded
 
@@ -109,10 +157,20 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION) {
+    if (found !== PROFILE_SCHEMA_VERSION && found !== 2) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
-    return yield* Schema.decodeUnknownEffect(Profile)(input).pipe(
+    // Version 2 had English text only.
+    const current =
+      found === 2
+        ? {
+            ...(input as object),
+            schemaVersion: PROFILE_SCHEMA_VERSION,
+            languages: ["en"],
+            translations: {},
+          }
+        : input
+    return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(
       Effect.mapError((e) => new InvalidProfile({ message: e.message })),
     )
   })

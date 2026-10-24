@@ -1,4 +1,5 @@
 import { Effect, Option } from "effect"
+import type { Language } from "../domain/Profile.ts"
 import type { SafePrompt } from "../domain/SafePrompt.ts"
 import { PIPELINE_VERSION } from "../pipeline/version.ts"
 import { AnalysisCache, type CacheKeyParts } from "./cache.ts"
@@ -19,6 +20,8 @@ export interface AnalyzeOptions {
   readonly noCache: boolean
   /** `--model` passed to the runner; part of the cache key. */
   readonly model: string | null
+  /** Report languages, default first (default `["en"]`); each non-English one costs a call. */
+  readonly languages?: ReadonlyArray<Language>
   /** Observations above this many characters are merged first (default REDUCE_INPUT_LIMIT). */
   readonly reduceInputLimit?: number
 }
@@ -35,6 +38,10 @@ export interface AnalysisPlan {
   readonly promptsAnalyzed: number
   readonly sessionsAnalyzed: number
 }
+
+/** One translation call per distinct non-English language. */
+export const translationCalls = (options: AnalyzeOptions): number =>
+  new Set((options.languages ?? []).filter((l) => l !== "en")).size
 
 export const keyParts = (
   kind: CacheKeyParts["kind"],
@@ -82,7 +89,8 @@ export const plan = (input: {
       chunks,
       sampled,
       cacheHits,
-      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 1 : 0),
+      llmCalls:
+        chunks.length - cacheHits + (chunks.length > 0 ? 1 + translationCalls(input.options) : 0),
       charsToSend,
       promptsAnalyzed: prompts.length,
       sessionsAnalyzed: new Set(prompts.map((p) => `${p.source}:${p.sessionId}`)).size,

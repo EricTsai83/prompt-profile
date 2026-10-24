@@ -196,3 +196,93 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
   "type": "object",
 }
 `;
+
+exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`] = `
+{
+  "additionalProperties": false,
+  "properties": {
+    "archetype": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string",
+        },
+        "name": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "name",
+        "description",
+      ],
+      "type": "object",
+    },
+    "dimensions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "enum": [
+              "work_style",
+              "communication",
+              "tech_profile",
+              "interests",
+              "growth",
+            ],
+            "type": "string",
+          },
+          "summary": {
+            "type": "string",
+          },
+          "title": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "key",
+          "title",
+          "summary",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+    "funFacts": {
+      "items": {
+        "type": "string",
+      },
+      "type": "array",
+    },
+    "headline": {
+      "type": "string",
+    },
+    "traits": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string",
+          },
+          "name": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "name",
+          "description",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+  },
+  "required": [
+    "headline",
+    "archetype",
+    "dimensions",
+    "traits",
+    "funFacts",
+  ],
+  "type": "object",
+}
+`;

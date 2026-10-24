@@ -97,6 +97,9 @@ export interface ProfileExtras {
  */
 export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtras): Profile => ({
   schemaVersion: PROFILE_SCHEMA_VERSION,
+  // English only; the analysis adds translations afterwards.
+  languages: ["en"],
+  translations: {},
   generatedAt: extras.generatedAt,
   engine: extras.engine,
   coverage: extras.coverage,

@@ -7,14 +7,17 @@ The user message contains two JSON documents: `observations` (each with `dimensi
 
 ## Write
 
-- `headline`: one sentence that captures this person.
-- `archetype`: a memorable name (2–5 words, e.g. "The Midnight Architect") and a one-paragraph
-  description.
+Keep it short: the report is read at a glance, and charts show the numbers.
+
+- `headline`: one sentence that captures this person, at most 12 words.
+- `archetype`: a memorable name (2–5 words, e.g. "The Midnight Architect") and a description
+  of at most two short sentences (30 words in total).
 - `dimensions`: exactly five, one per key — `work_style`, `communication`, `tech_profile`,
-  `interests`, `growth` — each with a short `title`, a 2–4 sentence `summary` and evidence.
-- `traits`: 3–6 of the most distinctive traits, each with `name`, `description`,
-  `confidence` and at least 2 pieces of evidence.
-- `funFacts`: 3–5 short, fun facts.
+  `interests`, `growth` — each with a short `title` (2–4 words), a `summary` of 1–2 sentences
+  and evidence.
+- `traits`: 3–6 of the most distinctive traits, each with a `name` of 1–4 words, a one-sentence
+  `description`, `confidence` and at least 2 pieces of evidence.
+- `funFacts`: 3–5 fun facts, each at most 15 words.
 
 ## Rules
 

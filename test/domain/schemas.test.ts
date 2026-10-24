@@ -6,6 +6,7 @@ import {
   decodeProfile,
   encodeProfile,
   Profile,
+  Translation,
   UnsupportedProfileVersion,
 } from "../../src/domain/Profile.ts"
 import { PromptRecord } from "../../src/domain/PromptRecord.ts"
@@ -79,8 +80,54 @@ describe("Profile", () => {
     }),
   )
 
-  // 1: before the report became English-only (it had a `language` field)
-  it.effect.each([1, "2", 3, undefined])(
+  it.effect("a version 2 file is read as an English-only profile", () =>
+    Effect.gen(function* () {
+      const {
+        languages: _languages,
+        translations: _translations,
+        ...v2
+      } = loadSample() as Record<string, unknown>
+      const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
+      expect(profile.schemaVersion).toBe(3)
+      expect(profile.languages).toEqual(["en"])
+      expect(profile.translations).toEqual({})
+    }),
+  )
+
+  it.effect.each([
+    ["an unknown language", { languages: ["en", "fr"] }],
+    ["a listed language without its translation", { translations: {} }],
+    ["a translation for a language that is not listed", { languages: ["en"] }],
+    ["duplicate languages", { languages: ["en", "en", "zh-TW"] }],
+  ] as const)("%s → InvalidProfile", ([, patch]) =>
+    Effect.gen(function* () {
+      const error = yield* Effect.flip(
+        decodeProfile({ ...(loadSample() as object), ...(patch as object) }),
+      )
+      expect(error._tag).toBe("InvalidProfile")
+    }),
+  )
+
+  it.effect("a translation must match the English structure", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as {
+        translations: { "zh-TW": { traits: Array<unknown>; dimensions: Array<unknown> } }
+      }
+      const zh = sample.translations["zh-TW"]
+      for (const broken of [
+        { ...zh, traits: zh.traits.slice(1) },
+        { ...zh, dimensions: zh.dimensions.slice(1) },
+      ]) {
+        const error = yield* Effect.flip(
+          decodeProfile({ ...sample, translations: { "zh-TW": broken } }),
+        )
+        expect(error._tag).toBe("InvalidProfile")
+      }
+    }),
+  )
+
+  // 1: had a `language` field; 2 is migrated (above)
+  it.effect.each([1, "3", 4, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {
@@ -143,6 +190,7 @@ describe("LLM schemas", () => {
   it.each([
     ["LlmChunkObservations", LlmChunkObservations],
     ["LlmProfileDraft", LlmProfileDraft],
+    ["LlmTranslation", Translation],
   ] as const)("%s produces a subset-compliant JSON Schema", (_name, schema) => {
     const json = toLlmJsonSchema(schema)
     expect(validateLlmJsonSchema(json)).toEqual([])

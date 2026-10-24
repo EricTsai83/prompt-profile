@@ -85,8 +85,10 @@ that fails to load is not counted in `Tests`.
   usernames) are data arrays.
 - When the profile format, an analysis prompt or a clean / redact rule changes, bump the
   matching version (see "Versions" in `plans/README.md`).
-- **Language**: everything in the repository and everything the product outputs is English.
-  Chinese appears only where it is input data: rules that handle Chinese prompts
-  (acknowledgements, correction phrases, CJK detection) and test data built from such prompts.
-  Exception: `.claude/skills/` holds the owner's personal workflow files, kept as written.
+- **Language**: everything in the repository (code, comments, docs, commits) and the CLI's
+  terminal messages are English. The report and card are multilingual (plan 14): their texts
+  live in `src/report/messages.ts` per language, generated text is translated by
+  `analysis/translate.ts`. Other Chinese appears only as input data: rules that handle Chinese
+  prompts and test data built from such prompts. Exception: `.claude/skills/` holds the owner's
+  personal workflow files, kept as written.
 - Commits use Conventional Commits.

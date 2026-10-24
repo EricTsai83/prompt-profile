@@ -51,6 +51,9 @@ export const messages = {
   merging: (groups: number) => `● Many observations: merging in ${groups} groups first…`,
   reducing: "● Writing the profile…",
   verified: (kept: number, total: number) => `● Verifying evidence: kept ${kept} / ${total}`,
+  translated: (language: string) => `● Translated into ${language}`,
+  translationFailed: (language: string) =>
+    `⚠ Translation into ${language} failed; the report is written without it`,
   done: "✔ Done!",
   reportLine: (p: string, opened: boolean) =>
     `  Report ${p}${opened ? " (opened in your browser)" : ""}`,

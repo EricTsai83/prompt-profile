@@ -1,5 +1,9 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
+  "languages": [
+    "en",
+    "zh-TW"
+  ],
   "generatedAt": "2026-10-24T02:00:00.000Z",
   "engine": {
     "runner": "claude-code",
@@ -121,6 +125,60 @@
     "Latest prompt: 03:12 AM.",
     "Longest streak: 23 days in a row."
   ],
+  "translations": {
+    "zh-TW": {
+      "headline": "半夜跟 AI 爭論命名的完美主義者",
+      "archetype": {
+        "name": "午夜架構師",
+        "description": "白天出貨，晚上重構。"
+      },
+      "dimensions": [
+        {
+          "key": "work_style",
+          "title": "工作風格",
+          "summary": "先規劃，再把大任務拆成小步驟。"
+        },
+        {
+          "key": "communication",
+          "title": "溝通",
+          "summary": "先規劃，再把大任務拆成小步驟。"
+        },
+        {
+          "key": "tech_profile",
+          "title": "技術輪廓",
+          "summary": "先規劃，再把大任務拆成小步驟。"
+        },
+        {
+          "key": "interests",
+          "title": "興趣",
+          "summary": "先規劃，再把大任務拆成小步驟。"
+        },
+        {
+          "key": "growth",
+          "title": "成長",
+          "summary": "先規劃，再把大任務拆成小步驟。"
+        }
+      ],
+      "traits": [
+        {
+          "name": "先規劃",
+          "description": "寫程式前，先請 AI 列出步驟和風險。"
+        },
+        {
+          "name": "直來直往",
+          "description": "寫程式前，先請 AI 列出步驟和風險。"
+        },
+        {
+          "name": "型別潔癖",
+          "description": "寫程式前，先請 AI 列出步驟和風險。"
+        }
+      ],
+      "funFacts": [
+        "最晚的 prompt：凌晨 03:12。",
+        "最長連續天數：23 天。"
+      ]
+    }
+  },
   "stats": {
     "window": {
       "since": "2026-04-24T00:00:00.000Z",
