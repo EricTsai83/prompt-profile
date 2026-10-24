@@ -21,11 +21,28 @@ The author's own report, from about 1,700 real prompts over six months, publishe
 The share card is the same for both: it never contains quotes or project names. The full report
 in every look (`--look`; render only, no new analysis):
 
-| [Classic](https://erictsai83.github.io/prompt-profile/demo/full/report.html) (default) | [Signal](https://erictsai83.github.io/prompt-profile/demo/signal/report.html) |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![Classic card](docs/demo/card.png)                                                    | ![Signal card](docs/demo/signal/card.png)                                     |
-| [Afterhours](https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html)  | [Studio](https://erictsai83.github.io/prompt-profile/demo/studio/report.html) |
-| ![Afterhours card](docs/demo/afterhours/card.png)                                      | ![Studio card](docs/demo/studio/card.png)                                     |
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <a href="https://erictsai83.github.io/prompt-profile/demo/full/report.html"><img src="docs/demo/card.png" width="420" alt="Classic card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/full/report.html">Classic</a> (default)
+    </td>
+    <td width="50%" align="center">
+      <a href="https://erictsai83.github.io/prompt-profile/demo/signal/report.html"><img src="docs/demo/signal/card.png" width="420" alt="Signal card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/signal/report.html">Signal</a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <a href="https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html"><img src="docs/demo/afterhours/card.png" width="420" alt="Afterhours card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html">Afterhours</a>
+    </td>
+    <td width="50%" align="center">
+      <a href="https://erictsai83.github.io/prompt-profile/demo/studio/report.html"><img src="docs/demo/studio/card.png" width="420" alt="Studio card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/studio/report.html">Studio</a>
+    </td>
+  </tr>
+</table>
 
 ## Quick start
 
