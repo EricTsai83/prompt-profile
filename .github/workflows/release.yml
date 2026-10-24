@@ -26,6 +26,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
+          # No pnpm in this job; v5 would otherwise find it in `packageManager` and fail
+          package-manager-cache: false
       # The tag without `v` must equal package.json `version`
       - id: version
         env:
@@ -121,6 +123,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - env:
           DIST_TAG: ${{ needs.check.outputs.dist-tag }}
         run: |
