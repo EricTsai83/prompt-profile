@@ -17,7 +17,12 @@ describe.skipIf(!hasData)("pipeline (real data)", () => {
   it.effect("runs end to end (prints stats and counts only, never prompt text)", () =>
     Effect.gen(function* () {
       const adapters = yield* makeAdapters({ home: homedir(), env: process.env })
-      const records = (yield* readSources(adapters)).flatMap((s) => s.records)
+      const sources = yield* readSources(adapters)
+      const records = sources.flatMap((s) => s.records)
+      const slashCommands: Record<string, number> = {}
+      for (const s of sources)
+        for (const [name, n] of Object.entries(s.diagnostics.slashCommands))
+          slashCommands[name] = (slashCommands[name] ?? 0) + n
       const now = DateTime.makeUnsafe(Date.now())
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       const result = processRecords(records, {
@@ -25,12 +30,22 @@ describe.skipIf(!hasData)("pipeline (real data)", () => {
         now,
         timezone,
         username: userInfo().username,
+        slashCommands,
       })
       console.log("[smoke] PipelineReport", JSON.stringify(result.report, null, 2))
       const stats = Schema.encodeSync(Stats)(result.stats)
       console.log(
         "[smoke] Stats",
-        JSON.stringify({ ...stats, topProjects: stats.topProjects.length }, null, 2),
+        JSON.stringify(
+          {
+            ...stats,
+            topProjects: stats.topProjects.length,
+            // Command names can be the user's own; print the count only.
+            topSlashCommands: stats.topSlashCommands.length,
+          },
+          null,
+          2,
+        ),
       )
 
       // Delegation heuristics: per client, how many sessions share the same first-prompt

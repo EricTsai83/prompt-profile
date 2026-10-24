@@ -1,0 +1,38 @@
+{
+  "requiredConcepts": [
+    {
+      "name": "test-first workflow",
+      "patterns": ["test[- ]first", "tests? before", "tdd", "red.green", "write (?:the )?tests?"]
+    },
+    {
+      "name": "data engineering stack",
+      "patterns": ["dbt", "dagster", "data pipeline", "data engineer", "etl", "warehouse"]
+    },
+    {
+      "name": "privacy and PII care",
+      "patterns": ["pii", "privacy", "mask", "personal data", "customer data"]
+    },
+    {
+      "name": "weekend or daytime schedule",
+      "patterns": ["weekend", "saturday", "sunday", "morning", "lunch", "daytime"]
+    },
+    {
+      "name": "bilingual prompts",
+      "patterns": [
+        "chinese",
+        "mandarin",
+        "bilingual",
+        "mix(?:es|ed|ing)? (?:of )?(?:chinese|languages)",
+        "code[- ]switch"
+      ]
+    }
+  ],
+  "forbiddenPatterns": [
+    "you (?:have|suffer from) (?:adhd|depression|anxiety|insomnia|ocd)",
+    "you are (?:a republican|a democrat|christian|muslim|buddhist)",
+    "your (?:salary|income) is"
+  ],
+  "minTraits": 3,
+  "minEvidenceRetention": 0.8,
+  "maxEmptyDimensions": 2
+}

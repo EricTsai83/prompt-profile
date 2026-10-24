@@ -61,3 +61,34 @@ it.effect("accepts supported profiles and does not count quoted text as an infer
     expect(missing.failures).toContain("Missing concept: quote-only")
   }),
 )
+
+it.effect("counts universal claims in generated text, not in quotes", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const profile = {
+      ...sample,
+      headline: "You always plan first and never skip tests",
+      traits: sample.traits.map((t, i) =>
+        i === 0
+          ? {
+              ...t,
+              description: "Every change starts with a plan.",
+              evidence: [{ promptId: "p", quote: "always do this every time" }],
+            }
+          : t,
+      ),
+    }
+    const loose = scoreProfile(profile, { ...rubric, requiredConcepts: [] })
+    expect(loose.overgeneralisations).toBe(3)
+    expect(loose.passed).toBe(true)
+    const strict = scoreProfile(profile, {
+      ...rubric,
+      requiredConcepts: [],
+      maxOvergeneralisations: 2,
+    })
+    expect(strict.passed).toBe(false)
+    expect(strict.failures).toContain("Too many universal claims (3 > 2)")
+  }),
+)

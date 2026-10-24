@@ -10,7 +10,12 @@ export interface QualityRubric {
   readonly minTraits: number
   readonly minEvidenceRetention: number
   readonly maxEmptyDimensions: number
+  /** Fails above this many universal claims; unset = counted only (see plan 13). */
+  readonly maxOvergeneralisations?: number
 }
+
+/** Universal quantifiers that a handful of prompts rarely supports ("every change", "never"). */
+const UNIVERSAL = /\b(?:every|always|never|all of your|none of your|each of your)\b/gi
 
 export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
   // Inspect generated claims, not copied quotes or statistics.
@@ -39,5 +44,15 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     failures.push("Evidence retention below threshold")
   if (emptyDimensions > rubric.maxEmptyDimensions)
     failures.push("Too many dimensions without evidence")
-  return { passed: failures.length === 0, failures, evidenceRetention, emptyDimensions }
+  const overgeneralisations = claims.match(UNIVERSAL)?.length ?? 0
+  const maxUniversal = rubric.maxOvergeneralisations
+  if (maxUniversal !== undefined && overgeneralisations > maxUniversal)
+    failures.push(`Too many universal claims (${overgeneralisations} > ${maxUniversal})`)
+  return {
+    passed: failures.length === 0,
+    failures,
+    evidenceRetention,
+    emptyDimensions,
+    overgeneralisations,
+  }
 }

@@ -1,0 +1,207 @@
+{
+  "timezone": "Asia/Taipei",
+  "sessions": [
+    {
+      "start": "2026-07-04T01:20:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "麻煩先幫我寫 test，再寫 function：把 CSV 的 amount 欄位轉成 Decimal，空字串要變 None",
+        "test 先跑一次確認會 fail，我想看到 red 再改 code",
+        "OK 現在 green 了。edge case 再補兩個：負數和千分位逗號 1,234.50",
+        "這個 parser 可以不要用 float 嗎？金額一定要 Decimal，謝謝",
+        "幫我把 parse_amount 的 docstring 寫成 Google style，英文就好"
+      ]
+    },
+    {
+      "start": "2026-07-05T02:10:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "這份 raw data 有 customer email 和手機，進 staging 之前要先 mask，幫我設計一下 masking 規則",
+        "email 只保留 domain，local part 用 sha256 hash 加 salt，salt 從環境變數讀",
+        "手機號碼台灣格式 09xx-xxx-xxx，只留最後三碼，其他換成 *",
+        "先寫 test case 覆蓋 masking 的每一條規則，再實作",
+        "能不能確認 log 裡面不會印出原始 email？我不想 PII 出現在任何 log"
+      ]
+    },
+    {
+      "start": "2026-07-08T04:35:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "quick question：pandas read_csv 的 dtype=str 跟 converters 哪個比較適合處理混亂的欄位？",
+        "好，那幫我改成 converters，然後補一個 test 確認 leading zero 不會被吃掉",
+        "這個 test 名稱太長了，改短一點但要看得出在測什麼"
+      ]
+    },
+    {
+      "start": "2026-07-11T01:40:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "我想把 ledger 資料搬進 dbt，先不要寫 model，幫我列出 staging / intermediate / mart 三層要放什麼",
+        "naming convention 用 stg_、int_、fct_、dim_，這樣 OK 嗎？有沒有更常見的做法",
+        "幫我寫 stg_transactions.sql，欄位 rename 成 snake_case，timestamp 轉 UTC",
+        "dbt test 幫我加 not_null 跟 unique 在 transaction_id，還有 accepted_values 在 currency",
+        "currency 只會有 TWD、USD、JPY，其他值要讓 test fail",
+        "麻煩解釋一下 dbt 的 ephemeral 跟 view materialization 差在哪裡"
+      ]
+    },
+    {
+      "start": "2026-07-12T02:30:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "int_daily_balance 這個 model 要用 window function 算每日餘額，先寫 expected output 的 seed 給我看",
+        "seed 裡面放三個帳戶、五天的資料就好，要包含沒有交易的日子",
+        "沒有交易的日子餘額要沿用前一天，這個 test 先寫",
+        "現在 test 過了，但 query 很慢，幫我看 explain plan 哪裡可以改",
+        "改用 incremental model，unique_key 用 account_id + date，is_incremental 的條件幫我寫清楚"
+      ]
+    },
+    {
+      "start": "2026-07-15T04:40:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "dbt docs 的 description 幫我補齊 fct_transactions 每個欄位，英文",
+        "amount 的 description 要寫清楚單位是最小貨幣單位還是元",
+        "謝謝，順便幫我檢查有沒有欄位描述跟實際型別對不上"
+      ]
+    },
+    {
+      "start": "2026-07-18T01:15:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "下一步想用 Airflow 排程這些 dbt job，先比較一下 Airflow、Dagster、Prefect，我比較在意本機開發體驗跟測試",
+        "Dagster 的 asset 概念跟 dbt model 怎麼對應？畫個簡單的對照表",
+        "好，就用 Dagster。幫我建一個最小的 project skeleton，只要能跑 dbt build",
+        "asset 的 unit test 要怎麼寫？可以 mock 掉 dbt 的執行嗎",
+        "先寫 test 再寫 asset，這是我的習慣，麻煩照這個順序"
+      ]
+    },
+    {
+      "start": "2026-07-19T02:05:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "Dagster 的 partition 怎麼設定成每日一個 partition，從 2026-01-01 開始？",
+        "backfill 的時候會不會一次開太多 run？幫我限制 concurrency 在 4",
+        "幫我寫一個 sensor，raw bucket 有新檔案就觸發 staging 的 asset",
+        "sensor 的 test 也要，用 build_sensor_context 模擬新檔案進來",
+        "如果同一個檔案被丟兩次，要 idempotent，不能重複寫入"
+      ]
+    },
+    {
+      "start": "2026-07-22T04:30:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "Dagster 的 resource 要怎麼注入 database connection，讓 test 可以換成 sqlite？",
+        "OK，再幫我把 connection string 改成從環境變數讀，不要寫死在 code 裡",
+        "pre-commit 加一個 hook 檢查有沒有不小心 commit 到 .env"
+      ]
+    },
+    {
+      "start": "2026-07-26T01:10:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "週末想把 ledger-etl 的 test 速度改善，現在跑一次要 40 秒，先幫我找出最慢的 test",
+        "pytest --durations 的結果看起來是 fixture 每次都重建 database，改成 session scope 可以嗎",
+        "改 scope 之前先寫一個 test 確認 test 之間不會互相污染資料",
+        "OK 現在 8 秒，謝謝。幫我在 README 記一下為什麼用 session scope"
+      ]
+    },
+    {
+      "start": "2026-07-25T01:50:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "回頭整理 ledger-etl：我想把它包成一個 Python package，用 uv 管理，幫我寫 pyproject.toml",
+        "package 名稱叫 ledger_etl，src layout，Python 3.12 以上",
+        "pytest 設定放進 pyproject，coverage 門檻設 90%",
+        "CI 用 GitHub Actions 跑 ruff、mypy 跟 pytest，matrix 跑 3.12 和 3.13",
+        "mypy 設 strict，有錯誤的地方先列出來給我看，不要直接改"
+      ]
+    },
+    {
+      "start": "2026-07-26T02:40:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "mypy 抱怨 Decimal 跟 None 的 union，幫我解釋一下怎麼寫比較乾淨",
+        "用 Optional[Decimal] 還是 Decimal | None？我們規範要統一",
+        "那全部改成 Decimal | None，test 也要跟著跑過",
+        "ruff 的 rule set 建議開哪些？我想嚴格一點但不要太吵"
+      ]
+    },
+    {
+      "start": "2026-07-29T04:35:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "fct_transactions 有一筆 duplicate，幫我寫一個 dbt test 抓出 transaction_id 重複但 amount 不同的情況",
+        "這個 custom generic test 要放在 tests/generic 底下嗎？幫我確認資料夾結構",
+        "謝謝，test 抓到了，是 source 那邊重送。staging 加 dedup，保留最新一筆"
+      ]
+    },
+    {
+      "start": "2026-08-01T01:30:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "想加 data quality 的監控：每天 row count 跟昨天比，差超過 30% 就發 Slack 通知，先設計不要寫 code",
+        "閾值應該放 config 還是寫在 asset 裡？哪個比較好測",
+        "好，放 config。幫我寫 asset check 跟對應的 test",
+        "Slack webhook URL 一樣從環境變數讀，test 裡 mock 掉，不要真的發",
+        "通知內容不要帶任何客戶資料，只有 table 名稱和數量"
+      ]
+    },
+    {
+      "start": "2026-08-05T04:30:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "lunch break 問一下：dbt 的 source freshness 要怎麼設定 warn 跟 error 的時間？",
+        "raw.transactions 超過 6 小時沒更新就 warn，24 小時 error",
+        "freshness 的結果可以接到 Dagster 的 asset check 嗎",
+        "好，先記下來，週末再做"
+      ]
+    },
+    {
+      "start": "2026-08-02T02:15:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "幫我寫一份 README，說明本機怎麼跑 Dagster、怎麼跑 test、環境變數有哪些，英文",
+        "環境變數用表格列出來：名稱、用途、範例值，範例值不要放真的 secret",
+        "再加一段 troubleshooting，常見的是 dbt profile 找不到"
+      ]
+    },
+    {
+      "start": "2026-08-08T01:45:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "現在想做 snapshot 追蹤客戶等級變化，dbt snapshot 的 timestamp 跟 check strategy 差在哪？",
+        "我們的 source 沒有可靠的 updated_at，所以用 check strategy，幫我寫",
+        "snapshot 也需要 test 嗎？如果需要，測什麼比較有意義",
+        "幫我加一個 test 確認同一個 customer 不會有兩筆 dbt_valid_to 都是 null"
+      ]
+    },
+    {
+      "start": "2026-08-09T02:20:00Z",
+      "project": "/home/dev/dbt-warehouse",
+      "prompts": [
+        "mart 層想給 BI 用，幫我設計 dim_customer，客戶等級要用 snapshot 的最新值",
+        "dim_customer 不能有 email 原文，只能有 masked 的版本，幫我在 model 裡加註解提醒",
+        "幫我在 schema.yml 加 meta 標記哪些欄位是 PII，之後想自動檢查",
+        "寫一個 macro 掃描 meta pii: true 的欄位，如果出現在 mart 層就讓 build fail",
+        "這個 macro 的 test 怎麼寫？我想要先看到它擋下一個故意放錯的 model"
+      ]
+    },
+    {
+      "start": "2026-08-12T04:40:00Z",
+      "project": "/home/dev/ledger-etl",
+      "prompts": [
+        "quick one：uv lock 之後 CI 跑的版本跟本機不一樣，怎麼確保一致？",
+        "好，CI 改成 uv sync --frozen，謝謝"
+      ]
+    },
+    {
+      "start": "2026-08-15T01:35:00Z",
+      "project": "/home/dev/orchestrator",
+      "prompts": [
+        "回顧一下這兩個月：從 CSV parser 到 dbt 到 Dagster，幫我整理成一頁的架構說明，給新同事看",
+        "架構圖用 mermaid，資料流從 raw bucket 到 mart，PII masking 的位置要標出來",
+        "最後幫我列出還沒有 test 覆蓋的地方，我想下週補"
+      ]
+    }
+  ]
+}

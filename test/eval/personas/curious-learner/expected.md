@@ -6,4 +6,5 @@ Should be recognised:
 - Explicitly asks the AI **not** to write the code ("just give me the steps", "don't fix them").
 - Topic progression: ownership → smart pointers → async → WebAssembly → game dev.
 - Clear growth over time (from borrow-checker confusion to fixed timesteps and spatial hashing).
-- Irregular hours, including late nights; lowercase, casual English with enthusiasm ("it compiles now!!").
+- Irregular hours from morning to evening (local time 10:00–21:30, no late nights); lowercase,
+  casual English with enthusiasm ("it compiles now!!").

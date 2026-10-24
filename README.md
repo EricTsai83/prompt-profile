@@ -8,6 +8,12 @@ personal profile.
 [Sample HTML report](docs/sample-report.html) · [Sample profile JSON](docs/sample-profile.json)
 (all sample data is hand-written and fictional).
 
+The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
+
+| Signal                                      | Afterhours                                          | Studio                                      |
+| ------------------------------------------- | --------------------------------------------------- | ------------------------------------------- |
+| ![Signal look](docs/sample-card-signal.png) | ![Afterhours look](docs/sample-card-afterhours.png) | ![Studio look](docs/sample-card-studio.png) |
+
 ```bash
 npx prompt-profile
 # or

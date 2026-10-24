@@ -46,6 +46,9 @@ prompt-profile render profile.json --card-hide stats,graphic
   missing-evidence warning and coverage line in every look. `--card-hide` does not touch it.
 - The report stays offline: the display font is embedded as a data URL, and the
   Content-Security-Policy allows `font-src data:` only for looks that need it.
+- Long text on the card is clipped at a word boundary with "…" (archetype 56 characters,
+  headline 120 in the looks / 150 in classic, trait 32), and the archetype type steps down
+  (96 → 72 → 58 px). The private report always shows the full text.
 - Derived files keep the private write rules (folders `0700`, files `0600`, temp + rename).
 
 ## Data and files

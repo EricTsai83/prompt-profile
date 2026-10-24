@@ -1,5 +1,30 @@
 # 10 · Release
 
+**Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done
+(see [plan 13](./13-product-quality.md)); it is the last plan in the execution order. Nothing is
+pushed or published. The checklist below is unchanged from the original plan; this section
+records where things stand.
+
+### Already in the repository
+
+- README with privacy notes, requirements, FAQ, sample card/report; MIT `LICENSE`;
+  `docs/terms-check.md` (first pass, 2026-10-24); `SECURITY.md`; `RISKS.md`.
+- release-please config and manifest (first version `0.1.0`); `.github/workflows/ci.yml` and
+  `release.yml` (pack with `pnpm pack`, publish with provenance through Trusted Publishing).
+- `pnpm test:package` installs the packed tarball and checks version, help, prompts, fonts,
+  HTML, JSON, the 1200 × 630 PNG and a look. Tarball 159 KB; `--version` cold start ~0.9 s.
+- `prompt-profile` is unclaimed on npm (404 on 2026-10-24).
+
+### Still to do when the release resumes
+
+1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
+2. Regenerate the README sample card/report if the product changed since (plan 13).
+3. Push to GitHub; confirm CI passes there for the first time (RISKS 4).
+4. Owner: set up npm Trusted Publishing (OIDC) and release-please permissions.
+5. Merge the release PR; confirm the npm page shows provenance.
+6. Clean-environment check: new container, logged-in `claude`, `npx prompt-profile` end to end.
+7. Check the npm name again just before publishing.
+
 ## Goal
 
 Publish to npm so users can run `npm i -g prompt-profile` or `npx prompt-profile`, and lay the groundwork for adding standalone binaries and Homebrew later.

@@ -19,7 +19,7 @@ Sorted by severity.
      which looks more like workflow phrasings you reuse yourself, so no rule was added.
    - Suggestion: run `pnpm test:smoke`, look at the `first-prompt prefix hashes` output, and confirm yourself whether those groups are AI delegation;
      if so, add their fixed openings to `DELEGATION_PATTERNS` (and bump `PIPELINE_VERSION`).
-   - Also, `topSlashCommands` currently has no data: commands such as `/usage` and `/status` only appear in history, and are not filtered by `--since`.
+   - `topSlashCommands` works in the CLI (5 commands on the owner's data, 2026-10-24). An earlier note said it was empty: that came from the smoke test, which did not pass slash commands to the pipeline. It does now and prints only the count.
 
 3. **Profile quality needs your own assessment** (plan 07's manual acceptance)
    - Ran successfully end to end with Claude on your real data (`--since 2w`, 9 chunks): 40/40 pieces of evidence passed verification, and the second run hit the cache entirely.
@@ -74,7 +74,7 @@ Sorted by severity.
 14. **Extra Claude Code filter rules** (not listed in the plan, but found in real data): `isMeta`, `isCompactSummary` (AI-generated conversation summaries),
     `origin.kind: task-notification`, `turnOrigin: scheduled / peer`; files under `subagents/` are also not read.
 15. **The eval personas are smaller than specified**: 3 personas with 31–45 prompts each (the plan asks for 50–150).
-16. **The report's light / dark modes were only checked in Chrome (headless)**, never actually opened in Safari.
+16. **The report's light / dark modes were checked in Chrome and in WebKit 26.5** (Safari's engine, through Playwright) for every look at 1440 and 390 px on 2026-10-24: no overflow, no requests, display font loaded. Not yet opened in the Safari app itself.
 17. **"Clean environment (Docker) + `npx prompt-profile` from start to finish" and npm provenance** have not been verified (they require publishing first).
 18. **Font source**: Noto Sans TC is downloaded from GitHub raw (pinned commit `165c01b`) and its SHA-256 is verified; if GitHub changes its raw URL policy,
     the Chinese card can no longer be generated (the report is unaffected). The Inter font is embedded in the package under the OFL licence. (Removed later: the product is English-only, so the CJK font download no longer exists.)

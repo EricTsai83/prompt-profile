@@ -194,6 +194,7 @@ const program = Effect.gen(function* () {
           retries: calls.failedAttempts,
           traits: profile.traits.length,
           emptyDimensions: score.emptyDimensions,
+          universalClaims: score.overgeneralisations,
           archetype: profile.archetype.name,
           seconds,
         })

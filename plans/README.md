@@ -110,9 +110,10 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute `pla
 | 07 | [Analysis flow](./07-analysis.md) | `profile.json` | 05, 06 |
 | 08 | [Report output](./08-report.md) | HTML report + PNG card | 02 |
 | 09 | [CLI integration and UX](./09-cli.md) | The complete `prompt-profile` command | 05, 07, 08 |
-| 10 | [Release](./10-release.md) | npm package + CI | 09 |
 | 11 | [Profile customization UX](./11-profile-customization-ux.md) | Research: looks, stories, model comparison | 09 |
 | 12 | [Looks and share-card privacy](./12-looks-and-share-card.md) | `--look`, `--card-hide`, `render` variants | 11 |
+| 13 | [Product quality](./13-product-quality.md) | Grounded profiles, real-data checks, polish | 12 |
+| 10 | [Release](./10-release.md) (**pending**, last) | npm package + CI | 13 |
 
 **06 goes first**: "borrowing the user's `claude` / `codex` to produce structured JSON" is the biggest technical risk of the whole product (Schema compatibility, hooks / MCP interference, history pollution). Finish the 06 smoke test first and confirm both CLIs accept the JSON Schema produced by plan 02 before investing in other plans. If 06 shows that one of the CLIs is not viable, go back and adjust the LLM Schema in 02.
 
