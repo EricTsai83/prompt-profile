@@ -40,8 +40,16 @@ export interface TechniqueEvent {
   readonly source: string
   readonly sessionId: string
   readonly timestampMs: number
-  /** `transcript`: the session has full metadata on disk (one per session; the denominator). */
-  readonly kind: ToolTechnique | "transcript"
+  /**
+   * `transcript`: the session has full metadata on disk (one per session; the denominator).
+   * `model`: a model the session used (once per session and model).
+   */
+  readonly kind: ToolTechnique | "transcript" | "model"
+  /**
+   * A name, never content: skill name, subagent type, MCP server, model, or "subagent" for
+   * background / worktree use by a subagent.
+   */
+  readonly detail?: string
 }
 
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
@@ -70,6 +78,36 @@ const MonthTechniques = Schema.Struct({
   techniques: countsOf(PROMPT_TECHNIQUES, Count),
 })
 
+/** Where a skill comes from; decides whether the share page may show its name. */
+export const SKILL_ORIGINS = ["builtin", "plugin", "personal", "project", "unknown"] as const
+
+const NamedUse = Schema.Struct({
+  name: Schema.String,
+  uses: Count,
+  sessions: Count,
+  /** First and last day used, YYYY-MM-DD in the stats time zone. */
+  first: Schema.String,
+  last: Schema.String,
+})
+
+const SkillUse = Schema.Struct({
+  ...NamedUse.fields,
+  /** The skill's own description (SKILL.md front matter, or the built-in list); null if not found. */
+  description: Schema.NullOr(Schema.String),
+  origin: Schema.Literals(SKILL_ORIGINS),
+})
+export type SkillUse = typeof SkillUse.Type
+
+/** Named breakdown of the workflow techniques (busiest first, at most MAX_DETAILS each). */
+const Details = Schema.Struct({
+  skills: Schema.Array(SkillUse),
+  subagentTypes: Schema.Array(NamedUse),
+  mcpServers: Schema.Array(NamedUse),
+  models: Schema.Array(NamedUse),
+})
+
+export const MAX_DETAILS = 12
+
 export const Techniques = Schema.Struct({
   /**
    * Sessions whose transcript (with tool metadata) is still on disk. Claude Code deletes old
@@ -84,5 +122,6 @@ export const Techniques = Schema.Struct({
   maxParallel: Count,
   /** Days with at least two overlapping sessions. */
   parallelDays: Count,
+  details: Details,
 })
 export type Techniques = typeof Techniques.Type

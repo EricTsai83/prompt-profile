@@ -1484,7 +1484,109 @@
         }
       ],
       "maxParallel": 4,
-      "parallelDays": 31
+      "parallelDays": 31,
+      "details": {
+        "skills": [
+          {
+            "name": "code-review",
+            "uses": 31,
+            "sessions": 18,
+            "first": "2026-07-12",
+            "last": "2026-10-22",
+            "description": "Review a diff, PR or branch for correctness bugs, optionally posting or fixing findings",
+            "origin": "builtin"
+          },
+          {
+            "name": "review-with-two-models",
+            "uses": 14,
+            "sessions": 9,
+            "first": "2026-09-02",
+            "last": "2026-10-21",
+            "description": "Implement a change, then get an independent second-model review before merging",
+            "origin": "personal"
+          },
+          {
+            "name": "vercel:deploy",
+            "uses": 6,
+            "sessions": 5,
+            "first": "2026-08-20",
+            "last": "2026-10-15",
+            "description": "Deploy the current project to Vercel",
+            "origin": "plugin"
+          },
+          {
+            "name": "release-notes",
+            "uses": 3,
+            "sessions": 3,
+            "first": "2026-10-01",
+            "last": "2026-10-19",
+            "description": "Write release notes from merged PRs",
+            "origin": "project"
+          }
+        ],
+        "subagentTypes": [
+          {
+            "name": "Explore",
+            "uses": 96,
+            "sessions": 31,
+            "first": "2026-06-04",
+            "last": "2026-10-22"
+          },
+          {
+            "name": "general-purpose",
+            "uses": 40,
+            "sessions": 17,
+            "first": "2026-07-01",
+            "last": "2026-10-20"
+          },
+          {
+            "name": "migration-planner",
+            "uses": 5,
+            "sessions": 4,
+            "first": "2026-09-10",
+            "last": "2026-10-02"
+          }
+        ],
+        "mcpServers": [
+          {
+            "name": "github",
+            "uses": 120,
+            "sessions": 14,
+            "first": "2026-05-03",
+            "last": "2026-10-22"
+          },
+          {
+            "name": "linear",
+            "uses": 44,
+            "sessions": 8,
+            "first": "2026-07-20",
+            "last": "2026-10-18"
+          },
+          {
+            "name": "acme-billing",
+            "uses": 12,
+            "sessions": 3,
+            "first": "2026-09-15",
+            "last": "2026-10-09"
+          }
+        ],
+        "models": [
+          {
+            "name": "claude-opus-5-5",
+            "uses": 180,
+            "sessions": 180,
+            "first": "2026-04-25",
+            "last": "2026-10-23"
+          },
+          {
+            "name": "claude-sonnet-5-5",
+            "uses": 22,
+            "sessions": 22,
+            "first": "2026-05-10",
+            "last": "2026-09-30"
+          }
+        ]
+      }
     },
     "promptHabits": {
       "terseShare": 0.31,

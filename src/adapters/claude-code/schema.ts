@@ -20,6 +20,7 @@ export const ClaudeLine = Schema.Struct({
   message: Schema.optional(
     Schema.Struct({
       content: Schema.optional(Schema.Unknown),
+      model: Schema.optional(Schema.Unknown),
     }),
   ),
 })

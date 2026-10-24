@@ -111,6 +111,21 @@ export interface Messages {
   readonly growing: string
   readonly coverageNote: (sessions: number) => string
   readonly noData: string
+  readonly adoption: string
+  readonly stages: Record<
+    "plan" | "delegate" | "extend" | "verify" | "ship",
+    readonly [name: string, question: string]
+  >
+  readonly skillsUsed: string
+  readonly subagentTypes: string
+  readonly mcpServers: string
+  readonly modelsUsed: string
+  readonly customSkills: (n: number) => string
+  readonly customAgents: (n: number) => string
+  readonly customServers: (n: number) => string
+  readonly noDescription: string
+  readonly usedRange: (sessions: number, from: string, to: string) => string
+  readonly origin: Record<"builtin" | "plugin" | "personal" | "project" | "unknown", string>
   readonly sinceLast: (date: string) => string
   readonly lastSuggestions: string
   readonly correctionsShare: string
@@ -252,6 +267,30 @@ const en: Messages = {
   unitPrompts: "share of prompts",
   growing: "growing fastest",
   noData: "no transcripts kept",
+  adoption: "Adoption over time",
+  stages: {
+    plan: ["Plan", "Does the work start from a plan?"],
+    delegate: ["Delegate", "How much is handed to agents, and how?"],
+    extend: ["Extend", "Which skills and tools extend the agent?"],
+    verify: ["Verify", "Is the AI given context and asked to check its work?"],
+    ship: ["Ship", "Does the work end in a pull request?"],
+  },
+  skillsUsed: "Skills used",
+  subagentTypes: "Subagent types",
+  mcpServers: "MCP servers",
+  modelsUsed: "Models",
+  customSkills: (n) => `${n} custom ${n === 1 ? "skill" : "skills"}`,
+  customAgents: (n) => `${n} custom ${n === 1 ? "agent type" : "agent types"}`,
+  customServers: (n) => `${n} private ${n === 1 ? "server" : "servers"}`,
+  noDescription: "No description found",
+  usedRange: (n, a, b) => `${plural(n, "session", "sessions")} · ${a === b ? a : `${a} – ${b}`}`,
+  origin: {
+    builtin: "built-in",
+    plugin: "plugin",
+    personal: "my skill",
+    project: "project skill",
+    unknown: "skill",
+  },
   coverageNote: (n) =>
     `Workflow shares cover the ${plural(n, "session", "sessions")} whose transcripts are still on disk (Claude Code deletes old ones)`,
   sinceLast: (d) => `Since your last report (${d})`,
@@ -427,6 +466,30 @@ const zhTW: Messages = {
   unitPrompts: "佔 prompt 的比例",
   growing: "成長最快",
   noData: "沒有保留紀錄",
+  adoption: "隨時間的採用情況",
+  stages: {
+    plan: ["規劃", "工作是不是從計畫開始？"],
+    delegate: ["委派", "交給 agent 多少、怎麼交？"],
+    extend: ["擴充", "用了哪些 skills 和工具擴充 agent？"],
+    verify: ["驗證", "有沒有給 AI 足夠脈絡、要求它檢查？"],
+    ship: ["交付", "工作是不是以 pull request 收尾？"],
+  },
+  skillsUsed: "用過的 skills",
+  subagentTypes: "子代理類型",
+  mcpServers: "MCP server",
+  modelsUsed: "模型",
+  customSkills: (n) => `${n} 個自訂 skill`,
+  customAgents: (n) => `${n} 種自訂代理`,
+  customServers: (n) => `${n} 個私有 server`,
+  noDescription: "找不到說明",
+  usedRange: (n, a, b) => `${n} 個 session · ${a === b ? a : `${a} – ${b}`}`,
+  origin: {
+    builtin: "內建",
+    plugin: "plugin",
+    personal: "我的 skill",
+    project: "專案 skill",
+    unknown: "skill",
+  },
   coverageNote: (n) =>
     `工作流程的比例只涵蓋還保留完整紀錄的 ${n} 個 session（Claude Code 會刪除舊紀錄）`,
   sinceLast: (d) => `跟上次報告比（${d}）`,

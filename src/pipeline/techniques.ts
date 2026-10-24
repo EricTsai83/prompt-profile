@@ -1,9 +1,11 @@
 import { DateTime } from "effect"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import {
+  MAX_DETAILS,
   PROMPT_TECHNIQUES,
   TOOL_TECHNIQUES,
   type PromptTechnique,
+  type SkillUse,
   type TechniqueEvent,
   type Techniques,
   type ToolTechnique,
@@ -140,7 +142,7 @@ export const techniquesOf = (input: {
   for (const e of events) {
     const m = month(input.monthOf(e.timestampMs))
     if (e.kind === "transcript") m.covered.add(key(e.source, e.sessionId))
-    else m.tools[e.kind].add(key(e.source, e.sessionId))
+    else if (e.kind !== "model") m.tools[e.kind].add(key(e.source, e.sessionId))
   }
   // Every month from the first to the last, so a quiet month shows as a gap, not a jump.
   const known = [...months.keys()].toSorted()
@@ -192,7 +194,47 @@ export const techniquesOf = (input: {
     if (p.d === 1 && active >= 2) parallel.add(input.dayOf(p.t))
   }
 
+  /** Busiest names of one kind (subagent background / worktree markers excluded). */
+  const named = (kind: TechniqueEvent["kind"]) => {
+    const byName = new Map<
+      string,
+      { uses: number; sessions: Set<string>; first: number; last: number }
+    >()
+    for (const e of events) {
+      if (e.kind !== kind || e.detail === undefined) continue
+      const x = byName.get(e.detail) ?? {
+        uses: 0,
+        sessions: new Set(),
+        first: e.timestampMs,
+        last: e.timestampMs,
+      }
+      x.uses++
+      x.sessions.add(key(e.source, e.sessionId))
+      x.first = Math.min(x.first, e.timestampMs)
+      x.last = Math.max(x.last, e.timestampMs)
+      byName.set(e.detail, x)
+    }
+    return [...byName.entries()]
+      .map(([name, x]) => ({
+        name,
+        uses: x.uses,
+        sessions: x.sessions.size,
+        first: input.dayOf(x.first),
+        last: input.dayOf(x.last),
+      }))
+      .toSorted(
+        (a, b) => b.sessions - a.sessions || b.uses - a.uses || a.name.localeCompare(b.name),
+      )
+      .slice(0, MAX_DETAILS)
+  }
+
   return {
+    details: {
+      skills: named("skills").map((x) => ({ ...x, description: null, origin: "unknown" as const })),
+      subagentTypes: named("subagents"),
+      mcpServers: named("mcp"),
+      models: named("model"),
+    },
     coveredSessions: new Set(
       events.filter((e) => e.kind === "transcript").map((e) => key(e.source, e.sessionId)),
     ).size,
@@ -215,3 +257,18 @@ export const techniquesOf = (input: {
     parallelDays: parallel.size,
   }
 }
+
+/** Fill in each used skill's description and origin from a catalog (read by the CLI). */
+export const withSkillCatalog = (
+  t: Techniques,
+  catalog: ReadonlyMap<
+    string,
+    { readonly description: string | null; readonly origin: SkillUse["origin"] }
+  >,
+): Techniques => ({
+  ...t,
+  details: {
+    ...t.details,
+    skills: t.details.skills.map((s) => ({ ...s, ...catalog.get(s.name) })),
+  },
+})

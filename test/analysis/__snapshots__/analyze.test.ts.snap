@@ -862,6 +862,12 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
     "techniques": {
       "coveredSessions": 0,
+      "details": {
+        "mcpServers": [],
+        "models": [],
+        "skills": [],
+        "subagentTypes": [],
+      },
       "maxParallel": 0,
       "monthly": [],
       "parallelDays": 0,

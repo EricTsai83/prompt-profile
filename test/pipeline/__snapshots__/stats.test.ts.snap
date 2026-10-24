@@ -1175,6 +1175,12 @@ exports[`stats > computes stats from filtered and cleaned data 1`] = `
   },
   "techniques": {
     "coveredSessions": 0,
+    "details": {
+      "mcpServers": [],
+      "models": [],
+      "skills": [],
+      "subagentTypes": [],
+    },
     "maxParallel": 1,
     "monthly": [
       {

@@ -114,6 +114,58 @@ describe("techniques in stats", () => {
     ])
   })
 
+  it("details: named skills, subagent types, MCP servers and models, busiest first", () => {
+    const named: Array<TechniqueEvent> = [
+      ...events,
+      {
+        source: "claude-code",
+        sessionId: "a",
+        timestampMs: ms("2026-09-01T02:40:00Z"),
+        kind: "skills",
+        detail: "code-review",
+      },
+      {
+        source: "claude-code",
+        sessionId: "c",
+        timestampMs: ms("2026-10-02T02:06:00Z"),
+        kind: "skills",
+        detail: "code-review",
+      },
+      {
+        source: "claude-code",
+        sessionId: "c",
+        timestampMs: ms("2026-10-02T02:07:00Z"),
+        kind: "skills",
+        detail: "simplify",
+      },
+      {
+        source: "claude-code",
+        sessionId: "a",
+        timestampMs: ms("2026-09-01T02:41:00Z"),
+        kind: "mcp",
+        detail: "linear",
+      },
+      {
+        source: "claude-code",
+        sessionId: "a",
+        timestampMs: ms("2026-09-01T02:42:00Z"),
+        kind: "model",
+        detail: "claude-opus-5-5",
+      },
+    ]
+    const d = processRecords(records, { ...options, events: named }).stats.techniques!.details
+    expect(d.skills.map((x) => [x.name, x.uses, x.sessions, x.first, x.last])).toEqual([
+      ["code-review", 2, 2, "2026-09-01", "2026-10-02"],
+      ["simplify", 1, 1, "2026-10-02", "2026-10-02"],
+    ])
+    // the catalog is filled in later by the CLI (it reads SKILL.md files)
+    expect(d.skills[0]!.origin).toBe("unknown")
+    expect(d.skills[0]!.description).toBeNull()
+    expect(d.mcpServers.map((x) => x.name)).toEqual(["linear"])
+    expect(d.models.map((x) => [x.name, x.sessions])).toEqual([["claude-opus-5-5", 1]])
+    expect(d.subagentTypes).toEqual([])
+  })
+
   it("without events the workflow counts are zero, not missing", () => {
     const t = processRecords(records, options).stats.techniques!
     expect(t.tools.subagents).toEqual({ count: 0, sessions: 0 })

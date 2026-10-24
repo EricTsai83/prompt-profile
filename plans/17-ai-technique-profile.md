@@ -1,7 +1,8 @@
 # 17 · AI technique profile: how someone works with AI
 
-Status: implemented (2026-10-24); the layout of "How I work with AI" waits for the owner's
-choice between four review variants (`docs/ux/review/`).
+Status: implemented (2026-10-24). After reviewing four layouts (badges, bars, timeline,
+highlights) the owner asked for a deeper view of skills and AI capability; the chosen layout is
+a fifth one, the **capability map**, and the other four were removed.
 
 ## Goal
 
@@ -35,8 +36,24 @@ have prompts but no transcripts.
 - Profile `schemaVersion` 7 (`stats.techniques`) and 8 (`previous`); older files decode without
   them and the report leaves the sections out. Monthly technique data is not sent to the LLM.
 
-## Review variants
+## Capability map (the chosen layout)
 
-`pnpm review:variants <profile.json> <dir>` renders every layout; `docs/ux/review/build.mjs`
-adds screenshots and a side-by-side page. A: badges · B: bars · C: adoption timeline ·
-D: highlights. The default is B until the owner chooses; then the others are removed.
+An adoption timeline, then five stages — plan, delegate, extend, verify, ship — each with its
+measures and a named breakdown:
+
+- **Skills:** name, origin (built-in, plugin, personal, project), the skill's own description
+  from its `SKILL.md` front matter (or the built-in list), sessions and first–last use. Only the front
+  matter is kept: the skill body is never stored, and the arguments it was called with are never
+  read.
+- **Subagent types**, **MCP servers** (from `mcp__<server>__…` tool names) and **models**, with
+  session counts; background and worktree runs of subagents count under their techniques.
+- **Share page:** built-in and plugin skills, built-in subagent types, well-known MCP servers and
+  model names are shown; personal and project skills, custom agent types and other servers are
+  only counted ("2 custom skills"), and their descriptions are not shown. Lists in
+  `report/techniques.ts`.
+
+## Review variants (removed)
+
+Badges, bars, an adoption timeline and highlights were rendered side by side for review (commit
+`856db54`). None showed which skills were used; the capability map replaced them, keeping the
+timeline.

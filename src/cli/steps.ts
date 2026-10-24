@@ -5,6 +5,9 @@ import { snapshotOf } from "../domain/Progress.ts"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import type { TechniqueEvent } from "../domain/Techniques.ts"
 import { processRecords, type PipelineReport } from "../pipeline/index.ts"
+import { withSkillCatalog } from "../pipeline/techniques.ts"
+import { readSkillCatalog } from "../adapters/claude-code/skills.ts"
+import { resolveClaudeRoot } from "../adapters/claude-code/adapter.ts"
 import { Environment } from "../platform/Environment.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
@@ -118,6 +121,22 @@ export const runPipelineStep = (collected: Collected, since: string) =>
     )
     if (result.prompts.length === 0) {
       return yield* new NoData({ reason: "out-of-range", locations: collected.locations })
+    }
+    // Skill descriptions come from local SKILL.md files (front matter only).
+    const techniques = result.stats.techniques
+    if (techniques !== null && techniques.details.skills.length > 0) {
+      const path = yield* Path.Path
+      const catalog = yield* readSkillCatalog({
+        claudeRoot: resolveClaudeRoot(env.env, env.home, path),
+        projectDirs: [
+          ...new Set(collected.records.flatMap((r) => (r.project === null ? [] : [r.project]))),
+        ],
+        names: techniques.details.skills.map((x) => x.name),
+      })
+      return {
+        ...result,
+        stats: { ...result.stats, techniques: withSkillCatalog(techniques, catalog) },
+      }
     }
     return result
   })

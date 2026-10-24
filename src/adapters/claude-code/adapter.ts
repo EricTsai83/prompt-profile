@@ -6,8 +6,8 @@ import { isAnalysisPrompt } from "../../domain/markers.ts"
 import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { listDir } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
-import { techniqueOfTool } from "../common/techniques.ts"
-import type { TechniqueEvent, ToolTechnique } from "../../domain/Techniques.ts"
+import { techniqueOfTool, toolDetail } from "../common/techniques.ts"
+import type { TechniqueEvent } from "../../domain/Techniques.ts"
 import { createHash } from "node:crypto"
 import { firstMatch, slashCommandName } from "../common/rules.ts"
 import { CLAUDE_RULES, type ClaudeCandidate } from "./rules.ts"
@@ -80,6 +80,7 @@ interface ReadState {
   readonly seenPullRequests: Set<string>
   readonly worktreeSessions: Set<string>
   readonly transcriptSessions: Set<string>
+  readonly modelSessions: Set<string>
 }
 
 /** Lines that can carry a workflow technique; everything else is skipped unparsed. */
@@ -94,12 +95,13 @@ const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state
   const ms = line.timestamp === undefined ? null : Date.parse(line.timestamp)
   if (ms !== null && !Number.isNaN(ms)) file.lastMs = ms
   if (line.isSidechain === true || line.sessionId === undefined || file.lastMs === null) return
-  const push = (kind: ToolTechnique | "transcript") =>
+  const push = (kind: TechniqueEvent["kind"], detail?: string) =>
     state.events.push({
       source: SOURCE,
       sessionId: line.sessionId!,
       timestampMs: file.lastMs!,
       kind,
+      ...(detail === undefined ? {} : { detail }),
     })
   // the session has a transcript with metadata: it counts in the workflow denominator
   if (!state.transcriptSessions.has(line.sessionId)) {
@@ -120,12 +122,30 @@ const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state
     push("worktrees")
   }
   const content = line.message?.content
+  if (line.type === "assistant") {
+    const model = line.message?.model
+    if (typeof model === "string" && model !== "<synthetic>") {
+      const key = `${line.sessionId}\u0000${model}`
+      if (!state.modelSessions.has(key)) {
+        state.modelSessions.add(key)
+        push("model", model)
+      }
+    }
+  }
   if (line.type === "assistant" && Array.isArray(content)) {
     for (const item of content as ReadonlyArray<unknown>) {
       if (item && typeof item === "object" && (item as { type?: unknown }).type === "tool_use") {
-        const name = (item as { name?: unknown }).name
+        const { name, input } = item as { name?: unknown; input?: unknown }
         const kind = typeof name === "string" ? techniqueOfTool(name) : undefined
-        if (kind) push(kind)
+        if (kind && typeof name === "string") {
+          const args = (input ?? {}) as Record<string, unknown>
+          push(kind, toolDetail(kind, name, args))
+          // a subagent running in the background or in its own worktree
+          if (kind === "subagents" && args["run_in_background"] === true)
+            push("background", "subagent")
+          if (kind === "subagents" && args["isolation"] === "worktree")
+            push("worktrees", "subagent")
+        }
       }
     }
   }
@@ -275,6 +295,7 @@ export const makeClaudeCodeAdapter = (
         seenPullRequests: new Set(),
         worktreeSessions: new Set(),
         transcriptSessions: new Set(),
+        modelSessions: new Set(),
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right

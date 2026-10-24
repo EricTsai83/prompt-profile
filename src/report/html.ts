@@ -651,7 +651,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
   const every = correctionEvery(s)
   const signals = isPrivate ? signalRow(profile, loc) : null
   const progress = isPrivate ? progressBlock(profile, loc) : null
-  const tech = techniquesSection(s, loc, options.techniques ?? "bars")
+  const tech = techniquesSection(s, loc, audience)
   const perSession = promptsPerSession(s)
   const graphic = look
     ? graphicSvg(identity.graphic, s.hourHistogram, {

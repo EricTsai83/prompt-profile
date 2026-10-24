@@ -30,3 +30,25 @@ export const TOOL_NAME_TECHNIQUES: ReadonlyArray<{
 
 export const techniqueOfTool = (name: string): ToolTechnique | undefined =>
   TOOL_NAME_TECHNIQUES.find((t) => t.test(name))?.technique
+
+/** A short identifier, never free text: names longer than this are dropped. */
+const MAX_NAME = 80
+const NAME = /^[\w.:@/-]+$/
+
+const name = (v: unknown): string | undefined =>
+  typeof v === "string" && v.length <= MAX_NAME && NAME.test(v) ? v : undefined
+
+/**
+ * The name behind a technique use: skill name, subagent type or MCP server. Only these
+ * identifier fields are read, and only when they look like identifiers.
+ */
+export const toolDetail = (
+  technique: ToolTechnique,
+  tool: string,
+  input: Readonly<Record<string, unknown>>,
+): string | undefined => {
+  if (technique === "skills") return name(input["skill"])
+  if (technique === "subagents") return name(input["subagent_type"])
+  if (technique === "mcp") return name(tool.split("__")[1])
+  return undefined
+}

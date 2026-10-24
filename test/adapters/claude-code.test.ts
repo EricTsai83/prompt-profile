@@ -156,12 +156,22 @@ describe("Claude Code adapter (fixture)", () => {
       const root = mkdtempSync(join(tmpdir(), "pp-claude-"))
       mkdirSync(join(root, "projects", "p"), { recursive: true })
       const base = { sessionId: "s1", isSidechain: false }
-      const tool = (name: string, ts: string, extra: object = {}) => ({
+      const tool = (name: string, ts: string, extra: object = {}, input: object = {}) => ({
         ...base,
         ...extra,
         type: "assistant",
         timestamp: ts,
-        message: { content: [{ type: "tool_use", id: "t", name, input: { prompt: "secret" } }] },
+        message: {
+          model: "claude-opus-5-5",
+          content: [
+            {
+              type: "tool_use",
+              id: "t",
+              name,
+              input: { prompt: "secret", args: "secret", ...input },
+            },
+          ],
+        },
       })
       const lines = [
         {
@@ -172,7 +182,17 @@ describe("Claude Code adapter (fixture)", () => {
           permissionMode: "plan",
           message: { content: "plan the change" },
         },
-        tool("Agent", "2026-09-03T15:01:00.000Z"),
+        tool(
+          "Agent",
+          "2026-09-03T15:01:00.000Z",
+          {},
+          {
+            subagent_type: "Explore",
+            run_in_background: true,
+            isolation: "worktree",
+          },
+        ),
+        tool("Skill", "2026-09-03T15:01:30.000Z", {}, { skill: "code-review" }),
         tool("Bash", "2026-09-03T15:02:00.000Z"),
         tool("Skill", "2026-09-03T15:03:00.000Z", { isSidechain: true }),
         tool("mcp__linear__create_issue", "2026-09-03T15:04:00.000Z"),
@@ -197,15 +217,23 @@ describe("Claude Code adapter (fixture)", () => {
       )
       const read = yield* (yield* makeClaudeCodeAdapter(root)).read
       expect(
-        read.events.map((e) => [e.kind, new Date(e.timestampMs).toISOString().slice(11, 16)]),
+        read.events.map((e) => [
+          e.kind,
+          new Date(e.timestampMs).toISOString().slice(11, 16),
+          e.detail ?? null,
+        ]),
       ).toEqual([
-        ["transcript", "15:00"],
-        ["planMode", "15:00"],
-        ["subagents", "15:01"],
-        ["mcp", "15:04"],
-        ["pullRequests", "15:05"],
+        ["transcript", "15:00", null],
+        ["planMode", "15:00", null],
+        ["model", "15:01", "claude-opus-5-5"],
+        ["subagents", "15:01", "Explore"],
+        ["background", "15:01", "subagent"],
+        ["worktrees", "15:01", "subagent"],
+        ["skills", "15:01", "code-review"],
+        ["mcp", "15:04", "linear"],
+        ["pullRequests", "15:05", null],
         // no timestamp of its own: the last one seen in the file
-        ["worktrees", "15:06"],
+        ["worktrees", "15:06", null],
       ])
       expect(JSON.stringify(read.events)).not.toContain("secret")
       expect(JSON.stringify(read.events)).not.toContain("example.test")
