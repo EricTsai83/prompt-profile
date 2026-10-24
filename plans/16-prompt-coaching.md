@@ -1,6 +1,6 @@
 # 16 · Prompt coaching: from "who you are" to "how to prompt better"
 
-Status: implemented (2026-10-24); a budgeted persona run to validate the improvements is pending the owner's approval. Owner request: the report should not only describe; it should
+Status: implemented and validated (2026-10-24): 8 persona runs (28 calls) and one real-data run; see the model-comparison README. Owner request: the report should not only describe; it should
 show where the owner's prompts can improve.
 
 ## Two sources, both evidence-based

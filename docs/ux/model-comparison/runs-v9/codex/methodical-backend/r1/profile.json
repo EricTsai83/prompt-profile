@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:19:11.587Z",
+  "engine": {
+    "runner": "codex",
+    "model": null,
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 11,
+    "promptsAnalyzed": 36,
+    "evidenceKept": 25,
+    "evidenceDropped": 0
+  },
+  "headline": "You build backend changes in careful steps, with tests and escape routes.",
+  "archetype": {
+    "name": "The Transaction Guardian",
+    "description": "You ask how changes behave under pressure, failure, and rollback. Small steps, explicit tests, and operational documents make your plans reviewable."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Small Verified Steps",
+      "summary": "You often plan before implementation, narrow the next step, and request tests before changing behavior.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:1",
+          "quote": "Good plan. Let's start with step 1 only: the database migration."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Concise Explicit Requests",
+      "summary": "You use direct English and specify scope, sequencing, and output formats.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Write the migration and a rollback. Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:2",
+          "quote": "Turn the checklist into a GitHub issue template."
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Database Close Work",
+      "summary": "Your requests center on Go and PostgreSQL, with concrete choices around concurrency, isolation, and SQL tooling.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:0",
+          "quote": "Review this Go function for race conditions. Explain your reasoning step by step."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:0",
+          "quote": "I want to model double-entry bookkeeping in PostgreSQL. What constraints guarantee that every transaction balances?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:1",
+          "quote": "Please don't use an ORM here, plain sqlc queries."
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Correctness Meets Operations",
+      "summary": "You repeatedly focus on transactional guarantees, safe rollouts, and evidence that production behavior is observable.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-7:2",
+          "quote": "Add a test that proves the webhook is not written when the transaction rolls back."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:0",
+          "quote": "What observability do we need before turning on the ledger in production? Make a checklist."
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Understand Before Choosing",
+      "summary": "You use explanations and comparisons to explore concurrency and database trade-offs alongside implementation.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:1",
+          "quote": "What are the trade-offs between using a mutex here and a channel?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:2",
+          "quote": "Explain how this behaves under READ COMMITTED versus SERIALIZABLE."
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Scope Keeper",
+      "description": "You often divide changes into reviewable steps with explicit boundaries.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Write the migration and a rollback. Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:2",
+          "quote": "Now break the rollout into PR-sized steps."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:1",
+          "quote": "Good. Now refactor in small commits, one concern per commit, and tell me the commit messages first."
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Proof Before Change",
+      "description": "You repeatedly request tests that establish behavior before implementation or refactoring.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:0",
+          "quote": "Keep it under 80 lines and add tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:0",
+          "quote": "Implement step 1 of the outbox rollout: the outbox table and the transactional write. Tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Failure Path Thinker",
+      "description": "You often ask what happens during rollback, retries, or disruptive database changes.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:1",
+          "quote": "Add a section about exactly-once vs at-least-once delivery and how consumers should deduplicate."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:2",
+          "quote": "Add a test that proves the webhook is not written when the transaction rolls back."
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 1
+      }
+    }
+  ],
+  "funFacts": [
+    "Your 36 prompts span 11 sessions and 11 active days.",
+    "Your prompts are 100% English.",
+    "Your busiest hours tie: 09:00 and 10:00, with 13 prompts each, Berlin time.",
+    "Your project split: 29 prompts for billing-service, 7 for ledger."
+  ],
+  "improvements": [
+    {
+      "title": "Front-load implementation constraints",
+      "pattern": "In one outbox session, you supplied the SQL tooling constraint after requesting implementation.",
+      "impact": "The next prompt had to clarify that the implementation should use sqlc queries.",
+      "suggestion": "Include known tooling constraints in the implementation request, alongside scope and test expectations.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-7:0",
+          "quote": "Implement step 1 of the outbox rollout: the outbox table and the transactional write. Tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:1",
+          "quote": "Please don't use an ORM here, plain sqlc queries."
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:methodical-backend-7:0",
+        "after": "Implement step 1 of the outbox rollout: the outbox table and the transactional write. Tests first. Use plain sqlc queries, without an ORM."
+      }
+    },
+    {
+      "title": "Specify runbook requirements upfront",
+      "pattern": "In one runbook session, you added verification and rollback requirements in a follow-up.",
+      "impact": "The runbook request needed another prompt to specify its operational safeguards.",
+      "suggestion": "Put required sections and stage-level checks in the initial document request.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:1",
+          "quote": "Go with the dual-credential approach. Write a runbook in docs/runbooks/rotate-db-creds.md."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:methodical-backend-3:1",
+        "after": "Go with the dual-credential approach. Write a runbook in docs/runbooks/rotate-db-creds.md. Include a verification step after each stage and a rollback section."
+      }
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Europe/Berlin",
+    "totalPrompts": 36,
+    "analyzedPrompts": 36,
+    "totalSessions": 11,
+    "bySource": {
+      "claude-code": 36,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 36,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T07:30:00.000Z",
+      "to": "2026-09-15T08:38:00.000Z"
+    },
+    "activeDays": 11,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13, 6, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [10, 13, 7, 6, 0, 0, 0],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 85,
+      "p90": 112
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "billing-service",
+        "count": 29
+      },
+      {
+        "name": "ledger",
+        "count": 7
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null,
+    "activity": {
+      "projects": ["billing-service", "ledger"],
+      "days": [
+        {
+          "date": "2026-08-03",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-04",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-06",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-10",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-12",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-08-17",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-20",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-25",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-09-02",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-09-08",
+          "count": 3,
+          "byProject": [0, 3, 0]
+        },
+        {
+          "date": "2026-09-15",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [7, 0, 0],
+          [3, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [3, 3, 0],
+          [7, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [3, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 4, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [6, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

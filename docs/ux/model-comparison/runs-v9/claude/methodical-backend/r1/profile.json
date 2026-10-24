@@ -1,0 +1,624 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:17:59.350Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 11,
+    "promptsAnalyzed": 36,
+    "evidenceKept": 38,
+    "evidenceDropped": 0
+  },
+  "headline": "You plan first, test first, and keep payments correct.",
+  "archetype": {
+    "name": "The Ledger Guardian",
+    "description": "You treat every change to money-moving code as a risk to plan for. You want plans, tests and rollbacks in place before any code changes."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Plan, test, then step",
+      "summary": "You usually ask for a plan, hypotheses or competing approaches before any code. Then you work in small steps, write tests first and limit what the AI may touch.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:0",
+          "quote": "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:0",
+          "quote": "Keep it under 80 lines and add tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:1",
+          "quote": "refactor in small commits, one concern per commit, and tell me the commit messages first."
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Short, polite, decisive",
+      "summary": "Your prompts are brief imperatives. You often ask the AI to explain why before it changes anything, then state your decision in a few words.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:1",
+          "quote": "Can you explain why before changing anything?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:2",
+          "quote": "Agreed, use SELECT ... FOR UPDATE."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:2",
+          "quote": "Let's keep the mutex."
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Go and Postgres depth",
+      "summary": "You work on Go billing and ledger services and know PostgreSQL well: isolation levels, deferred constraint triggers and row locking. Your tools include sqlc, testcontainers and rapid, and you avoid ORMs.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-4:2",
+          "quote": "Explain how this behaves under READ COMMITTED versus SERIALIZABLE."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:1",
+          "quote": "Use a deferred constraint trigger. Write the SQL and property-based tests with rapid."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:1",
+          "quote": "Please don't use an ORM here, plain sqlc queries."
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Correctness and production readiness",
+      "summary": "You keep coming back to idempotency, race conditions, delivery guarantees and zero-downtime operations. You also want decisions written down in ADRs, design docs and runbooks.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-6:1",
+          "quote": "exactly-once vs at-least-once delivery and how consumers should deduplicate"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:0",
+          "quote": "rotate the database credentials without downtime"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-4:3",
+          "quote": "Document the decision in an ADR."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:1",
+          "quote": "Add alerting thresholds and explain how you chose them."
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Front-load the requirements",
+      "summary": "Your workflow is already disciplined. The next step is to put the constraints you add in follow-ups (sections, edge cases, no ORM) into the first request.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:2",
+          "quote": "Run through the edge cases again: leap years, currency rounding, negative line items."
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Plan before code",
+      "description": "In most sessions you ask for a plan, hypotheses or a comparison of approaches before any implementation.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:0",
+          "quote": "Before writing any code, outline a plan for adding idempotency keys to the payments API. List the risks."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:0",
+          "quote": "Propose two approaches and compare them."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-5:0",
+          "quote": "Help me form hypotheses before we look at code."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:2",
+          "quote": "Now break the rollout into PR-sized steps."
+        }
+      ],
+      "support": {
+        "sessions": 4,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Test-first verifier",
+      "description": "You often ask for tests first, characterization tests, property tests or benchmarks, so you have proof the code works.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:0",
+          "quote": "Keep it under 80 lines and add tests first."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-7:2",
+          "quote": "Add a test that proves the webhook is not written when the transaction rolls back."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:0",
+          "quote": "Before we refactor the invoice generator, write characterization tests that pin down the current behaviour."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:2",
+          "quote": "Add a benchmark so we can compare later."
+        }
+      ],
+      "support": {
+        "sessions": 4,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Tight scope keeper",
+      "description": "You often limit what the AI may touch and ask for small outputs such as a single step or just the diff.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-0:2",
+          "quote": "Do not touch the handlers yet."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-1:2",
+          "quote": "Show me the diff only."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-0:1",
+          "quote": "Let's start with step 1 only"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Reasoning on demand",
+      "description": "You often ask the AI to justify its reasoning before you accept a change.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-1:1",
+          "quote": "Can you explain why before changing anything?"
+        },
+        {
+          "promptId": "claude-code:methodical-backend-2:0",
+          "quote": "Review this Go function for race conditions. Explain your reasoning step by step."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-9:1",
+          "quote": "explain how you chose them."
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Documentation minded",
+      "description": "You regularly ask for ADRs, structured design docs and runbooks with rollback sections.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-4:3",
+          "quote": "Document the decision in an ADR."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-6:0",
+          "quote": "Sections: context, goals, non-goals, design, alternatives, rollout."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "a verification step after each stage and a rollback section"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 1
+      }
+    }
+  ],
+  "funFacts": [
+    "None of your 36 prompts were sent on a Friday, Saturday or Sunday.",
+    "26 of your prompts landed in the 9:00 and 10:00 hours.",
+    "Your correction rate is 0%: you never had to push back on the AI.",
+    "29 of your 36 prompts targeted billing-service.",
+    "Your median prompt is just 85 characters long."
+  ],
+  "improvements": [
+    {
+      "title": "Put requirements in the first request",
+      "pattern": "Sometimes you add key requirements, like the runbook's required sections or the edge cases to cover, in a follow-up prompt.",
+      "impact": "Extra prompts went to adding sections and re-checking edge cases that could have been covered in the first output.",
+      "suggestion": "When you already know the structure or the edge cases, list them in the first request. Your follow-ups can then be about refining the output, not completing the spec.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-3:1",
+          "quote": "Write a runbook in docs/runbooks/rotate-db-creds.md."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-3:2",
+          "quote": "The runbook should include a verification step after each stage and a rollback section."
+        },
+        {
+          "promptId": "claude-code:methodical-backend-10:2",
+          "quote": "Run through the edge cases again: leap years, currency rounding, negative line items."
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:methodical-backend-3:1",
+        "after": "Write a runbook in docs/runbooks/rotate-db-creds.md. Include a verification step after each stage and a rollback section."
+      }
+    },
+    {
+      "title": "Name the code under review",
+      "pattern": "In one session you asked for a review of \"this Go function\" without naming the file or the function.",
+      "impact": "The AI has to guess which code you mean, which can lead to a review of the wrong function.",
+      "suggestion": "Give the file path and function name, or paste the code, in the review request.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-2:0",
+          "quote": "Review this Go function for race conditions."
+        }
+      ],
+      "rewrite": null
+    },
+    {
+      "title": "State the audience and format",
+      "pattern": "Once, you asked for a changelog summary without saying who would read it or what format to use.",
+      "impact": "Without an audience, the summary's tone and level of detail are left to the AI.",
+      "suggestion": "Add one line saying who the summary is for and what format to use, for example a single bullet for API consumers.",
+      "evidence": [
+        {
+          "promptId": "claude-code:methodical-backend-8:2",
+          "quote": "Write a short summary for the changelog."
+        }
+      ],
+      "rewrite": null
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Europe/Berlin",
+    "totalPrompts": 36,
+    "analyzedPrompts": 36,
+    "totalSessions": 11,
+    "bySource": {
+      "claude-code": 36,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 36,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T07:30:00.000Z",
+      "to": "2026-09-15T08:38:00.000Z"
+    },
+    "activeDays": 11,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 13, 6, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [10, 13, 7, 6, 0, 0, 0],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 85,
+      "p90": 112
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "billing-service",
+        "count": 29
+      },
+      {
+        "name": "ledger",
+        "count": 7
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null,
+    "activity": {
+      "projects": ["billing-service", "ledger"],
+      "days": [
+        {
+          "date": "2026-08-03",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-04",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-06",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-10",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-12",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-08-17",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-20",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-08-25",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-09-02",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        },
+        {
+          "date": "2026-09-08",
+          "count": 3,
+          "byProject": [0, 3, 0]
+        },
+        {
+          "date": "2026-09-15",
+          "count": 3,
+          "byProject": [3, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [7, 0, 0],
+          [3, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [3, 3, 0],
+          [7, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [3, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 4, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [6, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

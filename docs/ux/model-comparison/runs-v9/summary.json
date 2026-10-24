@@ -1,0 +1,122 @@
+{
+  "budget": 40,
+  "used": 28,
+  "versions": {
+    "claude": "2.1.309 (Claude Code)",
+    "codex": "codex-cli 0.164.0"
+  },
+  "rows": [
+    {
+      "persona": "curious-learner",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 4,
+      "emptyDimensions": 0,
+      "universalClaims": 3,
+      "improvements": 3,
+      "archetype": "The Borrow-Checker Apprentice",
+      "seconds": 42
+    },
+    {
+      "persona": "curious-learner",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 3,
+      "emptyDimensions": 0,
+      "universalClaims": 0,
+      "improvements": 2,
+      "archetype": "The Hands-On Questioner",
+      "seconds": 60
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "universalClaims": 3,
+      "improvements": 3,
+      "archetype": "The Ledger Guardian",
+      "seconds": 48
+    },
+    {
+      "persona": "methodical-backend",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 3,
+      "emptyDimensions": 0,
+      "universalClaims": 0,
+      "improvements": 2,
+      "archetype": "The Transaction Guardian",
+      "seconds": 72
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "universalClaims": 1,
+      "improvements": 3,
+      "archetype": "The Midnight Pixel Medic",
+      "seconds": 47
+    },
+    {
+      "persona": "night-owl-frontend",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 3,
+      "retries": 0,
+      "traits": 3,
+      "emptyDimensions": 0,
+      "universalClaims": 0,
+      "improvements": 3,
+      "archetype": "The Midnight Interface Tuner",
+      "seconds": 90
+    },
+    {
+      "persona": "weekend-data-engineer",
+      "engine": "claude",
+      "repeat": 1,
+      "status": "ok",
+      "calls": 4,
+      "retries": 0,
+      "traits": 5,
+      "emptyDimensions": 0,
+      "universalClaims": 3,
+      "improvements": 3,
+      "archetype": "The Red-First Pipeline Keeper",
+      "seconds": 55
+    },
+    {
+      "persona": "weekend-data-engineer",
+      "engine": "codex",
+      "repeat": 1,
+      "status": "rubric failed",
+      "calls": 4,
+      "retries": 0,
+      "traits": 4,
+      "emptyDimensions": 0,
+      "universalClaims": 0,
+      "improvements": 2,
+      "archetype": "The Pipeline Gatekeeper",
+      "seconds": 78
+    }
+  ]
+}

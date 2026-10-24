@@ -1,0 +1,623 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:19:58.365Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 12,
+    "promptsAnalyzed": 51,
+    "evidenceKept": 35,
+    "evidenceDropped": 0
+  },
+  "headline": "Late-night frontend fixer who knows the bug before the AI does",
+  "archetype": {
+    "name": "The Midnight Pixel Medic",
+    "description": "You ship small UI fixes between 22:00 and 03:00 and catch browser quirks fast. You also keep accessibility in view the whole time."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Tight late-night loops",
+      "summary": "Your sessions are short, late at night, with small requests sent a few minutes apart. Once something works, you usually tack on the next tweak with \"順便\".",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:3",
+          "quote": "OK 這樣可以。順便把 hover 加個陰影"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:2",
+          "quote": "對，就是這樣。再幫我加個加入購物車的小動畫"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "好，那先用原生 img，我之後再處理"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Terse and blunt",
+      "summary": "You write short Traditional Chinese prompts with the English technical terms kept as they are. Your corrections are direct and often name the real cause.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:2",
+          "quote": "錯了，category 是陣列，不是字串"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:1",
+          "quote": "不是效能問題，是 touch-action 沒設"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Browser-quirk specialist",
+      "summary": "You work in React, Next.js static export, Tailwind, cva, zod and Storybook. You know iOS scrolling, LCP and font loading in depth.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-6:2",
+          "quote": "不是這個問題，hero 圖是 CSS background，不會被 preload"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-2:1",
+          "quote": "不是這樣，問題是 iOS 的 rubber band scroll"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:0",
+          "quote": "variant 用 cva 管理"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Accessible, lightweight UI",
+      "summary": "You keep returning to WCAG contrast, touch targets, focus and reduced motion. You'd rather use native APIs than add another dependency.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-7:0",
+          "quote": "購物車的數量按鈕在手機上太小了，至少 44px"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:2",
+          "quote": "不要用 framer-motion，用 CSS + IntersectionObserver 就好"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:3",
+          "quote": "focus ring 不要拿掉，改成品牌色"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Front-load what you know",
+      "summary": "Your expertise often shows up in the second prompt, as a correction. Putting those constraints and diagnoses in the first prompt would save rounds.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-11:0",
+          "quote": "商品頁的圖片輪播在 Android Chrome 上滑動會卡"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:2",
+          "quote": "不對，icon-only 的按鈕要有 aria-label"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Root-cause spotter",
+      "description": "You often name the real cause of a bug before the AI gets there.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-2:1",
+          "quote": "不是這樣，問題是 iOS 的 rubber band scroll"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:2",
+          "quote": "不是這個問題，hero 圖是 CSS background，不會被 preload"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:1",
+          "quote": "不是效能問題，是 touch-action 沒設"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Accessibility advocate",
+      "description": "Contrast, touch targets, aria-labels and focus rings come up again and again in your sessions.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-3:2",
+          "quote": "不對不對，對比度不夠，文字要符合 WCAG AA"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:2",
+          "quote": "icon-only 的按鈕要有 aria-label"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:3",
+          "quote": "加上 prefers-reduced-motion 的處理"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Incremental polisher",
+      "description": "Once something works, you usually add one more small enhancement in the same session.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:3",
+          "quote": "OK 這樣可以。順便把 hover 加個陰影"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-4:4",
+          "quote": "可以了，謝謝，順便幫我把按鈕的 disabled 樣式調一下"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:2",
+          "quote": "順便讓它支援鍵盤左右鍵"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Pragmatic minimalist",
+      "description": "You pick native APIs and simple workarounds over heavy libraries or long debugging detours.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-5:2",
+          "quote": "不要用 framer-motion，用 CSS + IntersectionObserver 就好"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-2:4",
+          "quote": "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "好，那先用原生 img，我之後再處理"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Blunt corrector",
+      "description": "Your corrections are short and direct, like \"不對\", \"錯了\" and \"還是不行\".",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:2",
+          "quote": "錯了，category 是陣列，不是字串"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-4:3",
+          "quote": "還是不行，送出的時候沒有 focus 到第一個錯誤欄位"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:1",
+          "quote": "還是錯，你改到桌機版了"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 1
+      }
+    }
+  ],
+  "funFacts": [
+    "Your latest prompt landed at 02:36.",
+    "You sent zero prompts between 03:00 and 22:00.",
+    "Midnight was your busiest hour, with 13 prompts.",
+    "96% of your prompts were in Chinese.",
+    "You never once opened a session on a Saturday."
+  ],
+  "improvements": [
+    {
+      "title": "Lead with your suspected cause",
+      "pattern": "Your bug reports describe the symptom, even when you already seem to know the cause or have ruled things out.",
+      "impact": "The AI's first answers went the wrong way, and you had to correct them with \"不是效能問題\" or \"不是這個問題\".",
+      "suggestion": "Put the device, what you've already tried and your hunch in the first message. One extra clause is enough.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-11:0",
+          "quote": "商品頁的圖片輪播在 Android Chrome 上滑動會卡"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:1",
+          "quote": "不是效能問題，是 touch-action 沒設"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:1",
+          "quote": "圖片已經是 webp 了，還有什麼方法？"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-11:0",
+        "after": "商品頁的圖片輪播在 Android Chrome 上滑動會卡，不是效能問題，我懷疑是 touch-action 沒設，幫我加上正確的 touch-action"
+      }
+    },
+    {
+      "title": "State constraints in the first ask",
+      "pattern": "Data types, library choices, size variants and a11y rules often arrive only after the first attempt.",
+      "impact": "These late constraints led to correction rounds like \"錯了，category 是陣列\" and \"不對，icon-only 的按鈕要有 aria-label\", and the stats show a 20% correction rate.",
+      "suggestion": "Before you send a build or refactor request, list the requirements you already know: types, which libraries to avoid, variants and a11y.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:1",
+          "quote": "幫我寫一個 useProducts hook，支援分頁跟 category filter"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:0",
+          "quote": "幫我把整個 Button 元件重構，variant 用 cva 管理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:0",
+          "quote": "我想做一個作品集首頁，要有那種滑動時元素淡入的效果"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-8:0",
+        "after": "幫我把整個 Button 元件重構，variant 跟 size（sm md lg）都用 cva 管理，icon-only 的按鈕要有 aria-label"
+      }
+    },
+    {
+      "title": "Paste the actual error output",
+      "pattern": "You report failures as \"還是不行\" without including the error message.",
+      "impact": "The AI has to guess what broke the build, which costs you another round.",
+      "suggestion": "Paste the key lines of the build or console output along with the failure report.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-9:1",
+          "quote": "還是不行，build 的時候報錯"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-9:1",
+        "after": "還是不行，build 的時候報錯，錯誤訊息如下：<貼上 build 輸出>"
+      }
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 51,
+    "analyzedPrompts": 51,
+    "totalSessions": 12,
+    "bySource": {
+      "claude-code": 51,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 51,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T14:40:00.000Z",
+      "to": "2026-09-14T16:02:00.000Z"
+    },
+    "activeDays": 12,
+    "hourHistogram": [13, 11, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 11],
+    "weekdayHistogram": [12, 1, 8, 13, 5, 0, 12],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]
+    ],
+    "promptLength": {
+      "median": 27,
+      "p90": 41
+    },
+    "languageMix": {
+      "zh": 0.9608,
+      "en": 0,
+      "mixed": 0.0392
+    },
+    "topProjects": [
+      {
+        "name": "shop-web",
+        "count": 43
+      },
+      {
+        "name": "portfolio",
+        "count": 8
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.1961,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": "02:36",
+    "activity": {
+      "projects": ["shop-web", "portfolio"],
+      "days": [
+        {
+          "date": "2026-08-03",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-04",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-06",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-10",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-12",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-15",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-08-19",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-23",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-01",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-05",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-09",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-09-14",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [5, 0, 0],
+          [7, 0, 0]
+        ],
+        [
+          [1, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [8, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [2, 0, 0],
+          [7, 4, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [5, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 4, 0],
+          [4, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [4, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0.0588,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

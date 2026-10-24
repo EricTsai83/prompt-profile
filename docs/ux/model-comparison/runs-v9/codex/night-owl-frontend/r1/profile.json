@@ -1,0 +1,584 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:21:28.087Z",
+  "engine": {
+    "runner": "codex",
+    "model": null,
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 2,
+    "chunksAnalyzed": 2,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 12,
+    "promptsAnalyzed": 51,
+    "evidenceKept": 31,
+    "evidenceDropped": 0
+  },
+  "headline": "You refine frontend details until interaction, accessibility, and performance line up.",
+  "archetype": {
+    "name": "The Midnight Interface Tuner",
+    "description": "You work through compact requests, direct corrections, and practical fallbacks. Visual polish shares your attention with keyboard access, browser quirks, and loading behavior."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Iterate and Adjust",
+      "summary": "You refine implementations in small steps and switch approaches when fixes keep missing the problem.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:3",
+          "quote": "OK 這樣可以。順便把 hover 加個陰影"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-2:4",
+          "quote": "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Compact Technical Direction",
+      "summary": "You use concise Traditional Chinese with English technical terms, giving direct corrections and specific values.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-5:1",
+          "quote": "動畫太慢了，duration 改 200ms，easing 用 ease-out"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:3",
+          "quote": "font-display 用 swap"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Frontend Systems Focus",
+      "summary": "Your requests span React data fetching, form validation, component tooling, and Next.js configuration.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:0",
+          "quote": "React Query 的 staleTime 要設多少比較好？商品資料一小時更新一次"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-4:0",
+          "quote": "結帳頁的表單驗證幫我改用 zod"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:0",
+          "quote": "幫我把整個 Button 元件重構，variant 用 cva 管理"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Polish With Access",
+      "summary": "You repeatedly ask for accessible interactions alongside precise styling and animation feedback.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-3:2",
+          "quote": "不對不對，對比度不夠，文字要符合 WCAG AA"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:3",
+          "quote": "focus ring 不要拿掉，改成品牌色"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:3",
+          "quote": "動畫結束後 badge 要跳一下"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Performance Through Questions",
+      "summary": "You explore caching and loading performance with concrete context, then adjust implementation choices as constraints emerge.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-6:0",
+          "quote": "Lighthouse 的 LCP 是 4.2 秒，幫我看看怎麼降"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:2",
+          "quote": "那改用系統字型 fallback，標題才用 webfont"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Accessibility Advocate",
+      "description": "You repeatedly bring contrast, motion preferences, labels, and keyboard behavior into frontend requests.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-5:3",
+          "quote": "加上 prefers-reduced-motion 的處理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:2",
+          "quote": "不對，icon-only 的按鈕要有 aria-label"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-11:2",
+          "quote": "對，pan-y。順便讓它支援鍵盤左右鍵"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Detail Tuner",
+      "description": "You turn visual feedback into concrete spacing, shadow, and animation adjustments.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-0:1",
+          "quote": "不對，間距太大了，gap 改成 12px"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:1",
+          "quote": "動畫太慢了，duration 改 200ms，easing 用 ease-out"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-7:3",
+          "quote": "動畫結束後 badge 要跳一下"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Pragmatic Adapter",
+      "description": "You accept simpler alternatives when browser behavior, build issues, or asset size complicate an approach.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-2:4",
+          "quote": "算了先把 sticky 拿掉，改成固定在頂部的 position fixed + padding-top"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:2",
+          "quote": "好，那先用原生 img，我之後再處理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-10:2",
+          "quote": "那改用系統字型 fallback，標題才用 webfont"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    }
+  ],
+  "funFacts": [
+    "Your latest recorded prompt landed at 02:36.",
+    "Your median prompt length is 27 characters.",
+    "Your shop-web project accounts for 43 prompts; portfolio gets 8.",
+    "Your longest recorded activity streak is 2 days."
+  ],
+  "improvements": [
+    {
+      "title": "Frontload Acceptance Criteria",
+      "pattern": "You often introduce component behavior and accessibility requirements after the initial implementation request.",
+      "impact": "These details become follow-up additions or corrections, including missing labels and form error behavior.",
+      "suggestion": "Include a compact checklist of known sizes, accessibility requirements, and interaction behavior in the opening request.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-8:0",
+          "quote": "幫我把整個 Button 元件重構，variant 用 cva 管理"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-8:2",
+          "quote": "不對，icon-only 的按鈕要有 aria-label"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-4:1",
+          "quote": "錯誤訊息要中文，而且要在欄位下面顯示"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-8:0",
+        "after": "幫我重構整個 Button 元件：variant 和 size 都用 cva 管理，size 支援 sm、md、lg；icon-only 按鈕要有 aria-label，並補上 Storybook stories。"
+      }
+    },
+    {
+      "title": "Specify Shapes and Constraints",
+      "pattern": "You sometimes leave data types and implementation preferences until a corrective follow-up.",
+      "impact": "The assistant assumes a string category or chooses an animation library you then reject.",
+      "suggestion": "State known input shapes and allowed tools alongside the requested behavior.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-1:1",
+          "quote": "幫我寫一個 useProducts hook，支援分頁跟 category filter"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-1:2",
+          "quote": "錯了，category 是陣列，不是字串"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-5:2",
+          "quote": "不要用 framer-motion，用 CSS + IntersectionObserver 就好"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-1:1",
+        "after": "幫我寫一個 useProducts hook，支援分頁跟 category filter；category 是陣列。"
+      }
+    },
+    {
+      "title": "Lead With Diagnostic Context",
+      "pattern": "Your initial debugging requests sometimes omit device or implementation details, and one build follow-up omits the error message.",
+      "impact": "Later prompts have to redirect diagnosis toward iOS scrolling or the hero image implementation.",
+      "suggestion": "Include the affected environment, relevant implementation, and observed failure upfront; paste the actual error when reporting a failed build.",
+      "evidence": [
+        {
+          "promptId": "claude-code:night-owl-frontend-2:0",
+          "quote": "為什麼 Safari 上 sticky header 會跳一下？"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-2:3",
+          "quote": "還是錯了，header 在 iPhone 13 上會閃"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-6:2",
+          "quote": "不是這個問題，hero 圖是 CSS background，不會被 preload"
+        },
+        {
+          "promptId": "claude-code:night-owl-frontend-9:1",
+          "quote": "還是不行，build 的時候報錯"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:night-owl-frontend-2:0",
+        "after": "iPhone 13 的 Safari 上，sticky header 在 iOS rubber band scroll 時會跳動、閃爍，幫我針對這個情境找原因。"
+      }
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 51,
+    "analyzedPrompts": 51,
+    "totalSessions": 12,
+    "bySource": {
+      "claude-code": 51,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 51,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-03T14:40:00.000Z",
+      "to": "2026-09-14T16:02:00.000Z"
+    },
+    "activeDays": 12,
+    "hourHistogram": [13, 11, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 11],
+    "weekdayHistogram": [12, 1, 8, 13, 5, 0, 12],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 7],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 2, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]
+    ],
+    "promptLength": {
+      "median": 27,
+      "p90": 41
+    },
+    "languageMix": {
+      "zh": 0.9608,
+      "en": 0,
+      "mixed": 0.0392
+    },
+    "topProjects": [
+      {
+        "name": "shop-web",
+        "count": 43
+      },
+      {
+        "name": "portfolio",
+        "count": 8
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.1961,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": "02:36",
+    "activity": {
+      "projects": ["shop-web", "portfolio"],
+      "days": [
+        {
+          "date": "2026-08-03",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-04",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-06",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-10",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-12",
+          "count": 5,
+          "byProject": [5, 0, 0]
+        },
+        {
+          "date": "2026-08-15",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-08-19",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-08-23",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-01",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-05",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        },
+        {
+          "date": "2026-09-09",
+          "count": 4,
+          "byProject": [0, 4, 0]
+        },
+        {
+          "date": "2026-09-14",
+          "count": 4,
+          "byProject": [4, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [5, 0, 0],
+          [7, 0, 0]
+        ],
+        [
+          [1, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [8, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [2, 0, 0],
+          [7, 4, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [5, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0]
+        ],
+        [
+          [0, 4, 0],
+          [4, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+          [4, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0.0588,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

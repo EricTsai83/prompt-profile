@@ -2,7 +2,14 @@
   "requiredConcepts": [
     {
       "name": "test-first workflow",
-      "patterns": ["test[- ]first", "tests? before", "tdd", "red.green", "write (?:the )?tests?"]
+      "patterns": [
+        "tests?[- ]first",
+        "tests? before",
+        "tdd",
+        "red.green",
+        "write (?:the )?tests?",
+        "see (?:the )?tests? fail"
+      ]
     },
     {
       "name": "data engineering stack",

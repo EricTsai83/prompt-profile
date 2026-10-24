@@ -1,0 +1,679 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:22:23.308Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 20,
+    "promptsAnalyzed": 82,
+    "evidenceKept": 40,
+    "evidenceDropped": 0
+  },
+  "headline": "A test-first data engineer who guards PII and money values",
+  "archetype": {
+    "name": "The Red-First Pipeline Keeper",
+    "description": "You want to watch tests fail before code ships, and you keep PII out of every layer. Most of your building happens on weekend mornings."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Test, design, then build",
+      "summary": "You usually ask for tests before the implementation and designs before the code, then move forward in small steps. You also want problems listed before anything gets changed.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:1",
+          "quote": "test 先跑一次確認會 fail，我想看到 red 再改 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:0",
+          "quote": "先設計不要寫 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-10:4",
+          "quote": "mypy 設 strict，有錯誤的地方先列出來給我看，不要直接改"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Short, polite, bilingual",
+      "summary": "You write brief Traditional Chinese prompts packed with English technical terms and often add a 麻煩 or 謝謝. When it comes to docs, you usually ask for English.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:3",
+          "quote": "這個 parser 可以不要用 float 嗎？金額一定要 Decimal，謝謝"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:4",
+          "quote": "幫我把 parse_amount 的 docstring 寫成 Google style，英文就好"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-18:1",
+          "quote": "好，CI 改成 uv sync --frozen，謝謝"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Modern Python data stack",
+      "summary": "You work in dbt (incremental models, snapshots, macros), Dagster (assets, sensors, asset checks) and strict Python tooling: uv, pytest, ruff, mypy, and GitHub Actions.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-4:4",
+          "quote": "改用 incremental model，unique_key 用 account_id + date，is_incremental 的條件幫我寫清楚"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-7:3",
+          "quote": "sensor 的 test 也要，用 build_sensor_context 模擬新檔案進來"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-10:3",
+          "quote": "CI 用 GitHub Actions 跑 ruff、mypy 跟 pytest，matrix 跑 3.12 和 3.13"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Privacy and correctness",
+      "summary": "You keep PII out of logs, alerts and marts, and you want the build to enforce that. You also insist on exact Decimal money values, clear units and idempotent pipelines.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:4",
+          "quote": "能不能確認 log 裡面不會印出原始 email？我不想 PII 出現在任何 log"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:3",
+          "quote": "寫一個 macro 掃描 meta pii: true 的欄位，如果出現在 mart 層就讓 build fail"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-7:4",
+          "quote": "如果同一個檔案被丟兩次，要 idempotent，不能重複寫入"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Concepts before code",
+      "summary": "You ask how a tool works before you use it. In two months your work went from a CSV parser to dbt to Dagster.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-3:5",
+          "quote": "麻煩解釋一下 dbt 的 ephemeral 跟 view materialization 差在哪裡"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:1",
+          "quote": "Dagster 的 asset 概念跟 dbt model 怎麼對應？畫個簡單的對照表"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-19:0",
+          "quote": "回顧一下這兩個月：從 CSV parser 到 dbt 到 Dagster"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Red before green",
+      "description": "In many sessions you ask for tests first, and sometimes you want to see them fail before any code exists.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:1",
+          "quote": "test 先跑一次確認會 fail，我想看到 red 再改 code"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:4",
+          "quote": "先寫 test 再寫 asset，這是我的習慣，麻煩照這個順序"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:3",
+          "quote": "先寫 test case 覆蓋 masking 的每一條規則，再實作"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:4",
+          "quote": "我想要先看到它擋下一個故意放錯的 model"
+        }
+      ],
+      "support": {
+        "sessions": 4,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "PII gatekeeper",
+      "description": "You keep customer data out of logs, alerts, docs and marts, and you want the build to enforce it automatically.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-1:1",
+          "quote": "local part 用 sha256 hash 加 salt，salt 從環境變數讀"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:4",
+          "quote": "通知內容不要帶任何客戶資料，只有 table 名稱和數量"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:1",
+          "quote": "dim_customer 不能有 email 原文，只能有 masked 的版本"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 3
+      }
+    },
+    {
+      "name": "Compare, then commit",
+      "description": "You ask for options or concepts first, then pick one based on your own constraints.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:0",
+          "quote": "先比較一下 Airflow、Dagster、Prefect，我比較在意本機開發體驗跟測試"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:2",
+          "quote": "好，就用 Dagster。幫我建一個最小的 project skeleton，只要能跑 dbt build"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-16:1",
+          "quote": "我們的 source 沒有可靠的 updated_at，所以用 check strategy，幫我寫"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:2",
+          "quote": "好，放 config。幫我寫 asset check 跟對應的 test"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 3
+      }
+    },
+    {
+      "name": "Edge-case hunter",
+      "description": "You push for exact money types, clear units, duplicates and odd inputs.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:2",
+          "quote": "edge case 再補兩個：負數和千分位逗號 1,234.50"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-5:1",
+          "quote": "amount 的 description 要寫清楚單位是最小貨幣單位還是元"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-12:0",
+          "quote": "幫我寫一個 dbt test 抓出 transaction_id 重複但 amount 不同的情況"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Weekend builder",
+      "description": "You save quick questions for lunch breaks and do the hands-on building on weekend mornings.",
+      "confidence": "low",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-14:0",
+          "quote": "lunch break 問一下：dbt 的 source freshness 要怎麼設定 warn 跟 error 的時間？"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-14:3",
+          "quote": "好，先記下來，週末再做"
+        }
+      ],
+      "support": {
+        "sessions": 1,
+        "weeks": 1
+      }
+    }
+  ],
+  "funFacts": [
+    "78% of your 82 prompts came on a Saturday or Sunday.",
+    "Every weekday prompt landed at noon on a Wednesday, 18 of them.",
+    "Your correction rate is 0%, so you added requirements instead of reverting.",
+    "95% of your prompts are in Chinese and none are pure English.",
+    "Your busiest hour is 9 AM, with 34 prompts."
+  ],
+  "improvements": [
+    {
+      "title": "Put known constraints in the first ask",
+      "pattern": "You often add rules you already had in mind, such as no floats, allowed currencies or no customer data, as separate follow-ups after the first request.",
+      "impact": "Each deliverable took extra rounds: the amount parser needed a later no-float fix, and the accepted_values test came back without the allowed currencies.",
+      "suggestion": "Before you send a request, list the hard rules in one block (types, allowed values, privacy, mocking). Save follow-ups for things you learn from the result.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:0",
+          "quote": "把 CSV 的 amount 欄位轉成 Decimal，空字串要變 None"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:3",
+          "quote": "這個 parser 可以不要用 float 嗎？金額一定要 Decimal"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-3:4",
+          "quote": "currency 只會有 TWD、USD、JPY，其他值要讓 test fail"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-13:4",
+          "quote": "通知內容不要帶任何客戶資料"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:weekend-data-engineer-0:0",
+        "after": "把 CSV 的 amount 欄位轉成 Decimal，空字串要變 None。全程不要經過 float，金額一定要 Decimal。edge case 要涵蓋負數和千分位逗號 1,234.50。麻煩先幫我寫 test，再寫 function。"
+      }
+    },
+    {
+      "title": "Save test-first as a project rule",
+      "pattern": "You restate the test-first order in many sessions.",
+      "impact": "The same instruction takes up space in prompt after prompt, and any session where you forget it falls back to the default order.",
+      "suggestion": "Write it once in a project instruction file, for example: \"Always write the tests first, run them and confirm they fail, then implement.\" Your prompts can then focus on the task.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-0:0",
+          "quote": "麻煩先幫我寫 test，再寫 function"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-6:4",
+          "quote": "先寫 test 再寫 asset，這是我的習慣，麻煩照這個順序"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-4:2",
+          "quote": "這個 test 先寫"
+        }
+      ],
+      "rewrite": null
+    },
+    {
+      "title": "Bundle design-level requirements upfront",
+      "pattern": "Governance rules for a model, such as PII masking and meta tags, came after the first design request.",
+      "impact": "dim_customer needed later follow-ups to add the masking rule and the PII tagging.",
+      "suggestion": "When you ask for a design, include the privacy and governance rules in the same prompt so the design accounts for them from the start.",
+      "evidence": [
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:0",
+          "quote": "mart 層想給 BI 用，幫我設計 dim_customer，客戶等級要用 snapshot 的最新值"
+        },
+        {
+          "promptId": "claude-code:weekend-data-engineer-17:1",
+          "quote": "dim_customer 不能有 email 原文，只能有 masked 的版本，幫我在 model 裡加註解提醒"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:weekend-data-engineer-17:0",
+        "after": "mart 層想給 BI 用，幫我設計 dim_customer，客戶等級要用 snapshot 的最新值。限制：不能有 email 原文，只能有 masked 的版本，並在 model 裡加註解提醒；schema.yml 用 meta 標記哪些欄位是 PII，之後要自動檢查。"
+      }
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 82,
+    "analyzedPrompts": 82,
+    "totalSessions": 20,
+    "bySource": {
+      "claude-code": 82,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 82,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-07-04T01:20:00.000Z",
+      "to": "2026-08-15T01:43:00.000Z"
+    },
+    "activeDays": 19,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 30, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "weekdayHistogram": [0, 0, 18, 0, 0, 33, 31],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 46,
+      "p90": 69.9
+    },
+    "languageMix": {
+      "zh": 0.9512,
+      "en": 0,
+      "mixed": 0.0488
+    },
+    "topProjects": [
+      {
+        "name": "dbt-warehouse",
+        "count": 30
+      },
+      {
+        "name": "ledger-etl",
+        "count": 28
+      },
+      {
+        "name": "orchestrator",
+        "count": 24
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 2,
+    "latestTime": null,
+    "activity": {
+      "projects": ["dbt-warehouse", "ledger-etl", "orchestrator"],
+      "days": [
+        {
+          "date": "2026-07-04",
+          "count": 5,
+          "byProject": [0, 5, 0, 0]
+        },
+        {
+          "date": "2026-07-05",
+          "count": 5,
+          "byProject": [0, 5, 0, 0]
+        },
+        {
+          "date": "2026-07-08",
+          "count": 3,
+          "byProject": [0, 3, 0, 0]
+        },
+        {
+          "date": "2026-07-11",
+          "count": 6,
+          "byProject": [6, 0, 0, 0]
+        },
+        {
+          "date": "2026-07-12",
+          "count": 5,
+          "byProject": [5, 0, 0, 0]
+        },
+        {
+          "date": "2026-07-15",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-07-18",
+          "count": 5,
+          "byProject": [0, 0, 5, 0]
+        },
+        {
+          "date": "2026-07-19",
+          "count": 5,
+          "byProject": [0, 0, 5, 0]
+        },
+        {
+          "date": "2026-07-22",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-07-25",
+          "count": 5,
+          "byProject": [0, 5, 0, 0]
+        },
+        {
+          "date": "2026-07-26",
+          "count": 8,
+          "byProject": [0, 8, 0, 0]
+        },
+        {
+          "date": "2026-07-29",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-01",
+          "count": 5,
+          "byProject": [0, 0, 5, 0]
+        },
+        {
+          "date": "2026-08-02",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-08-05",
+          "count": 4,
+          "byProject": [4, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-08",
+          "count": 4,
+          "byProject": [4, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-09",
+          "count": 5,
+          "byProject": [5, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-12",
+          "count": 2,
+          "byProject": [0, 2, 0, 0]
+        },
+        {
+          "date": "2026-08-15",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [10, 5, 3, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [9, 8, 13, 0],
+          [1, 2, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 4, 0, 0],
+          [10, 9, 8, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0.0122,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

@@ -136,3 +136,17 @@ The overreaches the blind review found in the v4 Claude profiles, checked one by
 
 No second blind review was run. The evidence is the rubric, the counts and the claim-by-claim
 check above, all on synthetic personas.
+
+## Follow-up: analysis version 9 (plan 16, prompt coaching)
+
+`pnpm eval:compare --repeats 1 --budget 40 --out docs/ux/model-comparison/runs-v9`
+([outputs](runs-v9/)): four personas × Claude Code / Codex × 1, 28 of 40 calls, no retries.
+
+- Every run produced 2–3 verified improvements; 15 of 21 include a rewrite of a real persona
+  prompt. They match each persona's `expected.md`, e.g. night-owl-frontend: "State constraints
+  in the first ask" (citing the 「錯了，category 是陣列」 correction); weekend-data-engineer:
+  "Save test-first as a project rule".
+- All 8 pass the rubrics after one rubric fix: weekend-data-engineer's test-first pattern did
+  not accept "tests first" (Codex's wording), a false failure.
+- Confidence is now spread (high / medium / low) after the support cap of plan 15.
+- Style difference: Codex writes improvement titles in Title Case, Claude in sentence case.

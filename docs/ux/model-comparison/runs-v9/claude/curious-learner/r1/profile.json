@@ -1,0 +1,585 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:16:11.947Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": "claude-opus-5-5",
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 9,
+    "promptsAnalyzed": 29,
+    "evidenceKept": 31,
+    "evidenceDropped": 1
+  },
+  "headline": "A Python dev learning Rust by asking why at every step.",
+  "archetype": {
+    "name": "The Borrow-Checker Apprentice",
+    "description": "You treat the AI as a patient tutor, not a code vending machine. You learn the idea, write the code yourself, then ask for review."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Learn, Try, Report",
+      "summary": "You ask for an explanation, write the code yourself, then come back for review. In several sessions you told the AI outright not to write the code for you.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        },
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "don't fix them, just tell me"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Casual and Candid",
+      "summary": "Your prompts are short, usually lowercase and direct. You say plainly when you're confused and when you're excited.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:2",
+          "quote": "it compiles now!!"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:2",
+          "quote": "my game will have ~500 entities"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Pythonista Going Rust",
+      "summary": "You come from Python, and you compare Rust to Python and JavaScript. Your prompts cover serde, clap, tokio and smol, and wasm-bindgen for a browser game.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "like I'm a Python developer?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "explain async/await in Rust vs JavaScript"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:0",
+          "quote": "Can I run Rust in the browser? I want to make a small game with WebAssembly"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Why and Trade-offs",
+      "summary": "You want idiomatic code, design reasons and comparisons, not just code that compiles. You also ask about edge cases in your own code.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-3:1",
+          "quote": "is tokio the only option? what are the trade-offs with smol?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-0:3",
+          "quote": "is it idiomatic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "any edge cases I missed?"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Structured Self-Study",
+      "summary": "Across sessions you move from ownership to smart pointers, async, error handling, WASM and game-engine topics. You use quizzes, roadmaps and note summaries along the way.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-6:2",
+          "quote": "what should I learn next to get better at game dev in Rust? give me a roadmap"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:2",
+          "quote": "summarize what I learned today in 5 bullet points so I can put it in my notes"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Hands-on Learner",
+      "description": "You usually keep the implementation for yourself and use the AI for explanations and review.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "explain AABB first, then let me try to implement it"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Relentless Why-Asker",
+      "description": "Even after a fix works, you want the mental model behind it.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-5:3",
+          "quote": "oh it was the requestAnimationFrame closure being dropped. why does that happen?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "why does Rust need an executor?"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Idiom Seeker",
+      "description": "You often ask whether your code is idiomatic Rust, not just whether it compiles.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:3",
+          "quote": "is it idiomatic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "point out non-idiomatic parts"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:2",
+          "quote": "I replaced the unwraps with ? and a custom error enum. better?"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Comparison Shopper",
+      "description": "You often frame questions as X vs Y so you can see the trade-offs.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-1:0",
+          "quote": "What's the difference between Box, Rc and Arc? When would I use each?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:1",
+          "quote": "what's the difference between wasm-bindgen and wasm-pack?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:0",
+          "quote": "fixed timestep vs variable?"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    }
+  ],
+  "funFacts": [
+    "All 29 prompts were in English, spread over 9 sessions on 9 active days.",
+    "Thursday is your big day, with 13 of 29 prompts.",
+    "Your 10 a.m. hour is your busiest, with 7 prompts.",
+    "Your latest prompt came in at 21:18, so no midnight hacking here.",
+    "Only 6.9% of your prompts were corrections."
+  ],
+  "improvements": [
+    {
+      "title": "Paste the error and code",
+      "pattern": "When something breaks, you describe it without including the compiler output or the code involved.",
+      "impact": "Without the actual error or snippet, the AI has to guess which borrow or which draw call is the problem.",
+      "suggestion": "Paste the full compiler error and the relevant function, and say what you expected to happen.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:1",
+          "quote": "Why does this borrow checker error happen?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:2",
+          "quote": "the canvas is blank, what am I doing wrong? I'm calling draw() every frame"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:curious-learner-5:2",
+        "after": "the canvas is blank. I'm calling draw() every frame from a requestAnimationFrame closure. here's my render loop setup and draw() function: <code>. no errors in the console. I expected the sprites to show up. what am I doing wrong? don't fix it, just explain."
+      }
+    },
+    {
+      "title": "Point reviews at specific concerns",
+      "pattern": "Review requests mention your code but often don't say where it lives or which behavior worries you.",
+      "impact": "Feedback stays generic because the AI doesn't know which edge cases or logic paths matter to you.",
+      "suggestion": "Name the file or function, and list one or two cases you're unsure about, like overlapping edges or large frame spikes.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:curious-learner-6:1",
+        "after": "I implemented a fixed timestep with an accumulator in my game loop: <code>. can you check my logic? I'm especially unsure what happens after a long frame spike and whether I'm interpolating rendering correctly."
+      }
+    },
+    {
+      "title": "Answer every quiz question",
+      "pattern": "In one session you asked for 5 quiz questions but answered only 3 before asking what you got wrong.",
+      "impact": "The AI had nothing to grade for questions 4 and 5.",
+      "suggestion": "Answer every question, even with a guess or 'not sure', so the review covers your gaps too.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-7:1",
+          "quote": "1: a trait is like an interface. 2: impl Trait in argument position is static dispatch. 3: dyn needs a vtable"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:curious-learner-7:1",
+        "after": "1: a trait is like an interface. 2: impl Trait in argument position is static dispatch. 3: dyn needs a vtable. 4: not sure. 5: not sure. please grade all five and explain the ones I missed or skipped."
+      }
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "America/New_York",
+    "totalPrompts": 29,
+    "analyzedPrompts": 29,
+    "totalSessions": 9,
+    "bySource": {
+      "claude-code": 29,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 29,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-02T14:00:00.000Z",
+      "to": "2026-09-16T14:18:00.000Z"
+    },
+    "activeDays": 9,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 3, 0, 0, 0, 0, 0, 4, 3, 3, 3, 0, 0],
+    "weekdayHistogram": [0, 0, 9, 13, 0, 0, 7],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 4, 0, 0, 3, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 74,
+      "p90": 89.4
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "rust-playground",
+        "count": 13
+      },
+      {
+        "name": "wasm-game",
+        "count": 10
+      },
+      {
+        "name": "notes",
+        "count": 6
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.069,
+    "imageRate": 0,
+    "longestStreakDays": 1,
+    "latestTime": "21:18",
+    "activity": {
+      "projects": ["rust-playground", "wasm-game", "notes"],
+      "days": [
+        {
+          "date": "2026-08-02",
+          "count": 4,
+          "byProject": [4, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-05",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-09",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-13",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-08-20",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-27",
+          "count": 4,
+          "byProject": [0, 4, 0, 0]
+        },
+        {
+          "date": "2026-09-03",
+          "count": 3,
+          "byProject": [0, 3, 0, 0]
+        },
+        {
+          "date": "2026-09-09",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-09-16",
+          "count": 3,
+          "byProject": [0, 3, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 3, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 3, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 3, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 4, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 3, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [4, 0, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,522 @@
+{
+  "schemaVersion": 6,
+  "languages": ["en"],
+  "translations": {},
+  "generatedAt": "2026-10-24T08:17:11.751Z",
+  "engine": {
+    "runner": "codex",
+    "model": null,
+    "analysisVersion": "9"
+  },
+  "coverage": {
+    "chunksTotal": 3,
+    "chunksAnalyzed": 3,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 9,
+    "promptsAnalyzed": 29,
+    "evidenceKept": 22,
+    "evidenceDropped": 0
+  },
+  "headline": "You learn Rust by questioning, building, and checking your own work.",
+  "archetype": {
+    "name": "The Hands-On Questioner",
+    "description": "You ask for explanations, try implementations yourself, and return for feedback. Your Rust questions stretch from ownership to browser games."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "Try Then Review",
+      "summary": "You often ask for guidance before implementing, then bring your work back for review.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "Short And Specific",
+      "summary": "You use conversational questions and often specify how you want to be taught.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-7:0",
+          "quote": "quiz me on Rust traits, 5 questions, wait for my answers"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:2",
+          "quote": "can you explain spatial hashing simply? my game will have ~500 entities"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "Rust Through Projects",
+      "summary": "You describe yourself as new to Rust, using Python as a reference point. Your practice includes CLI development and game mechanics.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:0",
+          "quote": "I'm new to Rust. Can you explain ownership like I'm a Python developer?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "I rewrote my todo app with clap."
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "Mechanisms And Correctness",
+      "summary": "You probe why Rust works as it does and seek quality beyond successful compilation.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "so RefCell moves the borrow check to runtime? that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-2:2",
+          "quote": "it compiles now!! next step: how do I write tests for the CLI?"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "Practice With Feedback",
+      "summary": "You request exercises, quizzes, and explanations of mistakes to guide your learning.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-0:2",
+          "quote": "ok I think I get it. can you give me 3 small exercises about lifetimes?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-7:2",
+          "quote": "what did I get wrong? explain the ones I missed"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "Keeps The Keyboard",
+      "description": "You repeatedly ask for guidance while keeping implementation in your own hands.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:0",
+          "quote": "Don't write it for me, just give me the steps."
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:0",
+          "quote": "I want to add collision detection. explain AABB first, then let me try to implement it"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 2
+      }
+    },
+    {
+      "name": "Asks Why",
+      "description": "You question mechanisms and trade-offs across memory safety and asynchronous execution.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-1:2",
+          "quote": "so RefCell moves the borrow check to runtime? that feels dangerous, why is it allowed?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-3:0",
+          "quote": "explain async/await in Rust vs JavaScript. why does Rust need an executor?"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Checks Beyond Compilation",
+      "description": "You seek tests, idiomatic usage, and edge-case feedback after implementing.",
+      "confidence": "high",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-2:2",
+          "quote": "it compiles now!! next step: how do I write tests for the CLI?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-4:0",
+          "quote": "can you review it and point out non-idiomatic parts?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "any edge cases I missed?"
+        }
+      ],
+      "support": {
+        "sessions": 3,
+        "weeks": 2
+      }
+    }
+  ],
+  "funFacts": [
+    "Your 29 prompts span 9 sessions.",
+    "Your busiest weekday was Thursday, with 13 prompts.",
+    "Your latest prompt landed at 21:18.",
+    "Your prompt language mix was 100% English."
+  ],
+  "improvements": [
+    {
+      "title": "Attach The Debugging Evidence",
+      "pattern": "You sometimes describe an error or symptom without code or diagnostics in the supplied prompt text.",
+      "impact": "The blank-canvas exchange only identifies the dropped animation closure in a later follow-up.",
+      "suggestion": "Include the relevant code, exact diagnostics, and expected behavior. For the canvas issue, show the animation callback and how its closure is retained.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-5:2",
+          "quote": "the canvas is blank, what am I doing wrong? I'm calling draw() every frame"
+        },
+        {
+          "promptId": "claude-code:curious-learner-5:3",
+          "quote": "oh it was the requestAnimationFrame closure being dropped. why does that happen?"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:curious-learner-5:2",
+        "after": "The canvas is blank even though I'm calling draw() every frame. Help me check whether the requestAnimationFrame closure is being dropped, and explain how its lifetime affects drawing."
+      }
+    },
+    {
+      "title": "Make Review Targets Explicit",
+      "pattern": "You sometimes request implementation reviews without code or a file reference in the supplied prompt text.",
+      "impact": "Those prompts leave the implementation to inspect unspecified.",
+      "suggestion": "Paste the implementation or identify its file when requesting a review. Keep your existing focus on logic, idioms, or edge cases.",
+      "evidence": [
+        {
+          "promptId": "claude-code:curious-learner-6:1",
+          "quote": "I implemented a fixed timestep with an accumulator. can you check my logic?"
+        },
+        {
+          "promptId": "claude-code:curious-learner-8:1",
+          "quote": "here is my AABB function, any edge cases I missed?"
+        }
+      ],
+      "rewrite": null
+    }
+  ],
+  "stats": {
+    "window": {
+      "since": null,
+      "until": "2026-10-24T00:00:00.000Z"
+    },
+    "timezone": "America/New_York",
+    "totalPrompts": 29,
+    "analyzedPrompts": 29,
+    "totalSessions": 9,
+    "bySource": {
+      "claude-code": 29,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 29,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-08-02T14:00:00.000Z",
+      "to": "2026-09-16T14:18:00.000Z"
+    },
+    "activeDays": 9,
+    "hourHistogram": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 6, 3, 0, 0, 0, 0, 0, 4, 3, 3, 3, 0, 0],
+    "weekdayHistogram": [0, 0, 9, 13, 0, 0, 7],
+    "activityGrid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 0, 4, 0, 0, 3, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    "promptLength": {
+      "median": 74,
+      "p90": 89.4
+    },
+    "languageMix": {
+      "zh": 0,
+      "en": 1,
+      "mixed": 0
+    },
+    "topProjects": [
+      {
+        "name": "rust-playground",
+        "count": 13
+      },
+      {
+        "name": "wasm-game",
+        "count": 10
+      },
+      {
+        "name": "notes",
+        "count": 6
+      }
+    ],
+    "topSlashCommands": [],
+    "correctionRate": 0.069,
+    "imageRate": 0,
+    "longestStreakDays": 1,
+    "latestTime": "21:18",
+    "activity": {
+      "projects": ["rust-playground", "wasm-game", "notes"],
+      "days": [
+        {
+          "date": "2026-08-02",
+          "count": 4,
+          "byProject": [4, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-05",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-09",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-13",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-08-20",
+          "count": 3,
+          "byProject": [3, 0, 0, 0]
+        },
+        {
+          "date": "2026-08-27",
+          "count": 4,
+          "byProject": [0, 4, 0, 0]
+        },
+        {
+          "date": "2026-09-03",
+          "count": 3,
+          "byProject": [0, 3, 0, 0]
+        },
+        {
+          "date": "2026-09-09",
+          "count": 3,
+          "byProject": [0, 0, 3, 0]
+        },
+        {
+          "date": "2026-09-16",
+          "count": 3,
+          "byProject": [0, 3, 0, 0]
+        }
+      ],
+      "gridByProject": [
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 3, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 3, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 3, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 4, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 3, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ],
+        [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [4, 0, 0, 0],
+          [3, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [0, 0, 0, 0]
+        ]
+      ]
+    },
+    "promptHabits": {
+      "terseShare": 0,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}
