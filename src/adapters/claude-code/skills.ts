@@ -56,13 +56,16 @@ export const frontMatterDescription = (text: string): string | null => {
 }
 
 /**
- * Describe the skills a user ran: their own (`<claudeRoot>/skills`), plugin skills
- * (`<claudeRoot>/plugins/**`), project skills (`<project>/.claude/skills`) and built-ins.
+ * Describe the skills a user ran: their own (`<claudeRoot>/skills`, `<agentsRoot>/skills`),
+ * plugin skills (`<claudeRoot>/plugins/**`), project skills (`<project>/.claude/skills` and
+ * `<project>/.agents/skills`) and built-ins.
  * Only the front matter description is kept; the skill body is never stored.
  * `names` may be plugin-scoped ("plugin:skill"); the part after the last ":" is the folder.
  */
 export const readSkillCatalog = (input: {
   readonly claudeRoot: string
+  /** `~/.agents`: the shared, tool-neutral skills folder (also `<project>/.agents/skills`). */
+  readonly agentsRoot?: string
   readonly projectDirs: ReadonlyArray<string>
   readonly names: ReadonlyArray<string>
 }): Effect.Effect<ReadonlyMap<string, SkillInfo>, never, FileSystem.FileSystem | Path.Path> =>
@@ -85,29 +88,41 @@ export const readSkillCatalog = (input: {
         Effect.orElseSucceed(() => [] as ReadonlyArray<string>),
       )
     const catalog = new Map<string, SkillInfo>()
+    /** The first existing `<dir>/<folder>/SKILL.md`. */
+    const firstIn = (dirs: ReadonlyArray<string>, folder: string) =>
+      Effect.gen(function* () {
+        for (const dir of dirs) {
+          const file = path.join(dir, folder, "SKILL.md")
+          if (yield* exists(file)) return file
+        }
+        return undefined
+      })
+    const personalDirs = [
+      path.join(input.claudeRoot, "skills"),
+      ...(input.agentsRoot === undefined ? [] : [path.join(input.agentsRoot, "skills")]),
+    ]
+    const projectDirs = input.projectDirs.flatMap((dir) => [
+      path.join(dir, ".claude", "skills"),
+      path.join(dir, ".agents", "skills"),
+    ])
     for (const name of input.names) {
       const folder = name.split(":").at(-1)!
-      const personal = path.join(input.claudeRoot, "skills", folder, "SKILL.md")
+      const personal = yield* firstIn(personalDirs, folder)
       const plugin = pluginFiles.find((f) => path.basename(path.dirname(f)) === folder)
-      let info: SkillInfo | undefined
-      if (yield* exists(personal))
-        info = { description: yield* describe(personal), origin: "personal" }
-      else if (plugin !== undefined)
-        info = {
-          description: yield* describe(path.join(input.claudeRoot, "plugins", plugin)),
-          origin: "plugin",
-        }
-      else {
-        for (const dir of input.projectDirs) {
-          const file = path.join(dir, ".claude", "skills", folder, "SKILL.md")
-          if (yield* exists(file)) {
-            info = { description: yield* describe(file), origin: "project" }
-            break
-          }
-        }
-      }
-      if (info === undefined && BUILTIN_SKILLS[folder] !== undefined)
-        info = { description: BUILTIN_SKILLS[folder]!, origin: "builtin" }
+      const project = personal || plugin ? undefined : yield* firstIn(projectDirs, folder)
+      const info: SkillInfo | undefined =
+        personal !== undefined
+          ? { description: yield* describe(personal), origin: "personal" }
+          : plugin !== undefined
+            ? {
+                description: yield* describe(path.join(input.claudeRoot, "plugins", plugin)),
+                origin: "plugin",
+              }
+            : project !== undefined
+              ? { description: yield* describe(project), origin: "project" }
+              : BUILTIN_SKILLS[folder] !== undefined
+                ? { description: BUILTIN_SKILLS[folder]!, origin: "builtin" }
+                : undefined
       catalog.set(name, info ?? { description: null, origin: "unknown" })
     }
     return catalog

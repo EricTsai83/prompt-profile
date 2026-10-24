@@ -12,6 +12,37 @@ const skill = (dir: string, name: string, frontMatter: string, body = "Body text
 }
 
 describe("skill catalog", () => {
+  it.effect("also reads the shared .agents/skills folders, personal and per project", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-skills-"))
+      skill(
+        join(root, ".agents", "skills"),
+        "shared-helper",
+        "description: A skill shared across agents",
+      )
+      const project = join(root, "work", "api")
+      skill(
+        join(project, ".agents", "skills"),
+        "db-migrate",
+        "description: Plan a database migration",
+      )
+      const catalog = yield* readSkillCatalog({
+        claudeRoot: join(root, ".claude"),
+        agentsRoot: join(root, ".agents"),
+        projectDirs: [project],
+        names: ["shared-helper", "db-migrate"],
+      })
+      expect(catalog.get("shared-helper")).toEqual({
+        description: "A skill shared across agents",
+        origin: "personal",
+      })
+      expect(catalog.get("db-migrate")).toEqual({
+        description: "Plan a database migration",
+        origin: "project",
+      })
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+
   it.effect("reads descriptions and origins; the body is never read", () =>
     Effect.gen(function* () {
       const root = mkdtempSync(join(tmpdir(), "pp-skills-"))

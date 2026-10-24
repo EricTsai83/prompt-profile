@@ -128,6 +128,7 @@ export const runPipelineStep = (collected: Collected, since: string) =>
       const path = yield* Path.Path
       const catalog = yield* readSkillCatalog({
         claudeRoot: resolveClaudeRoot(env.env, env.home, path),
+        agentsRoot: path.join(env.home, ".agents"),
         projectDirs: [
           ...new Set(collected.records.flatMap((r) => (r.project === null ? [] : [r.project]))),
         ],

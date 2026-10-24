@@ -42,7 +42,9 @@ An adoption timeline, then five stages — plan, delegate, extend, verify, ship 
 measures and a named breakdown:
 
 - **Skills:** name, origin (built-in, plugin, personal, project), the skill's own description
-  from its `SKILL.md` front matter (or the built-in list), sessions and first–last use. Only the front
+  from its `SKILL.md` front matter (or the built-in list), looked up in `~/.claude/skills`,
+  `~/.agents/skills`, `~/.claude/plugins/**`, and `.claude/skills` / `.agents/skills` of every
+  project the user worked in, sessions and first–last use. Only the front
   matter is kept: the skill body is never stored, and the arguments it was called with are never
   read.
 - **Subagent types**, **MCP servers** (from `mcp__<server>__…` tool names) and **models**, with
