@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile UX research — screenshot evidence</title>
+    <style>
+      * { box-sizing:border-box }
+      body { margin:0; color:var(--foreground,#202b25); font:14px/1.5 system-ui,sans-serif }
+      nav { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px }
+      button { padding:7px 10px; background:var(--card,#fff); color:inherit; border:1px solid var(--border,#dce3de); border-radius:5px; cursor:pointer; font:inherit; font-size:12px }
+      button[aria-selected="true"] { background:var(--foreground,#202b25); color:var(--background,#fff) }
+      button:focus-visible { outline:3px solid var(--ring,#26785d); outline-offset:2px }
+      figure { margin:0 }
+      img { display:block; width:100%; height:auto; border:1px solid var(--border,#dce3de) }
+      .mobile img { max-width:390px; margin:auto }
+      figcaption { font-size:12px; margin:8px 0; color:var(--muted-foreground,#5c6b63) }
+      [hidden] { display:none!important }
+    </style>
+  </head>
+  <body>
+    <nav role="tablist" aria-label="Captured UX comparisons">
+      <button type="button" role="tab" id="tab-design" aria-controls="design" aria-selected="true">
+        Three designs
+      </button>
+      <button
+        type="button"
+        role="tab"
+        id="tab-content"
+        aria-controls="content"
+        aria-selected="false"
+      >
+        Three content directions
+      </button>
+      <button type="button" role="tab" id="tab-flow" aria-controls="flow" aria-selected="false">
+        Free vs paid
+      </button>
+      <button type="button" role="tab" id="tab-model" aria-controls="model" aria-selected="false">
+        Model study
+      </button>
+      <button type="button" role="tab" id="tab-mobile" aria-controls="mobile" aria-selected="false">
+        Mobile
+      </button>
+      <button type="button" role="tab" id="tab-dark" aria-controls="dark" aria-selected="false">
+        Dark mobile
+      </button>
+      <button
+        type="button"
+        role="tab"
+        id="tab-current"
+        aria-controls="current"
+        aria-selected="false"
+      >
+        Current report
+      </button>
+    </nav>
+    <figure id="design" role="tabpanel" aria-labelledby="tab-design">
+      <img
+        src="screenshots/02-report-design-desktop.png"
+        alt="Three proposed report designs: editorial, evidence notebook and share poster, with the same profile"
+      />
+      <figcaption>
+        Research prototype, not shipped. Same synthetic profile, three proposed visual directions.
+        Captured at 1440px.
+      </figcaption>
+    </figure>
+    <figure id="content" role="tabpanel" aria-labelledby="tab-content" hidden>
+      <img
+        src="screenshots/01-content-directions-desktop.png"
+        alt="Three proposed content directions: work mirror, growth journal and share story; the growth version preserves an evidence gap"
+      />
+      <figcaption>
+        Research prototype, not shipped. The question and emphasis change; evidence and numbers stay
+        fixed. Captured at 1440px.
+      </figcaption>
+    </figure>
+    <figure id="flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+      <img
+        src="screenshots/03-generation-cost-flow.png"
+        alt="Proposed paths distinguish a free appearance change from a new narrative that requires LLM calls and confirmation"
+      />
+      <figcaption>
+        Proposed UX states. Actual call counts and profile hashes must verify these promises during
+        implementation.
+      </figcaption>
+    </figure>
+    <figure id="model" role="tabpanel" aria-labelledby="tab-model" hidden>
+      <img
+        src="screenshots/04-model-study-protocol.png"
+        alt="Existing Claude synthetic-persona quality results beside a proposed blind model comparison marked not run"
+      />
+      <figcaption>
+        The Claude baseline is observed; the Codex profile comparison is not run. No missing model
+        result is invented.
+      </figcaption>
+    </figure>
+    <figure id="mobile" role="tabpanel" aria-labelledby="tab-mobile" class="mobile" hidden>
+      <img
+        src="screenshots/02-report-design-mobile.png"
+        alt="Three proposed layouts stacked at a 390 pixel mobile width without horizontal overflow"
+      />
+      <figcaption>
+        390px research prototype. All three layouts remain readable in a vertical sequence.
+      </figcaption>
+    </figure>
+    <figure id="dark" role="tabpanel" aria-labelledby="tab-dark" class="mobile" hidden>
+      <img
+        src="screenshots/02-report-design-mobile-dark.png"
+        alt="Dark mobile research prototype captured at 360 pixel width"
+      />
+      <figcaption>
+        360px dark research prototype. Browser checks found one active panel and no horizontal
+        overflow.
+      </figcaption>
+    </figure>
+    <figure id="current" role="tabpanel" aria-labelledby="tab-current" hidden>
+      <img
+        src="screenshots/00-current-report-desktop.png"
+        alt="The existing actual report renderer showing summary, statistics, heatmap, traits, dimensions and evidence controls"
+      />
+      <figcaption>
+        Actual current renderer, with the fictional sample profile. This is the baseline, not a new
+        customization feature.
+      </figcaption>
+    </figure>
+    <script>
+      const tabs = [...document.querySelectorAll('[role="tab"]')]
+      function select(tab) {
+        for (const candidate of tabs) candidate.setAttribute("aria-selected", String(candidate === tab))
+        for (const panel of document.querySelectorAll('[role="tabpanel"]')) panel.hidden = panel.id !== tab.getAttribute("aria-controls")
+      }
+      for (const [index, tab] of tabs.entries()) {
+        tab.addEventListener("click", () => select(tab))
+        tab.addEventListener("keydown", (event) => {
+          const next = event.key === "ArrowRight" ? (index + 1) % tabs.length
+            : event.key === "ArrowLeft" ? (index + tabs.length - 1) % tabs.length
+            : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : null
+          if (next === null) return
+          event.preventDefault()
+          select(tabs[next])
+          tabs[next].focus()
+        })
+      }
+      console.assert(document.querySelectorAll('[role="tabpanel"]:not([hidden])').length === 1, "One screenshot must be visible")
+    </script>
+  </body>
+</html>

@@ -128,3 +128,10 @@ When 03 + 05 + 07 are done (before 04 and 08), first run `pnpm dev --out tmp` on
 - External data formats (Claude Code / Codex JSONL, CLI stdout) are always treated as **untrusted and subject to change**: parse them with lenient Schemas, skip and count failures, and never let the whole flow fail.
 - Any derived data written to the user's disk (cache, reports) contains personal information: directories `0700`, files `0600`; write to a temporary file first and then rename (to avoid leaving a broken file if interrupted).
 - Commits use Conventional Commits; a plan can be split into several small commits.
+
+
+## Follow-up research
+
+- [11 — Profile customization UX](./11-profile-customization-ux.md): explore content directions,
+  report layouts and model comparisons; define user choices, fixed product guarantees and
+  screenshot-based validation before implementing new customization controls.

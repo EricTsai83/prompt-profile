@@ -1,0 +1,246 @@
+{
+  "capturedAtUtc": "2026-10-24T04:20:48.822845+00:00",
+  "tool": "T3 html_preview",
+  "data": "Synthetic only. Proposals are not shipped features. Model comparison is not run.",
+  "captures": [
+    {
+      "file": "00-current-report-desktop.png",
+      "kind": "actual-report",
+      "source": "docs/sample-report.html",
+      "view": "current",
+      "appearance": "light",
+      "id": "S0",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 2282,
+        "capturedHeight": 2282,
+        "consoleMessages": [],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 2282
+        }
+      },
+      "sourceSha256": "2cee57a25af47ed321265e714c4f21b4e94235df7272bb7071f9e551fbfeca4b",
+      "renderedHtmlSha256": "2cee57a25af47ed321265e714c4f21b4e94235df7272bb7071f9e551fbfeca4b",
+      "imageSha256": "f6b886f09676ce39d38c3c95a2402e58a346235282118d80d0daa25938e3c7f1"
+    },
+    {
+      "file": "00-current-report-mobile.png",
+      "kind": "actual-report",
+      "source": "docs/sample-report.html",
+      "view": "current",
+      "appearance": "light",
+      "id": "S0",
+      "capture": {
+        "width": 390,
+        "contentHeight": 3293,
+        "capturedHeight": 3293,
+        "consoleMessages": [],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 3293
+        }
+      },
+      "sourceSha256": "2cee57a25af47ed321265e714c4f21b4e94235df7272bb7071f9e551fbfeca4b",
+      "renderedHtmlSha256": "2cee57a25af47ed321265e714c4f21b4e94235df7272bb7071f9e551fbfeca4b",
+      "imageSha256": "b6bdfb443a73522dd936d8c3748fae517e2f743e60cf5ef56b0748676c6a099c"
+    },
+    {
+      "file": "01-content-directions-desktop.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "content",
+      "appearance": "light",
+      "id": "S1",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 977,
+        "capturedHeight": 977,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"content\",\"width\":1440,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 977
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "imageSha256": "5fa29425357566f983781dace823b69048170ed406814be2fb32aa7957e4dcbb"
+    },
+    {
+      "file": "01-content-directions-mobile.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "content",
+      "appearance": "light",
+      "id": "S1",
+      "capture": {
+        "width": 390,
+        "contentHeight": 2064,
+        "capturedHeight": 2064,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"content\",\"width\":390,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 2064
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "imageSha256": "38ac4f0c2da4881bb49964da2ee749a4fa37c2343fb14c00eb6813e7e75dcd5d"
+    },
+    {
+      "file": "02-report-design-desktop.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "layout",
+      "appearance": "light",
+      "id": "S2",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 965,
+        "capturedHeight": 965,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"layout\",\"width\":1440,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 965
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "709f4db24be6fe5cfd15c62e81b62fcb9e15640c30f73386b6974b21f30040cc",
+      "imageSha256": "f02bf15096f8fa57014366544db0e13979d5cc14f2bec0c547a3487671fcc830"
+    },
+    {
+      "file": "02-report-design-mobile.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "layout",
+      "appearance": "light",
+      "id": "S2",
+      "capture": {
+        "width": 390,
+        "contentHeight": 2060,
+        "capturedHeight": 2060,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"layout\",\"width\":390,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 390,
+          "height": 2060
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "709f4db24be6fe5cfd15c62e81b62fcb9e15640c30f73386b6974b21f30040cc",
+      "imageSha256": "3c41e47f9285323ab03f41871889a0976911e419b89b6e0f336cbe08d309e198"
+    },
+    {
+      "file": "02-report-design-mobile-dark.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "layout",
+      "appearance": "dark",
+      "id": "S2",
+      "capture": {
+        "width": 360,
+        "contentHeight": 2130,
+        "capturedHeight": 2130,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"layout\",\"width\":360,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 360,
+          "height": 2130
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "709f4db24be6fe5cfd15c62e81b62fcb9e15640c30f73386b6974b21f30040cc",
+      "imageSha256": "5b62a33753b5ebfcf6dd9fc6914b801a4ecaebb648099a9b8ec0f18ed4bc9cdb"
+    },
+    {
+      "file": "03-generation-cost-flow.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "flow",
+      "appearance": "light",
+      "id": "S3",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 957,
+        "capturedHeight": 957,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"flow\",\"width\":1440,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 957
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "7a92e99d0b5fae4226374e3ead361a427d06ae6fbbf27a4e2ab0369c67d03341",
+      "imageSha256": "4e504fbe2372ea24419b3866b468ad89f5e857ebb482b2dcfd5afb31485883f6"
+    },
+    {
+      "file": "04-model-study-protocol.png",
+      "kind": "research-prototype",
+      "source": "docs/ux/profile-customization-prototype.html",
+      "view": "model",
+      "appearance": "light",
+      "id": "S5",
+      "capture": {
+        "width": 1440,
+        "contentHeight": 920,
+        "capturedHeight": 920,
+        "consoleMessages": [
+          {
+            "level": "log",
+            "text": "{\"view\":\"model\",\"width\":1440,\"overflow\":false,\"visiblePanels\":1,\"status\":\"research prototype; not shipped\"}"
+          }
+        ],
+        "screenshot": {
+          "mimeType": "image/png",
+          "width": 1440,
+          "height": 920
+        }
+      },
+      "sourceSha256": "2f5026955b2fe49a102be6ffb84ed0254fbde698d246cc79cc7478b8ec762d92",
+      "renderedHtmlSha256": "46aed8a36e7a51f63f3a902b5ece00d001da7f58c183550028d4caa95fb2d0c6",
+      "imageSha256": "06f9f1d79aca448b7a9a44c04b7e1b0e2f9713d5ace29666b1af27b1c29d816f"
+    }
+  ],
+  "notEstablished": [
+    "Participant usability",
+    "Production customization behavior",
+    "Comparative model quality",
+    "Network isolation from screenshots"
+  ]
+}

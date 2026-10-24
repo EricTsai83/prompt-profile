@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile customization — research prototype</title>
+    <style>
+      :root { color-scheme: light dark; --page:var(--background,#f8faf9); --ink:var(--foreground,#192922); --muted-ink:color-mix(in srgb,var(--ink) 70%,var(--page)); --surface:var(--card,#fff); --line:var(--border,#dce4df); --brand:#26785d; }
+      * { box-sizing:border-box }
+      body { margin:0; background:var(--page); color:var(--ink); font:15px/1.6 system-ui,sans-serif }
+      main { max-width:1180px; margin:auto; padding:32px 28px 40px }
+      h1,h2,h3,p { margin:0 }
+      h1 { font-size:clamp(28px,4vw,42px); line-height:1.14; letter-spacing:-.035em; max-width:830px; margin:12px 0 }
+      h2 { font-size:24px; line-height:1.25; letter-spacing:-.025em }
+      h3 { font-size:18px; line-height:1.3 }
+      .kicker { font:700 11px/1.5 system-ui,sans-serif; text-transform:uppercase; letter-spacing:.13em; color:var(--muted-ink) }
+      .status { display:inline-block; padding:5px 10px; border:1px solid var(--line); border-radius:5px; font-size:11px; font-weight:700; letter-spacing:.03em }
+      .lede { color:var(--muted-ink); max-width:800px }
+      nav { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0 28px; padding-bottom:18px; border-bottom:1px solid var(--line) }
+      button { font:inherit; cursor:pointer; border:1px solid var(--line); border-radius:6px; background:var(--surface); color:var(--ink); padding:9px 14px }
+      button[aria-selected="true"] { background:var(--ink); color:var(--page); border-color:var(--ink) }
+      button:focus-visible,summary:focus-visible { outline:3px solid #e49c43; outline-offset:4px }
+      [hidden] { display:none!important }
+      .section-head { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin:0 0 20px }
+      .section-head small,.muted { color:var(--muted-ink) }
+      .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px }
+      .two { grid-template-columns:repeat(2,minmax(0,1fr)) }
+      article { min-width:0 }
+      .version-label { display:flex; align-items:baseline; justify-content:space-between; gap:6px; margin:0 0 10px }
+      .version-label span { font-size:11px; color:var(--muted-ink) }
+      .sheet { background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:22px; min-height:340px }
+      .sheet h3 { margin:14px 0 12px; font-size:24px; letter-spacing:-.025em }
+      .sheet p + p { margin-top:12px }
+      .rule { height:3px; width:32px; background:var(--brand); margin-bottom:22px }
+      .quote { margin:20px 0 0; border-left:2px solid var(--brand); padding-left:12px; font-size:13px; color:var(--muted-ink) }
+      .quote blockquote { margin:0 0 6px }
+      .confidence { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--brand); font-weight:700 }
+      .note { margin-top:16px; font-size:13px; color:var(--muted-ink) }
+      .warning { color:#915a16; background:#fff4df; border-radius:5px; padding:12px; margin-top:18px; font-size:13px }
+      .invariants { display:flex; flex-wrap:wrap; gap:10px 24px; margin:24px 0 0; padding:18px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-size:13px }
+      .invariants strong { font-size:17px; margin-right:5px }
+      .editorial { background:#edf4ee; color:#18382b }
+      .editorial h3 { font-family:Georgia,serif; font-size:35px; font-weight:500; line-height:1.06 }
+      .editorial .kicker,.editorial .muted { color:#4b6658 }
+      .notebook { background:#fffefa; color:#242820; border-radius:0; border-top:4px solid #333f34 }
+      .notebook .kicker { color:#58644e }
+      .notebook .quote { color:#58644e }
+      .poster { background:linear-gradient(135deg,#211f46,#5851b7); color:#fff; display:flex; flex-direction:column; justify-content:space-between }
+      .poster .kicker { color:#c3bfff }
+      .poster h3 { font-size:31px }
+      .tags { display:flex; flex-wrap:wrap; gap:7px; margin:18px 0 }
+      .tag { padding:4px 9px; border:1px solid currentColor; border-radius:20px; font-size:11px }
+      .poster .tag { background:#ffffff18; border-color:transparent }
+      .poster .metrics { display:flex; gap:18px; margin-top:18px }
+      .poster .metrics b { display:block; font-size:25px }
+      .poster .metrics small { color:#d2cff5 }
+      details { margin-top:18px; font-size:13px }
+      summary { cursor:pointer; color:var(--brand) }
+      .flow { padding:24px; min-height:360px; background:var(--surface); border:1px solid var(--line); border-radius:9px }
+      .flow h3 { margin:12px 0 8px; font-size:24px }
+      .state { margin:22px 0 16px; padding:16px; background:var(--page); border-radius:6px; font-size:13px }
+      .state strong { display:block; font-size:17px; margin-bottom:6px }
+      .action { display:inline-block; padding:9px 14px; border-radius:6px; background:var(--brand); color:#fff; font-size:13px; margin-top:12px }
+      .steps { margin-top:24px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; font-size:13px }
+      .steps b { display:block; font-size:15px; margin-bottom:4px }
+      table { border-collapse:collapse; width:100%; margin:20px 0 0; font-size:13px }
+      th,td { text-align:left; border-bottom:1px solid var(--line); padding:12px 10px; overflow-wrap:anywhere }
+      th { color:var(--muted-ink); font-size:11px; text-transform:uppercase; letter-spacing:.04em }
+      .table-wrap { overflow:auto }
+      footer { margin-top:24px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; font-size:11px; color:var(--muted-ink) }
+      @media(max-width:760px) { main { padding:24px 16px } .grid,.two,.steps { grid-template-columns:1fr } .section-head { display:block } .section-head small { display:block; margin-top:8px } .sheet { min-height:0 } .flow { min-height:0 } .version-label { margin-top:12px } nav button { flex:1 1 40%; padding:9px 6px; font-size:13px } }
+    </style>
+  </head>
+  <body>
+    <main id="research" data-view="content">
+      <span class="status">RESEARCH PROTOTYPE · SYNTHETIC DATA · NOT SHIPPED</span>
+      <h1>One profile. Three kinds of choice.</h1>
+      <p class="lede">
+        Explore the story, the reading experience and the model independently. Evidence, statistics
+        and confidence rules stay under product control.
+      </p>
+      <nav role="tablist" aria-label="Research directions">
+        <button
+          type="button"
+          role="tab"
+          id="tab-content"
+          aria-controls="content"
+          aria-selected="true"
+          data-view="content"
+        >
+          01 Content direction
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-layout"
+          aria-controls="layout"
+          aria-selected="false"
+          data-view="layout"
+        >
+          02 Report design
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-flow"
+          aria-controls="flow"
+          aria-selected="false"
+          data-view="flow"
+        >
+          03 Free vs paid
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-model"
+          aria-controls="model"
+          aria-selected="false"
+          data-view="model"
+        >
+          04 Model study
+        </button>
+      </nav>
+      <section id="content" role="tabpanel" aria-labelledby="tab-content">
+        <div class="section-head">
+          <h2>Choose the question, not the conclusion.</h2>
+          <small>Controlled comparison: same evidence, same numbers</small>
+        </div>
+        <div class="grid">
+          <article>
+            <div class="version-label">
+              <b>A / Work mirror</b><span>Habit & collaboration</span>
+            </div>
+            <div class="sheet">
+              <div class="rule"></div>
+              <p class="kicker">A grounded work portrait</p>
+              <h3>You make the plan explicit.</h3>
+              <p>
+                You ask for the steps before implementation. Your strongest supported signal here is
+                how you structure the work.
+              </p>
+              <div class="quote">
+                <blockquote>“don't write code yet, break the plan into small steps”</blockquote>
+                <span>Verified sample quote · original wording retained</span>
+              </div>
+              <p class="note">Direct wording · medium reading depth</p>
+            </div>
+          </article>
+          <article>
+            <div class="version-label">
+              <b>B / Growth journal</b><span>Learning across time</span>
+            </div>
+            <div class="sheet">
+              <div class="rule"></div>
+              <p class="kicker">Reflection with limits</p>
+              <h3>A planning habit, with a question left open.</h3>
+              <p>
+                This sample supports planning before code. It does not establish how your skills
+                changed over the selected period.
+              </p>
+              <div class="warning">
+                Evidence gap: no verified growth evidence in this sample. Do not invent an
+                improvement story.
+              </div>
+              <p class="note">Reflective wording · same source evidence</p>
+            </div>
+          </article>
+          <article>
+            <div class="version-label"><b>C / Share story</b><span>Short & recognizable</span></div>
+            <div class="sheet">
+              <div class="rule"></div>
+              <p class="kicker">A compact introduction</p>
+              <h3>Plan first.<br />Build step by step.</h3>
+              <p>
+                A short presentation of the same supported planning behavior, without publishing
+                evidence excerpts.
+              </p>
+              <div class="tags">
+                <span class="tag">Plan first</span><span class="tag">Step by step</span>
+              </div>
+              <p class="note">Lightly playful · concise · inspect before sharing</p>
+            </div>
+          </article>
+        </div>
+        <div class="invariants">
+          <span><strong>1,980</strong> prompts in scope</span
+          ><span><strong>23 days</strong> longest streak</span
+          ><span><strong>Fixed</strong> verification & confidence rules</span>
+        </div>
+        <p class="note">
+          Candidate presentations only. A new narrative may need an LLM call; changing section order
+          does not. None of these presets is implemented in the CLI.
+        </p>
+      </section>
+      <section id="layout" role="tabpanel" aria-labelledby="tab-layout" hidden>
+        <div class="section-head">
+          <h2>Change the look. Keep the profile.</h2>
+          <small>Hypothesis: appearance belongs after analysis</small>
+        </div>
+        <div class="grid">
+          <article>
+            <div class="version-label"><b>A / Editorial</b><span>Calm reading</span></div>
+            <div class="sheet editorial">
+              <p class="kicker">Your collaboration profile</p>
+              <h3>The Midnight<br />Architect</h3>
+              <p>Ships features by day, refactors by night.</p>
+              <div class="tags">
+                <span class="tag">Plan first</span><span class="tag">Straight talker</span>
+              </div>
+              <details>
+                <summary>Read supporting evidence</summary>
+                <p class="quote">don't write code yet, break the plan into small steps</p>
+              </details>
+            </div>
+            <p class="note">Test hierarchy, readability and long headings.</p>
+          </article>
+          <article>
+            <div class="version-label">
+              <b>B / Evidence notebook</b><span>Claims next to sources</span>
+            </div>
+            <div class="sheet notebook">
+              <p class="kicker">The Midnight Architect / work style</p>
+              <h3>Plan first</h3>
+              <p>Asks the AI to list steps and risks before coding.</p>
+              <p class="confidence" style="margin-top:16px">High confidence · sample metadata</p>
+              <div class="quote">
+                <blockquote>“don't write code yet, break the plan into small steps”</blockquote>
+                <span>Supporting evidence</span>
+              </div>
+              <details>
+                <summary>Coverage & limitations</summary>
+                <p>
+                  One dimension has no verified evidence. Do not hide this warning when changing
+                  themes.
+                </p>
+              </details>
+            </div>
+            <p class="note">Test discoverability of evidence and uncertainty.</p>
+          </article>
+          <article>
+            <div class="version-label">
+              <b>C / Share poster</b><span>Exact export preview</span>
+            </div>
+            <div class="sheet poster">
+              <div>
+                <p class="kicker">Your collaboration profile</p>
+                <h3>The Midnight Architect</h3>
+                <p>Ships features by day, refactors by night.</p>
+                <div class="tags">
+                  <span class="tag">Plan first</span><span class="tag">Straight talker</span>
+                </div>
+              </div>
+              <div class="metrics">
+                <div><b>1,980</b><small>Prompts</small></div>
+                <div><b>23 days</b><small>Longest streak</small></div>
+              </div>
+            </div>
+            <p class="note">Omit evidence quotes. Offer metric visibility controls.</p>
+          </article>
+        </div>
+        <div class="invariants">
+          <span><strong>Same</strong> serialized profile</span
+          ><span><strong>0</strong> proposed LLM calls for theme changes</span
+          ><span><strong>Keep</strong> the original export</span>
+        </div>
+        <p class="note">
+          Layout sketches only. Final card verification uses the real 1200 × 630 renderer; these
+          tiles are research comparisons, not exported cards.
+        </p>
+      </section>
+      <section id="flow" role="tabpanel" aria-labelledby="tab-flow" hidden>
+        <div class="section-head">
+          <h2>Make the cost of a choice visible.</h2>
+          <small>Proposed states, not working generation controls</small>
+        </div>
+        <div class="grid two">
+          <article class="flow">
+            <p class="kicker">Path A / Appearance</p>
+            <h3>Preview another layout</h3>
+            <p>
+              Use the existing profile. Choose the visual presentation after you have something
+              useful to read.
+            </p>
+            <div class="state">
+              <strong>No new analysis</strong>0 LLM calls · profile data unchanged<br />Save to a
+              new variant folder.
+            </div>
+            <span class="action">Preview editorial layout</span>
+            <p class="note">Research question: can people predict this action is free?</p>
+          </article>
+          <article class="flow">
+            <p class="kicker">Path B / Narrative</p>
+            <h3>Try a growth-oriented story</h3>
+            <p>
+              A different interpretation needs analysis. Explain what can be reused before asking
+              for confirmation.
+            </p>
+            <div class="state">
+              <strong>Additional LLM calls</strong>Base estimate depends on compatible cached
+              observations.<br />Merges and retries may add calls; retain a hard budget.
+            </div>
+            <span class="action">Review estimate & confirm</span>
+            <p class="note">
+              Research question: do people understand the difference before proceeding?
+            </p>
+          </article>
+        </div>
+        <div class="steps">
+          <div>
+            <b>1. Keep the first run simple</b
+            ><span class="muted">Default scope → privacy → call estimate → confirmation.</span>
+          </div>
+          <div>
+            <b>2. Separate private and shared</b
+            ><span class="muted"
+              >Inspect the exact card, including selected metrics, before saving.</span
+            >
+          </div>
+          <div>
+            <b>3. Preserve every version</b
+            ><span class="muted">New variant folder; clear name, source and model provenance.</span>
+          </div>
+        </div>
+        <p class="note">
+          Validation: screenshots of both paths plus observed CLI-call counts and an unchanged input
+          hash. Screenshots alone cannot prove that a path is free or private.
+        </p>
+      </section>
+      <section id="model" role="tabpanel" aria-labelledby="tab-model" hidden>
+        <div class="section-head">
+          <h2>Compare models without changing the experiment.</h2>
+          <small>Do not fill missing results with invented output</small>
+        </div>
+        <div class="grid two">
+          <article class="flow">
+            <p class="kicker">Observed baseline / synthetic personas</p>
+            <h3>Claude persona checks</h3>
+            <p>
+              Three existing synthetic cases passed the quality gate. This establishes a pipeline
+              baseline, not a model preference.
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Persona</th>
+                    <th>Evidence retained</th>
+                    <th>Empty dimensions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Curious learner</td>
+                    <td>100%</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>Methodical backend</td>
+                    <td>100%</td>
+                    <td>0</td>
+                  </tr>
+                  <tr>
+                    <td>Night-owl frontend</td>
+                    <td>100%</td>
+                    <td>0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note">Model: claude-opus-5-5 · analysis version 4</p>
+          </article>
+          <article class="flow">
+            <p class="kicker">Proposed study / not run</p>
+            <h3>Blind engine comparison</h3>
+            <p>
+              Same input manifest, preset, layout and verification rules. Hide engine labels during
+              preference testing; reveal provenance afterward.
+            </p>
+            <div class="state">
+              <strong>Codex profile comparison: not run</strong>Choose an available model and repeat
+              each synthetic case.<br />A missing model name stays “unknown”.
+            </div>
+            <p class="note">
+              Start with 3 personas × 2 engines × 2 repeats = 12 analyses, subject to an explicit
+              call budget.
+            </p>
+          </article>
+        </div>
+        <div class="invariants">
+          <span><strong>Control</strong> input, scope & layout</span
+          ><span><strong>Review</strong> evidence & sensitive claims</span
+          ><span><strong>Measure</strong> usefulness, cost & variation</span>
+        </div>
+      </section>
+      <footer>
+        <span>Planning artifact · fictional sample · no new production customization</span
+        ><span>Acceptance evidence: screenshots + behavioral checks + user sessions</span>
+      </footer>
+    </main>
+    <script>
+      const root = document.getElementById("research")
+      const tabs = [...root.querySelectorAll('[role="tab"]')]
+      function show(view) {
+        root.dataset.view = view
+        for (const tab of tabs) tab.setAttribute("aria-selected", String(tab.dataset.view === view))
+        for (const panel of root.querySelectorAll('[role="tabpanel"]')) panel.hidden = panel.id !== view
+      }
+      for (const tab of tabs) tab.addEventListener("click", () => show(tab.dataset.view))
+      for (const [index, tab] of tabs.entries()) {
+        tab.addEventListener("keydown", (event) => {
+          const next = event.key === "ArrowRight" ? (index + 1) % tabs.length
+            : event.key === "ArrowLeft" ? (index + tabs.length - 1) % tabs.length
+            : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : null
+          if (next === null) return
+          event.preventDefault()
+          show(tabs[next].dataset.view)
+          tabs[next].focus()
+        })
+      }
+      const requested = new URLSearchParams(location.search).get("view")
+      show(tabs.some(tab => tab.dataset.view === requested) ? requested : root.dataset.view)
+      requestAnimationFrame(() => {
+        const overflow = document.documentElement.scrollWidth > innerWidth
+        const visiblePanels = [...root.querySelectorAll('[role="tabpanel"]')].filter(p => !p.hidden).length
+        console.assert(!overflow, "Page has horizontal overflow")
+        console.assert(visiblePanels === 1, "Expected one visible research view")
+        console.log(JSON.stringify({ view:root.dataset.view, width:innerWidth, overflow, visiblePanels, status:"research prototype; not shipped" }))
+      })
+    </script>
+  </body>
+</html>
