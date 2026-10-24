@@ -1,9 +1,11 @@
 # 10 · Release
 
 **Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done
-(see [plan 13](./13-product-quality.md)); it is the last plan in the execution order. Nothing is
-pushed or published. The checklist below is unchanged from the original plan; this section
-records where things stand.
+(see [plan 13](./13-product-quality.md)); it is the last plan in the execution order. It resumes
+only when the owner judges the product good enough to publish. Nothing is published, and none of
+the steps below (code changes or the owner's npm / GitHub setup) are done before then. This
+section records where things stand; the release design was revised on 2026-10-24 (see
+"Versioning and changelog").
 
 ### Already in the repository
 
@@ -11,6 +13,9 @@ records where things stand.
   `docs/terms-check.md` (first pass, 2026-10-24); `SECURITY.md`; `RISKS.md`.
 - release-please config and manifest (first version `0.1.0`); `.github/workflows/ci.yml` and
   `release.yml` (pack with `pnpm pack`, publish with provenance through Trusted Publishing).
+  To be replaced by the tag-triggered release below. Until then the Release workflow fails on
+  every push to `main`: the repository does not allow Actions to create pull requests, so
+  release-please cannot open its release PR. The failure is harmless, since nothing is published.
 - `pnpm test:package` installs the packed tarball and checks version, help, prompts, fonts,
   HTML, JSON, the 1200 × 630 PNG and a look. Tarball 159 KB; `--version` cold start ~0.9 s.
 - `prompt-profile` is unclaimed on npm (404 on 2026-10-24).
@@ -19,11 +24,14 @@ records where things stand.
 
 1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
 2. Regenerate the README sample card/report if the product changed since (plan 13).
-3. Push to GitHub; confirm CI passes there for the first time (RISKS 4).
-4. Owner: set up npm Trusted Publishing (OIDC) and release-please permissions.
-5. Merge the release PR; confirm the npm page shows provenance.
-6. Clean-environment check: new container, logged-in `claude`, `npx prompt-profile` end to end.
-7. Check the npm name again just before publishing.
+3. Confirm CI passes on GitHub (the repository is pushed; RISKS 4).
+4. Replace release-please with the tag-triggered workflow below (TDD where it applies:
+   the tag/version check is a script with a test).
+5. Owner: publish `0.1.0` by hand once, then register the Trusted Publisher (steps below).
+6. Release `0.1.1` (or the next version) through the workflow; confirm the npm page shows
+   provenance.
+7. Clean-environment check: new container, logged-in `claude`, `npx prompt-profile` end to end.
+8. Check the npm name again just before publishing.
 
 ## Goal
 
@@ -41,13 +49,56 @@ Publish to npm so users can run `npm i -g prompt-profile` or `npx prompt-profile
 
 ## Versioning and changelog
 
-- Use Changesets or release-please (pick one; release-please is recommended, as it generates the changelog automatically from Conventional Commits).
-- First version: `0.1.0`.
+Decided 2026-10-24: **a tag push releases**, modelled on T3 Code (`pingdotgg/t3code`,
+`.github/workflows/release.yml` and `docs/operations/release.md`). This replaces release-please.
+
+- Why: release-please opens a release PR, so it needs "Allow GitHub Actions to create and
+  approve pull requests" (a repository-wide switch) or a PAT / GitHub App token. A tag push
+  needs neither, and pushes to `main` no longer run a release job.
+- The owner bumps the version locally: `npm version patch|minor|major` (or
+  `npm version 0.2.0-beta.1`) changes `package.json` and creates the `vX.Y.Z` tag, then
+  `git push --follow-tags`.
+- Release notes: GitHub generates them when the release is created (Conventional Commit
+  subjects since the previous tag). No `CHANGELOG.md` is kept.
+- First version: `0.1.0`, published by hand (npm cannot register a Trusted Publisher for a
+  package that does not exist yet).
+- Remove `release-please-config.json` and `.release-please-manifest.json`.
 
 ## GitHub Actions: `.github/workflows/release.yml`
 
-- When the release PR is merged: build → test → `npm publish --provenance --access public`.
-- Use npm Trusted Publishing (OIDC); do not store an npm token in the repo.
+Trigger: `push` of tags `v*.*.*`. Top-level `permissions: contents: read`; each job asks for
+what it needs.
+
+1. **Check** (read-only): the tag without `v` must equal `package.json` `version`, otherwise
+   fail. A version with a suffix (`-beta.1`) is a prerelease with npm dist-tag `next`; a plain
+   `X.Y.Z` uses `latest`.
+2. **Verify**: `pnpm install --frozen-lockfile`, `typecheck`, `lint`, `format:check`, `test`,
+   `build`, `pnpm pack`, `scripts/test-package.mjs` on the tarball. Upload the tarball as an
+   artifact so the publish step ships exactly what was tested.
+3. **GitHub Release** (`contents: write`): create the release for the tag with generated notes,
+   marked prerelease for suffixed versions, the tarball attached.
+4. **npm publish** (`id-token: write`, only this job): download the tarball and run
+   `npm publish <tgz> --provenance --access public --tag <latest|next>`. On failure, print a
+   hint to check the Trusted Publisher registration.
+
+Order matters, as in T3 Code: nothing is published unless every check passed, and npm comes
+after the GitHub Release.
+
+Not taken from T3 Code: nightly and preview channels and a scheduled run (one small package
+does not need them), and committing version bumps back to `main` with a GitHub App (the version
+is bumped locally before tagging, so there is nothing to write back).
+
+### npm and GitHub setup (owner, once, when the release resumes)
+
+1. Create an npm account with 2FA.
+2. First publish by hand from a clean checkout: `npm login`, `pnpm build`,
+   `pnpm pack --out prompt-profile.tgz`, `node scripts/test-package.mjs prompt-profile.tgz`,
+   `npm publish prompt-profile.tgz --access public`.
+3. npmjs.com → package `prompt-profile` → Settings → Trusted Publisher → GitHub Actions:
+   user `EricTsai83`, repository `prompt-profile`, workflow file `release.yml`.
+4. On the same page, require 2FA and disallow tokens, so only the workflow can publish.
+5. GitHub: Workflow permissions stay at "Read repository contents and packages permissions";
+   "Allow GitHub Actions to create and approve pull requests" stays off.
 
 ## Later (out of scope this time; direction only)
 
@@ -61,3 +112,5 @@ Publish to npm so users can run `npm i -g prompt-profile` or `npx prompt-profile
 
 - [ ] In a clean environment (e.g. a new Docker container + a logged-in claude), `npx prompt-profile` runs from start to finish
 - [ ] The npm package page shows provenance
+- [ ] A pushed `vX.Y.Z` tag whose version differs from `package.json` fails before anything is published
+- [ ] Pushes to `main` no longer run a release job
