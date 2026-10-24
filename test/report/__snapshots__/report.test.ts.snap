@@ -220,6 +220,42 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .heat-h{font-size:9px}
 .stack{height:140px;gap:2px}
 }
+
+.g-2e{grid-template-columns:1fr 1fr}
+.tech-callout{display:inline-block;margin:0 0 12px;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:600}
+.tech-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tech-badge{position:relative;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;outline:none}
+.tech-badge:hover,.tech-badge:focus{border-color:var(--accent)}
+.tech-badge b{font-size:22px;letter-spacing:-.02em;line-height:1.1}
+.tb-name{font-size:13px;font-weight:600}
+.tb-sub,.tb-since{font-size:11.5px;color:var(--muted)}
+.spark{width:100%;height:28px;margin-top:4px}
+.spark polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.tech-bars{list-style:none;margin:0;padding:0}
+.tech-bars li{position:relative;display:grid;grid-template-columns:minmax(0,11em) 1fr 7.5em;align-items:center;gap:10px;font-size:13px;padding:5px 0;outline:none}
+.tech-bars li b{text-align:right;font-size:12px}
+.tbr-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tech-time{display:grid;grid-template-columns:minmax(9em,13em) repeat(var(--months),minmax(0,1fr));gap:3px;align-items:center}
+.tt-m{font-size:11px;color:var(--muted);text-align:center}
+.tt-name{position:relative;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;outline:none}
+.tt-c{position:relative;height:22px;border-radius:4px;background:var(--empty);outline:none}
+.tt-c.first::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--fg)}
+.tt-c:hover,.tt-c:focus{box-shadow:0 0 0 2px var(--fg)}
+:is(.tt-c).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
+:is(.tt-c).l2{background:color-mix(in srgb,var(--accent) 52%,var(--empty))}
+:is(.tt-c).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}
+:is(.tt-c).l4{background:var(--accent)}
+.tech-more{margin-top:10px}.tech-more summary{font-size:13px;color:var(--accent)}.tech-more .tech-badges{margin-top:10px}
+.tech-unit{font-size:11px;color:var(--muted);text-align:right;margin:-4px 0 4px}
+.tech-bars li{grid-template-columns:minmax(0,12em) 1fr 3.2em}
+.tech-hl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.hl{position:relative;display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:18px;background:var(--card);border:1px solid var(--border);outline:none}
+.hl>b{font-size:40px;letter-spacing:-.03em;line-height:1;color:var(--accent)}
+.hl h3{font-size:16px}.hl p{font-size:12.5px;color:var(--muted);margin-top:2px}
+.tech-chips{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.tech-chips li{position:relative;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:13px;outline:none}
+.tech-chips b{color:var(--accent);margin-left:4px}
+@media (max-width:760px){.tech-hl{grid-template-columns:1fr}.g-2e{grid-template-columns:1fr}.tech-time{grid-template-columns:minmax(7em,9em) repeat(var(--months),minmax(0,1fr))}.tt-name{font-size:12px}}
 :root{color-scheme:light dark;--bg:#f6f6f3;--fg:#1d1d1f;--muted:#6b6b70;--card:#ffffff;--border:#e6e6e1;--accent:#5b5bd6;--accent-soft:#ececfb;--warn:#9a5800;--empty:#ececea}
 @media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececee;--muted:#9a9aa2;--card:#1c1c20;--border:#2c2c33;--accent:#9d9dff;--accent-soft:#25254a;--warn:#f0b35a;--empty:#26262c}}
 .hero{--id-bg:var(--card);--id-fg:var(--fg);--id-muted:var(--muted);--id-split:transparent}.page [data-l]{display:none}
@@ -377,6 +413,142 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             </div>
             
           </section>
+
+          <section class="techniques">
+                  <div class="section-head">
+                    <h2><span data-l="en" lang="en">How I work with AI</span><span data-l="zh-TW" lang="zh-Hant-TW">我怎麼用 AI</span></h2>
+                    <p class="note"><span data-l="en" lang="en">Measured from tool metadata and prompt text; hover for definitions</span><span data-l="zh-TW" lang="zh-Hant-TW">從工具中繼資料與 prompt 文字量出來；滑過看定義</span></p>
+                  </div>
+                  <p class="tech-callout"><span data-l="en" lang="en">Up to 4 sessions at once · parallel on 31 days</span><span data-l="zh-TW" lang="zh-Hant-TW">最多同時 4 個 session · 31 天平行作業</span></p>
+    <div class="grid g-2e">
+      <article class="panel">
+        <h3><span data-l="en" lang="en">Workflow</span><span data-l="zh-TW" lang="zh-Hant-TW">工作流程</span></h3>
+        <p class="tech-unit"><span data-l="en" lang="en">share of sessions</span><span data-l="zh-TW" lang="zh-Hant-TW">佔 session 的比例</span></p><ul class="tech-bars">
+    <li class="tip tip-l" data-tip-en="Pull requests linked from sessions" data-tip-zh-TW="session 中連結的 pull request" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Ships pull requests</span><span data-l="zh-TW" lang="zh-Hant-TW">發 pull request</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:100.0%"></span
+          ></span>
+          <b>15%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions where the agent started subagents (Agent / Task tools)" data-tip-zh-TW="agent 啟動子代理（Agent / Task 工具）的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:97.9%"></span
+          ></span>
+          <b>15%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions with web search or web fetch" data-tip-zh-TW="有網路搜尋或抓取網頁的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Researches the web</span><span data-l="zh-TW" lang="zh-Hant-TW">上網查資料</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:45.8%"></span
+          ></span>
+          <b>7%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions that called a tool from an MCP server" data-tip-zh-TW="呼叫了 MCP server 工具的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Connects MCP tools</span><span data-l="zh-TW" lang="zh-Hant-TW">串接 MCP 工具</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:41.7%"></span
+          ></span>
+          <b>6%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions that invoked a Claude Code skill" data-tip-zh-TW="呼叫了 Claude Code skill 的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Uses skills</span><span data-l="zh-TW" lang="zh-Hant-TW">使用 skills</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:37.5%"></span
+          ></span>
+          <b>6%</b>
+        </li><li class="tip tip-l" data-tip-en="Prompts sent in plan mode, or plan mode entered by the agent" data-tip-zh-TW="在 plan 模式下送出的 prompt，或 agent 進入 plan 模式" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Plans in plan mode</span><span data-l="zh-TW" lang="zh-Hant-TW">用 plan 模式規劃</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:29.2%"></span
+          ></span>
+          <b>4%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions where the agent asked a structured question" data-tip-zh-TW="agent 提出結構化問題的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Lets the agent ask</span><span data-l="zh-TW" lang="zh-Hant-TW">讓 agent 反問</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:29.2%"></span
+          ></span>
+          <b>4%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions with monitors, scheduled wake-ups or cron tasks" data-tip-zh-TW="有監控、排程喚醒或 cron 任務的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Runs background work</span><span data-l="zh-TW" lang="zh-Hant-TW">跑背景任務</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:27.1%"></span
+          ></span>
+          <b>4%</b>
+        </li><li class="tip tip-l" data-tip-en="Sessions that used a git worktree" data-tip-zh-TW="使用 git worktree 的 session" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Isolates work in worktrees</span><span data-l="zh-TW" lang="zh-Hant-TW">用 worktree 隔離工作</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:18.8%"></span
+          ></span>
+          <b>3%</b>
+        </li>
+  </ul>
+      </article>
+      <article class="panel">
+        <h3><span data-l="en" lang="en">Prompt craft</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 寫法</span></h3>
+        <p class="tech-unit"><span data-l="en" lang="en">share of prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">佔 prompt 的比例</span></p><ul class="tech-bars">
+    <li class="tip tip-l" data-tip-en="Says what not to do or what must stay" data-tip-zh-TW="說明不要做什麼、什麼要保留" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">States constraints</span><span data-l="zh-TW" lang="zh-Hant-TW">說明限制</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:100.0%"></span
+          ></span>
+          <b>36%</b>
+        </li><li class="tip tip-l" data-tip-en="Includes an error, a failure or pasted code" data-tip-zh-TW="附上錯誤、失敗訊息或貼上程式碼" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Gives error context</span><span data-l="zh-TW" lang="zh-Hant-TW">附上錯誤脈絡</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:86.1%"></span
+          ></span>
+          <b>31%</b>
+        </li><li class="tip tip-l" data-tip-en="Mentions a file or path" data-tip-zh-TW="提到檔案或路徑" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Names files</span><span data-l="zh-TW" lang="zh-Hant-TW">指出檔案</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:75.0%"></span
+          ></span>
+          <b>27%</b>
+        </li><li class="tip tip-l" data-tip-en="Asks for tests or a check" data-tip-zh-TW="要求寫測試或檢查" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Asks for verification</span><span data-l="zh-TW" lang="zh-Hant-TW">要求驗證</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:66.7%"></span
+          ></span>
+          <b>24%</b>
+        </li><li class="tip tip-l" data-tip-en="Asks for a plan, steps or an outline" data-tip-zh-TW="要求計畫、步驟或大綱" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Plans first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:61.1%"></span
+          ></span>
+          <b>22%</b>
+        </li><li class="tip tip-l" data-tip-en="Asks for an explanation" data-tip-zh-TW="要求解釋" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Asks why</span><span data-l="zh-TW" lang="zh-Hant-TW">問為什麼</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:50.0%"></span
+          ></span>
+          <b>18%</b>
+        </li><li class="tip tip-l" data-tip-en="Uses a numbered or bulleted list" data-tip-zh-TW="使用編號或條列" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Structures requests</span><span data-l="zh-TW" lang="zh-Hant-TW">條列需求</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:38.9%"></span
+          ></span>
+          <b>14%</b>
+        </li><li class="tip tip-l" data-tip-en="States the expected result" data-tip-zh-TW="寫出預期結果" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Defines done</span><span data-l="zh-TW" lang="zh-Hant-TW">定義完成</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:33.3%"></span
+          ></span>
+          <b>12%</b>
+        </li><li class="tip tip-l" data-tip-en="Shows an example of what is wanted" data-tip-zh-TW="提供想要的範例" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Gives examples</span><span data-l="zh-TW" lang="zh-Hant-TW">給範例</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:25.0%"></span
+          ></span>
+          <b>9%</b>
+        </li><li class="tip tip-l" data-tip-en="Asks for a table, JSON, Markdown or another format" data-tip-zh-TW="要求表格、JSON、Markdown 等格式" tabindex="-1">
+          <span class="tbr-name"><span data-l="en" lang="en">Specifies the format</span><span data-l="zh-TW" lang="zh-Hant-TW">指定格式</span></span>
+          <span class="share-track"
+            ><span class="share-fill" style="width:19.4%"></span
+          ></span>
+          <b>7%</b>
+        </li>
+  </ul>
+      </article>
+    </div>
+                </section>
 
           <section class="coaching">
                   <div class="section-head">

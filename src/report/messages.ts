@@ -1,4 +1,5 @@
 import type { Confidence, DimensionKey, Language } from "../domain/Profile.ts"
+import type { PromptTechnique, ToolTechnique } from "../domain/Techniques.ts"
 
 export interface Messages {
   /** Name of the language in its own script, for the switch. */
@@ -95,6 +96,21 @@ export interface Messages {
   readonly after: string
   readonly suggested: string
   readonly signalsTitle: string
+  readonly techniques: string
+  readonly techniquesNote: string
+  readonly workflow: string
+  readonly promptCraft: string
+  readonly ofSessions: (pct: number) => string
+  readonly ofPrompts: (pct: number) => string
+  readonly sessionsUsed: (n: number) => string
+  readonly parallel: (max: number, days: number) => string
+  readonly since: (month: string) => string
+  readonly moreCount: (n: number) => string
+  readonly unitSessions: string
+  readonly unitPrompts: string
+  readonly growing: string
+  readonly toolNames: Record<ToolTechnique, readonly [name: string, definition: string]>
+  readonly promptNames: Record<PromptTechnique, readonly [name: string, definition: string]>
   readonly signal: {
     readonly corrections: (rate: number) => readonly [string, string]
     readonly terse: (share: number) => readonly [string, string]
@@ -215,6 +231,51 @@ const en: Messages = {
   after: "Try",
   suggested: "Suggested rewrite",
   signalsTitle: "Signals worth a look",
+  techniques: "How I work with AI",
+  techniquesNote: "Measured from tool metadata and prompt text; hover for definitions",
+  workflow: "Workflow",
+  promptCraft: "Prompt craft",
+  ofSessions: (p) => `${p}% of sessions`,
+  ofPrompts: (p) => `${p}% of prompts`,
+  sessionsUsed: (n) => plural(n, "session", "sessions"),
+  parallel: (m, d) => `Up to ${m} sessions at once · parallel on ${plural(d, "day", "days")}`,
+  since: (m) => `since ${m}`,
+  moreCount: (n) => `${n} more`,
+  unitSessions: "share of sessions",
+  unitPrompts: "share of prompts",
+  growing: "growing fastest",
+  toolNames: {
+    subagents: [
+      "Delegates to subagents",
+      "Sessions where the agent started subagents (Agent / Task tools)",
+    ],
+    skills: ["Uses skills", "Sessions that invoked a Claude Code skill"],
+    planMode: [
+      "Plans in plan mode",
+      "Prompts sent in plan mode, or plan mode entered by the agent",
+    ],
+    mcp: ["Connects MCP tools", "Sessions that called a tool from an MCP server"],
+    web: ["Researches the web", "Sessions with web search or web fetch"],
+    background: [
+      "Runs background work",
+      "Sessions with monitors, scheduled wake-ups or cron tasks",
+    ],
+    askUser: ["Lets the agent ask", "Sessions where the agent asked a structured question"],
+    worktrees: ["Isolates work in worktrees", "Sessions that used a git worktree"],
+    pullRequests: ["Ships pull requests", "Pull requests linked from sessions"],
+  },
+  promptNames: {
+    planFirst: ["Plans first", "Asks for a plan, steps or an outline"],
+    context: ["Gives error context", "Includes an error, a failure or pasted code"],
+    filePaths: ["Names files", "Mentions a file or path"],
+    constraints: ["States constraints", "Says what not to do or what must stay"],
+    acceptance: ["Defines done", "States the expected result"],
+    examples: ["Gives examples", "Shows an example of what is wanted"],
+    verification: ["Asks for verification", "Asks for tests or a check"],
+    structured: ["Structures requests", "Uses a numbered or bulleted list"],
+    whyExplain: ["Asks why", "Asks for an explanation"],
+    outputFormat: ["Specifies the format", "Asks for a table, JSON, Markdown or another format"],
+  },
   signal: {
     corrections: (r) => [
       `1 in ${Math.round(1 / r)} prompts corrects the AI`,
@@ -337,6 +398,42 @@ const zhTW: Messages = {
   after: "可以試試",
   suggested: "建議的寫法",
   signalsTitle: "值得注意的訊號",
+  techniques: "我怎麼用 AI",
+  techniquesNote: "從工具中繼資料與 prompt 文字量出來；滑過看定義",
+  workflow: "工作流程",
+  promptCraft: "prompt 寫法",
+  ofSessions: (p) => `${p}% 的 session`,
+  ofPrompts: (p) => `${p}% 的 prompt`,
+  sessionsUsed: (n) => `${n.toLocaleString("zh-TW")} 個 session`,
+  parallel: (m, d) => `最多同時 ${m} 個 session · ${d} 天平行作業`,
+  since: (m) => `從 ${m} 開始`,
+  moreCount: (n) => `另外 ${n} 項`,
+  unitSessions: "佔 session 的比例",
+  unitPrompts: "佔 prompt 的比例",
+  growing: "成長最快",
+  toolNames: {
+    subagents: ["委派子代理", "agent 啟動子代理（Agent / Task 工具）的 session"],
+    skills: ["使用 skills", "呼叫了 Claude Code skill 的 session"],
+    planMode: ["用 plan 模式規劃", "在 plan 模式下送出的 prompt，或 agent 進入 plan 模式"],
+    mcp: ["串接 MCP 工具", "呼叫了 MCP server 工具的 session"],
+    web: ["上網查資料", "有網路搜尋或抓取網頁的 session"],
+    background: ["跑背景任務", "有監控、排程喚醒或 cron 任務的 session"],
+    askUser: ["讓 agent 反問", "agent 提出結構化問題的 session"],
+    worktrees: ["用 worktree 隔離工作", "使用 git worktree 的 session"],
+    pullRequests: ["發 pull request", "session 中連結的 pull request"],
+  },
+  promptNames: {
+    planFirst: ["先規劃", "要求計畫、步驟或大綱"],
+    context: ["附上錯誤脈絡", "附上錯誤、失敗訊息或貼上程式碼"],
+    filePaths: ["指出檔案", "提到檔案或路徑"],
+    constraints: ["說明限制", "說明不要做什麼、什麼要保留"],
+    acceptance: ["定義完成", "寫出預期結果"],
+    examples: ["給範例", "提供想要的範例"],
+    verification: ["要求驗證", "要求寫測試或檢查"],
+    structured: ["條列需求", "使用編號或條列"],
+    whyExplain: ["問為什麼", "要求解釋"],
+    outputFormat: ["指定格式", "要求表格、JSON、Markdown 等格式"],
+  },
   signal: {
     corrections: (r) => [
       `每 ${Math.round(1 / r)} 則 prompt 就有一次糾正 AI`,

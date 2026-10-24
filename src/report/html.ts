@@ -26,6 +26,7 @@ import {
 } from "./looks.ts"
 import { MESSAGES, type Messages } from "./messages.ts"
 import { triggeredSignals } from "./signals.ts"
+import { techniquesSection, techniqueStyle } from "./techniques.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -572,6 +573,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
   const minor = order.slice(3)
   const every = correctionEvery(s)
   const signals = isPrivate ? signalRow(profile, loc) : null
+  const tech = techniquesSection(s, loc, options.techniques ?? "bars")
   const perSession = promptsPerSession(s)
   const graphic = look
     ? graphicSvg(identity.graphic, s.hourHistogram, {
@@ -592,7 +594,7 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(lookStyle(look))}${raw(
+          ${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(lookStyle(look))}${raw(
             languageStyle(loc.langs),
           )}
         </style>
@@ -710,6 +712,18 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
                 : ""
             }
           </section>
+
+          ${
+            tech
+              ? html`<section class="techniques">
+                  <div class="section-head">
+                    <h2>${loc.text((m) => m.techniques)}</h2>
+                    <p class="note">${loc.text((m) => m.techniquesNote)}</p>
+                  </div>
+                  ${tech}
+                </section>`
+              : ""
+          }
 
           ${
             isPrivate && (profile.improvements.length > 0 || signals !== null)

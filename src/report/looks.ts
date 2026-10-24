@@ -1,3 +1,4 @@
+import type { TechniqueView } from "./techniques.ts"
 /**
  * Render-only choices: a look (report + card design) and the card parts to hide. They never
  * change the profile, the analysis or its cache; see plans/12-looks-and-share-card.md.
@@ -13,6 +14,8 @@ export type CardPart = (typeof CARD_PARTS)[number]
 export interface RenderOptions {
   readonly look: LookId
   readonly cardHide: ReadonlyArray<CardPart>
+  /** Layout of "How I work with AI" (plan 17 review); not a CLI flag. Default `bars`. */
+  readonly techniques?: TechniqueView
 }
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = { look: "classic", cardHide: [] }
