@@ -9,6 +9,10 @@ export interface Messages {
   readonly title: string
   readonly switchLabel: string
   readonly period: (from: string, to: string) => string
+  readonly dataPeriod: string
+  readonly generated: string
+  readonly analyzed: string
+  readonly months: (n: number) => string
   readonly coverage: (prompts: number, sessions: number) => string
   readonly sampled: (analyzed: number, total: number) => string
   readonly totalPrompts: string
@@ -150,6 +154,10 @@ const en: Messages = {
   title: "My AI collaboration profile",
   switchLabel: "Language",
   period: (from, to) => `${from} – ${to}`,
+  dataPeriod: "Data period",
+  generated: "Generated",
+  analyzed: "Analyzed",
+  months: (n) => plural(n, "month", "months"),
   coverage: (p, s) => `${p.toLocaleString("en")} prompts · ${s.toLocaleString("en")} sessions`,
   sampled: (a, t) => `${a} of ${t} weeks sampled`,
   totalPrompts: "Prompts",
@@ -356,6 +364,10 @@ const zhTW: Messages = {
   title: "我的 AI 協作側寫",
   switchLabel: "語言",
   period: (from, to) => `${from} – ${to}`,
+  dataPeriod: "資料區間",
+  generated: "產生時間",
+  analyzed: "分析內容",
+  months: (n) => `${n} 個月`,
   coverage: (p, s) =>
     `${p.toLocaleString("zh-TW")} 則 prompt · ${s.toLocaleString("zh-TW")} 個 session`,
   sampled: (a, t) => `抽樣分析 ${a} / ${t} 週`,

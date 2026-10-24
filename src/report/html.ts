@@ -39,6 +39,23 @@ const formatDate = (t: DateTime.Utc, timeZone: string, locale: string): string =
     day: "numeric",
   }).format(DateTime.toEpochMillis(t))
 
+const formatMonth = (t: DateTime.Utc, timeZone: string, locale: string): string =>
+  new Intl.DateTimeFormat(locale, { timeZone, year: "numeric", month: "short" }).format(
+    DateTime.toEpochMillis(t),
+  )
+
+/** Calendar days from `from` to `to` in `timeZone`, both included. */
+const daysBetween = (from: DateTime.Utc, to: DateTime.Utc, timeZone: string): number => {
+  const day = (t: DateTime.Utc) => {
+    const [y, m, d] = new Intl.DateTimeFormat("en-CA", { timeZone })
+      .format(DateTime.toEpochMillis(t))
+      .split("-")
+      .map(Number) as [number, number, number]
+    return Date.UTC(y, m - 1, d) / 86_400_000
+  }
+  return day(to) - day(from) + 1
+}
+
 const formatDateTime = (t: DateTime.Utc, timeZone: string, locale: string): string =>
   new Intl.DateTimeFormat(locale, {
     timeZone,
@@ -446,7 +463,7 @@ p{margin:0}
 .hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
-.hero .meta{margin-top:16px;font-size:12.5px;color:var(--id-muted)}
+.hero .facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
 .hero:has(.hero-clock){min-height:270px}
 .hero-clock{position:absolute;right:32px;top:50%;transform:translateY(-50%);width:min(28%,210px)}
 .hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
@@ -716,27 +733,48 @@ const renderPage = (profile: Profile, options: RenderOptions, audience: Audience
               <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
               <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
               ${look ? html`<p class="chrono">${windowText}</p>` : ""}
-              ${
-                isPrivate
-                  ? html`<p class="meta">
-                      ${loc.text((m) =>
-                        [
-                          period
-                            ? m.period(
-                                formatDate(period.from, tz, m.locale),
-                                formatDate(period.to, tz, m.locale),
-                              )
-                            : null,
-                          m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
-                          c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
-                          c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
-                        ]
-                          .filter((x) => x !== null)
-                          .join(" · "),
-                      )}
-                    </p>`
-                  : ""
-              }
+              <dl class="facts">
+                <div>
+                  <dt>${loc.text((m) => m.dataPeriod)}</dt>
+                  <dd>
+                    ${loc.text((m) => {
+                      if (period === null) return m.none
+                      const days = daysBetween(period.from, period.to, tz)
+                      return isPrivate
+                        ? `${m.period(formatDate(period.from, tz, m.locale), formatDate(period.to, tz, m.locale))} · ${m.days(days)}`
+                        : `${m.period(formatMonth(period.from, tz, m.locale), formatMonth(period.to, tz, m.locale))} · ${days < 45 ? m.days(days) : m.months(Math.round(days / 30.44))}`
+                    })}
+                  </dd>
+                </div>
+                <div>
+                  <dt>${loc.text((m) => m.generated)}</dt>
+                  <dd>
+                    ${loc.text((m) =>
+                      isPrivate
+                        ? formatDateTime(profile.generatedAt, tz, m.locale)
+                        : formatDate(profile.generatedAt, tz, m.locale),
+                    )}
+                  </dd>
+                </div>
+                ${
+                  isPrivate
+                    ? html`<div>
+                        <dt>${loc.text((m) => m.analyzed)}</dt>
+                        <dd>
+                          ${loc.text((m) =>
+                            [
+                              m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
+                              c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
+                              c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
+                            ]
+                              .filter((x) => x !== null)
+                              .join(" · "),
+                          )}
+                        </dd>
+                      </div>`
+                    : ""
+                }
+              </dl>
             </div>
             ${
               graphic

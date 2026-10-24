@@ -55,6 +55,24 @@ describe("share page", () => {
     }),
   )
 
+  it.effect("states the data period by month and when the profile was generated", () =>
+    Effect.gen(function* () {
+      const out = renderShareHtml(yield* sample())
+      const facts = /<dl class="facts">([\s\S]*?)<\/dl>/.exec(out)?.[1] ?? ""
+      for (const part of [
+        "Data period",
+        "Apr 2026 – Oct 2026",
+        "6 months",
+        "Generated",
+        "Oct 24, 2026",
+        "2026年4月 – 2026年10月",
+        "6 個月",
+      ])
+        expect({ part, found: facts.includes(part) }).toEqual({ part, found: true })
+      expect(facts).not.toContain("Apr 25")
+    }),
+  )
+
   it.effect("writeReport writes share.html privately next to the report", () =>
     Effect.gen(function* () {
       const dir = join(mkdtempSync(join(tmpdir(), "pp-share-")), "out")

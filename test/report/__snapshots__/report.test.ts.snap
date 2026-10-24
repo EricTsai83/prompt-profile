@@ -32,7 +32,7 @@ p{margin:0}
 .hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
-.hero .meta{margin-top:16px;font-size:12.5px;color:var(--id-muted)}
+.hero .facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
 .hero:has(.hero-clock){min-height:270px}
 .hero-clock{position:absolute;right:32px;top:50%;transform:translateY(-50%);width:min(28%,210px)}
 .hero .chrono{margin-top:14px;font-size:13px;font-weight:600;color:var(--id-fg)}
@@ -298,9 +298,26 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
               <p class="tagline"><span data-l="en" lang="en">A perfectionist who argues with AI about naming at midnight</span><span data-l="zh-TW" lang="zh-Hant-TW">半夜跟 AI 爭論命名的完美主義者</span></p>
               <p class="desc"><span data-l="en" lang="en">Ships features by day, refactors by night.</span><span data-l="zh-TW" lang="zh-Hant-TW">白天出貨，晚上重構。</span></p>
               
-              <p class="meta">
-                      <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
-                    </p>
+              <dl class="facts">
+                <div>
+                  <dt><span data-l="en" lang="en">Data period</span><span data-l="zh-TW" lang="zh-Hant-TW">資料區間</span></dt>
+                  <dd>
+                    <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 182 days</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 182 天</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt><span data-l="en" lang="en">Generated</span><span data-l="zh-TW" lang="zh-Hant-TW">產生時間</span></dt>
+                  <dd>
+                    <span data-l="en" lang="en">Oct 24, 2026, 10:00 AM</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年10月24日 上午10:00</span>
+                  </dd>
+                </div>
+                <div>
+                        <dt><span data-l="en" lang="en">Analyzed</span><span data-l="zh-TW" lang="zh-Hant-TW">分析內容</span></dt>
+                        <dd>
+                          <span data-l="en" lang="en">1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
+                        </dd>
+                      </div>
+              </dl>
             </div>
             <div class="hero-clock"><figure class="clock">
     <svg viewBox="0 0 260 260" aria-hidden="true">

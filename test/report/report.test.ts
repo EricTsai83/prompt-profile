@@ -50,6 +50,25 @@ describe("renderHtml", () => {
     }),
   )
 
+  it.effect("states the data period, its length and when the report was generated", () =>
+    Effect.gen(function* () {
+      const out = renderHtml(yield* sample())
+      const facts = /<dl class="facts">([\s\S]*?)<\/dl>/.exec(out)?.[1] ?? ""
+      for (const part of [
+        "Data period",
+        "Apr 25, 2026 – Oct 23, 2026",
+        "182 days",
+        "Generated",
+        "Oct 24, 2026",
+        "資料區間",
+        "2026年4月25日 – 2026年10月23日",
+        "182 天",
+        "產生時間",
+      ])
+        expect({ part, found: facts.includes(part) }).toEqual({ part, found: true })
+    }),
+  )
+
   it.effect("flags dimensions without evidence and shows coverage", () =>
     Effect.gen(function* () {
       const out = renderHtml(yield* sample())
