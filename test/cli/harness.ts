@@ -58,6 +58,16 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       { name: "Direct", description: "d", confidence: "high", evidence: evidence.slice(0, 2) },
     ],
     funFacts: ["fact"],
+    improvements: [
+      {
+        title: "Name the file",
+        pattern: "p",
+        impact: "i",
+        suggestion: "s",
+        evidence: evidence.slice(0, 1),
+        rewrite: { promptId: evidence[0]?.promptId ?? "", after: "In src/app.ts, rename x." },
+      },
+    ],
   }
 }
 

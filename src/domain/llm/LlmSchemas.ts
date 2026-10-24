@@ -4,6 +4,7 @@ import {
   CONFIDENCES,
   DIMENSION_KEYS,
   MAX_QUOTE_LENGTH,
+  OBSERVATION_KEYS,
   type Coverage,
   type Engine,
   type Evidence,
@@ -28,7 +29,7 @@ const LlmEvidence = Schema.Struct({
 export const LlmChunkObservations = Schema.Struct({
   observations: Schema.Array(
     Schema.Struct({
-      dimension: Schema.Literals(DIMENSION_KEYS),
+      dimension: Schema.Literals(OBSERVATION_KEYS),
       claim: Schema.String,
       evidence: Schema.Array(LlmEvidence),
     }),
@@ -56,6 +57,17 @@ export const LlmProfileDraft = Schema.Struct({
     }),
   ),
   funFacts: Schema.Array(Schema.String),
+  improvements: Schema.Array(
+    Schema.Struct({
+      title: Schema.String,
+      pattern: Schema.String,
+      impact: Schema.String,
+      suggestion: Schema.String,
+      evidence: Schema.Array(LlmEvidence),
+      /** `promptId` of one evidence prompt and the suggested prompt; empty strings for none. */
+      rewrite: Schema.Struct({ promptId: Schema.String, after: Schema.String }),
+    }),
+  ),
 })
 export type LlmProfileDraft = typeof LlmProfileDraft.Type
 
@@ -119,5 +131,13 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     support: null,
   })),
   funFacts: draft.funFacts,
+  improvements: draft.improvements.map((i) => ({
+    title: i.title,
+    pattern: i.pattern,
+    impact: i.impact,
+    suggestion: i.suggestion,
+    evidence: i.evidence.map(toEvidence),
+    rewrite: i.rewrite.promptId === "" || i.rewrite.after.trim() === "" ? null : i.rewrite,
+  })),
   stats: extras.stats,
 })

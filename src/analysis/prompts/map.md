@@ -24,7 +24,7 @@ Do not guess what they replaced. A `~` path means the user's home directory.
 
 ## What to observe
 
-Write observations for these five dimensions (key in parentheses):
+Write observations for these five dimensions (key in parentheses), plus `prompting` below:
 
 1. Work style (`work_style`): planning vs. diving in, task size, iteration, pace, time of day,
    how they verify, how much they delegate.
@@ -35,6 +35,13 @@ Write observations for these five dimensions (key in parentheses):
    security, learning…).
 5. Growth (`growth`): what they are learning or struggling with; changes over time inside
    this batch.
+
+Also record how the prompts themselves could work better (key `prompting`), only when the
+prompts show it: missing context (no file, error message or expected result), vague asks,
+several unrelated tasks in one prompt, constraints given only after a wrong answer, repeated
+corrections of the same kind, or the same boilerplate typed again and again. Cite the prompt
+that shows the gap, and a follow-up that reveals it when there is one (e.g. a correction that
+adds a requirement the first prompt could have stated). Describe the habit, not the person.
 
 ## Rules
 

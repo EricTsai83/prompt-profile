@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "languages": [
     "en",
     "zh-TW"
@@ -137,6 +137,37 @@
     "Latest prompt: 03:12 AM.",
     "Longest streak: 23 days in a row."
   ],
+  "improvements": [
+    {
+      "title": "State the expected result first",
+      "pattern": "You often describe the change and add the real requirement only after the first answer.",
+      "impact": "Several follow-ups in this sample start with a correction such as “no, keep the old API”.",
+      "suggestion": "Put the expected result and the constraints in the first prompt.",
+      "evidence": [
+        {
+          "promptId": "claude-code:s1:u1",
+          "quote": "don't write code yet, break the plan into small steps"
+        }
+      ],
+      "rewrite": {
+        "promptId": "claude-code:s1:u1",
+        "after": "Plan only, no code yet: break the change into small steps, list the risks of each, and keep the public API unchanged."
+      }
+    },
+    {
+      "title": "Name the file and the error",
+      "pattern": "Debugging prompts rarely say which file or which error message.",
+      "impact": "The AI has to ask or guess before it can help.",
+      "suggestion": "Paste the error line and name the file and function in the same prompt.",
+      "evidence": [
+        {
+          "promptId": "codex:s2:3",
+          "quote": "<script>alert('x')</script> 這段為什麼會被執行？"
+        }
+      ],
+      "rewrite": null
+    }
+  ],
   "translations": {
     "zh-TW": {
       "headline": "半夜跟 AI 爭論命名的完美主義者",
@@ -188,6 +219,20 @@
       "funFacts": [
         "最晚的 prompt：凌晨 03:12。",
         "最長連續天數：23 天。"
+      ],
+      "improvements": [
+        {
+          "title": "先講預期結果",
+          "pattern": "你常先描述要改什麼，等第一次回答後才補上真正的要求。",
+          "impact": "這份樣本裡有幾個追問是以糾正開頭，例如「不對，保留舊的 API」。",
+          "suggestion": "在第一個 prompt 就寫出預期結果和限制。"
+        },
+        {
+          "title": "指出檔案和錯誤訊息",
+          "pattern": "除錯的 prompt 很少說是哪個檔案、哪個錯誤。",
+          "impact": "AI 必須先問或先猜，才能幫上忙。",
+          "suggestion": "同一個 prompt 裡貼上錯誤那一行，並寫出檔案和函式名稱。"
+        }
       ]
     }
   },
@@ -2913,6 +2958,14 @@
           ]
         ]
       ]
+    },
+    "promptHabits": {
+      "terseShare": 0.31,
+      "longSessionShare": 0.08,
+      "reusedOpenings": {
+        "openings": 2,
+        "sessions": 14
+      }
     }
   }
 }

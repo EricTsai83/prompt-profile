@@ -1,8 +1,9 @@
 import { Schema } from "effect"
-import { DimensionKey, Evidence } from "./Profile.ts"
+import { Evidence, ObservationKey } from "./Profile.ts"
 
 export const Observation = Schema.Struct({
-  dimension: DimensionKey,
+  /** One of the five dimensions, or `prompting` (how the prompts could be better). */
+  dimension: ObservationKey,
   claim: Schema.String,
   evidence: Schema.Array(Evidence),
 })

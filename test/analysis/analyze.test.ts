@@ -73,6 +73,24 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       },
     ],
     funFacts: ["longest streak: 3 days"],
+    improvements: [
+      {
+        title: "Say the goal first",
+        pattern: "p",
+        impact: "i",
+        suggestion: "s",
+        evidence: evidence.slice(0, 1),
+        rewrite: { promptId: evidence[0]?.promptId ?? "", after: "Do X, then Y." },
+      },
+      {
+        title: "invented",
+        pattern: "p",
+        impact: "i",
+        suggestion: "s",
+        evidence: [{ promptId: "x", quote: "y" }],
+        rewrite: { promptId: "", after: "" },
+      },
+    ],
   }
 }
 
@@ -151,12 +169,16 @@ describe("analyze", () => {
         chunksFailed: 0,
         chunksFromCache: 0,
         sampled: false,
-        evidenceDropped: 1,
+        // the made-up trait quote and the made-up improvement quote
+        evidenceDropped: 2,
       })
+      expect(profile.improvements.map((i) => [i.title, i.rewrite !== null])).toEqual([
+        ["Say the goal first", true],
+      ])
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "8",
+        analysisVersion: "9",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

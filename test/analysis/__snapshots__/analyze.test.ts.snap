@@ -11,8 +11,8 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "chunksFailed": 0,
     "chunksFromCache": 0,
     "chunksTotal": 12,
-    "evidenceDropped": 1,
-    "evidenceKept": 6,
+    "evidenceDropped": 2,
+    "evidenceKept": 7,
     "promptsAnalyzed": 80,
     "sampled": false,
     "sessionsAnalyzed": 80,
@@ -59,7 +59,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "8",
+    "analysisVersion": "9",
     "model": "fake-model",
     "runner": "claude-code",
   },
@@ -68,10 +68,28 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   ],
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "headline": "A steady developer",
+  "improvements": [
+    {
+      "evidence": [
+        {
+          "promptId": "claude-code:d0s0:0",
+          "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
+        },
+      ],
+      "impact": "i",
+      "pattern": "p",
+      "rewrite": {
+        "after": "Do X, then Y.",
+        "promptId": "claude-code:d0s0:0",
+      },
+      "suggestion": "s",
+      "title": "Say the goal first",
+    },
+  ],
   "languages": [
     "en",
   ],
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "stats": {
     "activeDays": 0,
     "activity": {
@@ -829,6 +847,14 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
     "latestTime": null,
     "longestStreakDays": 0,
+    "promptHabits": {
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0,
+      },
+      "terseShare": 0,
+    },
     "promptLength": {
       "median": 0,
       "p90": 0,

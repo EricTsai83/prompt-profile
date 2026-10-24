@@ -18,6 +18,18 @@ Keep it short: the report is read at a glance, and charts show the numbers.
 - `traits`: 3–6 of the most distinctive traits, each with a `name` of 1–4 words, a one-sentence
   `description`, `confidence` and at least 2 pieces of evidence.
 - `funFacts`: 3–5 fun facts, each at most 15 words.
+- `improvements`: 2–4 concrete ways this person's prompts could work better, built mainly from
+  the `prompting` observations (other observations may support them). Each has a `title` (2–6
+  words, an action such as "State the expected result first"), a one-sentence `pattern` (what
+  they do), a one-sentence `impact` (what it visibly costs in these prompts, such as the
+  follow-up corrections it caused — never guess at time lost), a 1–2 sentence `suggestion`,
+  `evidence` (at least 1 quote) and a `rewrite`: the `promptId` of one evidence prompt and
+  `after`, that prompt rewritten the way you suggest, in the prompt's original language, using
+  only what the prompts show (you may add what a later correction revealed). Use empty strings
+  for `rewrite` when no single prompt suits it. Order by how much it would help. Be specific
+  and constructive: no grades, no scores, no lecturing. If the prompts are already clear,
+  return fewer improvements rather than inventing problems. `stats.promptHabits` and
+  `correctionRate` may support an improvement; quote their numbers exactly.
 
 ## Rules
 

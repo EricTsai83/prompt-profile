@@ -18,6 +18,7 @@ exports[`LLM schemas > LlmChunkObservations produces a subset-compliant JSON Sch
               "tech_profile",
               "interests",
               "growth",
+              "prompting",
             ],
             "type": "string",
           },
@@ -137,6 +138,70 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     "headline": {
       "type": "string",
     },
+    "improvements": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "impact": {
+            "type": "string",
+          },
+          "pattern": {
+            "type": "string",
+          },
+          "rewrite": {
+            "additionalProperties": false,
+            "properties": {
+              "after": {
+                "type": "string",
+              },
+              "promptId": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "promptId",
+              "after",
+            ],
+            "type": "object",
+          },
+          "suggestion": {
+            "type": "string",
+          },
+          "title": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "title",
+          "pattern",
+          "impact",
+          "suggestion",
+          "evidence",
+          "rewrite",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "traits": {
       "items": {
         "additionalProperties": false,
@@ -192,6 +257,7 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     "dimensions",
     "traits",
     "funFacts",
+    "improvements",
   ],
   "type": "object",
 }
@@ -256,6 +322,33 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
     "headline": {
       "type": "string",
     },
+    "improvements": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "impact": {
+            "type": "string",
+          },
+          "pattern": {
+            "type": "string",
+          },
+          "suggestion": {
+            "type": "string",
+          },
+          "title": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "title",
+          "pattern",
+          "impact",
+          "suggestion",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "traits": {
       "items": {
         "additionalProperties": false,
@@ -282,6 +375,7 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
     "dimensions",
     "traits",
     "funFacts",
+    "improvements",
   ],
   "type": "object",
 }

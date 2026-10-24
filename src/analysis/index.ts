@@ -28,6 +28,7 @@ import { DEFAULT_CONCURRENCY, keyParts, selectChunks, type AnalyzeOptions } from
 import { loadPrompt } from "./prompts.ts"
 import {
   verifyDimensions,
+  verifyImprovements,
   verifyObservations,
   verifyTraits,
   type EvidenceCounts,
@@ -301,11 +302,13 @@ export const analyze = (input: {
       ),
     )
     const dimensions = verifyDimensions(profile.dimensions, texts, counts)
+    const improvements = verifyImprovements(profile.improvements, texts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)
     const verifiedProfile: Profile = {
       ...profile,
       traits,
       dimensions,
+      improvements,
       coverage: { ...profile.coverage, evidenceKept: counts.kept, evidenceDropped: counts.dropped },
     }
     // ---- translate (verified text only) ---------------------------------------------

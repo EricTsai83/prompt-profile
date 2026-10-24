@@ -37,6 +37,25 @@ export const MAX_ACTIVITY_PROJECTS = 6
 
 export const EMPTY_ACTIVITY: typeof Activity.Encoded = { projects: [], days: [], gridByProject: [] }
 
+/** Prompting habits that can point to an improvement (plan 16). */
+export const PromptHabits = Schema.Struct({
+  /** Share of cleaned prompts with fewer than ~4 words (a CJK character counts as 0.4). */
+  terseShare: Ratio,
+  /** Share of sessions with more than LONG_SESSION_PROMPTS prompts. */
+  longSessionShare: Ratio,
+  /** Openings (first-prompt prefixes) shared by ≥ 3 sessions, and how many sessions use them. */
+  reusedOpenings: Schema.Struct({ openings: Count, sessions: Count }),
+})
+export type PromptHabits = typeof PromptHabits.Type
+
+export const LONG_SESSION_PROMPTS = 40
+
+export const EMPTY_PROMPT_HABITS: typeof PromptHabits.Encoded = {
+  terseShare: 0,
+  longSessionShare: 0,
+  reusedOpenings: { openings: 0, sessions: 0 },
+}
+
 export const Stats = Schema.Struct({
   window: Schema.Struct({
     since: Schema.NullOr(Schema.DateTimeUtcFromString),
@@ -72,6 +91,10 @@ export const Stats = Schema.Struct({
   latestTime: Schema.NullOr(Schema.String),
   /** Missing in profiles before schema version 4. */
   activity: Activity.pipe(Schema.withDecodingDefaultKey(Effect.succeed(EMPTY_ACTIVITY))),
+  /** Missing in profiles before schema version 6. */
+  promptHabits: PromptHabits.pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(EMPTY_PROMPT_HABITS)),
+  ),
 })
 export type Stats = typeof Stats.Type
 

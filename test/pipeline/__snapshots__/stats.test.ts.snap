@@ -1161,6 +1161,14 @@ exports[`stats > computes stats from filtered and cleaned data 1`] = `
   },
   "latestTime": "02:12",
   "longestStreakDays": 3,
+  "promptHabits": {
+    "longSessionShare": 0,
+    "reusedOpenings": {
+      "openings": 0,
+      "sessions": 0,
+    },
+    "terseShare": 0,
+  },
   "promptLength": {
     "median": 25,
     "p90": 33,

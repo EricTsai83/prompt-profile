@@ -6,7 +6,7 @@ import {
   decodeProfile,
   encodeProfile,
   Profile,
-  Translation,
+  LlmTranslation,
   UnsupportedProfileVersion,
 } from "../../src/domain/Profile.ts"
 import { PromptRecord } from "../../src/domain/PromptRecord.ts"
@@ -85,7 +85,7 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(5)
+      expect(profile.schemaVersion).toBe(6)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
     }),
   )
@@ -98,7 +98,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(5)
+      expect(profile.schemaVersion).toBe(6)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -137,7 +137,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 6, undefined])(
+  it.effect.each([1, "3", 7, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {
@@ -200,7 +200,7 @@ describe("LLM schemas", () => {
   it.each([
     ["LlmChunkObservations", LlmChunkObservations],
     ["LlmProfileDraft", LlmProfileDraft],
-    ["LlmTranslation", Translation],
+    ["LlmTranslation", LlmTranslation],
   ] as const)("%s produces a subset-compliant JSON Schema", (_name, schema) => {
     const json = toLlmJsonSchema(schema)
     expect(validateLlmJsonSchema(json)).toEqual([])
@@ -259,6 +259,7 @@ describe("LLM schemas", () => {
           { key: "growth", title: "G", summary: "s", evidence: [] },
           { key: "growth", title: "dup", summary: "s", evidence: [] },
         ],
+        improvements: [],
         traits: [],
         funFacts: [],
       }

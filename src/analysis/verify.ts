@@ -1,5 +1,5 @@
 import type { ChunkObservations } from "../domain/ChunkObservations.ts"
-import type { Confidence, Dimension, Evidence, Trait } from "../domain/Profile.ts"
+import type { Confidence, Dimension, Evidence, Improvement, Trait } from "../domain/Profile.ts"
 import { escapeText, unescapeText } from "./chunk.ts"
 
 /**
@@ -134,6 +134,25 @@ export const verifyTraits = (
           : "low"
     const stated = prompts.size < 2 ? DOWNGRADE[t.confidence] : t.confidence
     return [{ ...t, evidence, confidence: lower(stated, allowed), support }]
+  })
+
+/**
+ * Improvements need at least one verified quote; the rewrite is kept only when its prompt is
+ * among the verified evidence (its quote is the "before" shown in the report).
+ */
+export const verifyImprovements = (
+  improvements: ReadonlyArray<Improvement>,
+  texts: ReadonlyMap<string, string>,
+  counts: EvidenceCounts,
+): ReadonlyArray<Improvement> =>
+  improvements.flatMap((i) => {
+    const evidence = verifyEvidence(i.evidence, texts, counts)
+    if (evidence.length === 0) return []
+    const rewrite =
+      i.rewrite !== null && evidence.some((e) => e.promptId === i.rewrite!.promptId)
+        ? i.rewrite
+        : null
+    return [{ ...i, evidence, rewrite }]
   })
 
 /** Dimensions keep their summary even with 0 evidence (the report flags "insufficient evidence"). */

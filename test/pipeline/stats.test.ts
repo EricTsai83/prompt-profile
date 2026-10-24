@@ -87,6 +87,28 @@ describe("stats", () => {
     expect(stats.activity.days.every((d) => d.byProject.length === 7)).toBe(true)
   })
 
+  it("prompt habits: terse prompts, long sessions and reused openings", () => {
+    const opening = "Review this module for bugs and list them by severity"
+    const many = [
+      rec("fix it", "2026-09-01T02:00:00Z", { sessionId: "a" }),
+      rec("還是不行", "2026-09-01T02:01:00Z", { sessionId: "a" }),
+      rec("please rename the flag and keep the old API working", "2026-09-01T02:02:00Z", {
+        sessionId: "a",
+      }),
+      rec("幫我把商品列表改成 grid，手機版兩欄、桌機四欄", "2026-09-01T02:03:00Z", {
+        sessionId: "a",
+      }),
+      ...["b", "c", "d"].map((id, i) =>
+        rec(opening, `2026-09-0${i + 2}T02:00:00Z`, { sessionId: id }),
+      ),
+    ]
+    const { stats } = processRecords(many, options)
+    // "fix it" (2 words) and 還是不行 (4 CJK characters) are terse; the rest are not
+    expect(stats.promptHabits.terseShare).toBeCloseTo(2 / 7, 4)
+    expect(stats.promptHabits.longSessionShare).toBe(0)
+    expect(stats.promptHabits.reusedOpenings).toEqual({ openings: 1, sessions: 3 })
+  })
+
   it("latestTime is null without evening activity and handles empty input", () => {
     const { stats } = processRecords([rec("morning work item", "2026-09-01T02:00:00Z")], options)
     expect(stats.latestTime).toBeNull()

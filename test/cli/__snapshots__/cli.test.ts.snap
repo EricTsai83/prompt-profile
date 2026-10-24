@@ -17,7 +17,7 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 ● Analysing ██████░░░░░░ 1/2 chunks
 ● Analysing ████████████ 2/2 chunks
 ● Writing the profile…
-● Verifying evidence: kept 7 / 7
+● Verifying evidence: kept 8 / 8
 
 ✔ Done!
   Report <tmp>/out/report.html

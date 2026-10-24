@@ -6,9 +6,9 @@ import { Stats } from "./Stats.ts"
  * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
- * Versions 2–4 are migrated on decode.
+ * 6: `improvements` and `stats.promptHabits`. Versions 2–5 are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 5 as const
+export const PROFILE_SCHEMA_VERSION = 6 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -24,6 +24,11 @@ export const DIMENSION_KEYS = [
 ] as const
 export const DimensionKey = Schema.Literals(DIMENSION_KEYS)
 export type DimensionKey = typeof DimensionKey.Type
+
+/** Observation categories: the five dimensions plus `prompting` (feeds improvements only). */
+export const OBSERVATION_KEYS = [...DIMENSION_KEYS, "prompting"] as const
+export const ObservationKey = Schema.Literals(OBSERVATION_KEYS)
+export type ObservationKey = typeof ObservationKey.Type
 
 export const CONFIDENCES = ["high", "medium", "low"] as const
 export const Confidence = Schema.Literals(CONFIDENCES)
@@ -63,6 +68,23 @@ export const Trait = Schema.Struct({
 })
 export type Trait = typeof Trait.Type
 
+/** A way the prompts could improve, with verified evidence and one suggested rewrite. */
+export const Improvement = Schema.Struct({
+  title: Schema.String,
+  /** What the developer does (one sentence). */
+  pattern: Schema.String,
+  /** What it visibly costs in the prompts, e.g. follow-up corrections (one sentence). */
+  impact: Schema.String,
+  suggestion: Schema.String,
+  evidence: Schema.Array(Evidence),
+  /**
+   * `promptId` is one of `evidence` (its quote is the "before"); `after` is the suggested
+   * prompt in the original language. Null when the model gave none or it did not verify.
+   */
+  rewrite: Schema.NullOr(Schema.Struct({ promptId: Schema.String, after: Schema.String })),
+})
+export type Improvement = typeof Improvement.Type
+
 /** Filled by the program, never by the LLM. */
 export const Coverage = Schema.Struct({
   chunksTotal: Count,
@@ -92,6 +114,25 @@ const hasEachDimensionOnce = Schema.makeFilter<ReadonlyArray<Dimension>>((dims) 
   )
 })
 
+const ImprovementText = Schema.Struct({
+  title: Schema.String,
+  pattern: Schema.String,
+  impact: Schema.String,
+  suggestion: Schema.String,
+})
+
+/** What the translation call returns: every field required (LLM strict-schema subset). */
+export const LlmTranslation = Schema.Struct({
+  headline: Schema.String,
+  archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
+  dimensions: Schema.Array(
+    Schema.Struct({ key: DimensionKey, title: Schema.String, summary: Schema.String }),
+  ),
+  traits: Schema.Array(Schema.Struct({ name: Schema.String, description: Schema.String })),
+  funFacts: Schema.Array(Schema.String),
+  improvements: Schema.Array(ImprovementText),
+})
+
 /** Generated text in one non-English language, aligned with the English fields. */
 export const Translation = Schema.Struct({
   headline: Schema.String,
@@ -101,6 +142,10 @@ export const Translation = Schema.Struct({
   ),
   traits: Schema.Array(Schema.Struct({ name: Schema.String, description: Schema.String })),
   funFacts: Schema.Array(Schema.String),
+  /** Rewrites are not translated: they are prompts to copy. */
+  improvements: Schema.Array(ImprovementText).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed([])),
+  ),
 })
 export type Translation = typeof Translation.Type
 
@@ -118,15 +163,18 @@ const ProfileFields = Schema.Struct({
   dimensions: Schema.Array(Dimension).check(hasEachDimensionOnce),
   traits: Schema.Array(Trait),
   funFacts: Schema.Array(Schema.String),
+  /** Missing in profiles before schema version 6. */
+  improvements: Schema.Array(Improvement).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   stats: Stats,
 })
 
 /** Is `t` the same shape as the English text: same dimension keys, trait and fact counts? */
 export const matchesBase = (
-  base: Pick<typeof ProfileFields.Type, "dimensions" | "traits" | "funFacts">,
+  base: Pick<typeof ProfileFields.Type, "dimensions" | "traits" | "funFacts" | "improvements">,
   t: Translation,
 ): boolean =>
   t.traits.length === base.traits.length &&
+  t.improvements.length === base.improvements.length &&
   t.funFacts.length === base.funFacts.length &&
   t.dimensions.length === base.dimensions.length &&
   base.dimensions.every((d) => t.dimensions.some((x) => x.key === d.key))
@@ -165,7 +213,7 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && found !== 2 && found !== 3 && found !== 4) {
+    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5].includes(found as number)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.
@@ -177,7 +225,7 @@ export const decodeProfile = (
             languages: ["en"],
             translations: {},
           }
-        : found === 3 || found === 4
+        : found !== PROFILE_SCHEMA_VERSION
           ? { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
           : input
     return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(

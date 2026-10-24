@@ -3,6 +3,7 @@ import {
   quoteMatches,
   verifyDimensions,
   verifyObservations,
+  verifyImprovements,
   verifyTraits,
 } from "../../src/analysis/verify.ts"
 
@@ -246,5 +247,45 @@ describe("independent evidence", () => {
     })
     // support only caps; it never raises the model's confidence
     expect(run(["w1", "w2", "w3"], "low").confidence).toBe("low")
+  })
+})
+
+describe("improvements", () => {
+  const base = { title: "t", pattern: "p", impact: "i", suggestion: "s" }
+
+  it("keeps verified evidence and a rewrite of one of its prompts; drops the rest", () => {
+    const counts = { kept: 0, dropped: 0 }
+    const result = verifyImprovements(
+      [
+        {
+          ...base,
+          title: "kept",
+          evidence: [
+            { promptId: "p3", quote: "no, that's wrong" },
+            { promptId: "p1", quote: "invented" },
+          ],
+          rewrite: { promptId: "p3", after: "Use a Map and keep insertion order." },
+        },
+        {
+          ...base,
+          title: "rewrite of an unverified prompt",
+          evidence: [{ promptId: "p2", quote: "fix the <Button>" }],
+          rewrite: { promptId: "p1", after: "x" },
+        },
+        {
+          ...base,
+          title: "no verified evidence",
+          evidence: [{ promptId: "p1", quote: "invented" }],
+          rewrite: { promptId: "p1", after: "x" },
+        },
+      ],
+      texts,
+      counts,
+    )
+    expect(result.map((r) => [r.title, r.evidence.length, r.rewrite?.promptId ?? null])).toEqual([
+      ["kept", 1, "p3"],
+      ["rewrite of an unverified prompt", 1, null],
+    ])
+    expect(counts).toEqual({ kept: 2, dropped: 2 })
   })
 })

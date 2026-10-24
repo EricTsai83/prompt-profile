@@ -1,7 +1,7 @@
 import { Effect } from "effect"
 import {
+  LlmTranslation,
   matchesBase,
-  Translation,
   type Language,
   type Profile,
   type Translation as TranslationType,
@@ -10,7 +10,7 @@ import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
 import { Progress } from "./progress.ts"
 import { loadPrompt } from "./prompts.ts"
 
-const TRANSLATION_SCHEMA = makeLlmSchema("LlmTranslation", Translation)
+const TRANSLATION_SCHEMA = makeLlmSchema("LlmTranslation", LlmTranslation)
 
 /** How each non-English language is named in the translation request. */
 export const LANGUAGE_NAMES: Record<Exclude<Language, "en">, string> = {
@@ -24,6 +24,12 @@ export const translationInput = (p: Profile): TranslationType => ({
   dimensions: p.dimensions.map(({ key, title, summary }) => ({ key, title, summary })),
   traits: p.traits.map(({ name, description }) => ({ name, description })),
   funFacts: p.funFacts,
+  improvements: p.improvements.map(({ title, pattern, impact, suggestion }) => ({
+    title,
+    pattern,
+    impact,
+    suggestion,
+  })),
 })
 
 /** Same shape as the English text, with dimensions in the English order; else null. */

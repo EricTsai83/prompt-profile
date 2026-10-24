@@ -1,7 +1,8 @@
 import { DateTime } from "effect"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import { ORIGINS, SOURCE_IDS } from "../domain/Source.ts"
-import { MAX_ACTIVITY_PROJECTS, type Stats } from "../domain/Stats.ts"
+import { LONG_SESSION_PROMPTS, MAX_ACTIVITY_PROJECTS, type Stats } from "../domain/Stats.ts"
+import { openingKey } from "./filter.ts"
 
 /** Corrections addressed to the AI (case-insensitive; matched anywhere in the prompt). */
 export const CORRECTION_PATTERNS: ReadonlyArray<RegExp> = [
@@ -39,6 +40,10 @@ export const classifyLanguage = (text: string): "zh" | "en" | "mixed" => {
   const ratio = cjk / (cjk + words)
   return ratio >= 0.5 ? "zh" : ratio <= 0.15 ? "en" : "mixed"
 }
+
+/** Fewer than ~4 words of content: "fix it", "還是不行" (a CJK character counts as 0.4 words). */
+export const isTerse = (text: string): boolean =>
+  (text.match(LATIN_WORD)?.length ?? 0) + 0.4 * (text.match(CJK_CHAR)?.length ?? 0) < 4
 
 /** Local calendar parts in `timeZone`. */
 export interface LocalParts {
@@ -153,6 +158,31 @@ const activityOf = (
   return { projects: top, days, gridByProject: grid }
 }
 
+const habitsOf = (
+  filtered: ReadonlyArray<PromptRecord>,
+  terse: number,
+  cleanedCount: number,
+): Stats["promptHabits"] => {
+  const perSession = new Map<string, Array<PromptRecord>>()
+  for (const r of filtered) {
+    const key = `${r.source}:${r.sessionId}`
+    perSession.set(key, [...(perSession.get(key) ?? []), r])
+  }
+  const openings = new Map<string, number>()
+  for (const records of perSession.values()) {
+    const key = openingKey(records[0]!)
+    openings.set(key, (openings.get(key) ?? 0) + 1)
+  }
+  const reused = [...openings.values()].filter((n) => n >= 3)
+  const sessions = perSession.size
+  const long = [...perSession.values()].filter((r) => r.length > LONG_SESSION_PROMPTS).length
+  return {
+    terseShare: cleanedCount === 0 ? 0 : round(terse / cleanedCount),
+    longSessionShare: sessions === 0 ? 0 : round(long / sessions),
+    reusedOpenings: { openings: reused.length, sessions: reused.reduce((a, b) => a + b, 0) },
+  }
+}
+
 export const computeStats = (input: StatsInput): Stats => {
   const local = makeLocalParts(input.timezone)
   const { filtered, cleaned } = input
@@ -216,6 +246,7 @@ export const computeStats = (input: StatsInput): Stats => {
   }
   const n = cleaned.length
   const ratio = (x: number) => (n === 0 ? 0 : round(x / n))
+  const promptHabits = habitsOf(filtered, cleaned.filter((c) => isTerse(c.text)).length, n)
   // make the three ratios sum to exactly 1
   const zh = ratio(lang.zh)
   const en = ratio(lang.en)
@@ -248,5 +279,6 @@ export const computeStats = (input: StatsInput): Stats => {
     longestStreakDays,
     latestTime: latest?.label ?? null,
     activity,
+    promptHabits,
   }
 }
