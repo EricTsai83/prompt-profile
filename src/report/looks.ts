@@ -224,7 +224,7 @@ export const LOOKS: ReadonlyArray<Look> = [
 /** The look's data, or null for `classic`. */
 export const lookOf = (id: LookId): Look | null => LOOKS.find((l) => l.id === id) ?? null
 
-/** Colors of the classic report (no look); the classic card uses the light ones. */
+/** Colors of the classic report (no look); the classic card uses the dark ones. */
 export const CLASSIC_TOKENS: { readonly light: ReportTokens; readonly dark: ReportTokens } = {
   light: {
     bg: "#f6f6f3",

@@ -80,13 +80,13 @@ const cardMetrics = (profile: Profile, lang: Language, n: number): Array<[string
 const CARD_CLOCK = 300
 
 /**
- * The classic card: the classic report's hero on its page, in the same colors, with the same
+ * The classic card: the classic report's hero on its page, in its dark colors, with the same
  * hour clock. The hour labels are text nodes over the drawing (SVG images get no fonts).
  */
 const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: Language): Node => {
   const t = MESSAGES[lang]
   const c = contentIn(profile, lang)
-  const k = CLASSIC_TOKENS.light
+  const k = CLASSIC_TOKENS.dark
   const name = clip(c.archetype.name, 56)
   const showGraphic = !hide.includes("graphic")
   const clock = clockSvg(profile.stats.hourHistogram, k.accent)

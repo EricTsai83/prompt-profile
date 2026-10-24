@@ -93,11 +93,11 @@ describe("card", () => {
     }),
   )
 
-  it.effect("the default card wears the classic report's colors and its hour clock", () =>
+  it.effect("the default card wears the classic report's dark colors and its hour clock", () =>
     Effect.gen(function* () {
       const profile = yield* sample()
       const tree = JSON.stringify(cardTree(profile))
-      const { bg, card, fg, accent } = CLASSIC_TOKENS.light
+      const { bg, card, fg, accent } = CLASSIC_TOKENS.dark
       for (const color of [bg, card, fg]) expect(tree).toContain(color)
       expect(tree).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
     }),
