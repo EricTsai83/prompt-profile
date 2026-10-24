@@ -80,8 +80,8 @@ const cardMetrics = (profile: Profile, lang: Language, n: number): Array<[string
 const CARD_CLOCK = 300
 
 /**
- * The classic card: the classic report's hero on its page, in its dark colors, with the same
- * hour clock. The hour labels are text nodes over the drawing (SVG images get no fonts).
+ * The classic card: the classic report's hero edge to edge, like the looks, in its dark colors,
+ * with the same hour clock. The hour labels are text nodes over the drawing (SVG images get no fonts).
  */
 const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: Language): Node => {
   const t = MESSAGES[lang]
@@ -90,7 +90,7 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: La
   const name = clip(c.archetype.name, 56)
   const showGraphic = !hide.includes("graphic")
   const clock = clockSvg(profile.stats.hourHistogram, k.accent)
-  const left = 1200 - 36 - 56 - CARD_CLOCK
+  const left = CARD_WIDTH - 60 - CARD_CLOCK
   const top = (CARD_HEIGHT - CARD_CLOCK) / 2
   const scale = CARD_CLOCK / clock.width
   const ticks = [0, 6, 12, 18].map((hour) => {
@@ -118,21 +118,11 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: La
       boxSizing: "border-box",
       display: "flex",
       position: "relative",
-      backgroundColor: k.bg,
+      backgroundColor: k.card,
       color: k.fg,
       fontFamily: "Inter",
     },
     [
-      h("div", {
-        position: "absolute",
-        left: 36,
-        top: 36,
-        width: CARD_WIDTH - 72,
-        height: CARD_HEIGHT - 72,
-        backgroundColor: k.card,
-        border: `1.5px solid ${k.border}`,
-        borderRadius: 32,
-      }),
       ...(showGraphic
         ? [
             {
@@ -155,11 +145,11 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: La
           justifyContent: "space-between",
           // Absolute like the layers below it, so it is painted on top of them.
           position: "absolute",
-          left: 36,
-          top: 36,
-          width: CARD_WIDTH - 72,
-          height: CARD_HEIGHT - 72,
-          padding: "40px 56px",
+          left: 0,
+          top: 0,
+          width: CARD_WIDTH,
+          height: CARD_HEIGHT,
+          padding: "52px 60px",
           boxSizing: "border-box",
         },
         [

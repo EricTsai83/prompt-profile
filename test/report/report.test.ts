@@ -98,7 +98,9 @@ describe("card", () => {
       const profile = yield* sample()
       const tree = JSON.stringify(cardTree(profile))
       const { bg, card, fg, accent } = CLASSIC_TOKENS.dark
-      for (const color of [bg, card, fg]) expect(tree).toContain(color)
+      // Full bleed like the looks: the hero's color edge to edge, no page around it
+      expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
+      expect(tree).not.toContain(bg)
       expect(tree).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
     }),
   )
