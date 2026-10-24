@@ -22,24 +22,27 @@ The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
 2. Run it (Node.js ≥ 22):
 
    ```bash
-   npx prompt-profile
+   npx prompt-profile@latest
    ```
+
+   `@latest` makes npx fetch the newest version instead of reusing one it cached earlier.
 
 3. It reads your local history, shows how many prompts it found and how many CLI calls the
    analysis will take, and asks `Continue?`. The calls use your Claude / ChatGPT subscription
-   quota. To see what would be sent first, run `npx prompt-profile --dry-run` (calls nothing).
+   quota. To see what would be sent first, run `npx prompt-profile@latest --dry-run` (calls nothing).
 4. When it is done, the report opens in your browser. Everything is written to
    `./prompt-profile-report/`.
 
-Want to look around for free first? `npx prompt-profile stats` shows statistics without any LLM
+Want to look around for free first? `npx prompt-profile@latest stats` shows statistics without any LLM
 call.
 
 ## Install
 
 ```bash
-npx prompt-profile              # run without installing
+npx prompt-profile@latest       # run without installing (always the newest version)
 npm i -g prompt-profile         # or install the `prompt-profile` command
 prompt-profile --help
+npm i -g prompt-profile@latest  # update the installed command
 ```
 
 No Node.js? Every [GitHub Release](https://github.com/EricTsai83/prompt-profile/releases) has a
