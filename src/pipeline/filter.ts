@@ -1,4 +1,5 @@
 import { DateTime, Order } from "effect"
+import { createHash } from "node:crypto"
 import type { PromptRecord } from "../domain/PromptRecord.ts"
 import { increment, type Counts } from "./counts.ts"
 
@@ -13,10 +14,26 @@ export const TEMPLATE_MIN_SESSIONS = 3
  */
 export const DELEGATION_PATTERNS: ReadonlyArray<RegExp> = []
 
+/**
+ * Session openings confirmed by the owner as automated subtasks, as `openingKey` values
+ * (client + hash of the first 30 characters of the session's first prompt). The hash is what
+ * `pnpm test:smoke` prints, so a session can be excluded without its text in the repository.
+ * `pnpm inspect:openings` shows the owner the text behind each key, locally.
+ */
+export const DELEGATION_OPENINGS: ReadonlyArray<string> = []
+
+/** `<client> <8 hex>`: client and sha256 prefix of a prompt's first 30 characters. */
+export const openingKey = (r: Pick<PromptRecord, "client" | "text">): string =>
+  `${r.client ?? "-"} ${createHash("sha256")
+    .update(Array.from(r.text).slice(0, 30).join(""))
+    .digest("hex")
+    .slice(0, 8)}`
+
 export interface FilterOptions {
   readonly since: DateTime.Utc | null
   readonly until: DateTime.Utc
   readonly delegationPatterns?: ReadonlyArray<RegExp>
+  readonly delegationOpenings?: ReadonlyArray<string>
 }
 
 export interface FilterResult {
@@ -58,13 +75,14 @@ export const filterRecords = (
 
   // Rule: delegated-subtask (whole session, decided by its first prompt)
   const patterns = options.delegationPatterns ?? DELEGATION_PATTERNS
+  const openings = new Set(options.delegationOpenings ?? DELEGATION_OPENINGS)
   const delegated = new Set<string>()
   const firstSeen = new Set<string>()
   for (const r of sorted) {
     const key = `${r.source}:${r.sessionId}`
     if (firstSeen.has(key)) continue
     firstSeen.add(key)
-    if (patterns.some((p) => p.test(r.text))) delegated.add(key)
+    if (patterns.some((p) => p.test(r.text)) || openings.has(openingKey(r))) delegated.add(key)
   }
 
   const records = sorted.filter((r) => {

@@ -40,6 +40,7 @@
     "test:smoke:llm": "vitest run --config vitest.smoke.config.ts --project llm",
     "eval": "tsx scripts/eval.ts",
     "eval:compare": "tsx scripts/eval-compare.ts",
+    "inspect:openings": "tsx scripts/inspect-openings.ts",
     "dev:report": "tsx scripts/dev-report.ts",
     "test:package": "pnpm build && node scripts/test-package.mjs"
   },

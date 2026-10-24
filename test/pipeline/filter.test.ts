@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime } from "effect"
-import { filterRecords } from "../../src/pipeline/filter.ts"
+import { createHash } from "node:crypto"
+import { filterRecords, openingKey } from "../../src/pipeline/filter.ts"
 import { rec } from "./records.ts"
 
 const until = DateTime.makeUnsafe("2026-10-24T00:00:00Z")
@@ -65,6 +66,24 @@ describe("filter", () => {
       delegationPatterns: [/^You are a subagent\./],
     })
     expect(result.records.map((r) => r.sessionId)).toEqual(["human", "human"])
+    expect(result.excluded).toEqual({ "delegated-subtask": 2 })
+  })
+
+  it("excludes sessions whose opening matches a listed client + prefix hash", () => {
+    const opening = "Automated review job #12: check the diff for style issues"
+    const records = [
+      rec(opening, "2026-09-01T00:00:00Z", { sessionId: "job1", client: "sdk-ts" }),
+      rec("next step of the job", "2026-09-01T00:01:00Z", { sessionId: "job1", client: "sdk-ts" }),
+      rec(opening, "2026-09-02T00:00:00Z", { sessionId: "typed", client: "cli" }),
+    ]
+    const hash = createHash("sha256").update(opening.slice(0, 30)).digest("hex").slice(0, 8)
+    expect(openingKey(records[0]!)).toBe(`sdk-ts ${hash}`)
+    const result = filterRecords(records, {
+      since: null,
+      until,
+      delegationOpenings: [`sdk-ts ${hash}`],
+    })
+    expect(result.records.map((r) => r.sessionId)).toEqual(["typed"])
     expect(result.excluded).toEqual({ "delegated-subtask": 2 })
   })
 })

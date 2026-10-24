@@ -1,12 +1,12 @@
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect, Schema } from "effect"
-import { createHash } from "node:crypto"
 import { existsSync } from "node:fs"
 import { homedir, userInfo } from "node:os"
 import { join } from "node:path"
 import { makeAdapters, readSources } from "../../src/adapters/registry.ts"
 import { Stats } from "../../src/domain/Stats.ts"
+import { openingKey } from "../../src/pipeline/filter.ts"
 import { processRecords } from "../../src/pipeline/index.ts"
 import { claudeHome, codexHome } from "./helpers.ts"
 
@@ -59,11 +59,7 @@ describe.skipIf(!hasData)("pipeline (real data)", () => {
       }
       const dist = new Map<string, number>()
       for (const r of first.values()) {
-        const h = createHash("sha256")
-          .update(Array.from(r.text).slice(0, 30).join(""))
-          .digest("hex")
-          .slice(0, 8)
-        const k = `${r.client ?? "-"} ${h}`
+        const k = openingKey(r)
         dist.set(k, (dist.get(k) ?? 0) + 1)
       }
       const repeated = [...dist.entries()].filter(([, n]) => n >= 3).toSorted((a, b) => b[1] - a[1])
