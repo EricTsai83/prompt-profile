@@ -1,4 +1,4 @@
-import type { Profile } from "../domain/Profile.ts"
+import { MAX_QUOTE_LENGTH, type Profile } from "../domain/Profile.ts"
 import { makeRules, type RedactRule } from "./redact.ts"
 
 /**
@@ -115,6 +115,23 @@ const locationOf = (path: Path): string => {
   return `${section}${typeof index === "number" ? ` › ${index + 1}` : ""}${lang ? ` (${lang})` : ""}`
 }
 
+/** Model ids (`engine.model`, `stats.techniques.details.models[].name`): codes, not text. */
+const isModelId = (path: Path): boolean =>
+  (path.length === 2 && path[0] === "engine" && path[1] === "model") ||
+  (path.at(-1) === "name" && path.at(-3) === "models")
+
+/**
+ * A masked quote can grow past the quote limit (`a@b.co` → `[EMAIL]`): cut it with "…", never
+ * inside a marker such as `[EMAIL]`.
+ */
+const fitQuote = (text: string): string => {
+  if (text.length <= MAX_QUOTE_LENGTH) return text
+  let cut = MAX_QUOTE_LENGTH - 1
+  const open = text.lastIndexOf("[", cut)
+  if (open !== -1 && text.indexOf("]", open) >= cut) cut = open
+  return `${text.slice(0, cut).trimEnd()}…`
+}
+
 const isPlain = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" &&
   v !== null &&
@@ -156,7 +173,11 @@ export const checkOutput = (profile: Profile, options: CheckOptions): CheckResul
   }
 
   const walk = (value: unknown, path: Path): unknown => {
-    if (typeof value === "string") return DATE_LIKE.test(value) ? value : checkText(value, path)
+    if (typeof value === "string") {
+      if (DATE_LIKE.test(value) || isModelId(path)) return value
+      const out = checkText(value, path)
+      return path.at(-1) === "quote" && out !== value ? fitQuote(out) : out
+    }
     if (Array.isArray(value)) return value.map((v, i) => walk(v, [...path, i]))
     if (!isPlain(value)) return value
     return Object.fromEntries(

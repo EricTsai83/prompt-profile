@@ -152,9 +152,17 @@ const ring = (value: number, label: Raw): Raw =>
 
 // ---- profile sections ---------------------------------------------------------------------
 
-const quotes = (evidence: ReadonlyArray<Evidence>): Raw =>
+/** Verbatim text (quotes, rewrites): as written, or per language with project names replaced. */
+type Verbatim = (text: string) => Raw | string
+
+const makeVerbatim =
+  (loc: Loc, v: Visibility, scrub: Scrub): Verbatim =>
+  (text) =>
+    v.projects ? text : loc.text((_m, _c, l) => scrub(text, l))
+
+const quotes = (evidence: ReadonlyArray<Evidence>, say: Verbatim): Raw =>
   html`<ul class="evidence">
-    ${evidence.map((e) => html`<li><blockquote>${e.quote}</blockquote></li>`)}
+    ${evidence.map((e) => html`<li><blockquote>${say(e.quote)}</blockquote></li>`)}
   </ul>`
 
 const CONFIDENCE_RANK = { high: 0, medium: 1, low: 2 } as const
@@ -184,13 +192,13 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: S
       ${meter(t, loc)}
     </header>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
-    ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${t.evidence[0].quote}</blockquote>` : ""}
+    ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${makeVerbatim(loc, v, scrub)(t.evidence[0].quote)}</blockquote>` : ""}
     ${supportLine(t, loc)}
     ${
       v.quotes && t.evidence.length > 1
         ? html`<details>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
-            ${quotes(t.evidence.slice(1))}
+            ${quotes(t.evidence.slice(1), makeVerbatim(loc, v, scrub))}
           </details>`
         : ""
     }
@@ -208,7 +216,7 @@ const minorTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub
       v.quotes && t.evidence.length > 0
         ? html`<details>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
-            ${quotes(t.evidence)}
+            ${quotes(t.evidence, makeVerbatim(loc, v, scrub))}
           </details>`
         : ""
     }
@@ -240,7 +248,7 @@ const dimensionRow = (
       ${
         d.evidence.length === 0
           ? html`<p class="warning">${loc.text((m) => m.insufficientEvidence)}</p>`
-          : quotes(d.evidence)
+          : quotes(d.evidence, makeVerbatim(loc, v, scrub))
       }
     </div>
   </details>`
@@ -263,11 +271,11 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
         ? html`<div class="rewrite">
             <div>
               <span class="rw-label">${loc.text((m) => m.before)}</span>
-              <blockquote>${before.quote}</blockquote>
+              <blockquote>${makeVerbatim(loc, v, scrub)(before.quote)}</blockquote>
             </div>
             <div>
               <span class="rw-label">${loc.text((m) => m.after)}</span>
-              <p class="rw-after" title="${loc.attr((m) => m.suggested)}">${imp.rewrite.after}</p>
+              <p class="rw-after" title="${loc.attr((m) => m.suggested)}">${makeVerbatim(loc, v, scrub)(imp.rewrite.after)}</p>
             </div>
           </div>`
         : ""
@@ -276,7 +284,7 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
       others.length > 0
         ? html`<details>
             <summary>${loc.text((m) => m.showEvidence(others.length))}</summary>
-            ${quotes(others)}
+            ${quotes(others, makeVerbatim(loc, v, scrub))}
           </details>`
         : ""
     }
@@ -638,7 +646,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
   const every = correctionEvery(s)
   const signals = v.coaching ? signalRow(profile, loc) : null
   const progress = v.coaching ? progressBlock(profile, loc, v, scrub) : null
-  const tech = techniquesSection(s, loc, v)
+  const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
   const graphic = look
     ? graphicSvg(identity.graphic, s.hourHistogram, {
@@ -722,7 +730,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                     ${loc.text((m) =>
                       v.dates
                         ? formatDateTime(profile.generatedAt, tz, m.locale)
-                        : formatDate(profile.generatedAt, tz, m.locale),
+                        : formatMonth(profile.generatedAt, tz, m.locale),
                     )}
                   </dd>
                 </div>
@@ -964,7 +972,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                   <p>
                     ${loc.text(
                       (m) =>
-                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt((v.dates ? formatDateTime : formatDate)(profile.generatedAt, tz, m.locale))}`,
+                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt((v.dates ? formatDateTime : formatMonth)(profile.generatedAt, tz, m.locale))}`,
                     )}
                   </p>
                   <p>

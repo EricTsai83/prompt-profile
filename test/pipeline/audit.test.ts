@@ -1,7 +1,12 @@
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect } from "effect"
 import { readFileSync } from "node:fs"
-import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
+import {
+  decodeProfile,
+  encodeProfile,
+  MAX_QUOTE_LENGTH,
+  type Profile,
+} from "../../src/domain/Profile.ts"
 import { checkOutput, PERSONAL_RULES, SECRET_RULES } from "../../src/pipeline/audit.ts"
 
 const SAMPLE = new URL("../fixtures/profile.sample.json", import.meta.url)
@@ -112,4 +117,45 @@ describe("final output check", () => {
       false,
     )
   })
+
+  it.effect("a masked quote still fits the quote length limit, marker intact", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const quote = `${"x".repeat(MAX_QUOTE_LENGTH - 7)} a@b.co`
+      expect(quote.length).toBe(MAX_QUOTE_LENGTH)
+      const long: Profile = {
+        ...p,
+        traits: p.traits.map((t, i) =>
+          i === 0 ? { ...t, evidence: [{ ...t.evidence[0]!, quote }] } : t,
+        ),
+      }
+      const out = check(long, "mask").profile.traits[0]!.evidence[0]!.quote
+      expect(out.length).toBeLessThanOrEqual(MAX_QUOTE_LENGTH)
+      expect(out.endsWith("…")).toBe(true)
+      expect(out).not.toContain("a@b.co")
+      expect(out).not.toMatch(/\[[A-Z_]*…$/)
+      expect(encodeProfile(check(long, "mask").profile)).toBeDefined()
+    }),
+  )
+
+  it.effect("model ids are not checked, even when they contain the username", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const t = p.stats.techniques!
+      const withModel: Profile = {
+        ...p,
+        engine: { ...p.engine, model: "alice-code" },
+        stats: {
+          ...p.stats,
+          techniques: {
+            ...t,
+            details: { ...t.details, models: [{ ...t.details.models[0]!, name: "alice-code" }] },
+          },
+        },
+      }
+      const r = check(withModel, "strict")
+      expect(r.findings).toEqual([])
+      expect(r.profile.engine.model).toBe("alice-code")
+    }),
+  )
 })

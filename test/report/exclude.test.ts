@@ -90,6 +90,42 @@ describe("--exclude", () => {
     }),
   )
 
+  it.effect("projects: names are replaced in quotes, rewrites and skills too", () =>
+    Effect.gen(function* () {
+      const base = mentioning(yield* sample())
+      const t = base.stats.techniques!
+      const p: Profile = {
+        ...base,
+        traits: base.traits.map((x, i) =>
+          i === 0
+            ? { ...x, evidence: x.evidence.map((e) => ({ ...e, quote: `fix drawstuff login` })) }
+            : x,
+        ),
+        improvements: base.improvements.map((x) =>
+          x.rewrite ? { ...x, rewrite: { ...x.rewrite, after: "In drawstuff, add a test" } } : x,
+        ),
+        stats: {
+          ...base.stats,
+          techniques: {
+            ...t,
+            details: {
+              ...t.details,
+              skills: t.details.skills.map((x, i) =>
+                i === 0 ? { ...x, description: "Ships drawstuff releases" } : x,
+              ),
+            },
+          },
+        },
+      }
+      const out = without(p, ["projects"])
+      expect(out.toLowerCase()).not.toContain("drawstuff")
+      expect(out).toContain("fix Project A login")
+      expect(out).toContain("In Project A, add a test")
+      expect(out).toContain("Ships Project A releases")
+      expect(renderHtml(p)).toContain("fix drawstuff login")
+    }),
+  )
+
   it.effect("projects: names replaced everywhere, quotes kept", () =>
     Effect.gen(function* () {
       const p = mentioning(yield* sample())
@@ -108,6 +144,9 @@ describe("--exclude", () => {
       expect(out).toContain("Apr 2026 – Oct 2026 · 6 months")
       expect(out).toContain("2026年4月 – 2026年10月 · 6 個月")
       expect(out).not.toContain("Apr 25, 2026")
+      // the generation time is shown by month too, in the header and under How this was measured
+      expect(out).not.toContain("Oct 24, 2026")
+      expect(out).not.toContain("2026年10月24日")
       expect(out).toContain("<blockquote")
     }),
   )

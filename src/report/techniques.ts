@@ -11,6 +11,9 @@ import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"
 import type { Visibility } from "./visibility.ts"
 
+/** Free text as shown: project names replaced when they are hidden. */
+export type Say = (text: string) => Raw | string
+
 /**
  * "How I work with AI" as a capability map (plan 17, the owner's choice): an adoption
  * timeline, then five stages — plan, delegate, extend, verify, ship — each with its measures
@@ -151,15 +154,15 @@ const named = (title: Raw, items: ReadonlyArray<Raw>, hidden: Raw | null): Raw |
         ${hidden ? html`<p class="cap-hidden">${hidden}</p>` : ""}
       </div>`
 
-const skillItem = (s: SkillUse, loc: Loc, v: Visibility): Raw =>
+const skillItem = (s: SkillUse, loc: Loc, v: Visibility, say: Say): Raw =>
   html`<li class="cap-item">
     <div class="ci-head">
-      <b>${s.name}</b><span class="ci-tag">${loc.text((m) => m.origin[s.origin])}</span>
+      <b>${say(s.name)}</b><span class="ci-tag">${loc.text((m) => m.origin[s.origin])}</span>
     </div>
     <p>
       ${
         s.description !== null && (v.customNames || isPublicSkill(s))
-          ? s.description
+          ? say(s.description)
           : loc.text((m) => m.noDescription)
       }
     </p>
@@ -172,12 +175,18 @@ const skillItem = (s: SkillUse, loc: Loc, v: Visibility): Raw =>
     >
   </li>`
 
-const chip = (name: string, sessions: number, loc: Loc): Raw =>
+const chip = (name: string, sessions: number, loc: Loc, say: Say): Raw =>
   html`<li class="cap-chip tip" ${loc.tip((m) => m.sessionsUsed(sessions))} tabindex="-1">
-    ${name} <b>${sessions}</b>
+    ${say(name)} <b>${sessions}</b>
   </li>`
 
-const stageDetails = (stage: Stage, t: Techniques, loc: Loc, v: Visibility): Array<Raw> => {
+const stageDetails = (
+  stage: Stage,
+  t: Techniques,
+  loc: Loc,
+  v: Visibility,
+  say: Say,
+): Array<Raw> => {
   const d = t.details
   const share = !v.customNames
   const blocks: Array<Raw | null> = []
@@ -187,7 +196,7 @@ const stageDetails = (stage: Stage, t: Techniques, loc: Loc, v: Visibility): Arr
     blocks.push(
       named(
         loc.text((m) => m.subagentTypes),
-        shown.map((x) => chip(x.name, x.sessions, loc)),
+        shown.map((x) => chip(x.name, x.sessions, loc, say)),
         hidden > 0 ? loc.text((m) => m.customAgents(hidden)) : null,
       ),
     )
@@ -200,12 +209,12 @@ const stageDetails = (stage: Stage, t: Techniques, loc: Loc, v: Visibility): Arr
     blocks.push(
       named(
         loc.text((m) => m.skillsUsed),
-        skills.map((x) => skillItem(x, loc, v)),
+        skills.map((x) => skillItem(x, loc, v, say)),
         hiddenSkills > 0 ? loc.text((m) => m.customSkills(hiddenSkills)) : null,
       ),
       named(
         loc.text((m) => m.mcpServers),
-        servers.map((x) => chip(x.name, x.sessions, loc)),
+        servers.map((x) => chip(x.name, x.sessions, loc, say)),
         hiddenServers > 0 ? loc.text((m) => m.customServers(hiddenServers)) : null,
       ),
     )
@@ -214,7 +223,7 @@ const stageDetails = (stage: Stage, t: Techniques, loc: Loc, v: Visibility): Arr
     blocks.push(
       named(
         loc.text((m) => m.modelsUsed),
-        d.models.map((x) => chip(x.name, x.sessions, loc)),
+        d.models.map((x) => chip(x.name, x.sessions, loc, say)),
         null,
       ),
     )
@@ -226,6 +235,7 @@ const stageCard = (
   t: Techniques,
   loc: Loc,
   v: Visibility,
+  say: Say,
 ): Raw | null => {
   const tools = stage.tools
     .filter((k) => t.tools[k].count > 0)
@@ -247,7 +257,7 @@ const stageCard = (
         loc.tip((m) => `${m.promptNames[k][1]} · ${m.ofPrompts(pct(t.prompts[k]))}`),
       ),
     )
-  const extra = stageDetails(stage.id, t, loc, v)
+  const extra = stageDetails(stage.id, t, loc, v, say)
   const parallel =
     stage.id === "delegate" && t.maxParallel >= 2
       ? html`<p class="tech-callout">${loc.text((m) => m.parallel(t.maxParallel, t.parallelDays))}</p>`
@@ -265,10 +275,10 @@ const stageCard = (
 }
 
 /** The section body; null without technique data. */
-export const techniquesSection = (s: Stats, loc: Loc, v: Visibility): Raw | null => {
+export const techniquesSection = (s: Stats, loc: Loc, v: Visibility, say: Say): Raw | null => {
   const t = s.techniques
   if (t === null) return null
-  const cards = STAGES.map((stage) => stageCard(stage, t, loc, v)).filter(
+  const cards = STAGES.map((stage) => stageCard(stage, t, loc, v, say)).filter(
     (x): x is Raw => x !== null,
   )
   if (cards.length === 0) return null
