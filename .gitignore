@@ -7,3 +7,4 @@ tmp/
 prompt-profile-report/
 *.log
 .DS_Store
+dist-bin/

@@ -2,7 +2,7 @@ import { Effect } from "effect"
 import { Resvg, initWasm } from "@resvg/resvg-wasm"
 import satori from "satori"
 import { createRequire } from "node:module"
-import { readFileSync } from "node:fs"
+import { readAsset } from "../platform/assets.ts"
 import type { Profile } from "../domain/Profile.ts"
 import { DISPLAY_FONT, type FontData } from "./fonts.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
@@ -293,7 +293,9 @@ let wasmReady: Promise<void> | null = null
 const ensureWasm = (): Promise<void> => {
   if (wasmReady === null) {
     const require = createRequire(import.meta.url)
-    wasmReady = initWasm(readFileSync(require.resolve("@resvg/resvg-wasm/index_bg.wasm")))
+    wasmReady = initWasm(
+      readAsset("index_bg.wasm", () => require.resolve("@resvg/resvg-wasm/index_bg.wasm")),
+    )
   }
   return wasmReady
 }

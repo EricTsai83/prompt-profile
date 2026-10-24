@@ -10,7 +10,8 @@ Product decisions, architecture and the development plan: [`plans/README.md`](./
 
 ```
 src/
-  bin.ts          the only entry point; just calls cli/main.ts
+  bin.ts          the entry point; just calls cli/main.ts
+  standalone.ts   entry of the Bun binaries: registers embedded assets, then runs bin.ts
   cli/            effect/cli commands and UX: main.ts (flags), commands/ (one flow per command),
                   steps.ts (steps shared by commands), options.ts (flag parsing),
                   messages.ts (every printed line), render-error.ts

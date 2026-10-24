@@ -20,6 +20,17 @@ npx prompt-profile
 npm i -g prompt-profile && prompt-profile
 ```
 
+No Node.js? Every [GitHub Release](https://github.com/EricTsai83/prompt-profile/releases) also
+has a standalone executable for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64), with a
+`SHA256SUMS` file:
+
+```bash
+tar -xzf prompt-profile-<version>-darwin-arm64.tar.gz
+./prompt-profile-<version>-darwin-arm64/prompt-profile
+# macOS, if the archive was downloaded with a browser (the binary is not notarised):
+xattr -d com.apple.quarantine ./prompt-profile-<version>-darwin-arm64/prompt-profile
+```
+
 Output (in `./prompt-profile-report/` by default):
 
 - `report.html`: your private, single-file report that works offline — who you are (archetype,
@@ -83,7 +94,7 @@ cards agree.
 
 ## Requirements
 
-- Node.js ≥ 22
+- Node.js ≥ 22, or the standalone executable (no Node.js needed)
 - [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex)
   (`codex`) installed and logged in
 - **No API key needed**: the analysis runs your own logged-in `claude -p` or `codex exec` in the

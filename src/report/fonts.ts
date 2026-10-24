@@ -1,7 +1,7 @@
 import { Data, Effect, FileSystem, Path } from "effect"
 import { createHash } from "node:crypto"
-import { readFileSync } from "node:fs"
 import type { Language } from "../domain/Profile.ts"
+import { readAsset } from "../platform/assets.ts"
 import { writePrivateFile } from "../platform/files.ts"
 
 export interface FontData {
@@ -10,8 +10,7 @@ export interface FontData {
   readonly weight: 400 | 700 | 800
 }
 
-const read = (file: string) =>
-  new Uint8Array(readFileSync(new URL(`./fonts/${file}`, import.meta.url)))
+const read = (file: string) => readAsset(file, () => new URL(`./fonts/${file}`, import.meta.url))
 
 /** The display face of the share-first looks (static ExtraBold, SIL OFL). */
 export const DISPLAY_FONT = "Bricolage"

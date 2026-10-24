@@ -100,7 +100,8 @@ is bumped locally before tagging, so there is nothing to write back).
 
 ## Later (out of scope this time; direction only)
 
-- **Standalone binaries**: `bun build --compile`, one each for darwin-arm64 / darwin-x64 / linux-x64 / linux-arm64 / win-x64, published to GitHub Releases. First confirm that the satori / resvg native modules can be bundled.
+- **Standalone binaries**: moved to [plan 19](./19-standalone-binaries.md); built and attached by
+  the `binaries` job of `release.yml`.
 - **Homebrew**: create `EricTsai83/homebrew-tap` with a formula pointing to the GitHub Releases binaries.
 - **install.sh**: `curl -fsSL …/install.sh | sh`.
 - New adapters: Gemini CLI, Cursor, opencode… (see the list in ccusage's `rust/adapters/`). Only requires implementing `SourceAdapter` and registering it in the registry.

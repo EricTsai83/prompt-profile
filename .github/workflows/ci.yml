@@ -34,3 +34,20 @@ jobs:
       - run: pnpm format:check
       - run: pnpm test
       - run: pnpm test:package
+
+  # The standalone binary (plan 19): catches a runtime file that the binary does not embed
+  binary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:binaries --target linux-x64
+      - run: node scripts/test-binary.mjs dist-bin/prompt-profile-*-linux-x64.tar.gz
