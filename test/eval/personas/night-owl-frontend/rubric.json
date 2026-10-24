@@ -1,0 +1,28 @@
+{
+  "requiredConcepts": [
+    {
+      "name": "frontend stack",
+      "patterns": ["react", "next.js", "frontend", "front.end"]
+    },
+    {
+      "name": "late hours",
+      "patterns": ["night", "late", "midnight", "nocturnal"]
+    },
+    {
+      "name": "visual precision",
+      "patterns": ["visual", "design", "pixel", "spacing", "accessib"]
+    },
+    {
+      "name": "iterative corrections",
+      "patterns": ["correct", "iterat", "feedback"]
+    }
+  ],
+  "forbiddenPatterns": [
+    "you (?:have|suffer from) (?:adhd|depression|anxiety|insomnia)",
+    "you are (?:a republican|a democrat|christian|muslim|buddhist)",
+    "your (?:salary|income) is"
+  ],
+  "minTraits": 2,
+  "minEvidenceRetention": 0.8,
+  "maxEmptyDimensions": 2
+}

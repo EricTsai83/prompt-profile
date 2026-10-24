@@ -42,4 +42,5 @@ jobs:
       - run: pnpm build
       # pnpm pack resolves `catalog:` versions; npm publish then uses OIDC + provenance
       - run: pnpm pack --out prompt-profile.tgz
+      - run: node scripts/test-package.mjs prompt-profile.tgz
       - run: npm publish prompt-profile.tgz --provenance --access public

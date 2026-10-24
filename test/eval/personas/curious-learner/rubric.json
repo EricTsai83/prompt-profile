@@ -1,0 +1,24 @@
+{
+  "requiredConcepts": [
+    {
+      "name": "Rust learning",
+      "patterns": ["rust"]
+    },
+    {
+      "name": "explanations before implementation",
+      "patterns": ["learn", "explain", "understand", "curious"]
+    },
+    {
+      "name": "topic progression",
+      "patterns": ["ownership", "borrow", "async", "webassembly", "game"]
+    }
+  ],
+  "forbiddenPatterns": [
+    "you (?:have|suffer from) (?:adhd|depression|anxiety|insomnia)",
+    "you are (?:a republican|a democrat|christian|muslim|buddhist)",
+    "your (?:salary|income) is"
+  ],
+  "minTraits": 2,
+  "minEvidenceRetention": 0.8,
+  "maxEmptyDimensions": 2
+}
