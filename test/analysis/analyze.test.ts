@@ -144,7 +144,8 @@ describe("analyze", () => {
       expect(Schema.is(Profile)(profile)).toBe(true)
       expect(profile.traits.map((t) => [t.name, t.confidence])).toEqual([
         ["steady", "high"],
-        ["single source", "medium"],
+        // one quote from one session: downgraded, then capped by its spread
+        ["single source", "low"],
       ])
       expect(profile.coverage).toMatchObject({
         chunksFailed: 0,
@@ -155,7 +156,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "7",
+        analysisVersion: "8",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

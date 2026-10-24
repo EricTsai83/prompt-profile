@@ -131,9 +131,10 @@ describe("verify", () => {
       texts,
       counts,
     )
+    // without session metadata each prompt counts as its own session and week
     expect(traits.map((t) => [t.name, t.confidence])).toEqual([
-      ["a", "high"],
-      ["b", "medium"],
+      ["a", "medium"],
+      ["b", "low"],
     ])
     expect(counts).toEqual({ kept: 3, dropped: 2 })
   })
@@ -186,7 +187,7 @@ describe("independent evidence", () => {
       texts,
       { kept: 0, dropped: 0 },
     )
-    expect(result[0]!.confidence).toBe("medium")
+    expect(result[0]!.confidence).toBe("low")
   })
 
   it("caps confidence when independent prompts belong to one session", () => {
@@ -205,10 +206,45 @@ describe("independent evidence", () => {
       texts,
       { kept: 0, dropped: 0 },
       new Map([
-        ["p1", "session"],
-        ["p3", "session"],
+        ["p1", { session: "session", week: "w1" }],
+        ["p3", { session: "session", week: "w2" }],
       ]),
     )
-    expect(result[0]!.confidence).toBe("medium")
+    expect(result[0]!.confidence).toBe("low")
+    expect(result[0]!.support).toEqual({ sessions: 1, weeks: 2 })
+  })
+
+  const threePrompts = (confidence: "high" | "medium" | "low") => [
+    {
+      name: "t",
+      description: "d",
+      confidence,
+      evidence: [
+        { promptId: "p1", quote: "拆成小步驟" },
+        { promptId: "p2", quote: "fix  the <Button>" },
+        { promptId: "p3", quote: "use a Map" },
+      ],
+    },
+  ]
+
+  it("high confidence needs three sessions across at least two weeks", () => {
+    const run = (weeks: [string, string, string], confidence: "high" | "low" = "high") =>
+      verifyTraits(
+        threePrompts(confidence),
+        texts,
+        { kept: 0, dropped: 0 },
+        new Map([
+          ["p1", { session: "s1", week: weeks[0] }],
+          ["p2", { session: "s2", week: weeks[1] }],
+          ["p3", { session: "s3", week: weeks[2] }],
+        ]),
+      )[0]!
+    expect(run(["w1", "w1", "w1"]).confidence).toBe("medium")
+    expect(run(["w1", "w1", "w2"])).toMatchObject({
+      confidence: "high",
+      support: { sessions: 3, weeks: 2 },
+    })
+    // support only caps; it never raises the model's confidence
+    expect(run(["w1", "w2", "w3"], "low").confidence).toBe("low")
   })
 })

@@ -97,31 +97,43 @@ export const verifyObservations = (
 
 const DOWNGRADE: Record<Confidence, Confidence> = { high: "medium", medium: "low", low: "low" }
 
+const RANK: Record<Confidence, number> = { low: 0, medium: 1, high: 2 }
+const lower = (a: Confidence, b: Confidence): Confidence => (RANK[a] <= RANK[b] ? a : b)
+
+/** Where a prompt came from: its session and its analysed week (chunk). */
+export interface PromptOrigin {
+  readonly session: string
+  readonly week: string
+}
+
 /**
  * After reduce: a trait supported by < 2 distinct prompts drops one confidence level; with 0 it is
- * removed. High confidence also requires distinct sessions when session metadata is supplied.
- * Fewer than 3 traits is reported as-is (never loosen the rules to fill up).
+ * removed. Then the spread of its quotes caps the confidence (never raises it): `high` needs 3
+ * sessions across at least 2 weeks, `medium` 2 sessions, otherwise `low`. Without origin data
+ * every prompt counts as its own session and week. Fewer than 3 traits is reported as-is.
  */
 export const verifyTraits = (
-  traits: ReadonlyArray<Trait>,
+  traits: ReadonlyArray<Omit<Trait, "support">>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
-  sessions?: ReadonlyMap<string, string>,
+  origins?: ReadonlyMap<string, PromptOrigin>,
 ): ReadonlyArray<Trait> =>
   traits.flatMap((t) => {
     const evidence = verifyEvidence(t.evidence, texts, counts)
     if (evidence.length === 0) return []
     const prompts = new Set(evidence.map((e) => e.promptId))
-    const independentSessions = new Set(
-      evidence.map((e) => sessions?.get(e.promptId) ?? e.promptId),
-    )
-    const confidence =
-      prompts.size < 2
-        ? DOWNGRADE[t.confidence]
-        : independentSessions.size < 2 && t.confidence === "high"
+    const support = {
+      sessions: new Set(evidence.map((e) => origins?.get(e.promptId)?.session ?? e.promptId)).size,
+      weeks: new Set(evidence.map((e) => origins?.get(e.promptId)?.week ?? e.promptId)).size,
+    }
+    const allowed: Confidence =
+      support.sessions >= 3 && support.weeks >= 2
+        ? "high"
+        : support.sessions >= 2
           ? "medium"
-          : t.confidence
-    return [{ ...t, evidence, confidence }]
+          : "low"
+    const stated = prompts.size < 2 ? DOWNGRADE[t.confidence] : t.confidence
+    return [{ ...t, evidence, confidence: lower(stated, allowed), support }]
   })
 
 /** Dimensions keep their summary even with 0 evidence (the report flags "insufficient evidence"). */

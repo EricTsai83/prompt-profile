@@ -116,6 +116,7 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     description: t.description,
     confidence: t.confidence,
     evidence: t.evidence.map(toEvidence),
+    support: null,
   })),
   funFacts: draft.funFacts,
   stats: extras.stats,

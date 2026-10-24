@@ -5,9 +5,10 @@ import { Stats } from "./Stats.ts"
 /**
  * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
- * weekday × hour, by project). Versions 2 and 3 are migrated on decode.
+ * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
+ * Versions 2–4 are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 4 as const
+export const PROFILE_SCHEMA_VERSION = 5 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -48,11 +49,17 @@ export const Dimension = Schema.Struct({
 })
 export type Dimension = typeof Dimension.Type
 
+/** How widely a trait's verified quotes are spread: distinct sessions and analysed weeks. */
+export const Support = Schema.Struct({ sessions: Count, weeks: Count })
+export type Support = typeof Support.Type
+
 export const Trait = Schema.Struct({
   name: Schema.String,
   description: Schema.String,
   confidence: Confidence,
   evidence: Schema.Array(Evidence),
+  /** Filled by verification; null in profiles before schema version 5. */
+  support: Schema.NullOr(Support).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
 })
 export type Trait = typeof Trait.Type
 
@@ -158,10 +165,10 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && found !== 2 && found !== 3) {
+    if (found !== PROFILE_SCHEMA_VERSION && found !== 2 && found !== 3 && found !== 4) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
-    // Version 2 had English text only; versions 2–3 lack `stats.activity` (decoded as empty).
+    // Version 2 had English text only; missing newer fields decode to their defaults.
     const current =
       found === 2
         ? {
@@ -170,7 +177,7 @@ export const decodeProfile = (
             languages: ["en"],
             translations: {},
           }
-        : found === 3
+        : found === 3 || found === 4
           ? { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
           : input
     return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(

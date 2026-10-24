@@ -291,7 +291,14 @@ export const analyze = (input: {
       profile.traits,
       texts,
       counts,
-      new Map(input.prompts.map((p) => [p.id, `${p.source}:${p.sessionId}`])),
+      new Map(
+        outcomes.flatMap((o) =>
+          o.chunk.prompts.map((p) => [
+            p.id,
+            { session: `${p.source}:${p.sessionId}`, week: o.chunk.id },
+          ]),
+        ),
+      ),
     )
     const dimensions = verifyDimensions(profile.dimensions, texts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "languages": [
     "en",
     "zh-TW"
@@ -92,7 +92,11 @@
           "promptId": "codex:s2:3",
           "quote": "<script>alert('x')</script> 這段為什麼會被執行？"
         }
-      ]
+      ],
+      "support": {
+        "sessions": 4,
+        "weeks": 3
+      }
     },
     {
       "name": "Straight talker",
@@ -107,7 +111,11 @@
           "promptId": "claude-code:s4:u4",
           "quote": "don't write code yet, break the plan into small steps"
         }
-      ]
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 2
+      }
     },
     {
       "name": "Type purist",
@@ -118,7 +126,11 @@
           "promptId": "codex:s5:7",
           "quote": "don't write code yet, break the plan into small steps"
         }
-      ]
+      ],
+      "support": {
+        "sessions": 1,
+        "weeks": 1
+      }
     }
   ],
   "funFacts": [

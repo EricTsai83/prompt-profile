@@ -59,7 +59,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "7",
+    "analysisVersion": "8",
     "model": "fake-model",
     "runner": "claude-code",
   },
@@ -71,7 +71,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "languages": [
     "en",
   ],
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "stats": {
     "activeDays": 0,
     "activity": {
@@ -871,9 +871,13 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
         },
       ],
       "name": "steady",
+      "support": {
+        "sessions": 3,
+        "weeks": 3,
+      },
     },
     {
-      "confidence": "medium",
+      "confidence": "low",
       "description": "d",
       "evidence": [
         {
@@ -882,6 +886,10 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
         },
       ],
       "name": "single source",
+      "support": {
+        "sessions": 1,
+        "weeks": 1,
+      },
     },
   ],
   "translations": {},
