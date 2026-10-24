@@ -33,6 +33,31 @@ import {
 } from "./verify.ts"
 import { ANALYSIS_VERSION } from "./version.ts"
 
+const WEEKDAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const
+
+/**
+ * Stats as sent to the reduce step. Weekday arrays become objects keyed by day name: a model
+ * misread the Monday-first array as Sunday-first in the stage-3 comparison (plan 11).
+ */
+export const statsForReduce = (stats: Stats) => {
+  const encoded = encodeStats(stats)
+  const byDay = <A>(xs: ReadonlyArray<A>) =>
+    Object.fromEntries(WEEKDAYS.map((day, i) => [day, xs[i]]))
+  return {
+    ...encoded,
+    weekdayHistogram: byDay(encoded.weekdayHistogram),
+    activityGrid: byDay(encoded.activityGrid),
+  }
+}
+
 export { AnalysisFailed, type AnalyzeError } from "./errors.ts"
 export { REDUCE_INPUT_LIMIT } from "./merge.ts"
 export {
@@ -223,7 +248,7 @@ export const analyze = (input: {
 
     // ---- reduce ---------------------------------------------------------------------
     yield* progress.onReduceStart
-    const reducePrompt = `observations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(encodeStats(input.stats))}`
+    const reducePrompt = `observations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
     const draft = yield* runner
       .generate({
         system: loadPrompt("reduce"),

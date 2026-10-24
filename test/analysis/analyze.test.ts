@@ -105,6 +105,36 @@ const run = (
   )
 
 describe("analyze", () => {
+  it.effect("the reduce step gets weekday counts by name, not by position", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({ respond })
+      const grid = Array.from({ length: 7 }, (_row, d) =>
+        Array.from({ length: 24 }, (_cell, h) => d * 100 + h),
+      )
+      const labelled = { ...stats, weekdayHistogram: [1, 2, 3, 4, 5, 0, 7], activityGrid: grid }
+      yield* analyze({ prompts, stats: labelled, options }).pipe(
+        Effect.provide(
+          Layer.mergeAll(
+            Layer.succeed(LlmRunner, fake),
+            Layer.succeed(AnalysisCache, makeMemoryCache()),
+            Layer.succeed(Progress, silentProgress),
+          ),
+        ),
+      )
+      const sent = JSON.parse(/\n\nstats:\n(.*)$/s.exec(fake.log.at(-1)!.prompt)![1]!)
+      expect(sent.weekdayHistogram).toEqual({
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 0,
+        Sunday: 7,
+      })
+      expect(sent.activityGrid.Saturday[3]).toBe(503)
+    }),
+  )
+
   it.effect("produces a valid, verified Profile", () =>
     Effect.gen(function* () {
       const fake = makeFakeLlmRunner({ respond })
@@ -123,7 +153,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "4",
+        analysisVersion: "5",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

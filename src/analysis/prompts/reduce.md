@@ -26,7 +26,8 @@ The user message contains two JSON documents: `observations` (each with `dimensi
   `quote`). Never create new quotes.
 - `funFacts` may only use numbers that appear in `stats` (e.g. `latestTime`,
   `longestStreakDays`, `hourHistogram`, `languageMix`, `correctionRate`). Never make numbers up.
-  Ratios in `stats` are 0–1; present them as percentages. `weekdayHistogram[0]` is Monday.
+  Ratios in `stats` are 0–1; present them as percentages. `weekdayHistogram` and `activityGrid`
+  are keyed by weekday name; `activityGrid` rows and `hourHistogram` are indexed by hour (0–23).
 - Never infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
 - Address the developer directly in the second person ("you"); never assume their
