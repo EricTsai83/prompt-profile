@@ -142,7 +142,7 @@ check above, all on synthetic personas.
 `pnpm eval:compare --repeats 1 --budget 40 --out docs/ux/model-comparison/runs-v9`
 ([outputs](runs-v9/)): four personas × Claude Code / Codex × 1, 28 of 40 calls, no retries.
 
-- Every run produced 2–3 verified improvements; 15 of 21 include a rewrite of a real persona
+- Every run produced 2–3 verified improvements; 17 of 21 include a rewrite of a real persona
   prompt. They match each persona's `expected.md`, e.g. night-owl-frontend: "State constraints
   in the first ask" (citing the 「錯了，category 是陣列」 correction); weekend-data-engineer:
   "Save test-first as a project rule".
