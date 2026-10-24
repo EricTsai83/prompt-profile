@@ -43,7 +43,7 @@ Sorted by severity.
    - `esbuild`'s install script is explicitly disabled (`allowBuilds: esbuild: false`), and everything currently works.
    - `effect/cli` and `effect/process` are marked unstable; check them whenever Effect is upgraded.
 
-6. **Large install size**: the tarball is only 111 KB, but `node_modules` after install is about **117 MB** (effect, satori, resvg wasm),
+6. **Large install size**: the tarball is only 159 KB (111 KB before the 41 KB display font for the looks in plan 12), but `node_modules` after install is about **117 MB** (effect, satori, resvg wasm),
    so the first `npx prompt-profile` download takes a while. `--version` cold start is about 0.9 seconds.
 
 7. **CLAUDE.md / AGENTS.md may influence the analysis**: testing showed that `claude -p` loads `CLAUDE.md` from the cwd.
