@@ -19,8 +19,9 @@ the owner sees it. Every item comes from a finding in plans 11–12 or an open e
 | 5 | Report and looks checked in WebKit (Safari engine), light and dark | RISKS 16 | – | Done: WebKit 26.5, every look, light/dark, 1440/390 px |
 | 6 | Share-card rule for long text: keep word-boundary clipping (archetype 56, trait 32 characters); document it | Plan 11 stage 2, finding 4 | – | Done: recorded in plan 12 |
 | 7 | README: show the looks (sample cards regenerated from the synthetic fixture) | Plan 12 | – | Done: `docs/sample-card-{signal,afterhours,studio}.png` |
-| 8 | Real-data review: the owner reads a real report and judges accuracy | RISKS 3 | Owner, quota | |
-| 9 | Delegated-prompt check: the owner confirms whether the repeated session openings are AI delegation | RISKS 2 | Owner | |
+| 8 | Real-data review: the owner reads a real report and judges accuracy | RISKS 3 | Owner, quota | Run done (v6, 26/26 chunks, 44/44 quotes, `tmp/real-v6/`, not committed). Waiting for the owner's read. Structural flag: all 6 traits `high` |
+| 9 | Delegated-prompt check: the owner confirms whether the repeated session openings are AI delegation | RISKS 2 | Owner | Tooling done: `pnpm inspect:openings` (owner's terminal only) and hash-keyed `DELEGATION_OPENINGS`. Waiting for the owner's keys |
+| 10 | Confidence calibration: decide whether `high` should require support from several chunks, computed in `verify` rather than trusted from the model | Real-data run (all traits `high`); stage-3 review (one `high` on a single example) | Owner's read of item 8 | Open |
 
 ## Rules
 
