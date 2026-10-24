@@ -109,7 +109,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | – | **Pending**: tag-triggered workflow in place; publishing waits for the owner |
+| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | – | **In progress**: `0.1.0` on npm (by hand); Trusted Publisher, then the first tag release |
 | 19 | [Standalone binaries](./19-standalone-binaries.md) | Executables per platform on each GitHub Release | 10 | Built and checked; last box ticks on the first tag release |
 
 ## Shared rules for every plan

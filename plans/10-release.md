@@ -1,6 +1,6 @@
 # 10 · Release
 
-**Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done;
+**Status: in progress.** `0.1.0` is on npm (published by hand, 2026-10-24). Earlier: the owner deferred the release on 2026-10-24 until the product work is done;
 it is the last open plan. Plan 13 (product quality) is done: the owner read a real report on
 2026-10-24 and accepted it for now. Publishing resumes only when the owner decides to publish. On 2026-10-24 the owner had the code part done ahead
 of time (item 4: the tag-triggered workflow); nothing is published or tagged, and the owner's
@@ -16,7 +16,7 @@ npm / GitHub setup is not done. This section records where things stand.
   pushes to `main` run no release job. The workflow has not run yet: the first tag is its test.
 - `pnpm test:package` installs the packed tarball and checks version, help, prompts, fonts,
   HTML, JSON, the 1200 × 630 PNG and a look. Tarball 159 KB; `--version` cold start ~0.9 s.
-- `prompt-profile` is unclaimed on npm (404 on 2026-10-24).
+- `prompt-profile` is on npm, owned by `ericts` (`0.1.0`, 2026-10-24).
 
 ### Still to do when the release resumes
 
@@ -28,10 +28,15 @@ npm / GitHub setup is not done. This section records where things stand.
 4. ~~Replace release-please with the tag-triggered workflow below~~ — done 2026-10-24
    (`release.yml`, `scripts/release-version.ts`, `test/scripts/release-version.test.ts`).
 5. Owner: publish `0.1.0` by hand once, then register the Trusted Publisher (steps below).
+   `0.1.0` was published by hand on 2026-10-24 (npm user `ericts`, shasum matches the checked
+   tarball; `npx prompt-profile --version` works from a clean folder). npm also left a
+   `0.0.0-stage` placeholder version from its staged publishing. The Trusted Publisher and
+   "require 2FA, disallow tokens" are still to do. Do not push a `v0.1.0` tag: the workflow
+   would fail publishing an existing version after creating the GitHub Release.
 6. Release `0.1.1` (or the next version) through the workflow; confirm the npm page shows
    provenance.
 7. Clean-environment check: new container, logged-in `claude`, `npx prompt-profile` end to end.
-8. Check the npm name again just before publishing.
+8. ~~Check the npm name again just before publishing~~ — done; the name is ours.
 
 ## Goal
 
