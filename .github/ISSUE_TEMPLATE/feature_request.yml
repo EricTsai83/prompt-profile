@@ -1,0 +1,16 @@
+name: Feature request
+description: Describe the problem and the desired behavior.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Use a synthetic example; do not include personal prompts or reports.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Proposed behavior and alternatives
+    validations:
+      required: true

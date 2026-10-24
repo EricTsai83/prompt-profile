@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible problem using synthetic data.
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach real prompts, reports, caches, dry-run chunks, credentials or full CLI logs. Report security issues using SECURITY.md.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: prompt-profile, Node.js, and Claude Code / Codex versions.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps and synthetic reproduction
+      description: Command, expected result, actual result and a minimal hand-written fake record if needed. Remove personal paths.
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Sanitized error
+      description: Include only the relevant error after checking for private data.
