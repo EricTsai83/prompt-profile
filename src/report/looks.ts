@@ -1,7 +1,7 @@
 /**
  * Render-only choices: a look (report + card design), the card parts to hide and the report
  * parts to leave out. They never change the profile, the analysis or its cache; see
- * plans/12-looks-and-share-card.md and plans/18-unified-report-and-output-check.md.
+ * plans 12 and 18 (deleted when done; in git history).
  */
 
 export const LOOK_IDS = ["classic", "signal", "afterhours", "studio"] as const

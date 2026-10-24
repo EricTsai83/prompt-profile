@@ -96,38 +96,21 @@ There are three independent version numbers. Bump them whenever the correspondin
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 1 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
 
-## Execution order
+## Open plans
 
-Each plan can be handed to Claude Code / Codex independently, e.g. "Execute `plans/01-project-setup.md` and run the acceptance criteria when done."
+`plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
+in the change that finishes it; it stays in git history. Plans 01–09, 11, 12 and 14–18 are
+done and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
+`git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
+--name-only -- plans/` lists every deleted plan).
+
+Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
+`plans/10-release.md` and run the acceptance criteria when done."
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 01 | [Project setup](./01-project-setup.md) | An empty project that builds, tests and lints + AGENTS.md | – | Done |
-| 02 | [Domain and Schemas](./02-domain-schemas.md) | `PromptRecord`, `Profile` and other formats | 01 | Done |
-| 06 | [LlmRunner](./06-llm-runner.md) | Structured JSON via `claude` / `codex` | 02 | Done |
-| 03 | [Claude Code adapter](./03-adapter-claude-code.md) | Clean Claude Code prompts | 02 | Done |
-| 04 | [Codex adapter](./04-adapter-codex.md) | Clean Codex prompts | 02 | Done |
-| 05 | [Pipeline: filter, clean, redact, stats](./05-pipeline.md) | `Stats` + prompts that are safe to send | 03 (hook up 04 once it is done) | Done |
-| 07 | [Analysis flow](./07-analysis.md) | `profile.json` | 05, 06 | Done (owner's read → 13 item 8) |
-| 08 | [Report output](./08-report.md) | HTML report + PNG card | 02 | Done |
-| 09 | [CLI integration and UX](./09-cli.md) | The complete `prompt-profile` command | 05, 07, 08 | Done (built-binary run → 10) |
-| 11 | [Profile customization UX](./11-profile-customization-ux.md) | Research: looks, stories, model comparison | 09 | Done (stage 4 skipped by the owner) |
-| 12 | [Looks and share-card privacy](./12-looks-and-share-card.md) | `--look`, `--card-hide`, `render` variants | 11 | Done |
-| 13 | [Product quality](./13-product-quality.md) | Grounded profiles, real-data checks, polish | 12 | Done except item 8 (**owner**) |
-| 14 | [Report redesign and languages](./14-report-redesign-and-languages.md) | Charts, en / zh-TW switch, activity by project | 13 | Done |
-| 15 | [Profile storytelling](./15-profile-storytelling.md) | Identity-first report (share page later replaced by 18) | 14 | Done |
-| 16 | [Prompt coaching](./16-prompt-coaching.md) | Verified improvements and signals | 15 | Done |
-| 17 | [AI technique profile](./17-ai-technique-profile.md) | How I work with AI, progress since last report | 16 | Done |
-| 18 | [One report and output check](./18-unified-report-and-output-check.md) | `--exclude` parts, final secret / personal-data check | 17 | Done |
-| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | 13 item 8, 18 | **Pending** (owner decides when) |
-
-**06 goes first**: "borrowing the user's `claude` / `codex` to produce structured JSON" is the biggest technical risk of the whole product (Schema compatibility, hooks / MCP interference, history pollution). Finish the 06 smoke test first and confirm both CLIs accept the JSON Schema produced by plan 02 before investing in other plans. If 06 shows that one of the CLIs is not viable, go back and adjust the LLM Schema in 02.
-
-After 02, plans 03 / 04 / 06 / 08 are independent of each other and can proceed in parallel.
-
-### First milestone: walking skeleton
-
-When 03 + 05 + 07 are done (before 04 and 08), first run `pnpm dev --out tmp` on real Claude Code data to produce a `profile.json` and read it yourself. **If the profile quality is poor, tune `map.md` / `reduce.md` first; do not rush into the report layout.**
+| 13 | [Product quality](./13-product-quality.md) | Grounded profiles, real-data checks, polish | – | Done except item 8 (**owner**) |
+| 10 | [Release](./10-release.md) | npm package on tag pushes + CI | 13 item 8 | **Pending**: tag-triggered workflow in place; publishing waits for the owner |
 
 ## Shared rules for every plan
 
@@ -144,12 +127,12 @@ When 03 + 05 + 07 are done (before 04 and 08), first run `pnpm dev --out tmp` on
 
 1. **Owner: read a real report** (plan 13 item 8): `prompt-profile-report/report.html` from a
    fresh run, or `tmp/p18/report.html`. Findings become a new plan (prompt or rule changes bump
-   `ANALYSIS_VERSION` / `PIPELINE_VERSION`).
-2. **Owner: decide the product is ready to publish.** Until then nothing in plan 10 is done.
-3. **Plan 10, Release**, in its listed order: terms re-check, samples, the tag-triggered
-   workflow (replacing release-please), first manual publish + Trusted Publisher, then a
-   release through the workflow and the clean-environment check (which also covers plan 09's
-   built-binary run).
+   `ANALYSIS_VERSION` / `PIPELINE_VERSION`). Then plan 13 is done and deleted.
+2. **Owner: decide the product is ready to publish.**
+3. **Plan 10, Release**, in its listed order: terms re-check, samples, first manual publish +
+   Trusted Publisher, then a release through the tag-triggered workflow and the
+   clean-environment check (which also covers plan 09's built-binary run).
 
-New work gets the next plan number, a `Status:` line at the top, and acceptance boxes that are
-ticked (with where the evidence lives) when the plan is done.
+New work gets the next plan number (never reuse a deleted plan's number), a `Status:` line at
+the top, and acceptance boxes. When every box is ticked, delete the plan file and its row in the
+same change, and fix links that pointed to it.

@@ -1,7 +1,7 @@
 # Profile customization research package
 
 This is a planning artifact, not a production feature. All captures use fictional input.
-The [research plan](../../plans/11-profile-customization-ux.md) defines the study and decision gates.
+The research plan (plan 11, deleted when done; see `git log -- plans/11-profile-customization-ux.md`) defined the study and decision gates.
 
 ## Revised direction: a profile worth sharing
 

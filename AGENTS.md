@@ -92,3 +92,6 @@ that fails to load is not counted in `Tests`.
   prompts and test data built from such prompts. Exception: `.claude/skills/` holds the owner's
   personal workflow files, kept as written.
 - Commits use Conventional Commits.
+- **Plans**: `plans/` holds only unfinished plans. When a plan is done, delete its file and its
+  row in `plans/README.md` in the same change; it stays readable in git history. Fix links that
+  pointed to it.
