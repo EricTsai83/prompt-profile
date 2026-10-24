@@ -5,7 +5,8 @@ import { mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { runCli } from "../../src/cli/main.ts"
-import { LlmProvider, Opener } from "../../src/cli/services.ts"
+import { FontSource, LlmProvider, Opener } from "../../src/cli/services.ts"
+import { embeddedFonts } from "../../src/report/fonts.ts"
 import type { RunnerStatus } from "../../src/llm/detect.ts"
 import { makeFakeLlmRunner, type FakeLlmRunner, type FakeOptions } from "../../src/llm/fake.ts"
 import { Environment, type EnvironmentShape } from "../../src/platform/Environment.ts"
@@ -14,6 +15,18 @@ export const fixture = (name: string) => new URL(`../fixtures/${name}`, import.m
 
 /** Fake LLM: quotes the first prompt of each chunk; builds a profile from observations. */
 export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
+  if (schemaName === "LlmTranslation") {
+    // Prefix every string except dimension keys.
+    const tr = (x: unknown): unknown =>
+      typeof x === "string"
+        ? `譯 ${x}`
+        : Array.isArray(x)
+          ? x.map(tr)
+          : Object.fromEntries(
+              Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
+            )
+    return tr(JSON.parse(/\nprofile:\n(.*)$/s.exec(prompt)![1]!))
+  }
   if (schemaName === "LlmChunkObservations") {
     const m = /<prompt id="([^"]+)"[^>]*>\n(.{1,20})/.exec(prompt)!
     return {
@@ -77,10 +90,15 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     username: "dev",
     isTTY: false,
     platform: "linux",
+    locale: "en_US.UTF-8",
     ...options.env,
   }
   const layer = Layer.mergeAll(
     Layer.succeed(Environment, environment),
+    // No download in tests: Inter stands in for the CJK font (missing glyphs render empty).
+    Layer.succeed(FontSource, {
+      cjk: () => Effect.succeed(embeddedFonts().map((f) => ({ ...f, name: "Noto Sans TC" }))),
+    }),
     Layer.succeed(LlmProvider, {
       detect: Effect.succeed(options.statuses ?? [ok("claude-code"), ok("codex")]),
       make: (id) =>

@@ -77,6 +77,6 @@ Sorted by severity.
 16. **The report's light / dark modes were checked in Chrome and in WebKit 26.5** (Safari's engine, through Playwright) for every look at 1440 and 390 px on 2026-10-24: no overflow, no requests, display font loaded. Not yet opened in the Safari app itself.
 17. **"Clean environment (Docker) + `npx prompt-profile` from start to finish" and npm provenance** have not been verified (they require publishing first).
 18. **Font source**: Noto Sans TC is downloaded from GitHub raw (pinned commit `165c01b`) and its SHA-256 is verified; if GitHub changes its raw URL policy,
-    the Chinese card can no longer be generated (the report is unaffected). The Inter font is embedded in the package under the OFL licence. (Removed later: the product is English-only, so the CJK font download no longer exists.)
+    the Chinese card can no longer be generated (the report is unaffected). The Inter font is embedded in the package under the OFL licence. (Removed when the product became English-only, and restored with the same pinned URL and SHA-256 for the zh-TW card in plan 14.)
 19. **oxfmt rewrites `html\`\``templates**:`embeddedLanguageFormatting`is disabled in`.oxfmtrc.json`; keep an eye on this when updating oxfmt.
 20. **Standalone binaries (bun compile) are not yet considered**: `map.md`, the fonts and the resvg wasm are all read from the file system at runtime, which needs separate handling when bundling into a single executable.

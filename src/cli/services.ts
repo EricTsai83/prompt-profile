@@ -1,3 +1,5 @@
+import type { CjkFonts } from "../report/index.ts"
+import { loadCjkFonts } from "../report/fonts.ts"
 import { Console, Context, Effect, FileSystem, Layer, Path } from "effect"
 import { ChildProcess, ChildProcessSpawner } from "effect/process"
 import type { RunnerOptions } from "../llm/common.ts"
@@ -124,3 +126,14 @@ export const makeOutput = (options: {
       options.isTTY ? clearStatus.pipe(Effect.andThen(Console.error(text))) : Console.error(text),
   }
 }
+
+/** Where the card's CJK font comes from: a verified, cached download (tests use a stand-in). */
+export interface FontSourceShape {
+  readonly cjk: (cacheDir: string) => CjkFonts
+}
+
+export class FontSource extends Context.Service<FontSource, FontSourceShape>()(
+  "prompt-profile/FontSource",
+) {}
+
+export const FontSourceLive = Layer.succeed(FontSource, { cjk: (dir) => loadCjkFonts(dir) })

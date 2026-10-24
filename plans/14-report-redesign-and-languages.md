@@ -1,6 +1,8 @@
 # 14 · Report redesign and multiple languages
 
-Status: in progress (2026-10-24). Owner request: the HTML report has too much text; it needs
+Status: implemented (2026-10-24); a real bilingual run is pending the owner's quota approval.
+
+Owner request: the HTML report has too much text; it needs
 more charts, collapsible sections and a shorter title, no "My AI collaboration profile"
 eyebrow, and a language switch. This reverses the English-only decision of commit `476e6aa`
 for the **product output**; the repository itself stays English.

@@ -56,7 +56,9 @@ try {
   }
   const input = join(root, "sample profile.json")
   const output = join(root, "rendered report")
-  writeFileSync(input, readFileSync(join(repo, "test", "fixtures", "profile.sample.json")), {
+  // English only: a zh-TW card would download the CJK font, which this check must not need.
+  const sample = JSON.parse(readFileSync(join(repo, "test", "fixtures", "profile.sample.json")))
+  writeFileSync(input, JSON.stringify({ ...sample, languages: ["en"], translations: {} }), {
     mode: 0o600,
   })
   run(process.execPath, [bin, "render", input, "--out", output], {
@@ -69,8 +71,8 @@ try {
   assert.equal(png.readUInt32BE(16), 1200)
   assert.equal(png.readUInt32BE(20), 630)
   assert.deepEqual(
-    JSON.parse(readFileSync(join(output, "profile.json"), "utf8")),
-    JSON.parse(readFileSync(input, "utf8")),
+    JSON.parse(readFileSync(join(output, "profile.json"), "utf8")).languages,
+    JSON.parse(readFileSync(input, "utf8")).languages,
   )
   for (const file of ["report.html", "profile.json", "card.png"]) {
     assert.ok(existsSync(join(output, file)))

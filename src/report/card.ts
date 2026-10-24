@@ -8,7 +8,9 @@ import { DISPLAY_FONT, type FontData } from "./fonts.ts"
 import { peakHour } from "../domain/Stats.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, lookOf, type Look, type RenderOptions } from "./looks.ts"
-import { messages } from "./messages.ts"
+import { contentIn } from "./content.ts"
+import { MESSAGES } from "./messages.ts"
+import type { Language } from "../domain/Profile.ts"
 
 export const CARD_WIDTH = 1200
 export const CARD_HEIGHT = 630
@@ -50,15 +52,16 @@ export const clip = (s: string, max: number): string => {
 }
 
 /** Today's card. `hide` can only remove the trait or number rows. */
-const classicTree = (profile: Profile, hide: RenderOptions["cardHide"]): Node => {
-  const t = messages
+const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: Language): Node => {
+  const t = MESSAGES[lang]
+  const c = contentIn(profile, lang)
   const s = profile.stats
   const peak = peakHour(s)
   const numbers: Array<[string, string]> = [
     [t.totalPrompts, s.totalPrompts.toLocaleString("en")],
     [t.longestStreak, t.days(s.longestStreakDays)],
     s.latestTime
-      ? [t.latestTime, s.latestTime]
+      ? [t.cardLatest, s.latestTime]
       : [t.peakHour, peak === null ? t.none : `${String(peak).padStart(2, "0")}:00`],
   ]
   return h(
@@ -77,22 +80,22 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"]): Node =>
     },
     [
       h("div", { display: "flex", flexDirection: "column" }, [
-        h("div", { fontSize: 22, color: "#b9b9ff", letterSpacing: 2 }, t.title),
+        h("div", { fontSize: 22, color: "#b9b9ff", letterSpacing: 1 }, t.project),
         h(
           "div",
           { fontSize: 56, fontWeight: 700, marginTop: 14, lineHeight: 1.15 },
-          clip(profile.archetype.name, 56),
+          clip(c.archetype.name, 56),
         ),
         h(
           "div",
           { fontSize: 26, marginTop: 16, lineHeight: 1.4, color: "#dcdcf5" },
-          clip(profile.headline, 150),
+          clip(c.headline, 150),
         ),
       ]),
       h(
         "div",
         { display: "flex", gap: 12, flexWrap: "wrap" },
-        (hide.includes("traits") ? [] : profile.traits.slice(0, 3)).map((tr) =>
+        (hide.includes("traits") ? [] : profile.traits.slice(0, 3)).map((_tr, i) =>
           h(
             "div",
             {
@@ -102,7 +105,7 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"]): Node =>
               borderRadius: 999,
               backgroundColor: "rgba(255,255,255,0.14)",
             },
-            clip(tr.name, 32),
+            clip(c.trait(i).name, 32),
           ),
         ),
       ),
@@ -127,11 +130,17 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"]): Node =>
 const titleSize = (name: string) => (name.length > 44 ? 58 : name.length > 26 ? 72 : 96)
 
 /** A share-first look: identity colors, display type and the activity graphic. */
-const lookTree = (profile: Profile, look: Look, hide: RenderOptions["cardHide"]): Node => {
-  const t = messages
+const lookTree = (
+  profile: Profile,
+  look: Look,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+): Node => {
+  const t = MESSAGES[lang]
+  const c = contentIn(profile, lang)
   const s = profile.stats
   const id = look.identity
-  const name = clip(profile.archetype.name, 56)
+  const name = clip(c.archetype.name, 56)
   const showGraphic = !hide.includes("graphic")
   const graphic = graphicSvg(id.graphic, s.hourHistogram, id)
   const box = { bars: [56, 168, 340], orbit: [56, 110, 370], fold: [70, 190, 290] }[id.graphic]
@@ -212,14 +221,14 @@ const lookTree = (profile: Profile, look: Look, hide: RenderOptions["cardHide"])
               h(
                 "div",
                 { fontSize: 24, lineHeight: 1.4, marginTop: 20, color: id.muted },
-                clip(profile.headline, 120),
+                clip(c.headline, 120),
               ),
               hide.includes("traits")
                 ? null
                 : h(
                     "div",
                     { display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 },
-                    profile.traits.slice(0, 3).map((tr) =>
+                    profile.traits.slice(0, 3).map((_tr, i) =>
                       h(
                         "div",
                         {
@@ -230,7 +239,7 @@ const lookTree = (profile: Profile, look: Look, hide: RenderOptions["cardHide"])
                           border: `1.5px solid ${id.chipBorder}`,
                           backgroundColor: id.chipBackground,
                         },
-                        clip(tr.name, 32),
+                        clip(c.trait(i).name, 32),
                       ),
                     ),
                   ),
@@ -262,11 +271,12 @@ const lookTree = (profile: Profile, look: Look, hide: RenderOptions["cardHide"])
 export const cardTree = (
   profile: Profile,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+  lang: Language = profile.languages[0],
 ): Node => {
   const look = lookOf(options.look)
   return look === null
-    ? classicTree(profile, options.cardHide)
-    : lookTree(profile, look, options.cardHide)
+    ? classicTree(profile, options.cardHide, lang)
+    : lookTree(profile, look, options.cardHide, lang)
 }
 
 let wasmReady: Promise<void> | null = null
@@ -283,10 +293,11 @@ export const renderCard = (
   profile: Profile,
   fonts: ReadonlyArray<FontData>,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+  lang: Language = profile.languages[0],
 ): Effect.Effect<Uint8Array, Error> =>
   Effect.tryPromise({
     try: async () => {
-      const svg = await satori(cardTree(profile, options) as never, {
+      const svg = await satori(cardTree(profile, options, lang) as never, {
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         fonts: fonts.map((f) => ({

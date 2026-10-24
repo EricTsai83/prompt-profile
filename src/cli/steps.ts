@@ -10,7 +10,7 @@ import { writeReport, type RenderOptions } from "../report/index.ts"
 import { FileError, NoData } from "./errors.ts"
 import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
-import { Output } from "./services.ts"
+import { FontSource, Output } from "./services.ts"
 
 /*
  * Steps shared by the commands (commands/*). Wiring and output only: every decision
@@ -146,6 +146,10 @@ export const writeReportFiles = (
   options?: RenderOptions,
   source?: string | null,
 ) =>
-  writeReport(profile, outDir, options, source).pipe(
-    Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
-  )
+  Effect.gen(function* () {
+    const fonts = yield* FontSource
+    const cjk = fonts.cjk(yield* cacheDirOf)
+    return yield* writeReport(profile, outDir, options, source, cjk).pipe(
+      Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
+    )
+  })

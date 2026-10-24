@@ -11,97 +11,644 @@ exports[`renderHtml > matches snapshot 1`] = `
           http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"
         />
-        <title>My AI collaboration profile · The Midnight Architect</title>
+        <title>The Midnight Architect · prompt-profile</title>
         <style>
           
-:root{color-scheme:light dark;--bg:#f7f7f5;--fg:#1d1d1f;--muted:#6b6b70;--card:#fff;--border:#e4e4e0;--accent:#5b5bd6;--accent-soft:#ececfb;--warn:#a15c00;--empty:#ececea}
-@media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececee;--muted:#9a9aa2;--card:#1c1c20;--border:#2c2c33;--accent:#9d9dff;--accent-soft:#25254a;--warn:#f0b35a;--empty:#26262c}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
-main{max-width:960px;margin:0 auto;padding:48px 20px 64px}
-h1,h2,h3{line-height:1.25;margin:0}
-h1{font-size:clamp(28px,5vw,44px);margin:8px 0 12px}
-h2{font-size:22px;margin:56px 0 16px}
-h3{font-size:18px}
-p{margin:8px 0}
-.eyebrow{color:var(--accent);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin:0}
-.hero .archetype{font-size:20px;font-weight:600}
-.meta{color:var(--muted);font-size:14px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.stat,.card{background:var(--card);border:1px solid var(--border);border-radius:14px}
-.stat{padding:16px}
-.stat .value{font-size:24px;font-weight:700}
-.stat .label{color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.card{padding:18px 20px}
-.card header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.badge{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
-.badge.low{opacity:.7}
-details{margin-top:10px}
-summary{cursor:pointer;color:var(--accent);font-size:14px}
-.evidence{list-style:none;padding:0;margin:8px 0 0}
-blockquote{margin:6px 0;padding:6px 12px;border-left:3px solid var(--accent);color:var(--muted);font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
-.warning{color:var(--warn);font-size:14px}
-.heatmap{width:100%;height:auto}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+.page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}
+h1,h2,h3{line-height:1.2;margin:0}
+p{margin:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0 18px}
+.brand{font-weight:700;letter-spacing:-.01em}
+.switch{display:flex;gap:2px;padding:3px;border:1px solid var(--border);border-radius:999px;background:var(--card)}
+.switch label{padding:4px 12px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--muted)}
+.lang-input{position:absolute;opacity:0;pointer-events:none}
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:36px 40px;border:1px solid var(--border);background:var(--id-bg);color:var(--id-fg)}
+.hero .split{position:absolute;right:0;top:0;bottom:0;width:34%;background:var(--id-split)}
+.hero .copy{position:relative;max-width:60%}
+.hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
+.hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
+.hero .meta{margin-top:16px;font-size:12.5px;color:var(--id-muted)}
+.hero .graphic{position:absolute;right:36px;top:28px;bottom:28px;height:calc(100% - 56px);width:auto;max-width:30%;object-fit:contain}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.kpi,.panel,.trait,.dimension,.fact,.about{background:var(--card);border:1px solid var(--border);border-radius:18px}
+.kpi{padding:16px 18px}
+.kpi b{display:block;font-size:26px;letter-spacing:-.02em;line-height:1.1}
+.kpi>span{color:var(--muted);font-size:12.5px}
+.grid{display:grid;gap:12px;margin-bottom:12px}
+.g-2{grid-template-columns:2fr 1fr}
+.g-3{grid-template-columns:repeat(3,1fr)}
+.panel{padding:18px 20px}
+.panel h2{font-size:14px;margin-bottom:10px}
+.panel .note{color:var(--muted);font-size:12px;margin-top:6px}
+.chart{width:100%;height:auto;display:block}
+.bar{fill:var(--accent);fill-opacity:.35}
+.bar.peak{fill-opacity:1}
+.axis{fill:var(--muted);font-size:11px}
+.value{fill:var(--fg);font-size:12px;font-weight:700}
+.donut{display:flex;align-items:center;gap:16px}
+.donut svg{width:112px;flex:none}
+.track{fill:none;stroke:var(--empty);stroke-width:14}
+.seg{fill:none;stroke-width:14;stroke:var(--accent)}
+.s1{stroke-opacity:.55}.s2{stroke-opacity:.25}
+.donut-value{fill:var(--fg);font-size:20px;font-weight:700}
+.legend,.shares,.evidence,.facts{list-style:none;margin:0;padding:0}
+.legend li{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.legend b{margin-left:auto;padding-left:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none}
+.dot.s1{opacity:.55}.dot.s2{opacity:.25}
+.shares li{display:grid;grid-template-columns:84px 1fr 38px;align-items:center;gap:8px;font-size:13px;margin:7px 0}
+.share-track{height:8px;border-radius:99px;background:var(--empty);overflow:hidden}
+.share-fill{display:block;height:100%;background:var(--accent);border-radius:99px}
+.shares b{text-align:right;font-size:12px}
+.sub{color:var(--muted);font-size:12px;margin-top:12px}
+.rings{display:flex;gap:14px;flex-wrap:wrap}
+.ring{display:flex;align-items:center;gap:8px}
+.ring svg{width:52px}
+.ring b{display:block;font-size:17px}
+.ring div>span{font-size:12px;color:var(--muted)}
+.length{margin-top:14px}
+.length .shares li{grid-template-columns:84px 1fr 78px}
+details summary{cursor:pointer}
+details.panel>summary{font-weight:700;font-size:14px}
+details.panel>summary .note{font-weight:400;margin-left:8px}
+.heatmap{width:100%;height:auto;margin-top:12px}
 .heatmap .cell{fill:var(--accent)}
 .heatmap .cell[data-empty="true"]{fill:var(--empty)}
-.heatmap .axis{fill:var(--muted);font-size:11px}
-.facts{padding-left:20px}
-.facts li{margin:6px 0}
-footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
-footer p{margin:4px 0}
-
+section>h2{font-size:20px;margin:36px 0 14px}
+.traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.trait{padding:18px 20px}
+.trait header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
+.trait h3{font-size:17px}
+.trait p{font-size:14px;color:var(--muted)}
+.meter{display:flex;align-items:center;gap:3px;flex:none}
+.meter i{width:14px;height:6px;border-radius:3px;background:var(--empty)}
+.meter i.on{background:var(--accent)}
+.meter-label{font-size:11px;color:var(--muted);margin-left:6px;white-space:nowrap}
+.trait details{margin-top:10px}
+.trait summary,.dim-body summary{font-size:13px;color:var(--accent)}
+.evidence li{margin:8px 0 0}
+blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:var(--muted);font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.dims{display:grid;gap:8px}
+.dimension>summary{display:flex;align-items:center;gap:12px;padding:14px 18px;list-style:none}
+.dimension>summary::-webkit-details-marker{display:none}
+.dimension>summary::after{content:"+";margin-left:12px;color:var(--muted);font-size:18px;line-height:1}
+.dimension[open]>summary::after{content:"–"}
+.dim-name{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;min-width:120px}
+.dim-title{font-weight:600;flex:1}
+.badge{font-size:12px;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.badge.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.dim-body{padding:0 18px 16px}
+.dim-body p{font-size:14px}
+.warning{color:var(--warn);font-size:13px;margin-top:8px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.fact{padding:16px 18px;font-size:14px}
+.about{margin-top:36px;padding:14px 18px;font-size:13px;color:var(--muted)}
+.about summary{color:var(--fg);font-weight:600}
+.about p{margin-top:8px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media (max-width:760px){
+.hero{padding:26px 22px}.hero .copy{max-width:none}.hero .split{display:none}
+.hero .graphic{position:static;display:block;height:auto;width:62%;max-width:none;margin:18px 0 0 auto}
+.kpis{grid-template-columns:repeat(2,1fr)}.g-2,.g-3{grid-template-columns:1fr}
+.dim-name{min-width:0}.dimension>summary{flex-wrap:wrap;gap:6px 12px}
+}
+:root{color-scheme:light dark;--bg:#f6f6f3;--fg:#1d1d1f;--muted:#6b6b70;--card:#ffffff;--border:#e6e6e1;--accent:#5b5bd6;--accent-soft:#ececfb;--warn:#9a5800;--empty:#ececea}
+@media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececee;--muted:#9a9aa2;--card:#1c1c20;--border:#2c2c33;--accent:#9d9dff;--accent-soft:#25254a;--warn:#f0b35a;--empty:#26262c}}
+.hero{--id-bg:var(--card);--id-fg:var(--fg);--id-muted:var(--muted);--id-split:transparent}.page [data-l]{display:none}
+#lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:#fff}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
+#lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:#fff}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
         </style>
       </head>
       <body>
-        <main>
-          <section class="hero">
-                  <p class="eyebrow">My AI collaboration profile</p>
-                  <h1>A perfectionist who argues with AI about naming at midnight</h1>
-                  <p class="archetype">The Midnight Architect</p>
-                  <p>Ships features by day, refactors by night.</p>
-                  <p class="meta">
-    Period: Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions
-  </p>
-                </section>
+        <input
+                    type="radio"
+                    name="lang"
+                    id="lang-en"
+                    class="lang-input"
+                    checked
+                  /><input
+                    type="radio"
+                    name="lang"
+                    id="lang-zh-TW"
+                    class="lang-input"
+                    
+                  />
+        <div class="page">
+          <header class="topbar">
+            <span class="brand">prompt-profile</span>
+            <nav class="switch" aria-label="Language">
+                    <label for="lang-en" lang="en"
+                          >English</label
+                        ><label for="lang-zh-TW" lang="zh-Hant-TW"
+                          >中文</label
+                        >
+                  </nav>
+          </header>
 
-          <h2>Numbers</h2>
-          <section class="stats">
-            <div class="stat">
-    <div class="value">1,980</div>
-    <div class="label">Prompts</div>
+          <section class="hero">
+            
+            <div class="copy">
+              <h1><span data-l="en" lang="en">The Midnight Architect</span><span data-l="zh-TW" lang="zh-Hant-TW">午夜架構師</span></h1>
+              <p class="tagline"><span data-l="en" lang="en">A perfectionist who argues with AI about naming at midnight</span><span data-l="zh-TW" lang="zh-Hant-TW">半夜跟 AI 爭論命名的完美主義者</span></p>
+              <p class="desc"><span data-l="en" lang="en">Ships features by day, refactors by night.</span><span data-l="zh-TW" lang="zh-Hant-TW">白天出貨，晚上重構。</span></p>
+              <p class="meta">
+                <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
+              </p>
+            </div>
+            <img
+              class="graphic"
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODUgMjEwIj48cmVjdCB4PSIwLjAiIHk9IjEzMC44IiB3aWR0aD0iNy40IiBoZWlnaHQ9IjU0LjIiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC41Ii8+PHJlY3QgeD0iMTEuNyIgeT0iMTQ3LjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMzcuOSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjUiLz48cmVjdCB4PSIyMy40IiB5PSIxNTguOCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIyNi4yIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNCIvPjxyZWN0IHg9IjM1LjEiIHk9IjE2NC4zIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjIwLjciIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC40Ii8+PHJlY3QgeD0iNDYuOCIgeT0iMTY3LjAiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTguMCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjQiLz48cmVjdCB4PSI1OC41IiB5PSIxNjcuMCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxOC4wIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNCIvPjxyZWN0IHg9IjcwLjIiIHk9IjE2Ni4xIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjE4LjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC40Ii8+PHJlY3QgeD0iODEuOSIgeT0iMTYzLjQiIHdpZHRoPSI3LjQiIGhlaWdodD0iMjEuNiIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjQiLz48cmVjdCB4PSI5My42IiB5PSIxNDguOSIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIzNi4xIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNSIvPjxyZWN0IHg9IjEwNS4zIiB5PSIxMTEuNyIgd2lkdGg9IjcuNCIgaGVpZ2h0PSI3My4zIiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNiIvPjxyZWN0IHg9IjExNy4wIiB5PSI3OC4yIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjEwNi44IiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuNyIvPjxyZWN0IHg9IjEyOC43IiB5PSI1OC4zIiB3aWR0aD0iNy40IiBoZWlnaHQ9IjEyNi43IiByeD0iMy43IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuOCIvPjxyZWN0IHg9IjE0MC40IiB5PSI5NC41IiB3aWR0aD0iNy40IiBoZWlnaHQ9IjkwLjUiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC43Ii8+PHJlY3QgeD0iMTUyLjEiIHk9IjY3LjQiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTE3LjYiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iMTYzLjgiIHk9IjQwLjIiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTQ0LjgiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTc1LjUiIHk9IjMxLjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTUzLjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTg3LjIiIHk9IjQ0LjciIHdpZHRoPSI3LjQiIGhlaWdodD0iMTQwLjMiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iMTk4LjkiIHk9IjYwLjEiIHdpZHRoPSI3LjQiIGhlaWdodD0iMTI0LjkiIHJ4PSIzLjciIGZpbGw9IiM1YjViZDYiIGZpbGwtb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iMjEwLjYiIHk9Ijg1LjUiIHdpZHRoPSI3LjQiIGhlaWdodD0iOTkuNSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjciLz48cmVjdCB4PSIyMjIuMyIgeT0iNzYuNCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMDguNiIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIyMzQuMCIgeT0iNDkuMiIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMzUuOCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjkiLz48cmVjdCB4PSIyNDUuNyIgeT0iMjIuMSIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxNjIuOSIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIxLjAiLz48cmVjdCB4PSIyNTcuNCIgeT0iMTMuMCIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxNzIuMCIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIxLjAiLz48cmVjdCB4PSIyNjkuMSIgeT0iNTguMyIgd2lkdGg9IjcuNCIgaGVpZ2h0PSIxMjYuNyIgcng9IjMuNyIgZmlsbD0iIzViNWJkNiIgZmlsbC1vcGFjaXR5PSIwLjgiLz48cmVjdCB4PSIwIiB5PSIxOTkiIHdpZHRoPSIyODAiIGhlaWdodD0iMS41IiBmaWxsPSIjNWI1YmQ2IiBmaWxsLW9wYWNpdHk9IjAuMzUiLz48L3N2Zz4="
+              alt="Prompts by hour of day"
+            />
+          </section>
+
+          <section class="kpis">
+            <div class="kpi">
+    <b>1,980</b><span><span data-l="en" lang="en">Prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 數</span></span>
   </div>
-            <div class="stat">
-    <div class="value">22:00</div>
-    <div class="label">Peak hour</div>
+            <div class="kpi">
+    <b>141</b><span><span data-l="en" lang="en">Active days</span><span data-l="zh-TW" lang="zh-Hant-TW">活躍天數</span></span>
   </div>
-            <div class="stat">
-    <div class="value">58% / 27% / 15%</div>
-    <div class="label">Chinese / English / mixed</div>
+            <div class="kpi">
+    <b><span data-l="en" lang="en">23 days</span><span data-l="zh-TW" lang="zh-Hant-TW">23 天</span></b><span><span data-l="en" lang="en">Longest streak</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續</span></span>
   </div>
-            <div class="stat">
-    <div class="value">23 days</div>
-    <div class="label">Longest streak</div>
-  </div>
-            <div class="stat">
-    <div class="value">03:12</div>
-    <div class="label">Latest session</div>
-  </div>
-            <div class="stat">
-    <div class="value">141 days</div>
-    <div class="label">Active days</div>
-  </div>
-            <div class="stat">
-    <div class="value">12%</div>
-    <div class="label">Corrections</div>
+            <div class="kpi">
+    <b>22:00</b><span><span data-l="en" lang="en">Peak hour</span><span data-l="zh-TW" lang="zh-Hant-TW">最活躍時段</span></span>
   </div>
           </section>
 
-          <h2>When you prompt</h2>
-          <section class="card"><svg
+          <div class="grid g-2">
+            <article class="panel">
+              <h2><span data-l="en" lang="en">Prompts by hour</span><span data-l="zh-TW" lang="zh-Hant-TW">各時段的 prompt</span></h2>
+              <svg
+    viewBox="0 0 480 150"
+    class="chart"
+    role="img"
+    aria-label="Prompts by hour"
+  >
+    <rect
+      x="3"
+      y="92.70588235294117"
+      width="14"
+      height="31.3"
+      rx="3"
+      class="bar"
+      ><title>00:00 · 40</title></rect
+    ><rect
+      x="23"
+      y="104.98823529411764"
+      width="14"
+      height="19.0"
+      rx="3"
+      class="bar"
+      ><title>01:00 · 22</title></rect
+    ><rect
+      x="43"
+      y="113.85882352941177"
+      width="14"
+      height="10.1"
+      rx="3"
+      class="bar"
+      ><title>02:00 · 9</title></rect
+    ><rect
+      x="63"
+      y="117.95294117647059"
+      width="14"
+      height="6.0"
+      rx="3"
+      class="bar"
+      ><title>03:00 · 3</title></rect
+    ><rect
+      x="83"
+      y="122"
+      width="14"
+      height="2.0"
+      rx="3"
+      class="bar"
+      ><title>04:00 · 0</title></rect
+    ><rect
+      x="103"
+      y="122"
+      width="14"
+      height="2.0"
+      rx="3"
+      class="bar"
+      ><title>05:00 · 0</title></rect
+    ><rect
+      x="123"
+      y="119.31764705882352"
+      width="14"
+      height="4.7"
+      rx="3"
+      class="bar"
+      ><title>06:00 · 1</title></rect
+    ><rect
+      x="143"
+      y="117.27058823529411"
+      width="14"
+      height="6.7"
+      rx="3"
+      class="bar"
+      ><title>07:00 · 4</title></rect
+    ><rect
+      x="163"
+      y="106.35294117647058"
+      width="14"
+      height="17.6"
+      rx="3"
+      class="bar"
+      ><title>08:00 · 20</title></rect
+    ><rect
+      x="183"
+      y="78.37647058823529"
+      width="14"
+      height="45.6"
+      rx="3"
+      class="bar"
+      ><title>09:00 · 61</title></rect
+    ><rect
+      x="203"
+      y="53.12941176470588"
+      width="14"
+      height="70.9"
+      rx="3"
+      class="bar"
+      ><title>10:00 · 98</title></rect
+    ><rect
+      x="223"
+      y="38.117647058823536"
+      width="14"
+      height="85.9"
+      rx="3"
+      class="bar"
+      ><title>11:00 · 120</title></rect
+    ><rect
+      x="243"
+      y="65.41176470588235"
+      width="14"
+      height="58.6"
+      rx="3"
+      class="bar"
+      ><title>12:00 · 80</title></rect
+    ><rect
+      x="263"
+      y="44.94117647058823"
+      width="14"
+      height="79.1"
+      rx="3"
+      class="bar"
+      ><title>13:00 · 110</title></rect
+    ><rect
+      x="283"
+      y="24.470588235294116"
+      width="14"
+      height="99.5"
+      rx="3"
+      class="bar"
+      ><title>14:00 · 140</title></rect
+    ><rect
+      x="303"
+      y="17.647058823529406"
+      width="14"
+      height="106.4"
+      rx="3"
+      class="bar"
+      ><title>15:00 · 150</title></rect
+    ><rect
+      x="323"
+      y="27.882352941176464"
+      width="14"
+      height="96.1"
+      rx="3"
+      class="bar"
+      ><title>16:00 · 135</title></rect
+    ><rect
+      x="343"
+      y="39.48235294117647"
+      width="14"
+      height="84.5"
+      rx="3"
+      class="bar"
+      ><title>17:00 · 118</title></rect
+    ><rect
+      x="363"
+      y="58.58823529411765"
+      width="14"
+      height="65.4"
+      rx="3"
+      class="bar"
+      ><title>18:00 · 90</title></rect
+    ><rect
+      x="383"
+      y="51.76470588235294"
+      width="14"
+      height="72.2"
+      rx="3"
+      class="bar"
+      ><title>19:00 · 100</title></rect
+    ><rect
+      x="403"
+      y="31.294117647058826"
+      width="14"
+      height="92.7"
+      rx="3"
+      class="bar"
+      ><title>20:00 · 130</title></rect
+    ><rect
+      x="423"
+      y="10.82352941176471"
+      width="14"
+      height="113.2"
+      rx="3"
+      class="bar"
+      ><title>21:00 · 160</title></rect
+    ><rect
+      x="443"
+      y="4"
+      width="14"
+      height="120.0"
+      rx="3"
+      class="bar peak"
+      ><title>22:00 · 170</title></rect
+    ><rect
+      x="463"
+      y="38.117647058823536"
+      width="14"
+      height="85.9"
+      rx="3"
+      class="bar"
+      ><title>23:00 · 120</title></rect
+    ><text
+        x="3"
+        y="142"
+        text-anchor="start"
+        class="axis"
+        >00:00</text
+      ><text
+        x="130"
+        y="142"
+        text-anchor="middle"
+        class="axis"
+        >06:00</text
+      ><text
+        x="250"
+        y="142"
+        text-anchor="middle"
+        class="axis"
+        >12:00</text
+      ><text
+        x="370"
+        y="142"
+        text-anchor="middle"
+        class="axis"
+        >18:00</text
+      ><text
+        x="477"
+        y="142"
+        text-anchor="end"
+        class="axis"
+        >23:00</text
+      ><text
+          x="450"
+          y="-2"
+          text-anchor="middle"
+          class="value"
+          >170</text
+        >
+  </svg>
+              <p class="note">
+                <span data-l="en" lang="en">Busiest at 22:00 · latest 03:12</span><span data-l="zh-TW" lang="zh-Hant-TW">最忙 22:00 · 最晚 03:12</span>
+              </p>
+            </article>
+            <article class="panel">
+              <h2><span data-l="en" lang="en">Prompts by weekday</span><span data-l="zh-TW" lang="zh-Hant-TW">星期分布</span></h2>
+              <svg
+    viewBox="0 0 280 140"
+    class="chart"
+    role="img"
+    aria-label="Prompts by weekday"
+  >
+    <rect
+        x="8"
+        y="6"
+        width="24"
+        height="104.0"
+        rx="4"
+        class="bar peak"
+        ><title>320</title></rect
+      ><text x="20" y="130" text-anchor="middle" class="axis" data-l="en">Mon</text><text x="20" y="130" text-anchor="middle" class="axis" data-l="zh-TW">一</text><rect
+        x="48"
+        y="12.25"
+        width="24"
+        height="97.8"
+        rx="4"
+        class="bar"
+        ><title>300</title></rect
+      ><text x="60" y="130" text-anchor="middle" class="axis" data-l="en">Tue</text><text x="60" y="130" text-anchor="middle" class="axis" data-l="zh-TW">二</text><rect
+        x="88"
+        y="9.125"
+        width="24"
+        height="100.9"
+        rx="4"
+        class="bar"
+        ><title>310</title></rect
+      ><text x="100" y="130" text-anchor="middle" class="axis" data-l="en">Wed</text><text x="100" y="130" text-anchor="middle" class="axis" data-l="zh-TW">三</text><rect
+        x="128"
+        y="15.375"
+        width="24"
+        height="94.6"
+        rx="4"
+        class="bar"
+        ><title>290</title></rect
+      ><text x="140" y="130" text-anchor="middle" class="axis" data-l="en">Thu</text><text x="140" y="130" text-anchor="middle" class="axis" data-l="zh-TW">四</text><rect
+        x="168"
+        y="18.5"
+        width="24"
+        height="91.5"
+        rx="4"
+        class="bar"
+        ><title>280</title></rect
+      ><text x="180" y="130" text-anchor="middle" class="axis" data-l="en">Fri</text><text x="180" y="130" text-anchor="middle" class="axis" data-l="zh-TW">五</text><rect
+        x="208"
+        y="31"
+        width="24"
+        height="79.0"
+        rx="4"
+        class="bar"
+        ><title>240</title></rect
+      ><text x="220" y="130" text-anchor="middle" class="axis" data-l="en">Sat</text><text x="220" y="130" text-anchor="middle" class="axis" data-l="zh-TW">六</text><rect
+        x="248"
+        y="31"
+        width="24"
+        height="79.0"
+        rx="4"
+        class="bar"
+        ><title>240</title></rect
+      ><text x="260" y="130" text-anchor="middle" class="axis" data-l="en">Sun</text><text x="260" y="130" text-anchor="middle" class="axis" data-l="zh-TW">日</text>
+  </svg>
+            </article>
+          </div>
+
+          <div class="grid g-3">
+            <article class="panel">
+              <h2><span data-l="en" lang="en">Prompt language</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 語言</span></h2>
+              <div class="donut">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="44" class="track" />
+      <circle
+      cx="60"
+      cy="60"
+      r="44"
+      pathLength="100"
+      class="seg s0"
+      stroke-dasharray="58.00 42.00"
+      stroke-dashoffset="25.00"
+    /><circle
+      cx="60"
+      cy="60"
+      r="44"
+      pathLength="100"
+      class="seg s1"
+      stroke-dasharray="27.00 73.00"
+      stroke-dashoffset="-33.00"
+    /><circle
+      cx="60"
+      cy="60"
+      r="44"
+      pathLength="100"
+      class="seg s2"
+      stroke-dasharray="15.00 85.00"
+      stroke-dashoffset="-60.00"
+    />
+      <text x="60" y="66" text-anchor="middle" class="donut-value">
+        58%
+      </text>
+    </svg>
+    <ul class="legend">
+      <li><i class="dot s0"></i><span data-l="en" lang="en">Chinese</span><span data-l="zh-TW" lang="zh-Hant-TW">中文</span><b>58%</b></li><li><i class="dot s1"></i><span data-l="en" lang="en">English</span><span data-l="zh-TW" lang="zh-Hant-TW">英文</span><b>27%</b></li><li><i class="dot s2"></i><span data-l="en" lang="en">Mixed</span><span data-l="zh-TW" lang="zh-Hant-TW">混合</span><b>15%</b></li>
+    </ul>
+  </div>
+            </article>
+            <article class="panel">
+              <h2><span data-l="en" lang="en">Where you prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">在哪裡寫 prompt</span></h2>
+              <ul class="shares">
+    <li>
+            <span class="share-label">Claude Code</span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:73.7%"></span
+            ></span>
+            <b>74%</b>
+          </li><li>
+            <span class="share-label">Codex</span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:26.3%"></span
+            ></span>
+            <b>26%</b>
+          </li>
+  </ul>
+              <p class="sub"><span data-l="en" lang="en">How</span><span data-l="zh-TW" lang="zh-Hant-TW">方式</span></p>
+              <ul class="shares">
+    <li>
+            <span class="share-label"><span data-l="en" lang="en">Typed</span><span data-l="zh-TW" lang="zh-Hant-TW">手動輸入</span></span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:61.1%"></span
+            ></span>
+            <b>61%</b>
+          </li><li>
+            <span class="share-label"><span data-l="en" lang="en">App / SDK</span><span data-l="zh-TW" lang="zh-Hant-TW">App / SDK</span></span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:32.3%"></span
+            ></span>
+            <b>32%</b>
+          </li><li>
+            <span class="share-label"><span data-l="en" lang="en">Scripted</span><span data-l="zh-TW" lang="zh-Hant-TW">腳本</span></span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:6.1%"></span
+            ></span>
+            <b>6%</b>
+          </li><li>
+            <span class="share-label"><span data-l="en" lang="en">Other</span><span data-l="zh-TW" lang="zh-Hant-TW">其他</span></span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:0.5%"></span
+            ></span>
+            <b>1%</b>
+          </li>
+  </ul>
+            </article>
+            <article class="panel">
+              <h2><span data-l="en" lang="en">Habits</span><span data-l="zh-TW" lang="zh-Hant-TW">習慣</span></h2>
+              <div class="rings">
+                <div class="ring">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="26" class="track" />
+      <circle
+        cx="32"
+        cy="32"
+        r="26"
+        pathLength="100"
+        class="seg s0"
+        stroke-dasharray="12.0 100"
+        stroke-dashoffset="25"
+      />
+    </svg>
+    <div><b>12%</b><span><span data-l="en" lang="en">Corrections</span><span data-l="zh-TW" lang="zh-Hant-TW">糾正 AI</span></span></div>
+  </div>
+                <div class="ring">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="26" class="track" />
+      <circle
+        cx="32"
+        cy="32"
+        r="26"
+        pathLength="100"
+        class="seg s0"
+        stroke-dasharray="4.0 100"
+        stroke-dashoffset="25"
+      />
+    </svg>
+    <div><b>4%</b><span><span data-l="en" lang="en">With images</span><span data-l="zh-TW" lang="zh-Hant-TW">附圖片</span></span></div>
+  </div>
+              </div>
+              <div class="length">
+                <p class="sub"><span data-l="en" lang="en">Prompt length</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 長度</span></p>
+                <ul class="shares">
+                  <li>
+                        <span class="share-label"><span data-l="en" lang="en">median</span><span data-l="zh-TW" lang="zh-Hant-TW">中位數</span></span>
+                        <span class="share-track"
+                          ><span
+                            class="share-fill"
+                            style="width:20.87378640776699%"
+                          ></span
+                        ></span>
+                        <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b>
+                      </li><li>
+                        <span class="share-label"><span data-l="en" lang="en">longest 10%</span><span data-l="zh-TW" lang="zh-Hant-TW">最長的 10%</span></span>
+                        <span class="share-track"
+                          ><span
+                            class="share-fill"
+                            style="width:100%"
+                          ></span
+                        ></span>
+                        <b><span data-l="en" lang="en">412 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">412 字</span></b>
+                      </li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <details class="panel">
+            <summary>
+              <span data-l="en" lang="en">Weekly rhythm</span><span data-l="zh-TW" lang="zh-Hant-TW">一週節奏</span><span class="note"
+                ><span data-l="en" lang="en">Weekday × hour, darker = more prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">星期 × 時段，顏色越深代表 prompt 越多</span></span
+              >
+            </summary>
+            <svg
     viewBox="0 0 636 197"
     role="img"
-    aria-label="When you prompt"
+    aria-label="Weekly rhythm"
     class="heatmap"
   >
     <text x="47" y="14" text-anchor="middle" class="axis"
@@ -120,49 +667,7 @@ footer p{margin:4px 0}
         >18</text
       ><text x="572" y="14" text-anchor="middle" class="axis"
         >21</text
-      ><text
-        x="28"
-        y="37"
-        text-anchor="end"
-        class="axis"
-        >Mon</text
-      ><text
-        x="28"
-        y="62"
-        text-anchor="end"
-        class="axis"
-        >Tue</text
-      ><text
-        x="28"
-        y="87"
-        text-anchor="end"
-        class="axis"
-        >Wed</text
-      ><text
-        x="28"
-        y="112"
-        text-anchor="end"
-        class="axis"
-        >Thu</text
-      ><text
-        x="28"
-        y="137"
-        text-anchor="end"
-        class="axis"
-        >Fri</text
-      ><text
-        x="28"
-        y="162"
-        text-anchor="end"
-        class="axis"
-        >Sat</text
-      ><text
-        x="28"
-        y="187"
-        text-anchor="end"
-        class="axis"
-        >Sun</text
-      ><rect
+      ><text x="28" y="37" text-anchor="end" class="axis" data-l="en">Mon</text><text x="28" y="37" text-anchor="end" class="axis" data-l="zh-TW">一</text><text x="28" y="62" text-anchor="end" class="axis" data-l="en">Tue</text><text x="28" y="62" text-anchor="end" class="axis" data-l="zh-TW">二</text><text x="28" y="87" text-anchor="end" class="axis" data-l="en">Wed</text><text x="28" y="87" text-anchor="end" class="axis" data-l="zh-TW">三</text><text x="28" y="112" text-anchor="end" class="axis" data-l="en">Thu</text><text x="28" y="112" text-anchor="end" class="axis" data-l="zh-TW">四</text><text x="28" y="137" text-anchor="end" class="axis" data-l="en">Fri</text><text x="28" y="137" text-anchor="end" class="axis" data-l="zh-TW">五</text><text x="28" y="162" text-anchor="end" class="axis" data-l="en">Sat</text><text x="28" y="162" text-anchor="end" class="axis" data-l="zh-TW">六</text><text x="28" y="187" text-anchor="end" class="axis" data-l="en">Sun</text><text x="28" y="187" text-anchor="end" class="axis" data-l="zh-TW">日</text><rect
         x="36"
         y="22"
         width="22"
@@ -171,7 +676,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.568"
         data-empty=""
-        ><title>Mon 00:00 · 7</title></rect
+        ><title>00:00 · 7</title></rect
       ><rect
         x="61"
         y="22"
@@ -181,7 +686,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.466"
         data-empty=""
-        ><title>Mon 01:00 · 4</title></rect
+        ><title>01:00 · 4</title></rect
       ><rect
         x="86"
         y="22"
@@ -191,7 +696,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.373"
         data-empty=""
-        ><title>Mon 02:00 · 2</title></rect
+        ><title>02:00 · 2</title></rect
       ><rect
         x="111"
         y="22"
@@ -201,7 +706,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Mon 03:00 · 1</title></rect
+        ><title>03:00 · 1</title></rect
       ><rect
         x="136"
         y="22"
@@ -211,7 +716,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Mon 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="22"
@@ -221,7 +726,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Mon 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="22"
@@ -231,7 +736,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Mon 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="22"
@@ -241,7 +746,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Mon 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="22"
@@ -251,7 +756,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Mon 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="22"
@@ -261,7 +766,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.649"
         data-empty=""
-        ><title>Mon 09:00 · 10</title></rect
+        ><title>09:00 · 10</title></rect
       ><rect
         x="286"
         y="22"
@@ -271,7 +776,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Mon 10:00 · 17</title></rect
+        ><title>10:00 · 17</title></rect
       ><rect
         x="311"
         y="22"
@@ -281,7 +786,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Mon 11:00 · 20</title></rect
+        ><title>11:00 · 20</title></rect
       ><rect
         x="336"
         y="22"
@@ -291,7 +796,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.741"
         data-empty=""
-        ><title>Mon 12:00 · 14</title></rect
+        ><title>12:00 · 14</title></rect
       ><rect
         x="361"
         y="22"
@@ -301,7 +806,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Mon 13:00 · 19</title></rect
+        ><title>13:00 · 19</title></rect
       ><rect
         x="386"
         y="22"
@@ -311,7 +816,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.923"
         data-empty=""
-        ><title>Mon 14:00 · 24</title></rect
+        ><title>14:00 · 24</title></rect
       ><rect
         x="411"
         y="22"
@@ -321,7 +826,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.955"
         data-empty=""
-        ><title>Mon 15:00 · 26</title></rect
+        ><title>15:00 · 26</title></rect
       ><rect
         x="436"
         y="22"
@@ -331,7 +836,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.907"
         data-empty=""
-        ><title>Mon 16:00 · 23</title></rect
+        ><title>16:00 · 23</title></rect
       ><rect
         x="461"
         y="22"
@@ -341,7 +846,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Mon 17:00 · 20</title></rect
+        ><title>17:00 · 20</title></rect
       ><rect
         x="486"
         y="22"
@@ -351,7 +856,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Mon 18:00 · 15</title></rect
+        ><title>18:00 · 15</title></rect
       ><rect
         x="511"
         y="22"
@@ -361,7 +866,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Mon 19:00 · 17</title></rect
+        ><title>19:00 · 17</title></rect
       ><rect
         x="536"
         y="22"
@@ -371,7 +876,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Mon 20:00 · 22</title></rect
+        ><title>20:00 · 22</title></rect
       ><rect
         x="561"
         y="22"
@@ -381,7 +886,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.970"
         data-empty=""
-        ><title>Mon 21:00 · 27</title></rect
+        ><title>21:00 · 27</title></rect
       ><rect
         x="586"
         y="22"
@@ -391,7 +896,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1.000"
         data-empty=""
-        ><title>Mon 22:00 · 29</title></rect
+        ><title>22:00 · 29</title></rect
       ><rect
         x="611"
         y="22"
@@ -401,7 +906,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Mon 23:00 · 20</title></rect
+        ><title>23:00 · 20</title></rect
       ><rect
         x="36"
         y="47"
@@ -411,7 +916,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.537"
         data-empty=""
-        ><title>Tue 00:00 · 6</title></rect
+        ><title>00:00 · 6</title></rect
       ><rect
         x="61"
         y="47"
@@ -421,7 +926,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.466"
         data-empty=""
-        ><title>Tue 01:00 · 4</title></rect
+        ><title>01:00 · 4</title></rect
       ><rect
         x="86"
         y="47"
@@ -431,7 +936,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Tue 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="47"
@@ -441,7 +946,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Tue 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="47"
@@ -451,7 +956,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Tue 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="47"
@@ -461,7 +966,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Tue 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="47"
@@ -471,7 +976,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Tue 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="47"
@@ -481,7 +986,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Tue 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="47"
@@ -491,7 +996,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Tue 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="47"
@@ -501,7 +1006,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.649"
         data-empty=""
-        ><title>Tue 09:00 · 10</title></rect
+        ><title>09:00 · 10</title></rect
       ><rect
         x="286"
         y="47"
@@ -511,7 +1016,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.781"
         data-empty=""
-        ><title>Tue 10:00 · 16</title></rect
+        ><title>10:00 · 16</title></rect
       ><rect
         x="311"
         y="47"
@@ -521,7 +1026,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Tue 11:00 · 19</title></rect
+        ><title>11:00 · 19</title></rect
       ><rect
         x="336"
         y="47"
@@ -531,7 +1036,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Tue 12:00 · 13</title></rect
+        ><title>12:00 · 13</title></rect
       ><rect
         x="361"
         y="47"
@@ -541,7 +1046,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Tue 13:00 · 18</title></rect
+        ><title>13:00 · 18</title></rect
       ><rect
         x="386"
         y="47"
@@ -551,7 +1056,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Tue 14:00 · 22</title></rect
+        ><title>14:00 · 22</title></rect
       ><rect
         x="411"
         y="47"
@@ -561,7 +1066,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.923"
         data-empty=""
-        ><title>Tue 15:00 · 24</title></rect
+        ><title>15:00 · 24</title></rect
       ><rect
         x="436"
         y="47"
@@ -571,7 +1076,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Tue 16:00 · 22</title></rect
+        ><title>16:00 · 22</title></rect
       ><rect
         x="461"
         y="47"
@@ -581,7 +1086,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Tue 17:00 · 19</title></rect
+        ><title>17:00 · 19</title></rect
       ><rect
         x="486"
         y="47"
@@ -591,7 +1096,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.741"
         data-empty=""
-        ><title>Tue 18:00 · 14</title></rect
+        ><title>18:00 · 14</title></rect
       ><rect
         x="511"
         y="47"
@@ -601,7 +1106,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.781"
         data-empty=""
-        ><title>Tue 19:00 · 16</title></rect
+        ><title>19:00 · 16</title></rect
       ><rect
         x="536"
         y="47"
@@ -611,7 +1116,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.873"
         data-empty=""
-        ><title>Tue 20:00 · 21</title></rect
+        ><title>20:00 · 21</title></rect
       ><rect
         x="561"
         y="47"
@@ -621,7 +1126,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.955"
         data-empty=""
-        ><title>Tue 21:00 · 26</title></rect
+        ><title>21:00 · 26</title></rect
       ><rect
         x="586"
         y="47"
@@ -631,7 +1136,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.970"
         data-empty=""
-        ><title>Tue 22:00 · 27</title></rect
+        ><title>22:00 · 27</title></rect
       ><rect
         x="611"
         y="47"
@@ -641,7 +1146,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Tue 23:00 · 19</title></rect
+        ><title>23:00 · 19</title></rect
       ><rect
         x="36"
         y="72"
@@ -651,7 +1156,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.568"
         data-empty=""
-        ><title>Wed 00:00 · 7</title></rect
+        ><title>00:00 · 7</title></rect
       ><rect
         x="61"
         y="72"
@@ -661,7 +1166,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.466"
         data-empty=""
-        ><title>Wed 01:00 · 4</title></rect
+        ><title>01:00 · 4</title></rect
       ><rect
         x="86"
         y="72"
@@ -671,7 +1176,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Wed 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="72"
@@ -681,7 +1186,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Wed 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="72"
@@ -691,7 +1196,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Wed 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="72"
@@ -701,7 +1206,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Wed 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="72"
@@ -711,7 +1216,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Wed 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="72"
@@ -721,7 +1226,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Wed 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="72"
@@ -731,7 +1236,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Wed 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="72"
@@ -741,7 +1246,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.649"
         data-empty=""
-        ><title>Wed 09:00 · 10</title></rect
+        ><title>09:00 · 10</title></rect
       ><rect
         x="286"
         y="72"
@@ -751,7 +1256,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.781"
         data-empty=""
-        ><title>Wed 10:00 · 16</title></rect
+        ><title>10:00 · 16</title></rect
       ><rect
         x="311"
         y="72"
@@ -761,7 +1266,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Wed 11:00 · 20</title></rect
+        ><title>11:00 · 20</title></rect
       ><rect
         x="336"
         y="72"
@@ -771,7 +1276,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Wed 12:00 · 13</title></rect
+        ><title>12:00 · 13</title></rect
       ><rect
         x="361"
         y="72"
@@ -781,7 +1286,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Wed 13:00 · 18</title></rect
+        ><title>13:00 · 18</title></rect
       ><rect
         x="386"
         y="72"
@@ -791,7 +1296,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.907"
         data-empty=""
-        ><title>Wed 14:00 · 23</title></rect
+        ><title>14:00 · 23</title></rect
       ><rect
         x="411"
         y="72"
@@ -801,7 +1306,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.939"
         data-empty=""
-        ><title>Wed 15:00 · 25</title></rect
+        ><title>15:00 · 25</title></rect
       ><rect
         x="436"
         y="72"
@@ -811,7 +1316,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Wed 16:00 · 22</title></rect
+        ><title>16:00 · 22</title></rect
       ><rect
         x="461"
         y="72"
@@ -821,7 +1326,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Wed 17:00 · 19</title></rect
+        ><title>17:00 · 19</title></rect
       ><rect
         x="486"
         y="72"
@@ -831,7 +1336,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Wed 18:00 · 15</title></rect
+        ><title>18:00 · 15</title></rect
       ><rect
         x="511"
         y="72"
@@ -841,7 +1346,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.781"
         data-empty=""
-        ><title>Wed 19:00 · 16</title></rect
+        ><title>19:00 · 16</title></rect
       ><rect
         x="536"
         y="72"
@@ -851,7 +1356,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.873"
         data-empty=""
-        ><title>Wed 20:00 · 21</title></rect
+        ><title>20:00 · 21</title></rect
       ><rect
         x="561"
         y="72"
@@ -861,7 +1366,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.955"
         data-empty=""
-        ><title>Wed 21:00 · 26</title></rect
+        ><title>21:00 · 26</title></rect
       ><rect
         x="586"
         y="72"
@@ -871,7 +1376,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.985"
         data-empty=""
-        ><title>Wed 22:00 · 28</title></rect
+        ><title>22:00 · 28</title></rect
       ><rect
         x="611"
         y="72"
@@ -881,7 +1386,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Wed 23:00 · 20</title></rect
+        ><title>23:00 · 20</title></rect
       ><rect
         x="36"
         y="97"
@@ -891,7 +1396,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.537"
         data-empty=""
-        ><title>Thu 00:00 · 6</title></rect
+        ><title>00:00 · 6</title></rect
       ><rect
         x="61"
         y="97"
@@ -901,7 +1406,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Thu 01:00 · 3</title></rect
+        ><title>01:00 · 3</title></rect
       ><rect
         x="86"
         y="97"
@@ -911,7 +1416,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Thu 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="97"
@@ -921,7 +1426,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Thu 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="97"
@@ -931,7 +1436,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Thu 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="97"
@@ -941,7 +1446,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Thu 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="97"
@@ -951,7 +1456,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Thu 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="97"
@@ -961,7 +1466,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Thu 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="97"
@@ -971,7 +1476,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Thu 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="97"
@@ -981,7 +1486,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.624"
         data-empty=""
-        ><title>Thu 09:00 · 9</title></rect
+        ><title>09:00 · 9</title></rect
       ><rect
         x="286"
         y="97"
@@ -991,7 +1496,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Thu 10:00 · 15</title></rect
+        ><title>10:00 · 15</title></rect
       ><rect
         x="311"
         y="97"
@@ -1001,7 +1506,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Thu 11:00 · 19</title></rect
+        ><title>11:00 · 19</title></rect
       ><rect
         x="336"
         y="97"
@@ -1011,7 +1516,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.697"
         data-empty=""
-        ><title>Thu 12:00 · 12</title></rect
+        ><title>12:00 · 12</title></rect
       ><rect
         x="361"
         y="97"
@@ -1021,7 +1526,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Thu 13:00 · 17</title></rect
+        ><title>13:00 · 17</title></rect
       ><rect
         x="386"
         y="97"
@@ -1031,7 +1536,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Thu 14:00 · 22</title></rect
+        ><title>14:00 · 22</title></rect
       ><rect
         x="411"
         y="97"
@@ -1041,7 +1546,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.907"
         data-empty=""
-        ><title>Thu 15:00 · 23</title></rect
+        ><title>15:00 · 23</title></rect
       ><rect
         x="436"
         y="97"
@@ -1051,7 +1556,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.873"
         data-empty=""
-        ><title>Thu 16:00 · 21</title></rect
+        ><title>16:00 · 21</title></rect
       ><rect
         x="461"
         y="97"
@@ -1061,7 +1566,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Thu 17:00 · 18</title></rect
+        ><title>17:00 · 18</title></rect
       ><rect
         x="486"
         y="97"
@@ -1071,7 +1576,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.741"
         data-empty=""
-        ><title>Thu 18:00 · 14</title></rect
+        ><title>18:00 · 14</title></rect
       ><rect
         x="511"
         y="97"
@@ -1081,7 +1586,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Thu 19:00 · 15</title></rect
+        ><title>19:00 · 15</title></rect
       ><rect
         x="536"
         y="97"
@@ -1091,7 +1596,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Thu 20:00 · 20</title></rect
+        ><title>20:00 · 20</title></rect
       ><rect
         x="561"
         y="97"
@@ -1101,7 +1606,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.939"
         data-empty=""
-        ><title>Thu 21:00 · 25</title></rect
+        ><title>21:00 · 25</title></rect
       ><rect
         x="586"
         y="97"
@@ -1111,7 +1616,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.955"
         data-empty=""
-        ><title>Thu 22:00 · 26</title></rect
+        ><title>22:00 · 26</title></rect
       ><rect
         x="611"
         y="97"
@@ -1121,7 +1626,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Thu 23:00 · 19</title></rect
+        ><title>23:00 · 19</title></rect
       ><rect
         x="36"
         y="122"
@@ -1131,7 +1636,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.537"
         data-empty=""
-        ><title>Fri 00:00 · 6</title></rect
+        ><title>00:00 · 6</title></rect
       ><rect
         x="61"
         y="122"
@@ -1141,7 +1646,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Fri 01:00 · 3</title></rect
+        ><title>01:00 · 3</title></rect
       ><rect
         x="86"
         y="122"
@@ -1151,7 +1656,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Fri 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="122"
@@ -1161,7 +1666,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Fri 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="122"
@@ -1171,7 +1676,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Fri 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="122"
@@ -1181,7 +1686,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Fri 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="122"
@@ -1191,7 +1696,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Fri 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="122"
@@ -1201,7 +1706,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Fri 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="122"
@@ -1211,7 +1716,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Fri 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="122"
@@ -1221,7 +1726,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.624"
         data-empty=""
-        ><title>Fri 09:00 · 9</title></rect
+        ><title>09:00 · 9</title></rect
       ><rect
         x="286"
         y="122"
@@ -1231,7 +1736,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Fri 10:00 · 15</title></rect
+        ><title>10:00 · 15</title></rect
       ><rect
         x="311"
         y="122"
@@ -1241,7 +1746,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Fri 11:00 · 18</title></rect
+        ><title>11:00 · 18</title></rect
       ><rect
         x="336"
         y="122"
@@ -1251,7 +1756,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.697"
         data-empty=""
-        ><title>Fri 12:00 · 12</title></rect
+        ><title>12:00 · 12</title></rect
       ><rect
         x="361"
         y="122"
@@ -1261,7 +1766,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.781"
         data-empty=""
-        ><title>Fri 13:00 · 16</title></rect
+        ><title>13:00 · 16</title></rect
       ><rect
         x="386"
         y="122"
@@ -1271,7 +1776,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.873"
         data-empty=""
-        ><title>Fri 14:00 · 21</title></rect
+        ><title>14:00 · 21</title></rect
       ><rect
         x="411"
         y="122"
@@ -1281,7 +1786,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Fri 15:00 · 22</title></rect
+        ><title>15:00 · 22</title></rect
       ><rect
         x="436"
         y="122"
@@ -1291,7 +1796,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Fri 16:00 · 20</title></rect
+        ><title>16:00 · 20</title></rect
       ><rect
         x="461"
         y="122"
@@ -1301,7 +1806,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Fri 17:00 · 18</title></rect
+        ><title>17:00 · 18</title></rect
       ><rect
         x="486"
         y="122"
@@ -1311,7 +1816,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Fri 18:00 · 13</title></rect
+        ><title>18:00 · 13</title></rect
       ><rect
         x="511"
         y="122"
@@ -1321,7 +1826,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Fri 19:00 · 15</title></rect
+        ><title>19:00 · 15</title></rect
       ><rect
         x="536"
         y="122"
@@ -1331,7 +1836,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Fri 20:00 · 19</title></rect
+        ><title>20:00 · 19</title></rect
       ><rect
         x="561"
         y="122"
@@ -1341,7 +1846,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.923"
         data-empty=""
-        ><title>Fri 21:00 · 24</title></rect
+        ><title>21:00 · 24</title></rect
       ><rect
         x="586"
         y="122"
@@ -1351,7 +1856,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.939"
         data-empty=""
-        ><title>Fri 22:00 · 25</title></rect
+        ><title>22:00 · 25</title></rect
       ><rect
         x="611"
         y="122"
@@ -1361,7 +1866,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Fri 23:00 · 18</title></rect
+        ><title>23:00 · 18</title></rect
       ><rect
         x="36"
         y="147"
@@ -1371,7 +1876,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.503"
         data-empty=""
-        ><title>Sat 00:00 · 5</title></rect
+        ><title>00:00 · 5</title></rect
       ><rect
         x="61"
         y="147"
@@ -1381,7 +1886,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Sat 01:00 · 3</title></rect
+        ><title>01:00 · 3</title></rect
       ><rect
         x="86"
         y="147"
@@ -1391,7 +1896,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Sat 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="147"
@@ -1401,7 +1906,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sat 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="147"
@@ -1411,7 +1916,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sat 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="147"
@@ -1421,7 +1926,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sat 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="147"
@@ -1431,7 +1936,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sat 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="147"
@@ -1441,7 +1946,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Sat 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="147"
@@ -1451,7 +1956,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Sat 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="147"
@@ -1461,7 +1966,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.596"
         data-empty=""
-        ><title>Sat 09:00 · 8</title></rect
+        ><title>09:00 · 8</title></rect
       ><rect
         x="286"
         y="147"
@@ -1471,7 +1976,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Sat 10:00 · 13</title></rect
+        ><title>10:00 · 13</title></rect
       ><rect
         x="311"
         y="147"
@@ -1481,7 +1986,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sat 11:00 · 15</title></rect
+        ><title>11:00 · 15</title></rect
       ><rect
         x="336"
         y="147"
@@ -1491,7 +1996,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.649"
         data-empty=""
-        ><title>Sat 12:00 · 10</title></rect
+        ><title>12:00 · 10</title></rect
       ><rect
         x="361"
         y="147"
@@ -1501,7 +2006,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.741"
         data-empty=""
-        ><title>Sat 13:00 · 14</title></rect
+        ><title>13:00 · 14</title></rect
       ><rect
         x="386"
         y="147"
@@ -1511,7 +2016,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Sat 14:00 · 18</title></rect
+        ><title>14:00 · 18</title></rect
       ><rect
         x="411"
         y="147"
@@ -1521,7 +2026,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Sat 15:00 · 19</title></rect
+        ><title>15:00 · 19</title></rect
       ><rect
         x="436"
         y="147"
@@ -1531,7 +2036,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Sat 16:00 · 17</title></rect
+        ><title>16:00 · 17</title></rect
       ><rect
         x="461"
         y="147"
@@ -1541,7 +2046,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sat 17:00 · 15</title></rect
+        ><title>17:00 · 15</title></rect
       ><rect
         x="486"
         y="147"
@@ -1551,7 +2056,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.673"
         data-empty=""
-        ><title>Sat 18:00 · 11</title></rect
+        ><title>18:00 · 11</title></rect
       ><rect
         x="511"
         y="147"
@@ -1561,7 +2066,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Sat 19:00 · 13</title></rect
+        ><title>19:00 · 13</title></rect
       ><rect
         x="536"
         y="147"
@@ -1571,7 +2076,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Sat 20:00 · 17</title></rect
+        ><title>20:00 · 17</title></rect
       ><rect
         x="561"
         y="147"
@@ -1581,7 +2086,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Sat 21:00 · 20</title></rect
+        ><title>21:00 · 20</title></rect
       ><rect
         x="586"
         y="147"
@@ -1591,7 +2096,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Sat 22:00 · 22</title></rect
+        ><title>22:00 · 22</title></rect
       ><rect
         x="611"
         y="147"
@@ -1601,7 +2106,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sat 23:00 · 15</title></rect
+        ><title>23:00 · 15</title></rect
       ><rect
         x="36"
         y="172"
@@ -1611,7 +2116,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.503"
         data-empty=""
-        ><title>Sun 00:00 · 5</title></rect
+        ><title>00:00 · 5</title></rect
       ><rect
         x="61"
         y="172"
@@ -1621,7 +2126,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Sun 01:00 · 3</title></rect
+        ><title>01:00 · 3</title></rect
       ><rect
         x="86"
         y="172"
@@ -1631,7 +2136,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Sun 02:00 · 1</title></rect
+        ><title>02:00 · 1</title></rect
       ><rect
         x="111"
         y="172"
@@ -1641,7 +2146,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sun 03:00 · 0</title></rect
+        ><title>03:00 · 0</title></rect
       ><rect
         x="136"
         y="172"
@@ -1651,7 +2156,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sun 04:00 · 0</title></rect
+        ><title>04:00 · 0</title></rect
       ><rect
         x="161"
         y="172"
@@ -1661,7 +2166,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sun 05:00 · 0</title></rect
+        ><title>05:00 · 0</title></rect
       ><rect
         x="186"
         y="172"
@@ -1671,7 +2176,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:1"
         data-empty="true"
-        ><title>Sun 06:00 · 0</title></rect
+        ><title>06:00 · 0</title></rect
       ><rect
         x="211"
         y="172"
@@ -1681,7 +2186,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.308"
         data-empty=""
-        ><title>Sun 07:00 · 1</title></rect
+        ><title>07:00 · 1</title></rect
       ><rect
         x="236"
         y="172"
@@ -1691,7 +2196,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.423"
         data-empty=""
-        ><title>Sun 08:00 · 3</title></rect
+        ><title>08:00 · 3</title></rect
       ><rect
         x="261"
         y="172"
@@ -1701,7 +2206,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.596"
         data-empty=""
-        ><title>Sun 09:00 · 8</title></rect
+        ><title>09:00 · 8</title></rect
       ><rect
         x="286"
         y="172"
@@ -1711,7 +2216,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Sun 10:00 · 13</title></rect
+        ><title>10:00 · 13</title></rect
       ><rect
         x="311"
         y="172"
@@ -1721,7 +2226,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sun 11:00 · 15</title></rect
+        ><title>11:00 · 15</title></rect
       ><rect
         x="336"
         y="172"
@@ -1731,7 +2236,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.649"
         data-empty=""
-        ><title>Sun 12:00 · 10</title></rect
+        ><title>12:00 · 10</title></rect
       ><rect
         x="361"
         y="172"
@@ -1741,7 +2246,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.741"
         data-empty=""
-        ><title>Sun 13:00 · 14</title></rect
+        ><title>13:00 · 14</title></rect
       ><rect
         x="386"
         y="172"
@@ -1751,7 +2256,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.820"
         data-empty=""
-        ><title>Sun 14:00 · 18</title></rect
+        ><title>14:00 · 18</title></rect
       ><rect
         x="411"
         y="172"
@@ -1761,7 +2266,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.838"
         data-empty=""
-        ><title>Sun 15:00 · 19</title></rect
+        ><title>15:00 · 19</title></rect
       ><rect
         x="436"
         y="172"
@@ -1771,7 +2276,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Sun 16:00 · 17</title></rect
+        ><title>16:00 · 17</title></rect
       ><rect
         x="461"
         y="172"
@@ -1781,7 +2286,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sun 17:00 · 15</title></rect
+        ><title>17:00 · 15</title></rect
       ><rect
         x="486"
         y="172"
@@ -1791,7 +2296,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.673"
         data-empty=""
-        ><title>Sun 18:00 · 11</title></rect
+        ><title>18:00 · 11</title></rect
       ><rect
         x="511"
         y="172"
@@ -1801,7 +2306,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.719"
         data-empty=""
-        ><title>Sun 19:00 · 13</title></rect
+        ><title>19:00 · 13</title></rect
       ><rect
         x="536"
         y="172"
@@ -1811,7 +2316,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.801"
         data-empty=""
-        ><title>Sun 20:00 · 17</title></rect
+        ><title>20:00 · 17</title></rect
       ><rect
         x="561"
         y="172"
@@ -1821,7 +2326,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.856"
         data-empty=""
-        ><title>Sun 21:00 · 20</title></rect
+        ><title>21:00 · 20</title></rect
       ><rect
         x="586"
         y="172"
@@ -1831,7 +2336,7 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.890"
         data-empty=""
-        ><title>Sun 22:00 · 22</title></rect
+        ><title>22:00 · 22</title></rect
       ><rect
         x="611"
         y="172"
@@ -1841,114 +2346,146 @@ footer p{margin:4px 0}
         class="cell"
         style="fill-opacity:0.761"
         data-empty=""
-        ><title>Sun 23:00 · 15</title></rect
+        ><title>23:00 · 15</title></rect
       >
-  </svg></section>
+  </svg>
+          </details>
 
-          <h2>Traits</h2>
-          <section class="grid"><article class="card trait">
+          <section>
+            <h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2>
+            <div class="traits"><article class="trait">
     <header>
-      <h3>Plan first</h3>
-      <span class="badge high">High confidence</span>
+      <h3><span data-l="en" lang="en">Plan first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></h3>
+      <span class="meter high" title="High confidence"
+        ><i class="on"></i><i class="on"></i><i class="on"></i><span class="meter-label"
+          ><span data-l="en" lang="en">High confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">高信心</span></span
+        ></span
+      >
     </header>
-    <p>Asks the AI to list steps and risks before coding.</p>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <details>
-        <summary>Show 2 pieces of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card trait">
+            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
+  </ul>
+          </details>
+  </article><article class="trait">
     <header>
-      <h3>Straight talker</h3>
-      <span class="badge medium">Medium confidence</span>
+      <h3><span data-l="en" lang="en">Straight talker</span><span data-l="zh-TW" lang="zh-Hant-TW">直來直往</span></h3>
+      <span class="meter medium" title="Medium confidence"
+        ><i class="on"></i><i class="on"></i><i class=""></i><span class="meter-label"
+          ><span data-l="en" lang="en">Medium confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">中信心</span></span
+        ></span
+      >
     </header>
-    <p>Asks the AI to list steps and risks before coding.</p>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <details>
-        <summary>Show 2 pieces of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card trait">
+            <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li><li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+          </details>
+  </article><article class="trait">
     <header>
-      <h3>Type purist</h3>
-      <span class="badge low">Low confidence</span>
+      <h3><span data-l="en" lang="en">Type purist</span><span data-l="zh-TW" lang="zh-Hant-TW">型別潔癖</span></h3>
+      <span class="meter low" title="Low confidence"
+        ><i class="on"></i><i class=""></i><i class=""></i><span class="meter-label"
+          ><span data-l="en" lang="en">Low confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">低信心</span></span
+        ></span
+      >
     </header>
-    <p>Asks the AI to list steps and risks before coding.</p>
+    <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <details>
-        <summary>Show 1 piece of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article></section>
+            <summary><span data-l="en" lang="en">1 quote as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文佐證</span></summary>
+            <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+          </details>
+  </article></div>
+          </section>
 
-          <h2>Five dimensions</h2>
-          <section class="grid"><article class="card dimension">
-    <p class="eyebrow">Work style</p>
-    <h3>Work style</h3>
-    <p>Plans first, then breaks big tasks into small steps.</p>
-    <details>
-        <summary>Show 1 piece of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card dimension">
-    <p class="eyebrow">Communication</p>
-    <h3>Communication</h3>
-    <p>Plans first, then breaks big tasks into small steps.</p>
-    <details>
-        <summary>Show 1 piece of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card dimension">
-    <p class="eyebrow">Tech profile</p>
-    <h3>Tech profile</h3>
-    <p>Plans first, then breaks big tasks into small steps.</p>
-    <details>
-        <summary>Show 1 piece of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card dimension">
-    <p class="eyebrow">Interests</p>
-    <h3>Interests</h3>
-    <p>Plans first, then breaks big tasks into small steps.</p>
-    <details>
-        <summary>Show 1 piece of evidence</summary>
-        <ul class="evidence">
-          <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-        </ul>
-      </details>
-  </article><article class="card dimension">
-    <p class="eyebrow">Growth</p>
-    <h3>Growth</h3>
-    <p>Plans first, then breaks big tasks into small steps.</p>
-    <p class="warning">Insufficient evidence: no quote in this summary passed verification.</p>
-  </article></section>
+          <section>
+            <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>
+            <div class="dims"><details class="dimension">
+    <summary>
+      <span class="dim-name"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+      <span class="dim-title"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
+    </summary>
+    <div class="dim-body">
+      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary>
+      <span class="dim-name"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+      <span class="dim-title"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
+    </summary>
+    <div class="dim-body">
+      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary>
+      <span class="dim-name"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+      <span class="dim-title"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
+    </summary>
+    <div class="dim-body">
+      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary>
+      <span class="dim-name"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+      <span class="dim-title"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+      <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span>
+    </summary>
+    <div class="dim-body">
+      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details class="dimension">
+    <summary>
+      <span class="dim-name"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+      <span class="dim-title"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+      <span class="badge warn"><span data-l="en" lang="en">No verified evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">沒有通過驗證的證據</span></span>
+    </summary>
+    <div class="dim-body">
+      <p><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></p>
+      <p class="warning"><span data-l="en" lang="en">Insufficient evidence: no quote in this summary passed verification.</span><span data-l="zh-TW" lang="zh-Hant-TW">證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。</span></p>
+    </div>
+  </details></div>
+          </section>
 
-          <h2>Fun facts</h2>
+          <section>
+                  <h2><span data-l="en" lang="en">Fun facts</span><span data-l="zh-TW" lang="zh-Hant-TW">有趣的事實</span></h2>
                   <ul class="facts">
-                    <li>Latest prompt: 03:12 AM.</li><li>Longest streak: 23 days in a row.</li>
+                    <li class="fact"><span data-l="en" lang="en">Latest prompt: 03:12 AM.</span><span data-l="zh-TW" lang="zh-Hant-TW">最晚的 prompt：凌晨 03:12。</span></li><li class="fact"><span data-l="en" lang="en">Longest streak: 23 days in a row.</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續天數：23 天。</span></li>
                   </ul>
+                </section>
 
-          <footer>
+          <details class="about">
+            <summary><span data-l="en" lang="en">About this report</span><span data-l="zh-TW" lang="zh-Hant-TW">關於這份報告</span></summary>
             <p>
-              Engine: Claude Code (claude-opus-5-5) ·
-              Generated: Oct 24, 2026, 10:00 AM
+              <span data-l="en" lang="en">Engine: Claude Code (claude-opus-5-5) · Generated: Oct 24, 2026, 10:00 AM</span><span data-l="zh-TW" lang="zh-Hant-TW">分析引擎：Claude Code（claude-opus-5-5） · 產生時間：2026年10月24日 上午10:00</span>
             </p>
             <p>
-              41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped
+              <span data-l="en" lang="en">41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">已驗證 41 段證據（移除 3 段無效或重複的引文） · 1 段分析失敗，已略過</span>
             </p>
-            <p>Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</p>
+            <p><span data-l="en" lang="en">Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。</span></p>
             <p>prompt-profile · npx prompt-profile</p>
-          </footer>
-        </main>
+          </details>
+        </div>
       </body>
     </html> "
 `;

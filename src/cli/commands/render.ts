@@ -43,5 +43,8 @@ export const runRender = (options: {
     const t = messages
     yield* out.line(t.rendered(files.html))
     yield* out.line(t.renderedNoAnalysis)
-    yield* out.line(files.card ? t.cardLine(files.card) : t.cardSkipped(files.cardError ?? "?"))
+    for (const card of files.cards)
+      yield* out.line(
+        card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
+      )
   })

@@ -39,6 +39,12 @@ const look = Flag.Literals("look", LOOK_IDS).pipe(
   Flag.withDescription("Report and card design (render only; no extra LLM calls)"),
   Flag.withDefault("classic" as const),
 )
+const lang = Flag.String("lang").pipe(
+  Flag.withDescription(
+    "Report languages, the first is the default: en, zh-TW (default: from the system locale)",
+  ),
+  Flag.optional,
+)
 const cardHide = Flag.String("card-hide").pipe(
   Flag.withDescription("Leave parts out of the share card: comma list of traits, stats, graphic"),
   Flag.optional,
@@ -139,6 +145,7 @@ export const command = Command.make(
       Flag.optional,
     ),
     out,
+    lang,
     look,
     cardHide,
     full: Flag.Boolean("full").pipe(
@@ -175,6 +182,7 @@ export const command = Command.make(
           cache: f.cache,
           yes: f.yes,
           dryRun: f.dryRun,
+          lang: optional(f.lang),
           look: f.look,
           cardHide: optional(f.cardHide),
         }),

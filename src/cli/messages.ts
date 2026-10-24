@@ -58,7 +58,8 @@ export const messages = {
   reportLine: (p: string, opened: boolean) =>
     `  Report ${p}${opened ? " (opened in your browser)" : ""}`,
   cardLine: (p: string) => `  Card   ${p}`,
-  cardSkipped: (reason: string) => `  Card   not created: ${reason}`,
+  cardSkipped: (language: string, reason: string) =>
+    `  Card   (${language}) not created: ${reason}`,
   dataLine: (p: string) => `  Data   ${p}`,
   skippedChunks: (k: number) => `  ${k} chunk(s) failed and were skipped (noted in the report)`,
   interrupted: "Interrupted. Run again to resume from the cache.",

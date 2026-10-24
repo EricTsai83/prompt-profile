@@ -17,6 +17,8 @@ export interface EnvironmentShape {
   /** stdin and stdout are both terminals. */
   readonly isTTY: boolean
   readonly platform: NodeJS.Platform
+  /** POSIX or BCP 47 locale (e.g. `zh_TW.UTF-8`), for the default report languages. */
+  readonly locale: string
 }
 
 export class Environment extends Context.Service<Environment, EnvironmentShape>()(
@@ -46,6 +48,15 @@ export const resolveTimezone = (
   return [fromFile, systemZone].find((z) => z !== undefined && z !== "" && isTimeZone(z)) ?? "UTC"
 }
 
+/** `LC_ALL` > `LC_MESSAGES` > `LANG` (ignoring `C` / `POSIX`), else the Intl locale. */
+export const resolveLocale = (
+  env: Readonly<Record<string, string | undefined>>,
+  intlLocale: string,
+): string =>
+  [env["LC_ALL"], env["LC_MESSAGES"], env["LANG"]].find(
+    (v) => v !== undefined && v !== "" && !/^(?:C|POSIX)(?:\.|$)/.test(v),
+  ) ?? intlLocale
+
 const safeReadLink = (path: string): string | undefined => {
   try {
     return readlinkSync(path)
@@ -64,6 +75,7 @@ export const liveEnvironment = (): EnvironmentShape => {
     username: safeUsername(),
     isTTY: Boolean(process.stdin.isTTY && process.stdout.isTTY),
     platform: process.platform,
+    locale: resolveLocale(process.env, resolved.locale),
   }
 }
 

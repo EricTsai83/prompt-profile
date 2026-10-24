@@ -20,6 +20,7 @@ const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
   "--since": "--since accepts 1m, 3m, 6m, 1y or all.",
   "--max-calls": "Use a positive safe integer.",
   "--card-hide": "Use a comma list of traits, stats, graphic.",
+  "--lang": "Use a comma list of en, zh-TW (the first is the default).",
 }
 
 export const EXIT = {

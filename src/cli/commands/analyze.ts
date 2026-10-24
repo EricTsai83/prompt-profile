@@ -11,7 +11,7 @@ import type { LookId } from "../../report/looks.ts"
 import { VERSION } from "../../version.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, type Messages } from "../messages.ts"
-import { parseRenderOptions } from "../options.ts"
+import { parseLanguages, parseRenderOptions } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
   readSources,
@@ -33,6 +33,8 @@ export interface MainOptions {
   readonly cache: boolean
   readonly yes: boolean
   readonly dryRun: boolean
+  /** Report languages, comma-separated; default from the system locale. */
+  readonly lang?: string | undefined
   /** Render-only: the report/card look and the card parts to hide (default: classic, none). */
   readonly look?: LookId
   readonly cardHide?: string | undefined
@@ -102,6 +104,7 @@ export const runMain = (options: MainOptions) =>
     }
     const renderOptions = yield* parseRenderOptions(options.look ?? "classic", options.cardHide)
     const env = yield* Environment
+    const languages = yield* parseLanguages(options.lang, env.locale)
     const out = yield* Output
     const outDir = yield* resolveOut(options.out)
     yield* out.line(t.header(VERSION))
@@ -115,6 +118,7 @@ export const runMain = (options: MainOptions) =>
       full: options.full,
       noCache: !options.cache,
       model: options.model ?? null,
+      languages,
     }
     const provider = yield* LlmProvider
 
@@ -167,7 +171,10 @@ export const runMain = (options: MainOptions) =>
     yield* out.line("")
     yield* out.line(t.done)
     yield* out.line(t.reportLine(files.html, opened))
-    yield* out.line(files.card ? t.cardLine(files.card) : t.cardSkipped(files.cardError ?? "?"))
+    for (const card of files.cards)
+      yield* out.line(
+        card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
+      )
     yield* out.line(t.dataLine(files.profileJson))
     if (profile.coverage.chunksFailed > 0)
       yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))

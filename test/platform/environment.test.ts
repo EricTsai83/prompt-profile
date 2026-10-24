@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest"
-import { resolveTimezone } from "../../src/platform/Environment.ts"
+import { resolveLocale, resolveTimezone } from "../../src/platform/Environment.ts"
 
 const links: Record<string, string> = {
   "/etc/localtime": "/var/db/timezone/zoneinfo/Asia/Taipei",
@@ -18,5 +18,17 @@ describe("resolveTimezone", () => {
     ["nothing usable → UTC", "CST-8", undefined, "UTC"],
   ] as const)("%s", (_name, tz, system, expected) => {
     expect(resolveTimezone(tz, system, readLink)).toBe(expected)
+  })
+})
+
+describe("resolveLocale", () => {
+  it.each([
+    ["LC_ALL wins", { LC_ALL: "zh_TW.UTF-8", LANG: "en_US.UTF-8" }, "en-US", "zh_TW.UTF-8"],
+    ["then LC_MESSAGES", { LC_MESSAGES: "zh_TW", LANG: "en_US" }, "en-US", "zh_TW"],
+    ["then LANG", { LANG: "zh_TW.UTF-8" }, "en-US", "zh_TW.UTF-8"],
+    ["C / POSIX mean unset", { LC_ALL: "C", LANG: "POSIX" }, "zh-TW", "zh-TW"],
+    ["Intl when nothing is set", {}, "zh-Hant-TW", "zh-Hant-TW"],
+  ] as const)("%s", (_name, env, intl, expected) => {
+    expect(resolveLocale(env, intl)).toBe(expected)
   })
 })

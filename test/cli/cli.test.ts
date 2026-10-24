@@ -58,13 +58,6 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("there is no --lang flag any more (English only)", () =>
-    Effect.gen(function* () {
-      const r = yield* makeHarness().run(["--yes", "--lang", "en", "--since", "all"])
-      expect(r.code).toBe(2)
-    }),
-  )
-
   it.effect("second run uses the cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()
@@ -203,6 +196,53 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(r.code).toBe(0)
       expect(readFileSync(join(out, "report.html"), "utf8")).toContain('data-look="studio"')
       expect(existsSync(join(out, "render.json"))).toBe(true)
+    }),
+  )
+
+  it.effect("--lang writes a bilingual report and one card per language", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const out = join(h.root, "bi")
+      const r = yield* h.run(["--yes", "--since", "all", "--lang", "zh-TW,en", "--out", out])
+      expect(r.code).toBe(0)
+      expect(r.stdout).toContain("Translated into zh-TW")
+      const report = readFileSync(join(out, "report.html"), "utf8")
+      expect(report).toMatch(/id="lang-zh-TW"[^>]*checked/)
+      expect(report).toContain('id="lang-en"')
+      expect(report).toContain("譯 The Fixer")
+      expect(existsSync(join(out, "card.png"))).toBe(true)
+      expect(existsSync(join(out, "card.en.png"))).toBe(true)
+      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      expect(profile.languages).toEqual(["zh-TW", "en"])
+      // one translation call on top of the map and reduce calls
+      expect(h.fakes.at(-1)!.log.filter((c) => c.schema === "LlmTranslation")).toHaveLength(1)
+    }),
+  )
+
+  it.effect("the default languages follow the system locale", () =>
+    Effect.gen(function* () {
+      const h = makeHarness({ env: { locale: "zh_TW.UTF-8" } })
+      const out = join(h.root, "zh")
+      expect((yield* h.run(["--yes", "--since", "all", "--out", out])).code).toBe(0)
+      expect(JSON.parse(readFileSync(join(out, "profile.json"), "utf8")).languages).toEqual([
+        "zh-TW",
+        "en",
+      ])
+      const en = makeHarness()
+      const outEn = join(en.root, "en")
+      expect((yield* en.run(["--yes", "--since", "all", "--out", outEn])).code).toBe(0)
+      expect(readFileSync(join(outEn, "report.html"), "utf8")).not.toContain('name="lang"')
+      expect(en.fakes.at(-1)!.log.some((c) => c.schema === "LlmTranslation")).toBe(false)
+    }),
+  )
+
+  it.effect("an unknown --lang is a usage error before any work", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const r = yield* h.run(["--yes", "--since", "all", "--lang", "fr"])
+      expect(r.code).toBe(2)
+      expect(r.stderr).toContain("--lang")
+      expect(h.fakes.length).toBe(0)
     }),
   )
 

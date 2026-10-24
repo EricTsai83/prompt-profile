@@ -1,4 +1,5 @@
 import { DateTime, Effect } from "effect"
+import { LANGUAGES, type Language } from "../domain/Profile.ts"
 import { CARD_PARTS, type CardPart, type LookId, type RenderOptions } from "../report/looks.ts"
 import { InvalidArgument } from "./errors.ts"
 
@@ -36,4 +37,21 @@ export const parseRenderOptions = (
   return parts.every(isPart)
     ? Effect.succeed({ look, cardHide: parts })
     : Effect.fail(new InvalidArgument({ flag: "--card-hide", value: cardHide }))
+}
+
+/** A Chinese locale gets a Traditional Chinese report with English; anything else English. */
+export const defaultLanguages = (locale: string): Array<Language> =>
+  /^zh(?:[-_]|$)/i.test(locale) ? ["zh-TW", "en"] : ["en"]
+
+/** `--lang zh-TW,en` (the first is the default), or the locale's default when not given. */
+export const parseLanguages = (
+  value: string | undefined,
+  locale: string,
+): Effect.Effect<Array<Language>, InvalidArgument> => {
+  if (value === undefined) return Effect.succeed(defaultLanguages(locale))
+  const parts = value.split(",").map((p) => p.trim())
+  const isLanguage = (p: string): p is Language => (LANGUAGES as ReadonlyArray<string>).includes(p)
+  return parts.length > 0 && parts.every(isLanguage)
+    ? Effect.succeed([...new Set(parts)])
+    : Effect.fail(new InvalidArgument({ flag: "--lang", value }))
 }

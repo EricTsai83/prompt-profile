@@ -22,9 +22,11 @@ npm i -g prompt-profile && prompt-profile
 
 Output (in `./prompt-profile-report/` by default):
 
-- `report.html`: a single-file report that works offline — traits, five dimensions, an activity
-  heatmap and fun facts, with verified quotes supporting traits and dimensions
-- `card.png`: a 1200 × 630 share card (**omits evidence quotes**)
+- `report.html`: a single-file report that works offline — charts of when and how you prompt,
+  traits, five dimensions and fun facts, with verified quotes behind collapsible sections, and a
+  language switch when the report has more than one language
+- `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
+  other language (**omits evidence quotes**)
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)
 
 ## Requirements
@@ -51,6 +53,7 @@ prompt-profile --no-cache      # do not read the analysis cache
 prompt-profile --yes           # skip the confirmation (required in non-interactive sessions)
 prompt-profile --dry-run       # write what would be sent to the LLM into --out, call nothing
 prompt-profile --verbose       # full errors and LLM call timings
+prompt-profile --lang zh-TW,en # report languages, the first is the default (en, zh-TW)
 prompt-profile --look signal   # classic (default) / signal / afterhours / studio
 prompt-profile --card-hide stats,graphic  # leave traits / stats / graphic out of card.png
 
@@ -110,8 +113,14 @@ Administrator policy, environment settings and CLI/provider diagnostics can stil
 controls are tested on specific versions, and do not promise zero CLI/provider logs or traffic.
 See [runner notes](src/llm/NOTES.md) and the [security policy](SECURITY.md).
 
-prompt-profile has no telemetry and the renderer makes no network requests; fonts ship with the
-package. The borrowed CLI manages its own network requests and provider data retention.
+prompt-profile has no telemetry. The report makes no network requests and its fonts ship with
+the package. The one exception is the Chinese share card: on first use it downloads Noto Sans TC
+(about 11 MB, from a pinned GitHub commit), checks its SHA-256 and caches it; no prompt data is
+sent. The borrowed CLI manages its own network requests and provider data retention.
+
+Languages: without `--lang`, a Chinese system locale gives a Traditional Chinese report with an
+English switch (`zh-TW,en`); any other locale gives English. The profile is written in English
+and then translated, one extra CLI call per extra language; quotes stay as you wrote them.
 
 ## FAQ
 
