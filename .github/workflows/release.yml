@@ -1,34 +1,40 @@
 name: Release
 
+# A pushed vX.Y.Z tag releases (plan 10): `npm version patch` locally, then
+# `git push --follow-tags`. Nothing is published unless every check passed, and npm comes after
+# the GitHub Release.
 on:
   push:
-    branches: [main]
+    tags: ["v*.*.*"]
 
 permissions:
   contents: read
 
-jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-    steps:
-      - id: release
-        uses: googleapis/release-please-action@v4
-        with:
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
-  publish:
-    needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+jobs:
+  check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # npm Trusted Publishing (OIDC) + provenance; no NPM_TOKEN stored
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      dist-tag: ${{ steps.version.outputs.dist-tag }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      # The tag without `v` must equal package.json `version`
+      - id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: node scripts/release-version.ts "$TAG"
+
+  verify:
+    needs: check
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -36,11 +42,58 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck && pnpm lint && pnpm format:check && pnpm test
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm test
       - run: pnpm build
-      # pnpm pack resolves `catalog:` versions; npm publish then uses OIDC + provenance
+      # pnpm pack resolves `catalog:` versions; publish ships exactly this tested tarball
       - run: pnpm pack --out prompt-profile.tgz
       - run: node scripts/test-package.mjs prompt-profile.tgz
-      - run: npm publish prompt-profile.tgz --provenance --access public
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: prompt-profile.tgz
+          if-no-files-found: error
+
+  github-release:
+    needs: [check, verify]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.check.outputs.prerelease }}
+        run: |
+          flags=(--verify-tag --generate-notes --title "$TAG")
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          gh release create "$TAG" prompt-profile.tgz "${flags[@]}"
+
+  npm-publish:
+    needs: [check, github-release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm Trusted Publishing (OIDC) + provenance; no NPM_TOKEN stored
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: package
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - env:
+          DIST_TAG: ${{ needs.check.outputs.dist-tag }}
+        run: |
+          if ! npm publish prompt-profile.tgz --provenance --access public --tag "$DIST_TAG"; then
+            echo "::error::npm publish failed. Check the Trusted Publisher on npmjs.com (package prompt-profile → Settings → Trusted Publisher: GitHub Actions, EricTsai83/prompt-profile, release.yml)."
+            exit 1
+          fi

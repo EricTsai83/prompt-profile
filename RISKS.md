@@ -23,7 +23,7 @@ Sorted by severity.
      `src/analysis/prompts/map.md` / `reduce.md` with an `ANALYSIS_VERSION` bump.
 
 4. **The release has not been exercised yet**
-   - CI (`.github/workflows/ci.yml`) is green on `main`. The current `release.yml` (release-please) fails on every push because the repository does not let Actions open pull requests; it publishes nothing. Plan 10 replaces it with a tag-triggered release.
+   - CI (`.github/workflows/ci.yml`) is green on `main`. `release.yml` now runs only on a pushed `vX.Y.Z` tag (plan 10) and has never run: the first tag will be its first real test.
    - Publishing first requires a manual first publish and npm Trusted Publishing (plan 10).
    - Publishing must use `pnpm pack`: `npm pack` / `npm publish` do not understand `catalog:` versions and produce a broken package
      (the release workflow handles this; be careful when publishing manually).

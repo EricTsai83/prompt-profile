@@ -1,21 +1,19 @@
 # 10 · Release
 
 **Status: pending.** The owner deferred the release on 2026-10-24 until the product work is done
-(see [plan 13](./13-product-quality.md)); it is the last plan in the execution order. It resumes
-only when the owner judges the product good enough to publish. Nothing is published, and none of
-the steps below (code changes or the owner's npm / GitHub setup) are done before then. This
-section records where things stand; the release design was revised on 2026-10-24 (see
-"Versioning and changelog").
+(see [plan 13](./13-product-quality.md)); it is the last open plan. Publishing resumes only when
+the owner judges the product good enough. On 2026-10-24 the owner had the code part done ahead
+of time (item 4: the tag-triggered workflow); nothing is published or tagged, and the owner's
+npm / GitHub setup is not done. This section records where things stand.
 
 ### Already in the repository
 
 - README with privacy notes, requirements, FAQ, sample card/report; MIT `LICENSE`;
   `docs/terms-check.md` (first pass, 2026-10-24); `SECURITY.md`; `RISKS.md`.
-- release-please config and manifest (first version `0.1.0`); `.github/workflows/ci.yml` and
-  `release.yml` (pack with `pnpm pack`, publish with provenance through Trusted Publishing).
-  To be replaced by the tag-triggered release below. Until then the Release workflow fails on
-  every push to `main`: the repository does not allow Actions to create pull requests, so
-  release-please cannot open its release PR. The failure is harmless, since nothing is published.
+- `.github/workflows/ci.yml`, and `release.yml` triggered by a pushed `v*.*.*` tag (see
+  "GitHub Actions" below), with `scripts/release-version.ts` checking the tag against
+  `package.json` (tested in `test/scripts/`). release-please and its config are removed, so
+  pushes to `main` run no release job. The workflow has not run yet: the first tag is its test.
 - `pnpm test:package` installs the packed tarball and checks version, help, prompts, fonts,
   HTML, JSON, the 1200 × 630 PNG and a look. Tarball 159 KB; `--version` cold start ~0.9 s.
 - `prompt-profile` is unclaimed on npm (404 on 2026-10-24).
@@ -25,8 +23,8 @@ section records where things stand; the release design was revised on 2026-10-24
 1. Re-read the Anthropic and OpenAI terms and update `docs/terms-check.md` (RISKS 1).
 2. Regenerate the README sample card/report if the product changed since (plan 13).
 3. ~~Confirm CI passes on GitHub~~ — done: CI is green on `main` since 2026-10-24.
-4. Replace release-please with the tag-triggered workflow below (TDD where it applies:
-   the tag/version check is a script with a test).
+4. ~~Replace release-please with the tag-triggered workflow below~~ — done 2026-10-24
+   (`release.yml`, `scripts/release-version.ts`, `test/scripts/release-version.test.ts`).
 5. Owner: publish `0.1.0` by hand once, then register the Trusted Publisher (steps below).
 6. Release `0.1.1` (or the next version) through the workflow; confirm the npm page shows
    provenance.
@@ -62,7 +60,7 @@ Decided 2026-10-24: **a tag push releases**, modelled on T3 Code (`pingdotgg/t3c
   subjects since the previous tag). No `CHANGELOG.md` is kept.
 - First version: `0.1.0`, published by hand (npm cannot register a Trusted Publisher for a
   package that does not exist yet).
-- Remove `release-please-config.json` and `.release-please-manifest.json`.
+- ~~Remove `release-please-config.json` and `.release-please-manifest.json`.~~ Done.
 
 ## GitHub Actions: `.github/workflows/release.yml`
 
@@ -113,4 +111,5 @@ is bumped locally before tagging, so there is nothing to write back).
 - [ ] In a clean environment (e.g. a new Docker container + a logged-in claude), `npx prompt-profile` runs from start to finish
 - [ ] The npm package page shows provenance
 - [ ] A pushed `vX.Y.Z` tag whose version differs from `package.json` fails before anything is published
-- [ ] Pushes to `main` no longer run a release job
+      (the check is unit-tested and is the first job; still to be seen on a real tag push)
+- [x] Pushes to `main` no longer run a release job (`release.yml` triggers only on `v*.*.*` tags)
