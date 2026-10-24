@@ -14,6 +14,20 @@ The same profile in the other looks (`--look signal`, `afterhours`, `studio`):
 | ------------------------------------------- | --------------------------------------------------- | ------------------------------------------- |
 | ![Signal look](docs/sample-card-signal.png) | ![Afterhours look](docs/sample-card-afterhours.png) | ![Studio look](docs/sample-card-studio.png) |
 
+### A real report
+
+The author's own report, from about 1,700 real prompts over six months, published as written:
+
+- [Full report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/full/report.html): what you see on your own machine, with quotes from
+  real prompts, suggested rewrites, project names, exact dates and fun facts.
+- [Shareable report](https://htmlpreview.github.io/?https://github.com/EricTsai83/prompt-profile/blob/main/docs/demo/without-personal/report.html): the same profile rendered with
+  `--exclude personal`: no quotes, rewrites or fun facts, projects shown as "Project A, B…",
+  dates by month. This is what you would post publicly.
+
+![Share card of the real report](docs/demo/card.png)
+
+The share card is the same for both: it never contains quotes or project names.
+
 ## Quick start
 
 1. Install [Claude Code](https://claude.com/claude-code) or [Codex](https://github.com/openai/codex)
