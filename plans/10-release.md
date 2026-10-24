@@ -1,6 +1,6 @@
 # 10 · Release
 
-**Status: in progress.** `0.1.0` is on npm (published by hand, 2026-10-24). Earlier: the owner deferred the release on 2026-10-24 until the product work is done;
+**Status: in progress.** `0.1.0` was published by hand and `0.1.1` by the workflow (2026-10-24); the clean-environment check (item 7) is left. Earlier: the owner deferred the release on 2026-10-24 until the product work is done;
 it is the last open plan. Plan 13 (product quality) is done: the owner read a real report on
 2026-10-24 and accepted it for now. Publishing resumes only when the owner decides to publish. On 2026-10-24 the owner had the code part done ahead
 of time (item 4: the tag-triggered workflow); nothing is published or tagged, and the owner's
@@ -30,11 +30,15 @@ npm / GitHub setup is not done. This section records where things stand.
 5. Owner: publish `0.1.0` by hand once, then register the Trusted Publisher (steps below).
    `0.1.0` was published by hand on 2026-10-24 (npm user `ericts`, shasum matches the checked
    tarball; `npx prompt-profile --version` works from a clean folder). npm also left a
-   `0.0.0-stage` placeholder version from its staged publishing. The Trusted Publisher and
-   "require 2FA, disallow tokens" are still to do. Do not push a `v0.1.0` tag: the workflow
+   `0.0.0-stage` placeholder version from its staged publishing. The Trusted Publisher was
+   registered with `npm trust github` the same day; "require 2FA, disallow tokens" on the package
+   settings page is left to the owner. Do not push a `v0.1.0` tag: the workflow
    would fail publishing an existing version after creating the GitHub Release.
-6. Release `0.1.1` (or the next version) through the workflow; confirm the npm page shows
-   provenance.
+6. ~~Release `0.1.1` (or the next version) through the workflow; confirm the npm page shows
+   provenance~~ — done 2026-10-24: `v0.1.1` released by the workflow (Trusted Publisher, SLSA
+   provenance, GitHub Release with five binaries and `SHA256SUMS`). The first two runs failed
+   before publishing and were fixed: setup-node's package-manager cache in jobs without pnpm,
+   and the version in the CLI output snapshot.
 7. Clean-environment check: new container, logged-in `claude`, `npx prompt-profile` end to end.
 8. ~~Check the npm name again just before publishing~~ — done; the name is ours.
 
@@ -107,8 +111,8 @@ is bumped locally before tagging, so there is nothing to write back).
 
 ## Later (out of scope this time; direction only)
 
-- **Standalone binaries**: moved to [plan 19](./19-standalone-binaries.md); built and attached by
-  the `binaries` job of `release.yml`.
+- **Standalone binaries**: done in plan 19 (deleted; see git history); built and attached by the
+  `binaries` job of `release.yml`.
 - **Homebrew**: create `EricTsai83/homebrew-tap` with a formula pointing to the GitHub Releases binaries.
 - **install.sh**: `curl -fsSL …/install.sh | sh`.
 - New adapters: Gemini CLI, Cursor, opencode… (see the list in ccusage's `rust/adapters/`). Only requires implementing `SourceAdapter` and registering it in the registry.
@@ -117,7 +121,7 @@ is bumped locally before tagging, so there is nothing to write back).
 ## Acceptance criteria
 
 - [ ] In a clean environment (e.g. a new Docker container + a logged-in claude), `npx prompt-profile` runs from start to finish
-- [ ] The npm package page shows provenance
+- [x] The npm package page shows provenance (`0.1.1`)
 - [ ] A pushed `vX.Y.Z` tag whose version differs from `package.json` fails before anything is published
       (the check is unit-tested and is the first job; still to be seen on a real tag push)
 - [x] Pushes to `main` no longer run a release job (`release.yml` triggers only on `v*.*.*` tags)
