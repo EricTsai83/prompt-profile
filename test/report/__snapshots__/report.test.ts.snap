@@ -14,7 +14,8 @@ exports[`renderHtml > matches snapshot 1`] = `
         <title>The Midnight Architect · prompt-profile</title>
         <style>
           
-:root{--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#a0a4ad}
+:root{--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#d3d6dc}
+@media (prefers-color-scheme:dark){:root{--po:#454952}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 .page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}
@@ -248,7 +249,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-l"
-            data-tip-en="Thu, Apr 30, 2026 · 4 prompts · Other 3 · dotfiles 1" data-tip-zh-TW="2026年4月30日週四 · 4 個 prompt · 其他 3 · dotfiles 1"
+            data-tip-en="Thu, Apr 30, 2026 · 4 prompts · Other folders 3 · dotfiles 1" data-tip-zh-TW="2026年4月30日週四 · 4 個 prompt · 其他資料夾 3 · dotfiles 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip tip-l"
@@ -256,11 +257,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-l"
-            data-tip-en="Sat, May 2, 2026 · 5 prompts · Other 5" data-tip-zh-TW="2026年5月2日週六 · 5 個 prompt · 其他 5"
+            data-tip-en="Sat, May 2, 2026 · 5 prompts · Other folders 5" data-tip-zh-TW="2026年5月2日週六 · 5 個 prompt · 其他資料夾 5"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-l"
-            data-tip-en="Sun, May 3, 2026 · 5 prompts · drawstuff 3 · Other 2" data-tip-zh-TW="2026年5月3日週日 · 5 個 prompt · drawstuff 3 · 其他 2"
+            data-tip-en="Sun, May 3, 2026 · 5 prompts · drawstuff 3 · Other folders 2" data-tip-zh-TW="2026年5月3日週日 · 5 個 prompt · drawstuff 3 · 其他資料夾 2"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -269,15 +270,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip tip-l"
-            data-tip-en="Mon, May 4, 2026 · 12 prompts · Other 8 · drawstuff 2" data-tip-zh-TW="2026年5月4日週一 · 12 個 prompt · 其他 8 · drawstuff 2"
+            data-tip-en="Mon, May 4, 2026 · 12 prompts · Other folders 8 · drawstuff 2" data-tip-zh-TW="2026年5月4日週一 · 12 個 prompt · 其他資料夾 8 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip tip-l"
-            data-tip-en="Tue, May 5, 2026 · 16 prompts · Other 15 · prompt-profile 1" data-tip-zh-TW="2026年5月5日週二 · 16 個 prompt · 其他 15 · prompt-profile 1"
+            data-tip-en="Tue, May 5, 2026 · 16 prompts · Other folders 15 · prompt-profile 1" data-tip-zh-TW="2026年5月5日週二 · 16 個 prompt · 其他資料夾 15 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-l"
-            data-tip-en="Wed, May 6, 2026 · 6 prompts · Other 5 · prompt-profile 1" data-tip-zh-TW="2026年5月6日週三 · 6 個 prompt · 其他 5 · prompt-profile 1"
+            data-tip-en="Wed, May 6, 2026 · 6 prompts · Other folders 5 · prompt-profile 1" data-tip-zh-TW="2026年5月6日週三 · 6 個 prompt · 其他資料夾 5 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip tip-l"
@@ -289,11 +290,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip tip-l"
-            data-tip-en="Sat, May 9, 2026 · 10 prompts · Other 6 · drawstuff 3" data-tip-zh-TW="2026年5月9日週六 · 10 個 prompt · 其他 6 · drawstuff 3"
+            data-tip-en="Sat, May 9, 2026 · 10 prompts · Other folders 6 · drawstuff 3" data-tip-zh-TW="2026年5月9日週六 · 10 個 prompt · 其他資料夾 6 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip tip-l"
-            data-tip-en="Sun, May 10, 2026 · 9 prompts · Other 7 · drawstuff 1" data-tip-zh-TW="2026年5月10日週日 · 9 個 prompt · 其他 7 · drawstuff 1"
+            data-tip-en="Sun, May 10, 2026 · 9 prompts · Other folders 7 · drawstuff 1" data-tip-zh-TW="2026年5月10日週日 · 9 個 prompt · 其他資料夾 7 · drawstuff 1"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -302,11 +303,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip"
-            data-tip-en="Mon, May 11, 2026 · 15 prompts · Other 7 · drawstuff 5" data-tip-zh-TW="2026年5月11日週一 · 15 個 prompt · 其他 7 · drawstuff 5"
+            data-tip-en="Mon, May 11, 2026 · 15 prompts · Other folders 7 · drawstuff 5" data-tip-zh-TW="2026年5月11日週一 · 15 個 prompt · 其他資料夾 7 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, May 12, 2026 · 31 prompts · Other 18 · drawstuff 9" data-tip-zh-TW="2026年5月12日週二 · 31 個 prompt · 其他 18 · drawstuff 9"
+            data-tip-en="Tue, May 12, 2026 · 31 prompts · Other folders 18 · drawstuff 9" data-tip-zh-TW="2026年5月12日週二 · 31 個 prompt · 其他資料夾 18 · drawstuff 9"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
@@ -314,7 +315,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Thu, May 14, 2026 · 13 prompts · Other 11 · drawstuff 2" data-tip-zh-TW="2026年5月14日週四 · 13 個 prompt · 其他 11 · drawstuff 2"
+            data-tip-en="Thu, May 14, 2026 · 13 prompts · Other folders 11 · drawstuff 2" data-tip-zh-TW="2026年5月14日週四 · 13 個 prompt · 其他資料夾 11 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -322,11 +323,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sat, May 16, 2026 · 17 prompts · Other 9 · drawstuff 5" data-tip-zh-TW="2026年5月16日週六 · 17 個 prompt · 其他 9 · drawstuff 5"
+            data-tip-en="Sat, May 16, 2026 · 17 prompts · Other folders 9 · drawstuff 5" data-tip-zh-TW="2026年5月16日週六 · 17 個 prompt · 其他資料夾 9 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, May 17, 2026 · 19 prompts · Other 9 · prompt-profile 6" data-tip-zh-TW="2026年5月17日週日 · 19 個 prompt · 其他 9 · prompt-profile 6"
+            data-tip-en="Sun, May 17, 2026 · 19 prompts · Other folders 9 · prompt-profile 6" data-tip-zh-TW="2026年5月17日週日 · 19 個 prompt · 其他資料夾 9 · prompt-profile 6"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -335,27 +336,27 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l1 tip"
-            data-tip-en="Mon, May 18, 2026 · 2 prompts · drawstuff 1 · Other 1" data-tip-zh-TW="2026年5月18日週一 · 2 個 prompt · drawstuff 1 · 其他 1"
+            data-tip-en="Mon, May 18, 2026 · 2 prompts · drawstuff 1 · Other folders 1" data-tip-zh-TW="2026年5月18日週一 · 2 個 prompt · drawstuff 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, May 19, 2026 · 29 prompts · Other 19 · drawstuff 6" data-tip-zh-TW="2026年5月19日週二 · 29 個 prompt · 其他 19 · drawstuff 6"
+            data-tip-en="Tue, May 19, 2026 · 29 prompts · Other folders 19 · drawstuff 6" data-tip-zh-TW="2026年5月19日週二 · 29 個 prompt · 其他資料夾 19 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, May 20, 2026 · 24 prompts · Other 17 · drawstuff 5" data-tip-zh-TW="2026年5月20日週三 · 24 個 prompt · 其他 17 · drawstuff 5"
+            data-tip-en="Wed, May 20, 2026 · 24 prompts · Other folders 17 · drawstuff 5" data-tip-zh-TW="2026年5月20日週三 · 24 個 prompt · 其他資料夾 17 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Thu, May 21, 2026 · 28 prompts · Other 16 · drawstuff 6" data-tip-zh-TW="2026年5月21日週四 · 28 個 prompt · 其他 16 · drawstuff 6"
+            data-tip-en="Thu, May 21, 2026 · 28 prompts · Other folders 16 · drawstuff 6" data-tip-zh-TW="2026年5月21日週四 · 28 個 prompt · 其他資料夾 16 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, May 22, 2026 · 24 prompts · Other 16 · drawstuff 7" data-tip-zh-TW="2026年5月22日週五 · 24 個 prompt · 其他 16 · drawstuff 7"
+            data-tip-en="Fri, May 22, 2026 · 24 prompts · Other folders 16 · drawstuff 7" data-tip-zh-TW="2026年5月22日週五 · 24 個 prompt · 其他資料夾 16 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sat, May 23, 2026 · 9 prompts · Other 6 · drawstuff 2" data-tip-zh-TW="2026年5月23日週六 · 9 個 prompt · 其他 6 · drawstuff 2"
+            data-tip-en="Sat, May 23, 2026 · 9 prompts · Other folders 6 · drawstuff 2" data-tip-zh-TW="2026年5月23日週六 · 9 個 prompt · 其他資料夾 6 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -368,11 +369,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip"
-            data-tip-en="Mon, May 25, 2026 · 10 prompts · Other 4 · drawstuff 3" data-tip-zh-TW="2026年5月25日週一 · 10 個 prompt · 其他 4 · drawstuff 3"
+            data-tip-en="Mon, May 25, 2026 · 10 prompts · Other folders 4 · drawstuff 3" data-tip-zh-TW="2026年5月25日週一 · 10 個 prompt · 其他資料夾 4 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, May 26, 2026 · 3 prompts · Other 2 · prompt-profile 1" data-tip-zh-TW="2026年5月26日週二 · 3 個 prompt · 其他 2 · prompt-profile 1"
+            data-tip-en="Tue, May 26, 2026 · 3 prompts · Other folders 2 · prompt-profile 1" data-tip-zh-TW="2026年5月26日週二 · 3 個 prompt · 其他資料夾 2 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -384,15 +385,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Fri, May 29, 2026 · 18 prompts · Other 10 · prompt-profile 4" data-tip-zh-TW="2026年5月29日週五 · 18 個 prompt · 其他 10 · prompt-profile 4"
+            data-tip-en="Fri, May 29, 2026 · 18 prompts · Other folders 10 · prompt-profile 4" data-tip-zh-TW="2026年5月29日週五 · 18 個 prompt · 其他資料夾 10 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Sat, May 30, 2026 · 2 prompts · Other 2" data-tip-zh-TW="2026年5月30日週六 · 2 個 prompt · 其他 2"
+            data-tip-en="Sat, May 30, 2026 · 2 prompts · Other folders 2" data-tip-zh-TW="2026年5月30日週六 · 2 個 prompt · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Sun, May 31, 2026 · 2 prompts · Other 2" data-tip-zh-TW="2026年5月31日週日 · 2 個 prompt · 其他 2"
+            data-tip-en="Sun, May 31, 2026 · 2 prompts · Other folders 2" data-tip-zh-TW="2026年5月31日週日 · 2 個 prompt · 其他資料夾 2"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -405,15 +406,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Jun 2, 2026 · 5 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="2026年6月2日週二 · 5 個 prompt · 其他 4 · drawstuff 1"
+            data-tip-en="Tue, Jun 2, 2026 · 5 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="2026年6月2日週二 · 5 個 prompt · 其他資料夾 4 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Wed, Jun 3, 2026 · 4 prompts · Other 3 · prompt-profile 1" data-tip-zh-TW="2026年6月3日週三 · 4 個 prompt · 其他 3 · prompt-profile 1"
+            data-tip-en="Wed, Jun 3, 2026 · 4 prompts · Other folders 3 · prompt-profile 1" data-tip-zh-TW="2026年6月3日週三 · 4 個 prompt · 其他資料夾 3 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Jun 4, 2026 · 8 prompts · Other 4 · drawstuff 2" data-tip-zh-TW="2026年6月4日週四 · 8 個 prompt · 其他 4 · drawstuff 2"
+            data-tip-en="Thu, Jun 4, 2026 · 8 prompts · Other folders 4 · drawstuff 2" data-tip-zh-TW="2026年6月4日週四 · 8 個 prompt · 其他資料夾 4 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -425,7 +426,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Sun, Jun 7, 2026 · 2 prompts · prompt-profile 1 · Other 1" data-tip-zh-TW="2026年6月7日週日 · 2 個 prompt · prompt-profile 1 · 其他 1"
+            data-tip-en="Sun, Jun 7, 2026 · 2 prompts · prompt-profile 1 · Other folders 1" data-tip-zh-TW="2026年6月7日週日 · 2 個 prompt · prompt-profile 1 · 其他資料夾 1"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -434,19 +435,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l1 tip"
-            data-tip-en="Mon, Jun 8, 2026 · 2 prompts · prompt-profile 1 · Other 1" data-tip-zh-TW="2026年6月8日週一 · 2 個 prompt · prompt-profile 1 · 其他 1"
+            data-tip-en="Mon, Jun 8, 2026 · 2 prompts · prompt-profile 1 · Other folders 1" data-tip-zh-TW="2026年6月8日週一 · 2 個 prompt · prompt-profile 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Jun 9, 2026 · 3 prompts · drawstuff 2 · Other 1" data-tip-zh-TW="2026年6月9日週二 · 3 個 prompt · drawstuff 2 · 其他 1"
+            data-tip-en="Tue, Jun 9, 2026 · 3 prompts · drawstuff 2 · Other folders 1" data-tip-zh-TW="2026年6月9日週二 · 3 個 prompt · drawstuff 2 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Wed, Jun 10, 2026 · 3 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="2026年6月10日週三 · 3 個 prompt · 其他 2 · drawstuff 1"
+            data-tip-en="Wed, Jun 10, 2026 · 3 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="2026年6月10日週三 · 3 個 prompt · 其他資料夾 2 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Thu, Jun 11, 2026 · 9 prompts · drawstuff 4 · Other 3" data-tip-zh-TW="2026年6月11日週四 · 9 個 prompt · drawstuff 4 · 其他 3"
+            data-tip-en="Thu, Jun 11, 2026 · 9 prompts · drawstuff 4 · Other folders 3" data-tip-zh-TW="2026年6月11日週四 · 9 個 prompt · drawstuff 4 · 其他資料夾 3"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
@@ -454,11 +455,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Jun 13, 2026 · 28 prompts · Other 19 · drawstuff 4" data-tip-zh-TW="2026年6月13日週六 · 28 個 prompt · 其他 19 · drawstuff 4"
+            data-tip-en="Sat, Jun 13, 2026 · 28 prompts · Other folders 19 · drawstuff 4" data-tip-zh-TW="2026年6月13日週六 · 28 個 prompt · 其他資料夾 19 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sun, Jun 14, 2026 · 17 prompts · Other 13 · drawstuff 3" data-tip-zh-TW="2026年6月14日週日 · 17 個 prompt · 其他 13 · drawstuff 3"
+            data-tip-en="Sun, Jun 14, 2026 · 17 prompts · Other folders 13 · drawstuff 3" data-tip-zh-TW="2026年6月14日週日 · 17 個 prompt · 其他資料夾 13 · drawstuff 3"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -467,31 +468,31 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l2 tip"
-            data-tip-en="Mon, Jun 15, 2026 · 3 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="2026年6月15日週一 · 3 個 prompt · 其他 2 · drawstuff 1"
+            data-tip-en="Mon, Jun 15, 2026 · 3 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="2026年6月15日週一 · 3 個 prompt · 其他資料夾 2 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Jun 16, 2026 · 6 prompts · prompt-profile 3 · Other 2" data-tip-zh-TW="2026年6月16日週二 · 6 個 prompt · prompt-profile 3 · 其他 2"
+            data-tip-en="Tue, Jun 16, 2026 · 6 prompts · prompt-profile 3 · Other folders 2" data-tip-zh-TW="2026年6月16日週二 · 6 個 prompt · prompt-profile 3 · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Wed, Jun 17, 2026 · 8 prompts · Other 5 · drawstuff 2" data-tip-zh-TW="2026年6月17日週三 · 8 個 prompt · 其他 5 · drawstuff 2"
+            data-tip-en="Wed, Jun 17, 2026 · 8 prompts · Other folders 5 · drawstuff 2" data-tip-zh-TW="2026年6月17日週三 · 8 個 prompt · 其他資料夾 5 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Thu, Jun 18, 2026 · 9 prompts · Other 6 · prompt-profile 2" data-tip-zh-TW="2026年6月18日週四 · 9 個 prompt · 其他 6 · prompt-profile 2"
+            data-tip-en="Thu, Jun 18, 2026 · 9 prompts · Other folders 6 · prompt-profile 2" data-tip-zh-TW="2026年6月18日週四 · 9 個 prompt · 其他資料夾 6 · prompt-profile 2"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Fri, Jun 19, 2026 · 3 prompts · Other 2 · prompt-profile 1" data-tip-zh-TW="2026年6月19日週五 · 3 個 prompt · 其他 2 · prompt-profile 1"
+            data-tip-en="Fri, Jun 19, 2026 · 3 prompts · Other folders 2 · prompt-profile 1" data-tip-zh-TW="2026年6月19日週五 · 3 個 prompt · 其他資料夾 2 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Jun 20, 2026 · 26 prompts · Other 14 · prompt-profile 7" data-tip-zh-TW="2026年6月20日週六 · 26 個 prompt · 其他 14 · prompt-profile 7"
+            data-tip-en="Sat, Jun 20, 2026 · 26 prompts · Other folders 14 · prompt-profile 7" data-tip-zh-TW="2026年6月20日週六 · 26 個 prompt · 其他資料夾 14 · prompt-profile 7"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, Jun 21, 2026 · 33 prompts · Other 18 · drawstuff 9" data-tip-zh-TW="2026年6月21日週日 · 33 個 prompt · 其他 18 · drawstuff 9"
+            data-tip-en="Sun, Jun 21, 2026 · 33 prompts · Other folders 18 · drawstuff 9" data-tip-zh-TW="2026年6月21日週日 · 33 個 prompt · 其他資料夾 18 · drawstuff 9"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -500,27 +501,27 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip"
-            data-tip-en="Mon, Jun 22, 2026 · 12 prompts · Other 7 · drawstuff 4" data-tip-zh-TW="2026年6月22日週一 · 12 個 prompt · 其他 7 · drawstuff 4"
+            data-tip-en="Mon, Jun 22, 2026 · 12 prompts · Other folders 7 · drawstuff 4" data-tip-zh-TW="2026年6月22日週一 · 12 個 prompt · 其他資料夾 7 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Tue, Jun 23, 2026 · 12 prompts · Other 6 · drawstuff 4" data-tip-zh-TW="2026年6月23日週二 · 12 個 prompt · 其他 6 · drawstuff 4"
+            data-tip-en="Tue, Jun 23, 2026 · 12 prompts · Other folders 6 · drawstuff 4" data-tip-zh-TW="2026年6月23日週二 · 12 個 prompt · 其他資料夾 6 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Wed, Jun 24, 2026 · 2 prompts · dotfiles 1 · Other 1" data-tip-zh-TW="2026年6月24日週三 · 2 個 prompt · dotfiles 1 · 其他 1"
+            data-tip-en="Wed, Jun 24, 2026 · 2 prompts · dotfiles 1 · Other folders 1" data-tip-zh-TW="2026年6月24日週三 · 2 個 prompt · dotfiles 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Jun 25, 2026 · 3 prompts · Other 2 · prompt-profile 1" data-tip-zh-TW="2026年6月25日週四 · 3 個 prompt · 其他 2 · prompt-profile 1"
+            data-tip-en="Thu, Jun 25, 2026 · 3 prompts · Other folders 2 · prompt-profile 1" data-tip-zh-TW="2026年6月25日週四 · 3 個 prompt · 其他資料夾 2 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Fri, Jun 26, 2026 · 8 prompts · Other 4 · prompt-profile 3" data-tip-zh-TW="2026年6月26日週五 · 8 個 prompt · 其他 4 · prompt-profile 3"
+            data-tip-en="Fri, Jun 26, 2026 · 8 prompts · Other folders 4 · prompt-profile 3" data-tip-zh-TW="2026年6月26日週五 · 8 個 prompt · 其他資料夾 4 · prompt-profile 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Sat, Jun 27, 2026 · 6 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="2026年6月27日週六 · 6 個 prompt · 其他 4 · drawstuff 1"
+            data-tip-en="Sat, Jun 27, 2026 · 6 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="2026年6月27日週六 · 6 個 prompt · 其他資料夾 4 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -533,7 +534,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Jun 29, 2026 · 26 prompts · Other 15 · drawstuff 5" data-tip-zh-TW="2026年6月29日週一 · 26 個 prompt · 其他 15 · drawstuff 5"
+            data-tip-en="Mon, Jun 29, 2026 · 26 prompts · Other folders 15 · drawstuff 5" data-tip-zh-TW="2026年6月29日週一 · 26 個 prompt · 其他資料夾 15 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -545,7 +546,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Thu, Jul 2, 2026 · 2 prompts · Other 2" data-tip-zh-TW="2026年7月2日週四 · 2 個 prompt · 其他 2"
+            data-tip-en="Thu, Jul 2, 2026 · 2 prompts · Other folders 2" data-tip-zh-TW="2026年7月2日週四 · 2 個 prompt · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -553,11 +554,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Jul 4, 2026 · 31 prompts · Other 21 · prompt-profile 5" data-tip-zh-TW="2026年7月4日週六 · 31 個 prompt · 其他 21 · prompt-profile 5"
+            data-tip-en="Sat, Jul 4, 2026 · 31 prompts · Other folders 21 · prompt-profile 5" data-tip-zh-TW="2026年7月4日週六 · 31 個 prompt · 其他資料夾 21 · prompt-profile 5"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sun, Jul 5, 2026 · 14 prompts · Other 9 · drawstuff 3" data-tip-zh-TW="2026年7月5日週日 · 14 個 prompt · 其他 9 · drawstuff 3"
+            data-tip-en="Sun, Jul 5, 2026 · 14 prompts · Other folders 9 · drawstuff 3" data-tip-zh-TW="2026年7月5日週日 · 14 個 prompt · 其他資料夾 9 · drawstuff 3"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -570,27 +571,27 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Jul 7, 2026 · 3 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="2026年7月7日週二 · 3 個 prompt · 其他 2 · drawstuff 1"
+            data-tip-en="Tue, Jul 7, 2026 · 3 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="2026年7月7日週二 · 3 個 prompt · 其他資料夾 2 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Wed, Jul 8, 2026 · 14 prompts · drawstuff 6 · Other 4" data-tip-zh-TW="2026年7月8日週三 · 14 個 prompt · drawstuff 6 · 其他 4"
+            data-tip-en="Wed, Jul 8, 2026 · 14 prompts · drawstuff 6 · Other folders 4" data-tip-zh-TW="2026年7月8日週三 · 14 個 prompt · drawstuff 6 · 其他資料夾 4"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Thu, Jul 9, 2026 · 2 prompts · Other 2" data-tip-zh-TW="2026年7月9日週四 · 2 個 prompt · 其他 2"
+            data-tip-en="Thu, Jul 9, 2026 · 2 prompts · Other folders 2" data-tip-zh-TW="2026年7月9日週四 · 2 個 prompt · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Fri, Jul 10, 2026 · 14 prompts · Other 7 · drawstuff 4" data-tip-zh-TW="2026年7月10日週五 · 14 個 prompt · 其他 7 · drawstuff 4"
+            data-tip-en="Fri, Jul 10, 2026 · 14 prompts · Other folders 7 · drawstuff 4" data-tip-zh-TW="2026年7月10日週五 · 14 個 prompt · 其他資料夾 7 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Jul 11, 2026 · 32 prompts · Other 21 · drawstuff 8" data-tip-zh-TW="2026年7月11日週六 · 32 個 prompt · 其他 21 · drawstuff 8"
+            data-tip-en="Sat, Jul 11, 2026 · 32 prompts · Other folders 21 · drawstuff 8" data-tip-zh-TW="2026年7月11日週六 · 32 個 prompt · 其他資料夾 21 · drawstuff 8"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, Jul 12, 2026 · 27 prompts · Other 17 · drawstuff 7" data-tip-zh-TW="2026年7月12日週日 · 27 個 prompt · 其他 17 · drawstuff 7"
+            data-tip-en="Sun, Jul 12, 2026 · 27 prompts · Other folders 17 · drawstuff 7" data-tip-zh-TW="2026年7月12日週日 · 27 個 prompt · 其他資料夾 17 · drawstuff 7"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -599,19 +600,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Jul 13, 2026 · 20 prompts · Other 15 · drawstuff 3" data-tip-zh-TW="2026年7月13日週一 · 20 個 prompt · 其他 15 · drawstuff 3"
+            data-tip-en="Mon, Jul 13, 2026 · 20 prompts · Other folders 15 · drawstuff 3" data-tip-zh-TW="2026年7月13日週一 · 20 個 prompt · 其他資料夾 15 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Jul 14, 2026 · 6 prompts · drawstuff 3 · Other 3" data-tip-zh-TW="2026年7月14日週二 · 6 個 prompt · drawstuff 3 · 其他 3"
+            data-tip-en="Tue, Jul 14, 2026 · 6 prompts · drawstuff 3 · Other folders 3" data-tip-zh-TW="2026年7月14日週二 · 6 個 prompt · drawstuff 3 · 其他資料夾 3"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Wed, Jul 15, 2026 · 9 prompts · Other 6 · drawstuff 3" data-tip-zh-TW="2026年7月15日週三 · 9 個 prompt · 其他 6 · drawstuff 3"
+            data-tip-en="Wed, Jul 15, 2026 · 9 prompts · Other folders 6 · drawstuff 3" data-tip-zh-TW="2026年7月15日週三 · 9 個 prompt · 其他資料夾 6 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Jul 16, 2026 · 4 prompts · Other 3 · drawstuff 1" data-tip-zh-TW="2026年7月16日週四 · 4 個 prompt · 其他 3 · drawstuff 1"
+            data-tip-en="Thu, Jul 16, 2026 · 4 prompts · Other folders 3 · drawstuff 1" data-tip-zh-TW="2026年7月16日週四 · 4 個 prompt · 其他資料夾 3 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -619,11 +620,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Jul 18, 2026 · 23 prompts · Other 15 · drawstuff 6" data-tip-zh-TW="2026年7月18日週六 · 23 個 prompt · 其他 15 · drawstuff 6"
+            data-tip-en="Sat, Jul 18, 2026 · 23 prompts · Other folders 15 · drawstuff 6" data-tip-zh-TW="2026年7月18日週六 · 23 個 prompt · 其他資料夾 15 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sun, Jul 19, 2026 · 14 prompts · drawstuff 6 · Other 6" data-tip-zh-TW="2026年7月19日週日 · 14 個 prompt · drawstuff 6 · 其他 6"
+            data-tip-en="Sun, Jul 19, 2026 · 14 prompts · drawstuff 6 · Other folders 6" data-tip-zh-TW="2026年7月19日週日 · 14 個 prompt · drawstuff 6 · 其他資料夾 6"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -636,15 +637,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, Jul 21, 2026 · 23 prompts · Other 16 · drawstuff 3" data-tip-zh-TW="2026年7月21日週二 · 23 個 prompt · 其他 16 · drawstuff 3"
+            data-tip-en="Tue, Jul 21, 2026 · 23 prompts · Other folders 16 · drawstuff 3" data-tip-zh-TW="2026年7月21日週二 · 23 個 prompt · 其他資料夾 16 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Wed, Jul 22, 2026 · 8 prompts · Other 4 · drawstuff 3" data-tip-zh-TW="2026年7月22日週三 · 8 個 prompt · 其他 4 · drawstuff 3"
+            data-tip-en="Wed, Jul 22, 2026 · 8 prompts · Other folders 4 · drawstuff 3" data-tip-zh-TW="2026年7月22日週三 · 8 個 prompt · 其他資料夾 4 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Jul 23, 2026 · 5 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="2026年7月23日週四 · 5 個 prompt · 其他 4 · drawstuff 1"
+            data-tip-en="Thu, Jul 23, 2026 · 5 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="2026年7月23日週四 · 5 個 prompt · 其他資料夾 4 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -665,23 +666,23 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Jul 27, 2026 · 25 prompts · Other 11 · drawstuff 7" data-tip-zh-TW="2026年7月27日週一 · 25 個 prompt · 其他 11 · drawstuff 7"
+            data-tip-en="Mon, Jul 27, 2026 · 25 prompts · Other folders 11 · drawstuff 7" data-tip-zh-TW="2026年7月27日週一 · 25 個 prompt · 其他資料夾 11 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, Jul 28, 2026 · 33 prompts · Other 20 · drawstuff 8" data-tip-zh-TW="2026年7月28日週二 · 33 個 prompt · 其他 20 · drawstuff 8"
+            data-tip-en="Tue, Jul 28, 2026 · 33 prompts · Other folders 20 · drawstuff 8" data-tip-zh-TW="2026年7月28日週二 · 33 個 prompt · 其他資料夾 20 · drawstuff 8"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, Jul 29, 2026 · 27 prompts · Other 16 · prompt-profile 8" data-tip-zh-TW="2026年7月29日週三 · 27 個 prompt · 其他 16 · prompt-profile 8"
+            data-tip-en="Wed, Jul 29, 2026 · 27 prompts · Other folders 16 · prompt-profile 8" data-tip-zh-TW="2026年7月29日週三 · 27 個 prompt · 其他資料夾 16 · prompt-profile 8"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Thu, Jul 30, 2026 · 25 prompts · Other 16 · prompt-profile 5" data-tip-zh-TW="2026年7月30日週四 · 25 個 prompt · 其他 16 · prompt-profile 5"
+            data-tip-en="Thu, Jul 30, 2026 · 25 prompts · Other folders 16 · prompt-profile 5" data-tip-zh-TW="2026年7月30日週四 · 25 個 prompt · 其他資料夾 16 · prompt-profile 5"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, Jul 31, 2026 · 25 prompts · Other 14 · drawstuff 8" data-tip-zh-TW="2026年7月31日週五 · 25 個 prompt · 其他 14 · drawstuff 8"
+            data-tip-en="Fri, Jul 31, 2026 · 25 prompts · Other folders 14 · drawstuff 8" data-tip-zh-TW="2026年7月31日週五 · 25 個 prompt · 其他資料夾 14 · drawstuff 8"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -689,7 +690,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, Aug 2, 2026 · 22 prompts · Other 11 · prompt-profile 6" data-tip-zh-TW="2026年8月2日週日 · 22 個 prompt · 其他 11 · prompt-profile 6"
+            data-tip-en="Sun, Aug 2, 2026 · 22 prompts · Other folders 11 · prompt-profile 6" data-tip-zh-TW="2026年8月2日週日 · 22 個 prompt · 其他資料夾 11 · prompt-profile 6"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -702,27 +703,27 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Tue, Aug 4, 2026 · 5 prompts · Other 4 · dotfiles 1" data-tip-zh-TW="2026年8月4日週二 · 5 個 prompt · 其他 4 · dotfiles 1"
+            data-tip-en="Tue, Aug 4, 2026 · 5 prompts · Other folders 4 · dotfiles 1" data-tip-zh-TW="2026年8月4日週二 · 5 個 prompt · 其他資料夾 4 · dotfiles 1"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Wed, Aug 5, 2026 · 13 prompts · Other 7 · drawstuff 5" data-tip-zh-TW="2026年8月5日週三 · 13 個 prompt · 其他 7 · drawstuff 5"
+            data-tip-en="Wed, Aug 5, 2026 · 13 prompts · Other folders 7 · drawstuff 5" data-tip-zh-TW="2026年8月5日週三 · 13 個 prompt · 其他資料夾 7 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Aug 6, 2026 · 8 prompts · prompt-profile 3 · Other 3" data-tip-zh-TW="2026年8月6日週四 · 8 個 prompt · prompt-profile 3 · 其他 3"
+            data-tip-en="Thu, Aug 6, 2026 · 8 prompts · prompt-profile 3 · Other folders 3" data-tip-zh-TW="2026年8月6日週四 · 8 個 prompt · prompt-profile 3 · 其他資料夾 3"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Fri, Aug 7, 2026 · 2 prompts · Other 2" data-tip-zh-TW="2026年8月7日週五 · 2 個 prompt · 其他 2"
+            data-tip-en="Fri, Aug 7, 2026 · 2 prompts · Other folders 2" data-tip-zh-TW="2026年8月7日週五 · 2 個 prompt · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Sat, Aug 8, 2026 · 2 prompts · drawstuff 1 · Other 1" data-tip-zh-TW="2026年8月8日週六 · 2 個 prompt · drawstuff 1 · 其他 1"
+            data-tip-en="Sat, Aug 8, 2026 · 2 prompts · drawstuff 1 · Other folders 1" data-tip-zh-TW="2026年8月8日週六 · 2 個 prompt · drawstuff 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Sun, Aug 9, 2026 · 6 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="2026年8月9日週日 · 6 個 prompt · 其他 4 · drawstuff 1"
+            data-tip-en="Sun, Aug 9, 2026 · 6 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="2026年8月9日週日 · 6 個 prompt · 其他資料夾 4 · drawstuff 1"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -731,31 +732,31 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l2 tip"
-            data-tip-en="Mon, Aug 10, 2026 · 6 prompts · Other 4 · drawstuff 2" data-tip-zh-TW="2026年8月10日週一 · 6 個 prompt · 其他 4 · drawstuff 2"
+            data-tip-en="Mon, Aug 10, 2026 · 6 prompts · Other folders 4 · drawstuff 2" data-tip-zh-TW="2026年8月10日週一 · 6 個 prompt · 其他資料夾 4 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, Aug 11, 2026 · 20 prompts · Other 12 · prompt-profile 4" data-tip-zh-TW="2026年8月11日週二 · 20 個 prompt · 其他 12 · prompt-profile 4"
+            data-tip-en="Tue, Aug 11, 2026 · 20 prompts · Other folders 12 · prompt-profile 4" data-tip-zh-TW="2026年8月11日週二 · 20 個 prompt · 其他資料夾 12 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, Aug 12, 2026 · 31 prompts · Other 15 · drawstuff 10" data-tip-zh-TW="2026年8月12日週三 · 31 個 prompt · 其他 15 · drawstuff 10"
+            data-tip-en="Wed, Aug 12, 2026 · 31 prompts · Other folders 15 · drawstuff 10" data-tip-zh-TW="2026年8月12日週三 · 31 個 prompt · 其他資料夾 15 · drawstuff 10"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Thu, Aug 13, 2026 · 11 prompts · Other 7 · drawstuff 2" data-tip-zh-TW="2026年8月13日週四 · 11 個 prompt · 其他 7 · drawstuff 2"
+            data-tip-en="Thu, Aug 13, 2026 · 11 prompts · Other folders 7 · drawstuff 2" data-tip-zh-TW="2026年8月13日週四 · 11 個 prompt · 其他資料夾 7 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, Aug 14, 2026 · 30 prompts · Other 26 · prompt-profile 3" data-tip-zh-TW="2026年8月14日週五 · 30 個 prompt · 其他 26 · prompt-profile 3"
+            data-tip-en="Fri, Aug 14, 2026 · 30 prompts · Other folders 26 · prompt-profile 3" data-tip-zh-TW="2026年8月14日週五 · 30 個 prompt · 其他資料夾 26 · prompt-profile 3"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Aug 15, 2026 · 33 prompts · Other 22 · drawstuff 7" data-tip-zh-TW="2026年8月15日週六 · 33 個 prompt · 其他 22 · drawstuff 7"
+            data-tip-en="Sat, Aug 15, 2026 · 33 prompts · Other folders 22 · drawstuff 7" data-tip-zh-TW="2026年8月15日週六 · 33 個 prompt · 其他資料夾 22 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, Aug 16, 2026 · 31 prompts · Other 20 · prompt-profile 6" data-tip-zh-TW="2026年8月16日週日 · 31 個 prompt · 其他 20 · prompt-profile 6"
+            data-tip-en="Sun, Aug 16, 2026 · 31 prompts · Other folders 20 · prompt-profile 6" data-tip-zh-TW="2026年8月16日週日 · 31 個 prompt · 其他資料夾 20 · prompt-profile 6"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -764,7 +765,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip"
-            data-tip-en="Mon, Aug 17, 2026 · 9 prompts · prompt-profile 3 · Other 3" data-tip-zh-TW="2026年8月17日週一 · 9 個 prompt · prompt-profile 3 · 其他 3"
+            data-tip-en="Mon, Aug 17, 2026 · 9 prompts · prompt-profile 3 · Other folders 3" data-tip-zh-TW="2026年8月17日週一 · 9 個 prompt · prompt-profile 3 · 其他資料夾 3"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -772,19 +773,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Wed, Aug 19, 2026 · 5 prompts · Other 3 · prompt-profile 2" data-tip-zh-TW="2026年8月19日週三 · 5 個 prompt · 其他 3 · prompt-profile 2"
+            data-tip-en="Wed, Aug 19, 2026 · 5 prompts · Other folders 3 · prompt-profile 2" data-tip-zh-TW="2026年8月19日週三 · 5 個 prompt · 其他資料夾 3 · prompt-profile 2"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Aug 20, 2026 · 5 prompts · Other 3 · drawstuff 1" data-tip-zh-TW="2026年8月20日週四 · 5 個 prompt · 其他 3 · drawstuff 1"
+            data-tip-en="Thu, Aug 20, 2026 · 5 prompts · Other folders 3 · drawstuff 1" data-tip-zh-TW="2026年8月20日週四 · 5 個 prompt · 其他資料夾 3 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Fri, Aug 21, 2026 · 4 prompts · Other 3 · drawstuff 1" data-tip-zh-TW="2026年8月21日週五 · 4 個 prompt · 其他 3 · drawstuff 1"
+            data-tip-en="Fri, Aug 21, 2026 · 4 prompts · Other folders 3 · drawstuff 1" data-tip-zh-TW="2026年8月21日週五 · 4 個 prompt · 其他資料夾 3 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Sat, Aug 22, 2026 · 5 prompts · Other 3 · drawstuff 2" data-tip-zh-TW="2026年8月22日週六 · 5 個 prompt · 其他 3 · drawstuff 2"
+            data-tip-en="Sat, Aug 22, 2026 · 5 prompts · Other folders 3 · drawstuff 2" data-tip-zh-TW="2026年8月22日週六 · 5 個 prompt · 其他資料夾 3 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -797,7 +798,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l3 tip"
-            data-tip-en="Mon, Aug 24, 2026 · 17 prompts · Other 10 · drawstuff 4" data-tip-zh-TW="2026年8月24日週一 · 17 個 prompt · 其他 10 · drawstuff 4"
+            data-tip-en="Mon, Aug 24, 2026 · 17 prompts · Other folders 10 · drawstuff 4" data-tip-zh-TW="2026年8月24日週一 · 17 個 prompt · 其他資料夾 10 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -805,15 +806,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, Aug 26, 2026 · 29 prompts · Other 20 · drawstuff 6" data-tip-zh-TW="2026年8月26日週三 · 29 個 prompt · 其他 20 · drawstuff 6"
+            data-tip-en="Wed, Aug 26, 2026 · 29 prompts · Other folders 20 · drawstuff 6" data-tip-zh-TW="2026年8月26日週三 · 29 個 prompt · 其他資料夾 20 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Thu, Aug 27, 2026 · 26 prompts · Other 19 · prompt-profile 4" data-tip-zh-TW="2026年8月27日週四 · 26 個 prompt · 其他 19 · prompt-profile 4"
+            data-tip-en="Thu, Aug 27, 2026 · 26 prompts · Other folders 19 · prompt-profile 4" data-tip-zh-TW="2026年8月27日週四 · 26 個 prompt · 其他資料夾 19 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Fri, Aug 28, 2026 · 12 prompts · Other 8 · prompt-profile 4" data-tip-zh-TW="2026年8月28日週五 · 12 個 prompt · 其他 8 · prompt-profile 4"
+            data-tip-en="Fri, Aug 28, 2026 · 12 prompts · Other folders 8 · prompt-profile 4" data-tip-zh-TW="2026年8月28日週五 · 12 個 prompt · 其他資料夾 8 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -821,7 +822,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sun, Aug 30, 2026 · 18 prompts · Other 13 · drawstuff 4" data-tip-zh-TW="2026年8月30日週日 · 18 個 prompt · 其他 13 · drawstuff 4"
+            data-tip-en="Sun, Aug 30, 2026 · 18 prompts · Other folders 13 · drawstuff 4" data-tip-zh-TW="2026年8月30日週日 · 18 個 prompt · 其他資料夾 13 · drawstuff 4"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -830,15 +831,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Aug 31, 2026 · 24 prompts · Other 16 · prompt-profile 4" data-tip-zh-TW="2026年8月31日週一 · 24 個 prompt · 其他 16 · prompt-profile 4"
+            data-tip-en="Mon, Aug 31, 2026 · 24 prompts · Other folders 16 · prompt-profile 4" data-tip-zh-TW="2026年8月31日週一 · 24 個 prompt · 其他資料夾 16 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Tue, Sep 1, 2026 · 2 prompts · drawstuff 1 · Other 1" data-tip-zh-TW="2026年9月1日週二 · 2 個 prompt · drawstuff 1 · 其他 1"
+            data-tip-en="Tue, Sep 1, 2026 · 2 prompts · drawstuff 1 · Other folders 1" data-tip-zh-TW="2026年9月1日週二 · 2 個 prompt · drawstuff 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, Sep 2, 2026 · 19 prompts · Other 10 · drawstuff 7" data-tip-zh-TW="2026年9月2日週三 · 19 個 prompt · 其他 10 · drawstuff 7"
+            data-tip-en="Wed, Sep 2, 2026 · 19 prompts · Other folders 10 · drawstuff 7" data-tip-zh-TW="2026年9月2日週三 · 19 個 prompt · 其他資料夾 10 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -850,11 +851,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Sep 5, 2026 · 29 prompts · Other 17 · drawstuff 10" data-tip-zh-TW="2026年9月5日週六 · 29 個 prompt · 其他 17 · drawstuff 10"
+            data-tip-en="Sat, Sep 5, 2026 · 29 prompts · Other folders 17 · drawstuff 10" data-tip-zh-TW="2026年9月5日週六 · 29 個 prompt · 其他資料夾 17 · drawstuff 10"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sun, Sep 6, 2026 · 24 prompts · Other 15 · drawstuff 4" data-tip-zh-TW="2026年9月6日週日 · 24 個 prompt · 其他 15 · drawstuff 4"
+            data-tip-en="Sun, Sep 6, 2026 · 24 prompts · Other folders 15 · drawstuff 4" data-tip-zh-TW="2026年9月6日週日 · 24 個 prompt · 其他資料夾 15 · drawstuff 4"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -863,7 +864,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Sep 7, 2026 · 22 prompts · Other 16 · prompt-profile 4" data-tip-zh-TW="2026年9月7日週一 · 22 個 prompt · 其他 16 · prompt-profile 4"
+            data-tip-en="Mon, Sep 7, 2026 · 22 prompts · Other folders 16 · prompt-profile 4" data-tip-zh-TW="2026年9月7日週一 · 22 個 prompt · 其他資料夾 16 · prompt-profile 4"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -871,15 +872,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Wed, Sep 9, 2026 · 12 prompts · Other 8 · drawstuff 2" data-tip-zh-TW="2026年9月9日週三 · 12 個 prompt · 其他 8 · drawstuff 2"
+            data-tip-en="Wed, Sep 9, 2026 · 12 prompts · Other folders 8 · drawstuff 2" data-tip-zh-TW="2026年9月9日週三 · 12 個 prompt · 其他資料夾 8 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Sep 10, 2026 · 4 prompts · Other 3 · drawstuff 1" data-tip-zh-TW="2026年9月10日週四 · 4 個 prompt · 其他 3 · drawstuff 1"
+            data-tip-en="Thu, Sep 10, 2026 · 4 prompts · Other folders 3 · drawstuff 1" data-tip-zh-TW="2026年9月10日週四 · 4 個 prompt · 其他資料夾 3 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, Sep 11, 2026 · 24 prompts · Other 16 · drawstuff 4" data-tip-zh-TW="2026年9月11日週五 · 24 個 prompt · 其他 16 · drawstuff 4"
+            data-tip-en="Fri, Sep 11, 2026 · 24 prompts · Other folders 16 · drawstuff 4" data-tip-zh-TW="2026年9月11日週五 · 24 個 prompt · 其他資料夾 16 · drawstuff 4"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -887,7 +888,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Sun, Sep 13, 2026 · 8 prompts · Other 4 · drawstuff 2" data-tip-zh-TW="2026年9月13日週日 · 8 個 prompt · 其他 4 · drawstuff 2"
+            data-tip-en="Sun, Sep 13, 2026 · 8 prompts · Other folders 4 · drawstuff 2" data-tip-zh-TW="2026年9月13日週日 · 8 個 prompt · 其他資料夾 4 · drawstuff 2"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -896,15 +897,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Sep 14, 2026 · 24 prompts · Other 14 · drawstuff 7" data-tip-zh-TW="2026年9月14日週一 · 24 個 prompt · 其他 14 · drawstuff 7"
+            data-tip-en="Mon, Sep 14, 2026 · 24 prompts · Other folders 14 · drawstuff 7" data-tip-zh-TW="2026年9月14日週一 · 24 個 prompt · 其他資料夾 14 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, Sep 15, 2026 · 32 prompts · Other 21 · drawstuff 7" data-tip-zh-TW="2026年9月15日週二 · 32 個 prompt · 其他 21 · drawstuff 7"
+            data-tip-en="Tue, Sep 15, 2026 · 32 prompts · Other folders 21 · drawstuff 7" data-tip-zh-TW="2026年9月15日週二 · 32 個 prompt · 其他資料夾 21 · drawstuff 7"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Wed, Sep 16, 2026 · 10 prompts · Other 7 · drawstuff 2" data-tip-zh-TW="2026年9月16日週三 · 10 個 prompt · 其他 7 · drawstuff 2"
+            data-tip-en="Wed, Sep 16, 2026 · 10 prompts · Other folders 7 · drawstuff 2" data-tip-zh-TW="2026年9月16日週三 · 10 個 prompt · 其他資料夾 7 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
@@ -912,15 +913,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, Sep 18, 2026 · 31 prompts · Other 18 · drawstuff 8" data-tip-zh-TW="2026年9月18日週五 · 31 個 prompt · 其他 18 · drawstuff 8"
+            data-tip-en="Fri, Sep 18, 2026 · 31 prompts · Other folders 18 · drawstuff 8" data-tip-zh-TW="2026年9月18日週五 · 31 個 prompt · 其他資料夾 18 · drawstuff 8"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Sep 19, 2026 · 21 prompts · Other 9 · prompt-profile 6" data-tip-zh-TW="2026年9月19日週六 · 21 個 prompt · 其他 9 · prompt-profile 6"
+            data-tip-en="Sat, Sep 19, 2026 · 21 prompts · Other folders 9 · prompt-profile 6" data-tip-zh-TW="2026年9月19日週六 · 21 個 prompt · 其他資料夾 9 · prompt-profile 6"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Sun, Sep 20, 2026 · 4 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="2026年9月20日週日 · 4 個 prompt · 其他 2 · drawstuff 1"
+            data-tip-en="Sun, Sep 20, 2026 · 4 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="2026年9月20日週日 · 4 個 prompt · 其他資料夾 2 · drawstuff 1"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -929,7 +930,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l2 tip"
-            data-tip-en="Mon, Sep 21, 2026 · 3 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="2026年9月21日週一 · 3 個 prompt · 其他 2 · drawstuff 1"
+            data-tip-en="Mon, Sep 21, 2026 · 3 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="2026年9月21日週一 · 3 個 prompt · 其他資料夾 2 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -945,11 +946,11 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Fri, Sep 25, 2026 · 29 prompts · Other 17 · drawstuff 9" data-tip-zh-TW="2026年9月25日週五 · 29 個 prompt · 其他 17 · drawstuff 9"
+            data-tip-en="Fri, Sep 25, 2026 · 29 prompts · Other folders 17 · drawstuff 9" data-tip-zh-TW="2026年9月25日週五 · 29 個 prompt · 其他資料夾 17 · drawstuff 9"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Sat, Sep 26, 2026 · 25 prompts · Other 15 · drawstuff 5" data-tip-zh-TW="2026年9月26日週六 · 25 個 prompt · 其他 15 · drawstuff 5"
+            data-tip-en="Sat, Sep 26, 2026 · 25 prompts · Other folders 15 · drawstuff 5" data-tip-zh-TW="2026年9月26日週六 · 25 個 prompt · 其他資料夾 15 · drawstuff 5"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
@@ -962,19 +963,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip"
-            data-tip-en="Mon, Sep 28, 2026 · 26 prompts · Other 15 · drawstuff 9" data-tip-zh-TW="2026年9月28日週一 · 26 個 prompt · 其他 15 · drawstuff 9"
+            data-tip-en="Mon, Sep 28, 2026 · 26 prompts · Other folders 15 · drawstuff 9" data-tip-zh-TW="2026年9月28日週一 · 26 個 prompt · 其他資料夾 15 · drawstuff 9"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Tue, Sep 29, 2026 · 32 prompts · Other 21 · drawstuff 6" data-tip-zh-TW="2026年9月29日週二 · 32 個 prompt · 其他 21 · drawstuff 6"
+            data-tip-en="Tue, Sep 29, 2026 · 32 prompts · Other folders 21 · drawstuff 6" data-tip-zh-TW="2026年9月29日週二 · 32 個 prompt · 其他資料夾 21 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Wed, Sep 30, 2026 · 19 prompts · Other 14 · drawstuff 3" data-tip-zh-TW="2026年9月30日週三 · 19 個 prompt · 其他 14 · drawstuff 3"
+            data-tip-en="Wed, Sep 30, 2026 · 19 prompts · Other folders 14 · drawstuff 3" data-tip-zh-TW="2026年9月30日週三 · 19 個 prompt · 其他資料夾 14 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip"
-            data-tip-en="Thu, Oct 1, 2026 · 8 prompts · Other 5 · prompt-profile 2" data-tip-zh-TW="2026年10月1日週四 · 8 個 prompt · 其他 5 · prompt-profile 2"
+            data-tip-en="Thu, Oct 1, 2026 · 8 prompts · Other folders 5 · prompt-profile 2" data-tip-zh-TW="2026年10月1日週四 · 8 個 prompt · 其他資料夾 5 · prompt-profile 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -986,7 +987,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sun, Oct 4, 2026 · 15 prompts · Other 10 · prompt-profile 4" data-tip-zh-TW="2026年10月4日週日 · 15 個 prompt · 其他 10 · prompt-profile 4"
+            data-tip-en="Sun, Oct 4, 2026 · 15 prompts · Other folders 10 · prompt-profile 4" data-tip-zh-TW="2026年10月4日週日 · 15 個 prompt · 其他資料夾 10 · prompt-profile 4"
             tabindex="-1"
           ></span>
       </div><div class="cal-w">
@@ -1003,19 +1004,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             tabindex="-1"
           ></span><span
             class="cal-d l1 tip"
-            data-tip-en="Wed, Oct 7, 2026 · 2 prompts · prompt-profile 1 · Other 1" data-tip-zh-TW="2026年10月7日週三 · 2 個 prompt · prompt-profile 1 · 其他 1"
+            data-tip-en="Wed, Oct 7, 2026 · 2 prompts · prompt-profile 1 · Other folders 1" data-tip-zh-TW="2026年10月7日週三 · 2 個 prompt · prompt-profile 1 · 其他資料夾 1"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip"
-            data-tip-en="Thu, Oct 8, 2026 · 32 prompts · Other 17 · prompt-profile 8" data-tip-zh-TW="2026年10月8日週四 · 32 個 prompt · 其他 17 · prompt-profile 8"
+            data-tip-en="Thu, Oct 8, 2026 · 32 prompts · Other folders 17 · prompt-profile 8" data-tip-zh-TW="2026年10月8日週四 · 32 個 prompt · 其他資料夾 17 · prompt-profile 8"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Fri, Oct 9, 2026 · 18 prompts · Other 11 · drawstuff 3" data-tip-zh-TW="2026年10月9日週五 · 18 個 prompt · 其他 11 · drawstuff 3"
+            data-tip-en="Fri, Oct 9, 2026 · 18 prompts · Other folders 11 · drawstuff 3" data-tip-zh-TW="2026年10月9日週五 · 18 個 prompt · 其他資料夾 11 · drawstuff 3"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip"
-            data-tip-en="Sat, Oct 10, 2026 · 14 prompts · Other 12 · drawstuff 2" data-tip-zh-TW="2026年10月10日週六 · 14 個 prompt · 其他 12 · drawstuff 2"
+            data-tip-en="Sat, Oct 10, 2026 · 14 prompts · Other folders 12 · drawstuff 2" data-tip-zh-TW="2026年10月10日週六 · 14 個 prompt · 其他資料夾 12 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip"
@@ -1028,23 +1029,23 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l4 tip tip-r"
-            data-tip-en="Mon, Oct 12, 2026 · 30 prompts · Other 19 · prompt-profile 5" data-tip-zh-TW="2026年10月12日週一 · 30 個 prompt · 其他 19 · prompt-profile 5"
+            data-tip-en="Mon, Oct 12, 2026 · 30 prompts · Other folders 19 · prompt-profile 5" data-tip-zh-TW="2026年10月12日週一 · 30 個 prompt · 其他資料夾 19 · prompt-profile 5"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip tip-r"
-            data-tip-en="Tue, Oct 13, 2026 · 11 prompts · Other 9 · drawstuff 2" data-tip-zh-TW="2026年10月13日週二 · 11 個 prompt · 其他 9 · drawstuff 2"
+            data-tip-en="Tue, Oct 13, 2026 · 11 prompts · Other folders 9 · drawstuff 2" data-tip-zh-TW="2026年10月13日週二 · 11 個 prompt · 其他資料夾 9 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip tip-r"
-            data-tip-en="Wed, Oct 14, 2026 · 28 prompts · Other 20 · dotfiles 4" data-tip-zh-TW="2026年10月14日週三 · 28 個 prompt · 其他 20 · dotfiles 4"
+            data-tip-en="Wed, Oct 14, 2026 · 28 prompts · Other folders 20 · dotfiles 4" data-tip-zh-TW="2026年10月14日週三 · 28 個 prompt · 其他資料夾 20 · dotfiles 4"
             tabindex="-1"
           ></span><span
             class="cal-d l4 tip tip-r"
-            data-tip-en="Thu, Oct 15, 2026 · 26 prompts · Other 16 · drawstuff 6" data-tip-zh-TW="2026年10月15日週四 · 26 個 prompt · 其他 16 · drawstuff 6"
+            data-tip-en="Thu, Oct 15, 2026 · 26 prompts · Other folders 16 · drawstuff 6" data-tip-zh-TW="2026年10月15日週四 · 26 個 prompt · 其他資料夾 16 · drawstuff 6"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-r"
-            data-tip-en="Fri, Oct 16, 2026 · 5 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="2026年10月16日週五 · 5 個 prompt · 其他 4 · drawstuff 1"
+            data-tip-en="Fri, Oct 16, 2026 · 5 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="2026年10月16日週五 · 5 個 prompt · 其他資料夾 4 · drawstuff 1"
             tabindex="-1"
           ></span><span
             class="cal-d l0 tip tip-r"
@@ -1061,19 +1062,19 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
         <span
             class="cal-d l2 tip tip-r"
-            data-tip-en="Mon, Oct 19, 2026 · 6 prompts · Other 5 · prompt-profile 1" data-tip-zh-TW="2026年10月19日週一 · 6 個 prompt · 其他 5 · prompt-profile 1"
+            data-tip-en="Mon, Oct 19, 2026 · 6 prompts · Other folders 5 · prompt-profile 1" data-tip-zh-TW="2026年10月19日週一 · 6 個 prompt · 其他資料夾 5 · prompt-profile 1"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-r"
-            data-tip-en="Tue, Oct 20, 2026 · 7 prompts · drawstuff 5 · Other 2" data-tip-zh-TW="2026年10月20日週二 · 7 個 prompt · drawstuff 5 · 其他 2"
+            data-tip-en="Tue, Oct 20, 2026 · 7 prompts · drawstuff 5 · Other folders 2" data-tip-zh-TW="2026年10月20日週二 · 7 個 prompt · drawstuff 5 · 其他資料夾 2"
             tabindex="-1"
           ></span><span
             class="cal-d l2 tip tip-r"
-            data-tip-en="Wed, Oct 21, 2026 · 5 prompts · Other 3 · drawstuff 2" data-tip-zh-TW="2026年10月21日週三 · 5 個 prompt · 其他 3 · drawstuff 2"
+            data-tip-en="Wed, Oct 21, 2026 · 5 prompts · Other folders 3 · drawstuff 2" data-tip-zh-TW="2026年10月21日週三 · 5 個 prompt · 其他資料夾 3 · drawstuff 2"
             tabindex="-1"
           ></span><span
             class="cal-d l3 tip tip-r"
-            data-tip-en="Thu, Oct 22, 2026 · 12 prompts · Other 5 · dotfiles 3" data-tip-zh-TW="2026年10月22日週四 · 12 個 prompt · 其他 5 · dotfiles 3"
+            data-tip-en="Thu, Oct 22, 2026 · 12 prompts · Other folders 5 · dotfiles 3" data-tip-zh-TW="2026年10月22日週四 · 12 個 prompt · 其他資料夾 5 · dotfiles 3"
             tabindex="-1"
           ></span><span class="cal-d out"></span><span class="cal-d out"></span><span class="cal-d out"></span>
       </div>
@@ -1301,15 +1302,15 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="heat-h">00</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">03</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">06</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">09</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">12</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">15</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">18</span><span class="heat-h"></span><span class="heat-h"></span><span class="heat-h">21</span><span class="heat-h"></span><span class="heat-h"></span>
     <span class="heat-d"><span data-l="en" lang="en">Mon</span><span data-l="zh-TW" lang="zh-Hant-TW">一</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Mon 00:00 · 7 prompts · Other 5 · drawstuff 1" data-tip-zh-TW="週一 00:00 · 7 個 prompt · 其他 5 · drawstuff 1"
+                data-tip-en="Mon 00:00 · 7 prompts · Other folders 5 · drawstuff 1" data-tip-zh-TW="週一 00:00 · 7 個 prompt · 其他資料夾 5 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Mon 01:00 · 4 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="週一 01:00 · 4 個 prompt · 其他 2 · drawstuff 1"
+                data-tip-en="Mon 01:00 · 4 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="週一 01:00 · 4 個 prompt · 其他資料夾 2 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Mon 02:00 · 2 prompts · Other 2" data-tip-zh-TW="週一 02:00 · 2 個 prompt · 其他 2"
+                data-tip-en="Mon 02:00 · 2 prompts · Other folders 2" data-tip-zh-TW="週一 02:00 · 2 個 prompt · 其他資料夾 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
@@ -1329,83 +1330,83 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Mon 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週一 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Mon 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週一 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Mon 08:00 · 3 prompts · Other 3" data-tip-zh-TW="週一 08:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Mon 08:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週一 08:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Mon 09:00 · 10 prompts · Other 5 · prompt-profile 4" data-tip-zh-TW="週一 09:00 · 10 個 prompt · 其他 5 · prompt-profile 4"
+                data-tip-en="Mon 09:00 · 10 prompts · Other folders 5 · prompt-profile 4" data-tip-zh-TW="週一 09:00 · 10 個 prompt · 其他資料夾 5 · prompt-profile 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 10:00 · 17 prompts · Other 6 · drawstuff 5" data-tip-zh-TW="週一 10:00 · 17 個 prompt · 其他 6 · drawstuff 5"
+                data-tip-en="Mon 10:00 · 17 prompts · Other folders 6 · drawstuff 5" data-tip-zh-TW="週一 10:00 · 17 個 prompt · 其他資料夾 6 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 11:00 · 20 prompts · Other 11 · drawstuff 6" data-tip-zh-TW="週一 11:00 · 20 個 prompt · 其他 11 · drawstuff 6"
+                data-tip-en="Mon 11:00 · 20 prompts · Other folders 11 · drawstuff 6" data-tip-zh-TW="週一 11:00 · 20 個 prompt · 其他資料夾 11 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Mon 12:00 · 14 prompts · Other 8 · prompt-profile 4" data-tip-zh-TW="週一 12:00 · 14 個 prompt · 其他 8 · prompt-profile 4"
+                data-tip-en="Mon 12:00 · 14 prompts · Other folders 8 · prompt-profile 4" data-tip-zh-TW="週一 12:00 · 14 個 prompt · 其他資料夾 8 · prompt-profile 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 13:00 · 19 prompts · Other 10 · drawstuff 4" data-tip-zh-TW="週一 13:00 · 19 個 prompt · 其他 10 · drawstuff 4"
+                data-tip-en="Mon 13:00 · 19 prompts · Other folders 10 · drawstuff 4" data-tip-zh-TW="週一 13:00 · 19 個 prompt · 其他資料夾 10 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 14:00 · 24 prompts · Other 13 · prompt-profile 5" data-tip-zh-TW="週一 14:00 · 24 個 prompt · 其他 13 · prompt-profile 5"
+                data-tip-en="Mon 14:00 · 24 prompts · Other folders 13 · prompt-profile 5" data-tip-zh-TW="週一 14:00 · 24 個 prompt · 其他資料夾 13 · prompt-profile 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 15:00 · 26 prompts · Other 12 · drawstuff 9" data-tip-zh-TW="週一 15:00 · 26 個 prompt · 其他 12 · drawstuff 9"
+                data-tip-en="Mon 15:00 · 26 prompts · Other folders 12 · drawstuff 9" data-tip-zh-TW="週一 15:00 · 26 個 prompt · 其他資料夾 12 · drawstuff 9"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 16:00 · 23 prompts · Other 16 · drawstuff 5" data-tip-zh-TW="週一 16:00 · 23 個 prompt · 其他 16 · drawstuff 5"
+                data-tip-en="Mon 16:00 · 23 prompts · Other folders 16 · drawstuff 5" data-tip-zh-TW="週一 16:00 · 23 個 prompt · 其他資料夾 16 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 17:00 · 20 prompts · Other 13 · drawstuff 4" data-tip-zh-TW="週一 17:00 · 20 個 prompt · 其他 13 · drawstuff 4"
+                data-tip-en="Mon 17:00 · 20 prompts · Other folders 13 · drawstuff 4" data-tip-zh-TW="週一 17:00 · 20 個 prompt · 其他資料夾 13 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Mon 18:00 · 15 prompts · Other 7 · prompt-profile 4" data-tip-zh-TW="週一 18:00 · 15 個 prompt · 其他 7 · prompt-profile 4"
+                data-tip-en="Mon 18:00 · 15 prompts · Other folders 7 · prompt-profile 4" data-tip-zh-TW="週一 18:00 · 15 個 prompt · 其他資料夾 7 · prompt-profile 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 19:00 · 17 prompts · Other 8 · drawstuff 5" data-tip-zh-TW="週一 19:00 · 17 個 prompt · 其他 8 · drawstuff 5"
+                data-tip-en="Mon 19:00 · 17 prompts · Other folders 8 · drawstuff 5" data-tip-zh-TW="週一 19:00 · 17 個 prompt · 其他資料夾 8 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 20:00 · 22 prompts · Other 12 · drawstuff 8" data-tip-zh-TW="週一 20:00 · 22 個 prompt · 其他 12 · drawstuff 8"
+                data-tip-en="Mon 20:00 · 22 prompts · Other folders 12 · drawstuff 8" data-tip-zh-TW="週一 20:00 · 22 個 prompt · 其他資料夾 12 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Mon 21:00 · 27 prompts · Other 17 · drawstuff 5" data-tip-zh-TW="週一 21:00 · 27 個 prompt · 其他 17 · drawstuff 5"
+                data-tip-en="Mon 21:00 · 27 prompts · Other folders 17 · drawstuff 5" data-tip-zh-TW="週一 21:00 · 27 個 prompt · 其他資料夾 17 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Mon 22:00 · 29 prompts · Other 18 · drawstuff 8" data-tip-zh-TW="週一 22:00 · 29 個 prompt · 其他 18 · drawstuff 8"
+                data-tip-en="Mon 22:00 · 29 prompts · Other folders 18 · drawstuff 8" data-tip-zh-TW="週一 22:00 · 29 個 prompt · 其他資料夾 18 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Mon 23:00 · 20 prompts · Other 13 · drawstuff 3" data-tip-zh-TW="週一 23:00 · 20 個 prompt · 其他 13 · drawstuff 3"
+                data-tip-en="Mon 23:00 · 20 prompts · Other folders 13 · drawstuff 3" data-tip-zh-TW="週一 23:00 · 20 個 prompt · 其他資料夾 13 · drawstuff 3"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Tue</span><span data-l="zh-TW" lang="zh-Hant-TW">二</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Tue 00:00 · 6 prompts · Other 5 · drawstuff 1" data-tip-zh-TW="週二 00:00 · 6 個 prompt · 其他 5 · drawstuff 1"
+                data-tip-en="Tue 00:00 · 6 prompts · Other folders 5 · drawstuff 1" data-tip-zh-TW="週二 00:00 · 6 個 prompt · 其他資料夾 5 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Tue 01:00 · 4 prompts · Other 3 · prompt-profile 1" data-tip-zh-TW="週二 01:00 · 4 個 prompt · 其他 3 · prompt-profile 1"
+                data-tip-en="Tue 01:00 · 4 prompts · Other folders 3 · prompt-profile 1" data-tip-zh-TW="週二 01:00 · 4 個 prompt · 其他資料夾 3 · prompt-profile 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Tue 02:00 · 1 prompt · Other 1" data-tip-zh-TW="週二 02:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Tue 02:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週二 02:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l0 tip"
@@ -1425,7 +1426,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Tue 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週二 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Tue 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週二 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
@@ -1433,71 +1434,71 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Tue 09:00 · 10 prompts · Other 7 · drawstuff 3" data-tip-zh-TW="週二 09:00 · 10 個 prompt · 其他 7 · drawstuff 3"
+                data-tip-en="Tue 09:00 · 10 prompts · Other folders 7 · drawstuff 3" data-tip-zh-TW="週二 09:00 · 10 個 prompt · 其他資料夾 7 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Tue 10:00 · 16 prompts · Other 9 · drawstuff 4" data-tip-zh-TW="週二 10:00 · 16 個 prompt · 其他 9 · drawstuff 4"
+                data-tip-en="Tue 10:00 · 16 prompts · Other folders 9 · drawstuff 4" data-tip-zh-TW="週二 10:00 · 16 個 prompt · 其他資料夾 9 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 11:00 · 19 prompts · Other 13 · drawstuff 6" data-tip-zh-TW="週二 11:00 · 19 個 prompt · 其他 13 · drawstuff 6"
+                data-tip-en="Tue 11:00 · 19 prompts · Other folders 13 · drawstuff 6" data-tip-zh-TW="週二 11:00 · 19 個 prompt · 其他資料夾 13 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Tue 12:00 · 13 prompts · Other 7 · drawstuff 3" data-tip-zh-TW="週二 12:00 · 13 個 prompt · 其他 7 · drawstuff 3"
+                data-tip-en="Tue 12:00 · 13 prompts · Other folders 7 · drawstuff 3" data-tip-zh-TW="週二 12:00 · 13 個 prompt · 其他資料夾 7 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 13:00 · 18 prompts · Other 14 · drawstuff 3" data-tip-zh-TW="週二 13:00 · 18 個 prompt · 其他 14 · drawstuff 3"
+                data-tip-en="Tue 13:00 · 18 prompts · Other folders 14 · drawstuff 3" data-tip-zh-TW="週二 13:00 · 18 個 prompt · 其他資料夾 14 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 14:00 · 22 prompts · Other 12 · drawstuff 8" data-tip-zh-TW="週二 14:00 · 22 個 prompt · 其他 12 · drawstuff 8"
+                data-tip-en="Tue 14:00 · 22 prompts · Other folders 12 · drawstuff 8" data-tip-zh-TW="週二 14:00 · 22 個 prompt · 其他資料夾 12 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 15:00 · 24 prompts · Other 16 · drawstuff 6" data-tip-zh-TW="週二 15:00 · 24 個 prompt · 其他 16 · drawstuff 6"
+                data-tip-en="Tue 15:00 · 24 prompts · Other folders 16 · drawstuff 6" data-tip-zh-TW="週二 15:00 · 24 個 prompt · 其他資料夾 16 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 16:00 · 22 prompts · Other 10 · drawstuff 6" data-tip-zh-TW="週二 16:00 · 22 個 prompt · 其他 10 · drawstuff 6"
+                data-tip-en="Tue 16:00 · 22 prompts · Other folders 10 · drawstuff 6" data-tip-zh-TW="週二 16:00 · 22 個 prompt · 其他資料夾 10 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 17:00 · 19 prompts · Other 14 · prompt-profile 3" data-tip-zh-TW="週二 17:00 · 19 個 prompt · 其他 14 · prompt-profile 3"
+                data-tip-en="Tue 17:00 · 19 prompts · Other folders 14 · prompt-profile 3" data-tip-zh-TW="週二 17:00 · 19 個 prompt · 其他資料夾 14 · prompt-profile 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Tue 18:00 · 14 prompts · Other 9 · dotfiles 3" data-tip-zh-TW="週二 18:00 · 14 個 prompt · 其他 9 · dotfiles 3"
+                data-tip-en="Tue 18:00 · 14 prompts · Other folders 9 · dotfiles 3" data-tip-zh-TW="週二 18:00 · 14 個 prompt · 其他資料夾 9 · dotfiles 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Tue 19:00 · 16 prompts · Other 7 · drawstuff 4" data-tip-zh-TW="週二 19:00 · 16 個 prompt · 其他 7 · drawstuff 4"
+                data-tip-en="Tue 19:00 · 16 prompts · Other folders 7 · drawstuff 4" data-tip-zh-TW="週二 19:00 · 16 個 prompt · 其他資料夾 7 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 20:00 · 21 prompts · Other 10 · drawstuff 5" data-tip-zh-TW="週二 20:00 · 21 個 prompt · 其他 10 · drawstuff 5"
+                data-tip-en="Tue 20:00 · 21 prompts · Other folders 10 · drawstuff 5" data-tip-zh-TW="週二 20:00 · 21 個 prompt · 其他資料夾 10 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Tue 21:00 · 26 prompts · Other 17 · drawstuff 5" data-tip-zh-TW="週二 21:00 · 26 個 prompt · 其他 17 · drawstuff 5"
+                data-tip-en="Tue 21:00 · 26 prompts · Other folders 17 · drawstuff 5" data-tip-zh-TW="週二 21:00 · 26 個 prompt · 其他資料夾 17 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Tue 22:00 · 27 prompts · Other 16 · drawstuff 8" data-tip-zh-TW="週二 22:00 · 27 個 prompt · 其他 16 · drawstuff 8"
+                data-tip-en="Tue 22:00 · 27 prompts · Other folders 16 · drawstuff 8" data-tip-zh-TW="週二 22:00 · 27 個 prompt · 其他資料夾 16 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Tue 23:00 · 19 prompts · Other 13 · prompt-profile 3" data-tip-zh-TW="週二 23:00 · 19 個 prompt · 其他 13 · prompt-profile 3"
+                data-tip-en="Tue 23:00 · 19 prompts · Other folders 13 · prompt-profile 3" data-tip-zh-TW="週二 23:00 · 19 個 prompt · 其他資料夾 13 · prompt-profile 3"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Wed</span><span data-l="zh-TW" lang="zh-Hant-TW">三</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Wed 00:00 · 7 prompts · Other 3 · drawstuff 2" data-tip-zh-TW="週三 00:00 · 7 個 prompt · 其他 3 · drawstuff 2"
+                data-tip-en="Wed 00:00 · 7 prompts · Other folders 3 · drawstuff 2" data-tip-zh-TW="週三 00:00 · 7 個 prompt · 其他資料夾 3 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Wed 01:00 · 4 prompts · drawstuff 2 · Other 2" data-tip-zh-TW="週三 01:00 · 4 個 prompt · drawstuff 2 · 其他 2"
+                data-tip-en="Wed 01:00 · 4 prompts · drawstuff 2 · Other folders 2" data-tip-zh-TW="週三 01:00 · 4 個 prompt · drawstuff 2 · 其他資料夾 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
@@ -1521,7 +1522,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Wed 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週三 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Wed 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週三 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
@@ -1529,75 +1530,75 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Wed 09:00 · 10 prompts · Other 6 · drawstuff 2" data-tip-zh-TW="週三 09:00 · 10 個 prompt · 其他 6 · drawstuff 2"
+                data-tip-en="Wed 09:00 · 10 prompts · Other folders 6 · drawstuff 2" data-tip-zh-TW="週三 09:00 · 10 個 prompt · 其他資料夾 6 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Wed 10:00 · 16 prompts · Other 12 · drawstuff 3" data-tip-zh-TW="週三 10:00 · 16 個 prompt · 其他 12 · drawstuff 3"
+                data-tip-en="Wed 10:00 · 16 prompts · Other folders 12 · drawstuff 3" data-tip-zh-TW="週三 10:00 · 16 個 prompt · 其他資料夾 12 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 11:00 · 20 prompts · Other 9 · prompt-profile 8" data-tip-zh-TW="週三 11:00 · 20 個 prompt · 其他 9 · prompt-profile 8"
+                data-tip-en="Wed 11:00 · 20 prompts · Other folders 9 · prompt-profile 8" data-tip-zh-TW="週三 11:00 · 20 個 prompt · 其他資料夾 9 · prompt-profile 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Wed 12:00 · 13 prompts · Other 10 · drawstuff 2" data-tip-zh-TW="週三 12:00 · 13 個 prompt · 其他 10 · drawstuff 2"
+                data-tip-en="Wed 12:00 · 13 prompts · Other folders 10 · drawstuff 2" data-tip-zh-TW="週三 12:00 · 13 個 prompt · 其他資料夾 10 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 13:00 · 18 prompts · drawstuff 8 · Other 8" data-tip-zh-TW="週三 13:00 · 18 個 prompt · drawstuff 8 · 其他 8"
+                data-tip-en="Wed 13:00 · 18 prompts · drawstuff 8 · Other folders 8" data-tip-zh-TW="週三 13:00 · 18 個 prompt · drawstuff 8 · 其他資料夾 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 14:00 · 23 prompts · Other 12 · drawstuff 8" data-tip-zh-TW="週三 14:00 · 23 個 prompt · 其他 12 · drawstuff 8"
+                data-tip-en="Wed 14:00 · 23 prompts · Other folders 12 · drawstuff 8" data-tip-zh-TW="週三 14:00 · 23 個 prompt · 其他資料夾 12 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 15:00 · 25 prompts · Other 14 · drawstuff 5" data-tip-zh-TW="週三 15:00 · 25 個 prompt · 其他 14 · drawstuff 5"
+                data-tip-en="Wed 15:00 · 25 prompts · Other folders 14 · drawstuff 5" data-tip-zh-TW="週三 15:00 · 25 個 prompt · 其他資料夾 14 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 16:00 · 22 prompts · Other 15 · drawstuff 4" data-tip-zh-TW="週三 16:00 · 22 個 prompt · 其他 15 · drawstuff 4"
+                data-tip-en="Wed 16:00 · 22 prompts · Other folders 15 · drawstuff 4" data-tip-zh-TW="週三 16:00 · 22 個 prompt · 其他資料夾 15 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 17:00 · 19 prompts · Other 14 · drawstuff 2" data-tip-zh-TW="週三 17:00 · 19 個 prompt · 其他 14 · drawstuff 2"
+                data-tip-en="Wed 17:00 · 19 prompts · Other folders 14 · drawstuff 2" data-tip-zh-TW="週三 17:00 · 19 個 prompt · 其他資料夾 14 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Wed 18:00 · 15 prompts · Other 12 · prompt-profile 2" data-tip-zh-TW="週三 18:00 · 15 個 prompt · 其他 12 · prompt-profile 2"
+                data-tip-en="Wed 18:00 · 15 prompts · Other folders 12 · prompt-profile 2" data-tip-zh-TW="週三 18:00 · 15 個 prompt · 其他資料夾 12 · prompt-profile 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Wed 19:00 · 16 prompts · Other 12 · drawstuff 2" data-tip-zh-TW="週三 19:00 · 16 個 prompt · 其他 12 · drawstuff 2"
+                data-tip-en="Wed 19:00 · 16 prompts · Other folders 12 · drawstuff 2" data-tip-zh-TW="週三 19:00 · 16 個 prompt · 其他資料夾 12 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 20:00 · 21 prompts · Other 13 · drawstuff 6" data-tip-zh-TW="週三 20:00 · 21 個 prompt · 其他 13 · drawstuff 6"
+                data-tip-en="Wed 20:00 · 21 prompts · Other folders 13 · drawstuff 6" data-tip-zh-TW="週三 20:00 · 21 個 prompt · 其他資料夾 13 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Wed 21:00 · 26 prompts · Other 14 · drawstuff 7" data-tip-zh-TW="週三 21:00 · 26 個 prompt · 其他 14 · drawstuff 7"
+                data-tip-en="Wed 21:00 · 26 prompts · Other folders 14 · drawstuff 7" data-tip-zh-TW="週三 21:00 · 26 個 prompt · 其他資料夾 14 · drawstuff 7"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Wed 22:00 · 28 prompts · Other 22 · drawstuff 3" data-tip-zh-TW="週三 22:00 · 28 個 prompt · 其他 22 · drawstuff 3"
+                data-tip-en="Wed 22:00 · 28 prompts · Other folders 22 · drawstuff 3" data-tip-zh-TW="週三 22:00 · 28 個 prompt · 其他資料夾 22 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Wed 23:00 · 20 prompts · Other 16 · drawstuff 3" data-tip-zh-TW="週三 23:00 · 20 個 prompt · 其他 16 · drawstuff 3"
+                data-tip-en="Wed 23:00 · 20 prompts · Other folders 16 · drawstuff 3" data-tip-zh-TW="週三 23:00 · 20 個 prompt · 其他資料夾 16 · drawstuff 3"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Thu</span><span data-l="zh-TW" lang="zh-Hant-TW">四</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Thu 00:00 · 6 prompts · drawstuff 3 · Other 3" data-tip-zh-TW="週四 00:00 · 6 個 prompt · drawstuff 3 · 其他 3"
+                data-tip-en="Thu 00:00 · 6 prompts · drawstuff 3 · Other folders 3" data-tip-zh-TW="週四 00:00 · 6 個 prompt · drawstuff 3 · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Thu 01:00 · 3 prompts · Other 2 · drawstuff 1" data-tip-zh-TW="週四 01:00 · 3 個 prompt · 其他 2 · drawstuff 1"
+                data-tip-en="Thu 01:00 · 3 prompts · Other folders 2 · drawstuff 1" data-tip-zh-TW="週四 01:00 · 3 個 prompt · 其他資料夾 2 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Thu 02:00 · 1 prompt · Other 1" data-tip-zh-TW="週四 02:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Thu 02:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週四 02:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l0 tip"
@@ -1617,83 +1618,83 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Thu 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週四 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Thu 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週四 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Thu 08:00 · 3 prompts · Other 3" data-tip-zh-TW="週四 08:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Thu 08:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週四 08:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Thu 09:00 · 9 prompts · prompt-profile 3 · Other 3" data-tip-zh-TW="週四 09:00 · 9 個 prompt · prompt-profile 3 · 其他 3"
+                data-tip-en="Thu 09:00 · 9 prompts · prompt-profile 3 · Other folders 3" data-tip-zh-TW="週四 09:00 · 9 個 prompt · prompt-profile 3 · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Thu 10:00 · 15 prompts · Other 9 · drawstuff 3" data-tip-zh-TW="週四 10:00 · 15 個 prompt · 其他 9 · drawstuff 3"
+                data-tip-en="Thu 10:00 · 15 prompts · Other folders 9 · drawstuff 3" data-tip-zh-TW="週四 10:00 · 15 個 prompt · 其他資料夾 9 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 11:00 · 19 prompts · Other 12 · prompt-profile 3" data-tip-zh-TW="週四 11:00 · 19 個 prompt · 其他 12 · prompt-profile 3"
+                data-tip-en="Thu 11:00 · 19 prompts · Other folders 12 · prompt-profile 3" data-tip-zh-TW="週四 11:00 · 19 個 prompt · 其他資料夾 12 · prompt-profile 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Thu 12:00 · 12 prompts · Other 9 · drawstuff 3" data-tip-zh-TW="週四 12:00 · 12 個 prompt · 其他 9 · drawstuff 3"
+                data-tip-en="Thu 12:00 · 12 prompts · Other folders 9 · drawstuff 3" data-tip-zh-TW="週四 12:00 · 12 個 prompt · 其他資料夾 9 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 13:00 · 17 prompts · Other 10 · drawstuff 6" data-tip-zh-TW="週四 13:00 · 17 個 prompt · 其他 10 · drawstuff 6"
+                data-tip-en="Thu 13:00 · 17 prompts · Other folders 10 · drawstuff 6" data-tip-zh-TW="週四 13:00 · 17 個 prompt · 其他資料夾 10 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 14:00 · 22 prompts · Other 12 · drawstuff 5" data-tip-zh-TW="週四 14:00 · 22 個 prompt · 其他 12 · drawstuff 5"
+                data-tip-en="Thu 14:00 · 22 prompts · Other folders 12 · drawstuff 5" data-tip-zh-TW="週四 14:00 · 22 個 prompt · 其他資料夾 12 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 15:00 · 23 prompts · Other 16 · drawstuff 4" data-tip-zh-TW="週四 15:00 · 23 個 prompt · 其他 16 · drawstuff 4"
+                data-tip-en="Thu 15:00 · 23 prompts · Other folders 16 · drawstuff 4" data-tip-zh-TW="週四 15:00 · 23 個 prompt · 其他資料夾 16 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 16:00 · 21 prompts · Other 12 · drawstuff 5" data-tip-zh-TW="週四 16:00 · 21 個 prompt · 其他 12 · drawstuff 5"
+                data-tip-en="Thu 16:00 · 21 prompts · Other folders 12 · drawstuff 5" data-tip-zh-TW="週四 16:00 · 21 個 prompt · 其他資料夾 12 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 17:00 · 18 prompts · Other 10 · drawstuff 6" data-tip-zh-TW="週四 17:00 · 18 個 prompt · 其他 10 · drawstuff 6"
+                data-tip-en="Thu 17:00 · 18 prompts · Other folders 10 · drawstuff 6" data-tip-zh-TW="週四 17:00 · 18 個 prompt · 其他資料夾 10 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Thu 18:00 · 14 prompts · Other 7 · drawstuff 5" data-tip-zh-TW="週四 18:00 · 14 個 prompt · 其他 7 · drawstuff 5"
+                data-tip-en="Thu 18:00 · 14 prompts · Other folders 7 · drawstuff 5" data-tip-zh-TW="週四 18:00 · 14 個 prompt · 其他資料夾 7 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Thu 19:00 · 15 prompts · Other 9 · drawstuff 5" data-tip-zh-TW="週四 19:00 · 15 個 prompt · 其他 9 · drawstuff 5"
+                data-tip-en="Thu 19:00 · 15 prompts · Other folders 9 · drawstuff 5" data-tip-zh-TW="週四 19:00 · 15 個 prompt · 其他資料夾 9 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 20:00 · 20 prompts · Other 12 · drawstuff 4" data-tip-zh-TW="週四 20:00 · 20 個 prompt · 其他 12 · drawstuff 4"
+                data-tip-en="Thu 20:00 · 20 prompts · Other folders 12 · drawstuff 4" data-tip-zh-TW="週四 20:00 · 20 個 prompt · 其他資料夾 12 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Thu 21:00 · 25 prompts · Other 15 · drawstuff 6" data-tip-zh-TW="週四 21:00 · 25 個 prompt · 其他 15 · drawstuff 6"
+                data-tip-en="Thu 21:00 · 25 prompts · Other folders 15 · drawstuff 6" data-tip-zh-TW="週四 21:00 · 25 個 prompt · 其他資料夾 15 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Thu 22:00 · 26 prompts · Other 18 · drawstuff 5" data-tip-zh-TW="週四 22:00 · 26 個 prompt · 其他 18 · drawstuff 5"
+                data-tip-en="Thu 22:00 · 26 prompts · Other folders 18 · drawstuff 5" data-tip-zh-TW="週四 22:00 · 26 個 prompt · 其他資料夾 18 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Thu 23:00 · 19 prompts · Other 15 · prompt-profile 3" data-tip-zh-TW="週四 23:00 · 19 個 prompt · 其他 15 · prompt-profile 3"
+                data-tip-en="Thu 23:00 · 19 prompts · Other folders 15 · prompt-profile 3" data-tip-zh-TW="週四 23:00 · 19 個 prompt · 其他資料夾 15 · prompt-profile 3"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Fri</span><span data-l="zh-TW" lang="zh-Hant-TW">五</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Fri 00:00 · 6 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="週五 00:00 · 6 個 prompt · 其他 4 · drawstuff 1"
+                data-tip-en="Fri 00:00 · 6 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="週五 00:00 · 6 個 prompt · 其他資料夾 4 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Fri 01:00 · 3 prompts · Other 3" data-tip-zh-TW="週五 01:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Fri 01:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週五 01:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Fri 02:00 · 1 prompt · Other 1" data-tip-zh-TW="週五 02:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Fri 02:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週五 02:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l0 tip"
@@ -1713,79 +1714,79 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Fri 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週五 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Fri 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週五 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Fri 08:00 · 3 prompts · Other 3" data-tip-zh-TW="週五 08:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Fri 08:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週五 08:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 09:00 · 9 prompts · Other 6 · drawstuff 2" data-tip-zh-TW="週五 09:00 · 9 個 prompt · 其他 6 · drawstuff 2"
+                data-tip-en="Fri 09:00 · 9 prompts · Other folders 6 · drawstuff 2" data-tip-zh-TW="週五 09:00 · 9 個 prompt · 其他資料夾 6 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 10:00 · 15 prompts · Other 7 · drawstuff 3" data-tip-zh-TW="週五 10:00 · 15 個 prompt · 其他 7 · drawstuff 3"
+                data-tip-en="Fri 10:00 · 15 prompts · Other folders 7 · drawstuff 3" data-tip-zh-TW="週五 10:00 · 15 個 prompt · 其他資料夾 7 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 11:00 · 18 prompts · Other 12 · drawstuff 3" data-tip-zh-TW="週五 11:00 · 18 個 prompt · 其他 12 · drawstuff 3"
+                data-tip-en="Fri 11:00 · 18 prompts · Other folders 12 · drawstuff 3" data-tip-zh-TW="週五 11:00 · 18 個 prompt · 其他資料夾 12 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 12:00 · 12 prompts · Other 7 · drawstuff 4" data-tip-zh-TW="週五 12:00 · 12 個 prompt · 其他 7 · drawstuff 4"
+                data-tip-en="Fri 12:00 · 12 prompts · Other folders 7 · drawstuff 4" data-tip-zh-TW="週五 12:00 · 12 個 prompt · 其他資料夾 7 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 13:00 · 16 prompts · Other 12 · drawstuff 2" data-tip-zh-TW="週五 13:00 · 16 個 prompt · 其他 12 · drawstuff 2"
+                data-tip-en="Fri 13:00 · 16 prompts · Other folders 12 · drawstuff 2" data-tip-zh-TW="週五 13:00 · 16 個 prompt · 其他資料夾 12 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 14:00 · 21 prompts · Other 16 · drawstuff 3" data-tip-zh-TW="週五 14:00 · 21 個 prompt · 其他 16 · drawstuff 3"
+                data-tip-en="Fri 14:00 · 21 prompts · Other folders 16 · drawstuff 3" data-tip-zh-TW="週五 14:00 · 21 個 prompt · 其他資料夾 16 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 15:00 · 22 prompts · Other 16 · drawstuff 3" data-tip-zh-TW="週五 15:00 · 22 個 prompt · 其他 16 · drawstuff 3"
+                data-tip-en="Fri 15:00 · 22 prompts · Other folders 16 · drawstuff 3" data-tip-zh-TW="週五 15:00 · 22 個 prompt · 其他資料夾 16 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 16:00 · 20 prompts · Other 10 · drawstuff 6" data-tip-zh-TW="週五 16:00 · 20 個 prompt · 其他 10 · drawstuff 6"
+                data-tip-en="Fri 16:00 · 20 prompts · Other folders 10 · drawstuff 6" data-tip-zh-TW="週五 16:00 · 20 個 prompt · 其他資料夾 10 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 17:00 · 18 prompts · Other 11 · drawstuff 3" data-tip-zh-TW="週五 17:00 · 18 個 prompt · 其他 11 · drawstuff 3"
+                data-tip-en="Fri 17:00 · 18 prompts · Other folders 11 · drawstuff 3" data-tip-zh-TW="週五 17:00 · 18 個 prompt · 其他資料夾 11 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 18:00 · 13 prompts · Other 8 · prompt-profile 3" data-tip-zh-TW="週五 18:00 · 13 個 prompt · 其他 8 · prompt-profile 3"
+                data-tip-en="Fri 18:00 · 13 prompts · Other folders 8 · prompt-profile 3" data-tip-zh-TW="週五 18:00 · 13 個 prompt · 其他資料夾 8 · prompt-profile 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Fri 19:00 · 15 prompts · Other 9 · prompt-profile 3" data-tip-zh-TW="週五 19:00 · 15 個 prompt · 其他 9 · prompt-profile 3"
+                data-tip-en="Fri 19:00 · 15 prompts · Other folders 9 · prompt-profile 3" data-tip-zh-TW="週五 19:00 · 15 個 prompt · 其他資料夾 9 · prompt-profile 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 20:00 · 19 prompts · Other 13 · drawstuff 3" data-tip-zh-TW="週五 20:00 · 19 個 prompt · 其他 13 · drawstuff 3"
+                data-tip-en="Fri 20:00 · 19 prompts · Other folders 13 · drawstuff 3" data-tip-zh-TW="週五 20:00 · 19 個 prompt · 其他資料夾 13 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Fri 21:00 · 24 prompts · Other 21 · drawstuff 2" data-tip-zh-TW="週五 21:00 · 24 個 prompt · 其他 21 · drawstuff 2"
+                data-tip-en="Fri 21:00 · 24 prompts · Other folders 21 · drawstuff 2" data-tip-zh-TW="週五 21:00 · 24 個 prompt · 其他資料夾 21 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Fri 22:00 · 25 prompts · Other 12 · drawstuff 6" data-tip-zh-TW="週五 22:00 · 25 個 prompt · 其他 12 · drawstuff 6"
+                data-tip-en="Fri 22:00 · 25 prompts · Other folders 12 · drawstuff 6" data-tip-zh-TW="週五 22:00 · 25 個 prompt · 其他資料夾 12 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Fri 23:00 · 18 prompts · Other 9 · drawstuff 5" data-tip-zh-TW="週五 23:00 · 18 個 prompt · 其他 9 · drawstuff 5"
+                data-tip-en="Fri 23:00 · 18 prompts · Other folders 9 · drawstuff 5" data-tip-zh-TW="週五 23:00 · 18 個 prompt · 其他資料夾 9 · drawstuff 5"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Sat</span><span data-l="zh-TW" lang="zh-Hant-TW">六</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Sat 00:00 · 5 prompts · Other 4 · drawstuff 1" data-tip-zh-TW="週六 00:00 · 5 個 prompt · 其他 4 · drawstuff 1"
+                data-tip-en="Sat 00:00 · 5 prompts · Other folders 4 · drawstuff 1" data-tip-zh-TW="週六 00:00 · 5 個 prompt · 其他資料夾 4 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Sat 01:00 · 3 prompts · Other 3" data-tip-zh-TW="週六 01:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Sat 01:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週六 01:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
@@ -1809,79 +1810,79 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
-                data-tip-en="Sat 07:00 · 1 prompt · Other 1" data-tip-zh-TW="週六 07:00 · 1 個 prompt · 其他 1"
+                data-tip-en="Sat 07:00 · 1 prompt · Other folders 1" data-tip-zh-TW="週六 07:00 · 1 個 prompt · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Sat 08:00 · 3 prompts · Other 3" data-tip-zh-TW="週六 08:00 · 3 個 prompt · 其他 3"
+                data-tip-en="Sat 08:00 · 3 prompts · Other folders 3" data-tip-zh-TW="週六 08:00 · 3 個 prompt · 其他資料夾 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 09:00 · 8 prompts · Other 5 · drawstuff 2" data-tip-zh-TW="週六 09:00 · 8 個 prompt · 其他 5 · drawstuff 2"
+                data-tip-en="Sat 09:00 · 8 prompts · Other folders 5 · drawstuff 2" data-tip-zh-TW="週六 09:00 · 8 個 prompt · 其他資料夾 5 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 10:00 · 13 prompts · Other 6 · drawstuff 4" data-tip-zh-TW="週六 10:00 · 13 個 prompt · 其他 6 · drawstuff 4"
+                data-tip-en="Sat 10:00 · 13 prompts · Other folders 6 · drawstuff 4" data-tip-zh-TW="週六 10:00 · 13 個 prompt · 其他資料夾 6 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 11:00 · 15 prompts · Other 11 · drawstuff 3" data-tip-zh-TW="週六 11:00 · 15 個 prompt · 其他 11 · drawstuff 3"
+                data-tip-en="Sat 11:00 · 15 prompts · Other folders 11 · drawstuff 3" data-tip-zh-TW="週六 11:00 · 15 個 prompt · 其他資料夾 11 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 12:00 · 10 prompts · Other 4 · drawstuff 3" data-tip-zh-TW="週六 12:00 · 10 個 prompt · 其他 4 · drawstuff 3"
+                data-tip-en="Sat 12:00 · 10 prompts · Other folders 4 · drawstuff 3" data-tip-zh-TW="週六 12:00 · 10 個 prompt · 其他資料夾 4 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 13:00 · 14 prompts · Other 9 · drawstuff 5" data-tip-zh-TW="週六 13:00 · 14 個 prompt · 其他 9 · drawstuff 5"
+                data-tip-en="Sat 13:00 · 14 prompts · Other folders 9 · drawstuff 5" data-tip-zh-TW="週六 13:00 · 14 個 prompt · 其他資料夾 9 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sat 14:00 · 18 prompts · Other 12 · drawstuff 4" data-tip-zh-TW="週六 14:00 · 18 個 prompt · 其他 12 · drawstuff 4"
+                data-tip-en="Sat 14:00 · 18 prompts · Other folders 12 · drawstuff 4" data-tip-zh-TW="週六 14:00 · 18 個 prompt · 其他資料夾 12 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sat 15:00 · 19 prompts · Other 12 · drawstuff 5" data-tip-zh-TW="週六 15:00 · 19 個 prompt · 其他 12 · drawstuff 5"
+                data-tip-en="Sat 15:00 · 19 prompts · Other folders 12 · drawstuff 5" data-tip-zh-TW="週六 15:00 · 19 個 prompt · 其他資料夾 12 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sat 16:00 · 17 prompts · Other 12 · drawstuff 4" data-tip-zh-TW="週六 16:00 · 17 個 prompt · 其他 12 · drawstuff 4"
+                data-tip-en="Sat 16:00 · 17 prompts · Other folders 12 · drawstuff 4" data-tip-zh-TW="週六 16:00 · 17 個 prompt · 其他資料夾 12 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 17:00 · 15 prompts · Other 9 · drawstuff 4" data-tip-zh-TW="週六 17:00 · 15 個 prompt · 其他 9 · drawstuff 4"
+                data-tip-en="Sat 17:00 · 15 prompts · Other folders 9 · drawstuff 4" data-tip-zh-TW="週六 17:00 · 15 個 prompt · 其他資料夾 9 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 18:00 · 11 prompts · Other 7 · drawstuff 2" data-tip-zh-TW="週六 18:00 · 11 個 prompt · 其他 7 · drawstuff 2"
+                data-tip-en="Sat 18:00 · 11 prompts · Other folders 7 · drawstuff 2" data-tip-zh-TW="週六 18:00 · 11 個 prompt · 其他資料夾 7 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sat 19:00 · 13 prompts · drawstuff 6 · Other 6" data-tip-zh-TW="週六 19:00 · 13 個 prompt · drawstuff 6 · 其他 6"
+                data-tip-en="Sat 19:00 · 13 prompts · drawstuff 6 · Other folders 6" data-tip-zh-TW="週六 19:00 · 13 個 prompt · drawstuff 6 · 其他資料夾 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sat 20:00 · 17 prompts · Other 12 · drawstuff 4" data-tip-zh-TW="週六 20:00 · 17 個 prompt · 其他 12 · drawstuff 4"
+                data-tip-en="Sat 20:00 · 17 prompts · Other folders 12 · drawstuff 4" data-tip-zh-TW="週六 20:00 · 17 個 prompt · 其他資料夾 12 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sat 21:00 · 20 prompts · Other 12 · drawstuff 6" data-tip-zh-TW="週六 21:00 · 20 個 prompt · 其他 12 · drawstuff 6"
+                data-tip-en="Sat 21:00 · 20 prompts · Other folders 12 · drawstuff 6" data-tip-zh-TW="週六 21:00 · 20 個 prompt · 其他資料夾 12 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Sat 22:00 · 22 prompts · Other 17 · drawstuff 5" data-tip-zh-TW="週六 22:00 · 22 個 prompt · 其他 17 · drawstuff 5"
+                data-tip-en="Sat 22:00 · 22 prompts · Other folders 17 · drawstuff 5" data-tip-zh-TW="週六 22:00 · 22 個 prompt · 其他資料夾 17 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip tip-r"
-                data-tip-en="Sat 23:00 · 15 prompts · Other 9 · drawstuff 2" data-tip-zh-TW="週六 23:00 · 15 個 prompt · 其他 9 · drawstuff 2"
+                data-tip-en="Sat 23:00 · 15 prompts · Other folders 9 · drawstuff 2" data-tip-zh-TW="週六 23:00 · 15 個 prompt · 其他資料夾 9 · drawstuff 2"
                 tabindex="-1"
               ></span><span class="heat-d"><span data-l="en" lang="en">Sun</span><span data-l="zh-TW" lang="zh-Hant-TW">日</span></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Sun 00:00 · 5 prompts · Other 5" data-tip-zh-TW="週日 00:00 · 5 個 prompt · 其他 5"
+                data-tip-en="Sun 00:00 · 5 prompts · Other folders 5" data-tip-zh-TW="週日 00:00 · 5 個 prompt · 其他資料夾 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip tip-l"
-                data-tip-en="Sun 01:00 · 3 prompts · prompt-profile 2 · Other 1" data-tip-zh-TW="週日 01:00 · 3 個 prompt · prompt-profile 2 · 其他 1"
+                data-tip-en="Sun 01:00 · 3 prompts · prompt-profile 2 · Other folders 1" data-tip-zh-TW="週日 01:00 · 3 個 prompt · prompt-profile 2 · 其他資料夾 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l1 tip"
@@ -1909,67 +1910,67 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                 tabindex="-1"
               ></span><span
                 class="heat-c l2 tip"
-                data-tip-en="Sun 08:00 · 3 prompts · Other 2 · dotfiles 1" data-tip-zh-TW="週日 08:00 · 3 個 prompt · 其他 2 · dotfiles 1"
+                data-tip-en="Sun 08:00 · 3 prompts · Other folders 2 · dotfiles 1" data-tip-zh-TW="週日 08:00 · 3 個 prompt · 其他資料夾 2 · dotfiles 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 09:00 · 8 prompts · Other 6 · drawstuff 1" data-tip-zh-TW="週日 09:00 · 8 個 prompt · 其他 6 · drawstuff 1"
+                data-tip-en="Sun 09:00 · 8 prompts · Other folders 6 · drawstuff 1" data-tip-zh-TW="週日 09:00 · 8 個 prompt · 其他資料夾 6 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 10:00 · 13 prompts · Other 12 · drawstuff 1" data-tip-zh-TW="週日 10:00 · 13 個 prompt · 其他 12 · drawstuff 1"
+                data-tip-en="Sun 10:00 · 13 prompts · Other folders 12 · drawstuff 1" data-tip-zh-TW="週日 10:00 · 13 個 prompt · 其他資料夾 12 · drawstuff 1"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 11:00 · 15 prompts · Other 8 · prompt-profile 4" data-tip-zh-TW="週日 11:00 · 15 個 prompt · 其他 8 · prompt-profile 4"
+                data-tip-en="Sun 11:00 · 15 prompts · Other folders 8 · prompt-profile 4" data-tip-zh-TW="週日 11:00 · 15 個 prompt · 其他資料夾 8 · prompt-profile 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 12:00 · 10 prompts · Other 6 · drawstuff 2" data-tip-zh-TW="週日 12:00 · 10 個 prompt · 其他 6 · drawstuff 2"
+                data-tip-en="Sun 12:00 · 10 prompts · Other folders 6 · drawstuff 2" data-tip-zh-TW="週日 12:00 · 10 個 prompt · 其他資料夾 6 · drawstuff 2"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 13:00 · 14 prompts · drawstuff 6 · Other 5" data-tip-zh-TW="週日 13:00 · 14 個 prompt · drawstuff 6 · 其他 5"
+                data-tip-en="Sun 13:00 · 14 prompts · drawstuff 6 · Other folders 5" data-tip-zh-TW="週日 13:00 · 14 個 prompt · drawstuff 6 · 其他資料夾 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sun 14:00 · 18 prompts · Other 10 · drawstuff 4" data-tip-zh-TW="週日 14:00 · 18 個 prompt · 其他 10 · drawstuff 4"
+                data-tip-en="Sun 14:00 · 18 prompts · Other folders 10 · drawstuff 4" data-tip-zh-TW="週日 14:00 · 18 個 prompt · 其他資料夾 10 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sun 15:00 · 19 prompts · Other 10 · drawstuff 8" data-tip-zh-TW="週日 15:00 · 19 個 prompt · 其他 10 · drawstuff 8"
+                data-tip-en="Sun 15:00 · 19 prompts · Other folders 10 · drawstuff 8" data-tip-zh-TW="週日 15:00 · 19 個 prompt · 其他資料夾 10 · drawstuff 8"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sun 16:00 · 17 prompts · Other 8 · prompt-profile 5" data-tip-zh-TW="週日 16:00 · 17 個 prompt · 其他 8 · prompt-profile 5"
+                data-tip-en="Sun 16:00 · 17 prompts · Other folders 8 · prompt-profile 5" data-tip-zh-TW="週日 16:00 · 17 個 prompt · 其他資料夾 8 · prompt-profile 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 17:00 · 15 prompts · Other 8 · drawstuff 5" data-tip-zh-TW="週日 17:00 · 15 個 prompt · 其他 8 · drawstuff 5"
+                data-tip-en="Sun 17:00 · 15 prompts · Other folders 8 · drawstuff 5" data-tip-zh-TW="週日 17:00 · 15 個 prompt · 其他資料夾 8 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 18:00 · 11 prompts · Other 5 · drawstuff 4" data-tip-zh-TW="週日 18:00 · 11 個 prompt · 其他 5 · drawstuff 4"
+                data-tip-en="Sun 18:00 · 11 prompts · Other folders 5 · drawstuff 4" data-tip-zh-TW="週日 18:00 · 11 個 prompt · 其他資料夾 5 · drawstuff 4"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip"
-                data-tip-en="Sun 19:00 · 13 prompts · Other 8 · prompt-profile 3" data-tip-zh-TW="週日 19:00 · 13 個 prompt · 其他 8 · prompt-profile 3"
+                data-tip-en="Sun 19:00 · 13 prompts · Other folders 8 · prompt-profile 3" data-tip-zh-TW="週日 19:00 · 13 個 prompt · 其他資料夾 8 · prompt-profile 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sun 20:00 · 17 prompts · Other 8 · drawstuff 6" data-tip-zh-TW="週日 20:00 · 17 個 prompt · 其他 8 · drawstuff 6"
+                data-tip-en="Sun 20:00 · 17 prompts · Other folders 8 · drawstuff 6" data-tip-zh-TW="週日 20:00 · 17 個 prompt · 其他資料夾 8 · drawstuff 6"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip"
-                data-tip-en="Sun 21:00 · 20 prompts · Other 15 · drawstuff 3" data-tip-zh-TW="週日 21:00 · 20 個 prompt · 其他 15 · drawstuff 3"
+                data-tip-en="Sun 21:00 · 20 prompts · Other folders 15 · drawstuff 3" data-tip-zh-TW="週日 21:00 · 20 個 prompt · 其他資料夾 15 · drawstuff 3"
                 tabindex="-1"
               ></span><span
                 class="heat-c l4 tip tip-r"
-                data-tip-en="Sun 22:00 · 22 prompts · Other 14 · drawstuff 5" data-tip-zh-TW="週日 22:00 · 22 個 prompt · 其他 14 · drawstuff 5"
+                data-tip-en="Sun 22:00 · 22 prompts · Other folders 14 · drawstuff 5" data-tip-zh-TW="週日 22:00 · 22 個 prompt · 其他資料夾 14 · drawstuff 5"
                 tabindex="-1"
               ></span><span
                 class="heat-c l3 tip tip-r"
-                data-tip-en="Sun 23:00 · 15 prompts · Other 8 · drawstuff 4" data-tip-zh-TW="週日 23:00 · 15 個 prompt · 其他 8 · drawstuff 4"
+                data-tip-en="Sun 23:00 · 15 prompts · Other folders 8 · drawstuff 4" data-tip-zh-TW="週日 23:00 · 15 個 prompt · 其他資料夾 8 · drawstuff 4"
                 tabindex="-1"
               ></span>
   </div>
@@ -2014,7 +2015,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <b>4%</b>
         </li><li>
           <span class="rank-name"
-            ><i class="dot" style="background:var(--po)"></i><span data-l="en" lang="en">Other</span><span data-l="zh-TW" lang="zh-Hant-TW">其他</span></span
+            ><i class="dot" style="background:var(--po)"></i><span data-l="en" lang="en">Other folders</span><span data-l="zh-TW" lang="zh-Hant-TW">其他資料夾</span></span
           >
           <span class="share-track"
             ><span
@@ -2032,7 +2033,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
                     <div class="stack" role="img" aria-label="Projects by week">
     <div
         class="stack-w tip tip-l"
-        data-tip-en="Week of Apr 27 · 17 prompts · Other 11 · drawstuff 4" data-tip-zh-TW="4月27日 那一週 · 17 個 prompt · 其他 11 · drawstuff 4"
+        data-tip-en="Week of Apr 27 · 17 prompts · Other folders 11 · drawstuff 4" data-tip-zh-TW="4月27日 那一週 · 17 個 prompt · 其他資料夾 11 · drawstuff 4"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:10.5%"
@@ -2040,7 +2041,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip tip-l"
-        data-tip-en="Week of May 4 · 55 prompts · Other 41 · drawstuff 8" data-tip-zh-TW="5月4日 那一週 · 55 個 prompt · 其他 41 · drawstuff 8"
+        data-tip-en="Week of May 4 · 55 prompts · Other folders 41 · drawstuff 8" data-tip-zh-TW="5月4日 那一週 · 55 個 prompt · 其他資料夾 41 · drawstuff 8"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:34.0%"
@@ -2048,7 +2049,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of May 11 · 115 prompts · Other 59 · drawstuff 32" data-tip-zh-TW="5月11日 那一週 · 115 個 prompt · 其他 59 · drawstuff 32"
+        data-tip-en="Week of May 11 · 115 prompts · Other folders 59 · drawstuff 32" data-tip-zh-TW="5月11日 那一週 · 115 個 prompt · 其他資料夾 59 · drawstuff 32"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:71.0%"
@@ -2056,7 +2057,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of May 18 · 116 prompts · Other 75 · drawstuff 27" data-tip-zh-TW="5月18日 那一週 · 116 個 prompt · 其他 75 · drawstuff 27"
+        data-tip-en="Week of May 18 · 116 prompts · Other folders 75 · drawstuff 27" data-tip-zh-TW="5月18日 那一週 · 116 個 prompt · 其他資料夾 75 · drawstuff 27"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:71.6%"
@@ -2064,7 +2065,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of May 25 · 35 prompts · Other 20 · prompt-profile 7" data-tip-zh-TW="5月25日 那一週 · 35 個 prompt · 其他 20 · prompt-profile 7"
+        data-tip-en="Week of May 25 · 35 prompts · Other folders 20 · prompt-profile 7" data-tip-zh-TW="5月25日 那一週 · 35 個 prompt · 其他資料夾 20 · prompt-profile 7"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:21.6%"
@@ -2072,7 +2073,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jun 1 · 19 prompts · Other 12 · drawstuff 3" data-tip-zh-TW="6月1日 那一週 · 19 個 prompt · 其他 12 · drawstuff 3"
+        data-tip-en="Week of Jun 1 · 19 prompts · Other folders 12 · drawstuff 3" data-tip-zh-TW="6月1日 那一週 · 19 個 prompt · 其他資料夾 12 · drawstuff 3"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:11.7%"
@@ -2080,7 +2081,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jun 8 · 64 prompts · Other 39 · drawstuff 14" data-tip-zh-TW="6月8日 那一週 · 64 個 prompt · 其他 39 · drawstuff 14"
+        data-tip-en="Week of Jun 8 · 64 prompts · Other folders 39 · drawstuff 14" data-tip-zh-TW="6月8日 那一週 · 64 個 prompt · 其他資料夾 39 · drawstuff 14"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:39.5%"
@@ -2088,7 +2089,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jun 15 · 88 prompts · Other 49 · drawstuff 18" data-tip-zh-TW="6月15日 那一週 · 88 個 prompt · 其他 49 · drawstuff 18"
+        data-tip-en="Week of Jun 15 · 88 prompts · Other folders 49 · drawstuff 18" data-tip-zh-TW="6月15日 那一週 · 88 個 prompt · 其他資料夾 49 · drawstuff 18"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:54.3%"
@@ -2096,7 +2097,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jun 22 · 43 prompts · Other 24 · drawstuff 10" data-tip-zh-TW="6月22日 那一週 · 43 個 prompt · 其他 24 · drawstuff 10"
+        data-tip-en="Week of Jun 22 · 43 prompts · Other folders 24 · drawstuff 10" data-tip-zh-TW="6月22日 那一週 · 43 個 prompt · 其他資料夾 24 · drawstuff 10"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:26.5%"
@@ -2104,7 +2105,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jun 29 · 77 prompts · Other 48 · drawstuff 14" data-tip-zh-TW="6月29日 那一週 · 77 個 prompt · 其他 48 · drawstuff 14"
+        data-tip-en="Week of Jun 29 · 77 prompts · Other folders 48 · drawstuff 14" data-tip-zh-TW="6月29日 那一週 · 77 個 prompt · 其他資料夾 48 · drawstuff 14"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:47.5%"
@@ -2112,7 +2113,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jul 6 · 92 prompts · Other 53 · drawstuff 26" data-tip-zh-TW="7月6日 那一週 · 92 個 prompt · 其他 53 · drawstuff 26"
+        data-tip-en="Week of Jul 6 · 92 prompts · Other folders 53 · drawstuff 26" data-tip-zh-TW="7月6日 那一週 · 92 個 prompt · 其他資料夾 53 · drawstuff 26"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:56.8%"
@@ -2120,7 +2121,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jul 13 · 76 prompts · Other 48 · drawstuff 22" data-tip-zh-TW="7月13日 那一週 · 76 個 prompt · 其他 48 · drawstuff 22"
+        data-tip-en="Week of Jul 13 · 76 prompts · Other folders 48 · drawstuff 22" data-tip-zh-TW="7月13日 那一週 · 76 個 prompt · 其他資料夾 48 · drawstuff 22"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:46.9%"
@@ -2128,7 +2129,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jul 20 · 36 prompts · Other 24 · drawstuff 7" data-tip-zh-TW="7月20日 那一週 · 36 個 prompt · 其他 24 · drawstuff 7"
+        data-tip-en="Week of Jul 20 · 36 prompts · Other folders 24 · drawstuff 7" data-tip-zh-TW="7月20日 那一週 · 36 個 prompt · 其他資料夾 24 · drawstuff 7"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:22.2%"
@@ -2136,7 +2137,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Jul 27 · 157 prompts · Other 88 · drawstuff 34" data-tip-zh-TW="7月27日 那一週 · 157 個 prompt · 其他 88 · drawstuff 34"
+        data-tip-en="Week of Jul 27 · 157 prompts · Other folders 88 · drawstuff 34" data-tip-zh-TW="7月27日 那一週 · 157 個 prompt · 其他資料夾 88 · drawstuff 34"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:96.9%"
@@ -2144,7 +2145,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Aug 3 · 36 prompts · Other 21 · drawstuff 8" data-tip-zh-TW="8月3日 那一週 · 36 個 prompt · 其他 21 · drawstuff 8"
+        data-tip-en="Week of Aug 3 · 36 prompts · Other folders 21 · drawstuff 8" data-tip-zh-TW="8月3日 那一週 · 36 個 prompt · 其他資料夾 21 · drawstuff 8"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:22.2%"
@@ -2152,7 +2153,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Aug 10 · 162 prompts · Other 106 · drawstuff 26" data-tip-zh-TW="8月10日 那一週 · 162 個 prompt · 其他 106 · drawstuff 26"
+        data-tip-en="Week of Aug 10 · 162 prompts · Other folders 106 · drawstuff 26" data-tip-zh-TW="8月10日 那一週 · 162 個 prompt · 其他資料夾 106 · drawstuff 26"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:100.0%"
@@ -2160,7 +2161,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Aug 17 · 28 prompts · Other 15 · drawstuff 6" data-tip-zh-TW="8月17日 那一週 · 28 個 prompt · 其他 15 · drawstuff 6"
+        data-tip-en="Week of Aug 17 · 28 prompts · Other folders 15 · drawstuff 6" data-tip-zh-TW="8月17日 那一週 · 28 個 prompt · 其他資料夾 15 · drawstuff 6"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:17.3%"
@@ -2168,7 +2169,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Aug 24 · 102 prompts · Other 70 · drawstuff 16" data-tip-zh-TW="8月24日 那一週 · 102 個 prompt · 其他 70 · drawstuff 16"
+        data-tip-en="Week of Aug 24 · 102 prompts · Other folders 70 · drawstuff 16" data-tip-zh-TW="8月24日 那一週 · 102 個 prompt · 其他資料夾 70 · drawstuff 16"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:63.0%"
@@ -2176,7 +2177,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Aug 31 · 98 prompts · Other 59 · drawstuff 25" data-tip-zh-TW="8月31日 那一週 · 98 個 prompt · 其他 59 · drawstuff 25"
+        data-tip-en="Week of Aug 31 · 98 prompts · Other folders 59 · drawstuff 25" data-tip-zh-TW="8月31日 那一週 · 98 個 prompt · 其他資料夾 59 · drawstuff 25"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:60.5%"
@@ -2184,7 +2185,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Sep 7 · 70 prompts · Other 47 · drawstuff 10" data-tip-zh-TW="9月7日 那一週 · 70 個 prompt · 其他 47 · drawstuff 10"
+        data-tip-en="Week of Sep 7 · 70 prompts · Other folders 47 · drawstuff 10" data-tip-zh-TW="9月7日 那一週 · 70 個 prompt · 其他資料夾 47 · drawstuff 10"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:43.2%"
@@ -2192,7 +2193,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Sep 14 · 132 prompts · Other 73 · drawstuff 35" data-tip-zh-TW="9月14日 那一週 · 132 個 prompt · 其他 73 · drawstuff 35"
+        data-tip-en="Week of Sep 14 · 132 prompts · Other folders 73 · drawstuff 35" data-tip-zh-TW="9月14日 那一週 · 132 個 prompt · 其他資料夾 73 · drawstuff 35"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:81.5%"
@@ -2200,7 +2201,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Sep 21 · 63 prompts · Other 35 · drawstuff 18" data-tip-zh-TW="9月21日 那一週 · 63 個 prompt · 其他 35 · drawstuff 18"
+        data-tip-en="Week of Sep 21 · 63 prompts · Other folders 35 · drawstuff 18" data-tip-zh-TW="9月21日 那一週 · 63 個 prompt · 其他資料夾 35 · drawstuff 18"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:38.9%"
@@ -2208,7 +2209,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Sep 28 · 100 prompts · Other 65 · drawstuff 20" data-tip-zh-TW="9月28日 那一週 · 100 個 prompt · 其他 65 · drawstuff 20"
+        data-tip-en="Week of Sep 28 · 100 prompts · Other folders 65 · drawstuff 20" data-tip-zh-TW="9月28日 那一週 · 100 個 prompt · 其他資料夾 65 · drawstuff 20"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:61.7%"
@@ -2216,7 +2217,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip"
-        data-tip-en="Week of Oct 5 · 69 prompts · Other 41 · drawstuff 13" data-tip-zh-TW="10月5日 那一週 · 69 個 prompt · 其他 41 · drawstuff 13"
+        data-tip-en="Week of Oct 5 · 69 prompts · Other folders 41 · drawstuff 13" data-tip-zh-TW="10月5日 那一週 · 69 個 prompt · 其他資料夾 41 · drawstuff 13"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:42.6%"
@@ -2224,7 +2225,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip tip-r"
-        data-tip-en="Week of Oct 12 · 100 prompts · Other 68 · drawstuff 14" data-tip-zh-TW="10月12日 那一週 · 100 個 prompt · 其他 68 · drawstuff 14"
+        data-tip-en="Week of Oct 12 · 100 prompts · Other folders 68 · drawstuff 14" data-tip-zh-TW="10月12日 那一週 · 100 個 prompt · 其他資料夾 68 · drawstuff 14"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:61.7%"
@@ -2232,7 +2233,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
         >
       </div><div
         class="stack-w tip tip-r"
-        data-tip-en="Week of Oct 19 · 30 prompts · Other 15 · drawstuff 9" data-tip-zh-TW="10月19日 那一週 · 30 個 prompt · 其他 15 · drawstuff 9"
+        data-tip-en="Week of Oct 19 · 30 prompts · Other folders 15 · drawstuff 9" data-tip-zh-TW="10月19日 那一週 · 30 個 prompt · 其他資料夾 15 · drawstuff 9"
         tabindex="-1"
       >
         <span class="stack-bar" style="height:18.5%"
@@ -2300,16 +2301,16 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
             <b>26%</b>
           </li>
   </ul>
-              <p class="sub"><span data-l="en" lang="en">How</span><span data-l="zh-TW" lang="zh-Hant-TW">方式</span></p>
+              <p class="sub"><span data-l="en" lang="en">Client</span><span data-l="zh-TW" lang="zh-Hant-TW">使用的工具</span></p>
               <ul class="shares">
     <li>
-            <span class="share-label"><span data-l="en" lang="en">Typed</span><span data-l="zh-TW" lang="zh-Hant-TW">手動輸入</span></span>
+            <span class="share-label"><span data-l="en" lang="en">Terminal</span><span data-l="zh-TW" lang="zh-Hant-TW">終端機</span></span>
             <span class="share-track"
               ><span class="share-fill" style="width:61.1%"></span
             ></span>
             <b>61%</b>
           </li><li>
-            <span class="share-label"><span data-l="en" lang="en">App / SDK</span><span data-l="zh-TW" lang="zh-Hant-TW">App / SDK</span></span>
+            <span class="share-label"><span data-l="en" lang="en">Desktop app / SDK</span><span data-l="zh-TW" lang="zh-Hant-TW">桌面 App / SDK</span></span>
             <span class="share-track"
               ><span class="share-fill" style="width:32.3%"></span
             ></span>

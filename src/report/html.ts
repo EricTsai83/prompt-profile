@@ -229,13 +229,14 @@ const CLASSIC_IDENTITY: Identity = {
 }
 
 /** Categorical colors for up to six projects, then "other"; readable in light and dark. */
-const PROJECT_PALETTE = `--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#a0a4ad`
+const PROJECT_PALETTE = `--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#d3d6dc`
 
 const tokens = (t: ReportTokens) =>
   `--bg:${t.bg};--fg:${t.fg};--muted:${t.muted};--card:${t.card};--border:${t.border};--accent:${t.accent};--accent-soft:${t.accentSoft};--warn:${t.warn};--empty:${t.empty}`
 
 const BASE_STYLE = `
 :root{${PROJECT_PALETTE}}
+@media (prefers-color-scheme:dark){:root{--po:#454952}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 .page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}

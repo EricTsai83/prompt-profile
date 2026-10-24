@@ -127,4 +127,14 @@ describe("report languages", () => {
       expect(out).toContain('class="heat"')
     }),
   )
+
+  it.effect("the client mix names clients, not whether a prompt was typed", () =>
+    Effect.gen(function* () {
+      const out = renderHtml(englishOnly(yield* sample()))
+      expect(out).toContain("Desktop app / SDK")
+      expect(out).toContain("Terminal")
+      expect(out).not.toContain(">Typed<")
+      expect(out).toContain("Other folders")
+    }),
+  )
 })
