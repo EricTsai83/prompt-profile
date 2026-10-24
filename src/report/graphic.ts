@@ -1,4 +1,50 @@
+import { chronotype } from "./derive.ts"
 import type { GraphicKind, Identity } from "./looks.ts"
+
+/** Busiest-hours window, as from `chronotype`. */
+type HourWindow = { readonly start: number; readonly end: number } | null
+
+/** The clock's dial radius in its 260 × 260 box; bars start just outside it. */
+export const CLOCK_DIAL = 60
+
+/**
+ * The 24 radial bars of the hour clock (260 × 260, centre 130): length by prompts in that hour,
+ * `on` for the busiest window. Shared by the report's hero and the classic card.
+ */
+export const clockBars = (
+  hours: ReadonlyArray<number>,
+  window: HourWindow,
+): Array<{ readonly from: string; readonly to: string; readonly on: boolean }> => {
+  const max = Math.max(1, ...hours)
+  const inWindow = (h: number) =>
+    window !== null && (h - window.start + 24) % 24 < (window.end - window.start + 24) % 24
+  return hours.map((n, h) => {
+    const a = (h / 24) * Math.PI * 2 - Math.PI / 2
+    const r0 = CLOCK_DIAL + 2
+    const r1 = r0 + 4 + (54 * n) / max
+    const p = (r: number) =>
+      `${(130 + Math.cos(a) * r).toFixed(1)} ${(130 + Math.sin(a) * r).toFixed(1)}`
+    return { from: p(r0), to: p(r1), on: inWindow(h) }
+  })
+}
+
+/** The report's hour clock as a standalone SVG (no hour labels: the card has no SVG fonts). */
+export const clockSvg = (
+  hours: ReadonlyArray<number>,
+  color: string,
+): { readonly svg: string; readonly width: number; readonly height: number } => {
+  const bars = clockBars(hours, chronotype({ hourHistogram: hours }))
+    .map(
+      (b) =>
+        `<path d="M${b.from}L${b.to}" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-opacity="${b.on ? 1 : 0.35}"/>`,
+    )
+    .join("")
+  return {
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 260"><circle cx="130" cy="130" r="${CLOCK_DIAL}" fill="none" stroke="${color}" stroke-opacity="0.25"/>${bars}</svg>`,
+    width: 260,
+    height: 260,
+  }
+}
 
 /** A look's signature graphic as a standalone SVG, drawn from the 24-hour histogram only. */
 export const graphicSvg = (

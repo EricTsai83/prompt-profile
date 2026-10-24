@@ -149,7 +149,7 @@ describe("looks: card", () => {
           variant: variantName(options),
           traits: !hidden("traits"),
           stats: !hidden("stats"),
-          graphic: options.look !== "classic" && !hidden("graphic"),
+          graphic: !hidden("graphic"),
         })
       }
     }),

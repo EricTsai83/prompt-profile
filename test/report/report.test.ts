@@ -6,6 +6,8 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { decodeProfile } from "../../src/domain/Profile.ts"
 import { cardTree, clip, renderCard } from "../../src/report/card.ts"
+import { clockSvg, svgDataUrl } from "../../src/report/graphic.ts"
+import { CLASSIC_TOKENS } from "../../src/report/looks.ts"
 import { embeddedFonts } from "../../src/report/fonts.ts"
 import { escapeHtml, html, raw } from "../../src/report/html-template.ts"
 import { renderHtml, writeReport } from "../../src/report/index.ts"
@@ -88,6 +90,16 @@ describe("card", () => {
       const png = yield* renderCard(profile, embeddedFonts())
       expect(Array.from(png.slice(0, 8))).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
       expect(pngSize(png)).toEqual({ width: 1200, height: 630 })
+    }),
+  )
+
+  it.effect("the default card wears the classic report's colors and its hour clock", () =>
+    Effect.gen(function* () {
+      const profile = yield* sample()
+      const tree = JSON.stringify(cardTree(profile))
+      const { bg, card, fg, accent } = CLASSIC_TOKENS.light
+      for (const color of [bg, card, fg]) expect(tree).toContain(color)
+      expect(tree).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
     }),
   )
 

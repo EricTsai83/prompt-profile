@@ -4,6 +4,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"
 import type { Chapter } from "./derive.ts"
+import { CLOCK_DIAL, clockBars } from "./graphic.ts"
 
 /**
  * Charts drawn from `stats` only, as HTML/CSS so they reflow on small screens. Hover (or tap)
@@ -184,17 +185,9 @@ export const radialClock = (
   window: { readonly start: number; readonly end: number } | null,
   label: Raw,
 ): Raw => {
-  const max = Math.max(1, ...s.hourHistogram)
-  const inWindow = (h: number) =>
-    window !== null && (h - window.start + 24) % 24 < (window.end - window.start + 24) % 24
-  const bars = s.hourHistogram.map((n, h) => {
-    const a = (h / 24) * Math.PI * 2 - Math.PI / 2
-    const r0 = 62
-    const r1 = r0 + 4 + (54 * n) / max
-    const p = (r: number) =>
-      `${(130 + Math.cos(a) * r).toFixed(1)} ${(130 + Math.sin(a) * r).toFixed(1)}`
-    return html`<path d="M${p(r0)}L${p(r1)}" class="${inWindow(h) ? "clock-bar on" : "clock-bar"}" />`
-  })
+  const bars = clockBars(s.hourHistogram, window).map(
+    (b) => html`<path d="M${b.from}L${b.to}" class="${b.on ? "clock-bar on" : "clock-bar"}" />`,
+  )
   const ticks = [0, 6, 12, 18].map((h) => {
     const a = (h / 24) * Math.PI * 2 - Math.PI / 2
     return html`<text
@@ -207,7 +200,7 @@ export const radialClock = (
   })
   return html`<figure class="clock">
     <svg viewBox="0 0 260 260" aria-hidden="true">
-      <circle cx="130" cy="130" r="60" class="clock-dial" />
+      <circle cx="130" cy="130" r="${CLOCK_DIAL}" class="clock-dial" />
       ${bars}${ticks}
     </svg>
     <figcaption>${label}</figcaption>

@@ -16,6 +16,7 @@ import { displayFontDataUrl } from "./fonts.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
 import {
+  CLASSIC_TOKENS,
   DEFAULT_RENDER_OPTIONS,
   excludedParts,
   lookOf,
@@ -390,31 +391,6 @@ const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
   </div>`
 
 // ---- styles -------------------------------------------------------------------------------
-
-const CLASSIC_TOKENS: { readonly light: ReportTokens; readonly dark: ReportTokens } = {
-  light: {
-    bg: "#f6f6f3",
-    fg: "#1d1d1f",
-    muted: "#6b6b70",
-    card: "#ffffff",
-    border: "#e6e6e1",
-    accent: "#5b5bd6",
-    accentSoft: "#ececfb",
-    warn: "#9a5800",
-    empty: "#ececea",
-  },
-  dark: {
-    bg: "#121214",
-    fg: "#ececee",
-    muted: "#9a9aa2",
-    card: "#1c1c20",
-    border: "#2c2c33",
-    accent: "#9d9dff",
-    accentSoft: "#25254a",
-    warn: "#f0b35a",
-    empty: "#26262c",
-  },
-}
 
 /** The classic hero: today's colors on a card, with the hour graphic. */
 const CLASSIC_IDENTITY: Identity = {
