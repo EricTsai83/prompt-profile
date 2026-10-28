@@ -286,3 +286,24 @@ bundled prompts, fonts, WASM rendering and file permissions.
 ## License
 
 MIT
+
+### Collaboration portraits
+
+Reports have two locally switchable views: a chart-led overview of collaboration preferences,
+workflow techniques and activity; and a detailed third-person portrait for readers who may not
+know the person, with interactions, supporting quotes, skill descriptions and suggestions.
+Evidence is expanded by default. Language and view switches work offline without JavaScript;
+printing includes both views.
+Quotes are verified against redacted prompts. Only the user's side of an interaction is
+available; requests do not prove successful outcomes. Statistics and contextual observations
+remain available alongside the narrative in their respective views. Older profiles remain renderable.
+
+Four original preference axes describe how the person starts (define/explore), paces work
+(stepwise/whole task), assigns decisions (direct/delegate), and converges (criteria/refinement).
+A complete combination receives a stable role name. Each preference needs verified evidence
+from at least two sessions; contradictory or insufficient evidence stays unresolved, and no
+complete role is assigned. These are contextual observations, not psychological assessments,
+ability scores or a validated personality instrument. The system is independent of MBTI.
+
+Re-analyse to generate the new portrait; rendering an older profile does not create new
+analysis. `pnpm dev:report` renders an entirely fictional portrait for local inspection.

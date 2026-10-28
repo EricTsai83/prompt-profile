@@ -94,7 +94,13 @@ export const reportContents = (p: Profile, options: RenderOptions): ReportConten
   const names = new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)])
   return {
     quotes: v.quotes
-      ? evidence(p.traits) + evidence(p.dimensions) + (v.coaching ? evidence(p.improvements) : 0)
+      ? evidence(p.traits) +
+        evidence(p.dimensions) +
+        (v.coaching ? evidence(p.improvements) : 0) +
+        (p.portrait
+          ? evidence(p.portrait.chapters) +
+            p.portrait.axes.reduce((n, a) => n + a.evidence.length + a.counterEvidence.length, 0)
+          : 0)
       : 0,
     projects: v.projects ? names.size : 0,
     exactDates: v.dates,

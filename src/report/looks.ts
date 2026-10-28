@@ -110,7 +110,7 @@ export interface Look {
 export const LOOKS: ReadonlyArray<Look> = [
   {
     id: "signal",
-    version: 1,
+    version: 3,
     light: {
       bg: "#f5f7ff",
       fg: "#14204c",
@@ -147,7 +147,7 @@ export const LOOKS: ReadonlyArray<Look> = [
   },
   {
     id: "afterhours",
-    version: 1,
+    version: 3,
     light: {
       bg: "#eef3f8",
       fg: "#10243a",
@@ -184,7 +184,7 @@ export const LOOKS: ReadonlyArray<Look> = [
   },
   {
     id: "studio",
-    version: 1,
+    version: 3,
     light: {
       bg: "#fff7f4",
       fg: "#252323",

@@ -68,7 +68,7 @@ describe("report languages", () => {
       expect(out).toContain('class="cal"')
       expect(out).toContain('class="chapters"')
       expect(out).toContain('class="donut"')
-      expect(out).toMatch(/<details class="dimension">/)
+      expect(out).toMatch(/<details open class="dimension">/)
     }),
   )
 

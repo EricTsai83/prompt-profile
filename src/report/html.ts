@@ -1,3 +1,6 @@
+import { portraitSection, portraitStyle } from "./portrait.ts"
+import { VIEW_MESSAGES } from "./messages.ts"
+import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
 import { DateTime } from "effect"
 import type { DimensionKey, Evidence, Language, Profile, Trait } from "../domain/Profile.ts"
 import {
@@ -197,7 +200,7 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: S
     ${supportLine(t, loc)}
     ${
       v.quotes && t.evidence.length > 1
-        ? html`<details>
+        ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
             ${quotes(t.evidence.slice(1), makeVerbatim(loc, v, scrub))}
           </details>`
@@ -215,7 +218,7 @@ const minorTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
     ${
       v.quotes && t.evidence.length > 0
-        ? html`<details>
+        ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
             ${quotes(t.evidence, makeVerbatim(loc, v, scrub))}
           </details>`
@@ -243,7 +246,7 @@ const dimensionRow = (
         : html`<span class="badge">${loc.text((m) => m.evidenceCount(d.evidence.length))}</span>`
     }`
   if (!v.quotes) return html`<div class="dimension static">${head}</div>`
-  return html`<details class="dimension">
+  return html`<details open class="dimension">
     <summary>${head}</summary>
     <div class="dim-body">
       ${
@@ -283,7 +286,7 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
     }
     ${
       others.length > 0
-        ? html`<details>
+        ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(others.length))}</summary>
             ${quotes(others, makeVerbatim(loc, v, scrub))}
           </details>`
@@ -428,7 +431,7 @@ p{margin:0}
 .hero .split{position:absolute;right:0;top:0;bottom:0;width:34%;background:var(--id-split)}
 .hero .copy{position:relative;max-width:60%}
 .hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
-.hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:block}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
 .hero .report-facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .report-facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .report-facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
 .hero:has(.hero-clock){min-height:270px}
@@ -622,6 +625,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
   const every = correctionEvery(s)
   const signals = v.coaching ? signalRow(profile, loc) : null
   const progress = v.coaching ? progressBlock(profile, loc, v, scrub) : null
+  const portrait = portraitSection(profile, loc, v, scrub)
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
   const graphic = look
@@ -643,12 +647,14 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(lookStyle(look))}${raw(
+          ${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(lookStyle(look))}${raw(
             languageStyle(loc.langs),
           )}
         </style>
       </head>
       <body>
+        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
+        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}" />
         ${
           multi
             ? loc.langs.map(
@@ -679,7 +685,10 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                 : ""
             }
           </header>
-
+          <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].navigation)}">
+            <label for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overview)}</label>
+            <label for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detail)}</label>
+          </nav>
           <section class="hero">
             ${identity.split ? html`<div class="split"></div>` : ""}
             <div class="copy">
@@ -737,6 +746,9 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
             }
           </section>
 
+          <main>
+          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewNote)}</p></header>
           <section class="sigs" aria-label="${loc.attr((m) => m.signature)}">
             ${signatureTile(
               html`${percent(nightShare(s))}%`,
@@ -764,54 +776,9 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
             )}
           </section>
 
-          <section>
-            <h2>${loc.text((m) => m.traits)}</h2>
-            <div class="traits">
-              ${signature.map((i) => signatureTrait(profile, i, loc, v, scrub))}
-            </div>
-            ${
-              minor.length > 0
-                ? html`<h3 class="sub-h">${loc.text((m) => m.moreTraits)}</h3>
-                    <ul class="minors">
-                      ${minor.map((i) => minorTrait(profile, i, loc, v, scrub))}
-                    </ul>`
-                : ""
-            }
-          </section>
 
-          ${
-            tech
-              ? html`<section class="techniques">
-                  <div class="section-head">
-                    <h2>${loc.text((m) => m.techniques)}</h2>
-                    <p class="note">${loc.text((m) => m.techniquesNote)}</p>
-                  </div>
-                  ${tech}
-                </section>`
-              : ""
-          }
-
-          ${
-            v.coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
-              ? html`<section class="coaching">
-                  <div class="section-head">
-                    <h2>${loc.text((m) => m.coaching)}</h2>
-                    <p class="note">${loc.text((m) => m.coachingNote)}</p>
-                  </div>
-                  <div class="improves">
-                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc, v, scrub))}
-                  </div>
-                  ${
-                    signals
-                      ? html`<h3 class="sub-h">${loc.text((m) => m.signalsTitle)}</h3>
-                          ${signals}`
-                      : ""
-                  }
-                  ${progress ?? ""}
-                </section>`
-              : ""
-          }
-
+          ${preferenceMap(profile, loc)}
+          ${workflowCharts(profile, loc)}
           <section>
             <h2>${loc.text((m) => m.rhythm)}</h2>
             ${
@@ -863,29 +830,6 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
               : ""
           }
 
-          <section>
-            <h2>${loc.text((m) => m.dimensions)}</h2>
-            <div class="dims">
-              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
-            </div>
-          </section>
-
-          ${
-            v.funFacts && profile.funFacts.length > 0
-              ? html`<section>
-                  <h2>${loc.text((m) => m.funFacts)}</h2>
-                  <ul class="facts">
-                    ${profile.funFacts.map(
-                      (_f, i) =>
-                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
-                    )}
-                  </ul>
-                </section>`
-              : ""
-          }
-
-          <details class="about">
-                  <summary>${loc.text((m) => m.howMeasured)}</summary>
                   <div class="grid g-3 measured">
                     <article class="panel">
                       <h3>${loc.text((m) => m.languageMix)}</h3>
@@ -945,6 +889,82 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                       </div>
                     </article>
                   </div>
+          ${
+            v.funFacts && profile.funFacts.length > 0
+              ? html`<section>
+                  <h2>${loc.text((m) => m.funFacts)}</h2>
+                  <ul class="facts">
+                    ${profile.funFacts.map(
+                      (_f, i) =>
+                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
+                    )}
+                  </ul>
+                </section>`
+              : ""
+          }
+
+          <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].next)}</label>
+          </section>
+          <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}">
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailNote)}</p></header>
+          ${portrait ?? ""}
+          <section>
+            <h2>${loc.text((m) => m.traits)}</h2>
+            <div class="traits">
+              ${signature.map((i) => signatureTrait(profile, i, loc, v, scrub))}
+            </div>
+            ${
+              minor.length > 0
+                ? html`<h3 class="sub-h">${loc.text((m) => m.moreTraits)}</h3>
+                    <ul class="minors">
+                      ${minor.map((i) => minorTrait(profile, i, loc, v, scrub))}
+                    </ul>`
+                : ""
+            }
+          </section>
+
+          ${
+            tech
+              ? html`<section class="techniques">
+                  <div class="section-head">
+                    <h2>${loc.text((m) => m.techniques)}</h2>
+                    <p class="note">${loc.text((m) => m.techniquesNote)}</p>
+                  </div>
+                  ${tech}
+                </section>`
+              : ""
+          }
+
+          ${
+            v.coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
+              ? html`<section class="coaching">
+                  <div class="section-head">
+                    <h2>${loc.text((m) => m.coaching)}</h2>
+                    <p class="note">${loc.text((m) => m.coachingNote)}</p>
+                  </div>
+                  <div class="improves">
+                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc, v, scrub))}
+                  </div>
+                  ${
+                    signals
+                      ? html`<h3 class="sub-h">${loc.text((m) => m.signalsTitle)}</h3>
+                          ${signals}`
+                      : ""
+                  }
+                  ${progress ?? ""}
+                </section>`
+              : ""
+          }
+
+          <section>
+            <h2>${loc.text((m) => m.dimensions)}</h2>
+            <div class="dims">
+              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
+            </div>
+          </section>
+
+          <section class="about">
+                  <h2>${loc.text((m) => m.howMeasured)}</h2>
                   <p>
                     ${loc.text(
                       (m) =>
@@ -959,10 +979,13 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                   </p>
                   ${excluded.length > 0 ? html`<p>${loc.text((m) => m.leftOut(excluded.join(", ")))}</p>` : ""}
                   <p>${loc.text((m) => m.privacy)}</p>
-                </details>
+                </section>
+          <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].back)}</label>
+          </section>
+          </main>
           <footer class="foot">prompt-profile · npx prompt-profile</footer>
         </div>
       </body>
     </html> `
-  return page.value
+  return page.value.replace(/[ \t]+$/gm, "")
 }

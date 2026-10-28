@@ -557,3 +557,80 @@ const zhTW: Messages = {
 
 /** Every text of the report and the card, per language. */
 export const MESSAGES: Record<Language, Messages> = { en, "zh-TW": zhTW }
+
+/** Copy for the original collaboration portrait, independent of generated prose. */
+export const PORTRAIT_MESSAGES = {
+  en: {
+    title: "A portrait of collaboration",
+    preferences: "Observed collaboration preferences",
+    note: "Preferences observed in these conversations, not a psychological assessment or an ability score. They may change with the task and the available history.",
+    supporting: "Supporting patterns, activity and practical suggestions",
+    unclear: "Mixed or insufficient evidence",
+    axes: {
+      framing: ["Starting point", "Define first", "Explore first"],
+      pacing: ["Pace", "Step by step", "Whole task"],
+      control: ["Decision ownership", "Direct", "Delegate"],
+      closure: ["Convergence", "Check criteria", "Refine results"],
+    },
+  },
+  "zh-TW": {
+    title: "一個人如何與 AI 共事",
+    preferences: "對話中展現的協作偏好",
+    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分；可能隨任務與可取得的紀錄改變。",
+    supporting: "更多行為證據、使用紀錄與實用建議",
+    unclear: "偏好混合或證據不足",
+    axes: {
+      framing: ["起手方式", "先定義", "先探索"],
+      pacing: ["推進節奏", "分步推進", "整包交付"],
+      control: ["決策分工", "主導", "授權"],
+      closure: ["收斂方式", "規格驗收", "逐步打磨"],
+    },
+  },
+} as const
+
+/** Navigation and chart labels for the report's two reading views. */
+export const VIEW_MESSAGES = {
+  en: {
+    navigation: "Report views",
+    overview: "Visual overview",
+    detail: "Profile & evidence",
+    overviewTitle: "The collaboration at a glance",
+    detailTitle: "The person behind the prompts",
+    overviewNote:
+      "Patterns, rhythm and workflow. Continue to the second page for the story and its evidence.",
+    detailNote:
+      "Read the interactions, supporting quotes and tools behind the overview. Evidence is expanded by default.",
+    next: "Read the profile and evidence →",
+    back: "← Back to the visual overview",
+    tools: "Workflow in practice",
+    promptTechniques: "How prompts are shaped",
+    toolsNote:
+      "Share of sessions with available tool metadata. These describe agent activity, not an ability score.",
+    promptsNote:
+      "Share of cleaned prompts matching each writing technique. Heuristic signals, not quality grades.",
+    noTools: "No tool metadata is available for this period.",
+    mixed: "Mixed / insufficient evidence",
+    first: "Observed preference",
+    noPortrait:
+      "A collaboration portrait is not available in this profile. The detail page contains the available observations.",
+  },
+  "zh-TW": {
+    navigation: "報告頁面",
+    overview: "圖表總覽",
+    detail: "人物側寫與證據",
+    overviewTitle: "一眼看見協作方式",
+    detailTitle: "從對話認識這個人",
+    overviewNote: "先看協作偏好、使用節奏與工作流程，再到第二頁閱讀互動故事與證據。",
+    detailNote: "閱讀總覽背後的互動、原文引述與使用工具。證據預設展開，不必逐一點開。",
+    next: "閱讀人物側寫與證據 →",
+    back: "← 回到圖表總覽",
+    tools: "工作流程中的工具",
+    promptTechniques: "Prompt 的表達習慣",
+    toolsNote: "比例以具備工具紀錄的 session 為分母；呈現 agent 活動，不代表能力評分。",
+    promptsNote: "各項表達技巧在清理後 prompt 中的出現比例，屬於規則偵測結果，並非品質評分。",
+    noTools: "這段期間沒有可用的工具紀錄。",
+    mixed: "混合偏好／證據不足",
+    first: "觀察到的偏好",
+    noPortrait: "這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。",
+  },
+} as const
