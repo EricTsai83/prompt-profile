@@ -2,7 +2,7 @@
 
 ## The product in one sentence
 
-A CLI tool that reads the user's local Claude Code / Codex prompt history, **borrows the user's already-logged-in `claude` or `codex` CLI as the LLM** (no API key needed), and produces a "what kind of person are you" profile report locally (HTML + PNG card).
+A CLI tool that reads the user's local Claude Code / Codex prompt history, **borrows the user's already-logged-in `claude` or `codex` CLI as the LLM** (no API key needed), and produces an evidence-backed portrait of how a person collaborates with AI locally (HTML + PNG card).
 
 ```bash
 npm i -g prompt-profile   # or npx prompt-profile
@@ -91,10 +91,10 @@ There are three independent version numbers. Bump them whenever the correspondin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 8 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 9 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 9 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 10 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 1 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
+| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 3 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
 
 ## Open plans
 
@@ -107,15 +107,17 @@ deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 `plans/20-<name>.md` and run the acceptance criteria when done."
 
-None open. New plans are listed here as
-`| # | Plan | Output | Depends on | Status |`.
+| # | Plan | Output | Depends on | Status |
+|---|---|---|---|---|
+| 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
+| 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Planned |
 
 ## Shared rules for every plan
 
 - Write tests first (TDD); tests verify behaviour only, not internal structure.
 - **Fixtures must not contain real prompt content**: always use hand-written fake data, but follow the real format's field structure.
 - Smoke tests that read real local data go in `test/smoke/` and skip automatically when no data is found (they always skip on CI).
-- When each plan is done: `pnpm typecheck && pnpm lint && pnpm test` must all pass.
+- When each plan is done: `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` must all pass.
 - External data formats (Claude Code / Codex JSONL, CLI stdout) are always treated as **untrusted and subject to change**: parse them with lenient Schemas, skip and count failures, and never let the whole flow fail.
 - Any derived data written to the user's disk (cache, reports) contains personal information: directories `0700`, files `0600`; write to a temporary file first and then rename (to avoid leaving a broken file if interrupted).
 - Commits use Conventional Commits; a plan can be split into several small commits.
@@ -123,7 +125,12 @@ None open. New plans are listed here as
 
 ## What is left, in order
 
-Nothing is open. Released: `0.1.1` on npm (Trusted Publisher, provenance) and GitHub Releases
+Start plan 21 to iterate report content and visual direction against the current implementation.
+Plan 20 remains the product roadmap: history retention and character art studies can proceed
+independently, with visual decisions coordinated through plan 21. Final character mapping follows
+evidence and role calibration.
+
+Released: `0.1.1` on npm (Trusted Publisher, provenance) and GitHub Releases
 with standalone binaries, 2026-10-24; how to release is in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Ideas, not planned yet:
