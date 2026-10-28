@@ -1,3 +1,5 @@
+import { verifyPortrait } from "./portrait.ts"
+import { roleCode, ROLE_NAMES } from "../domain/Interaction.ts"
 import { Clock, DateTime, Effect, Option, Ref } from "effect"
 import type { ChunkObservations, Observation } from "../domain/ChunkObservations.ts"
 import { encodeStats } from "../domain/Stats.ts"
@@ -260,7 +262,19 @@ export const analyze = (input: {
 
     // ---- reduce ---------------------------------------------------------------------
     yield* progress.onReduceStart
-    const reducePrompt = `observations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
+    const citedIds = new Set(observations.flatMap((o) => o.evidence.map((e) => e.promptId)))
+    const promptContext = outcomes
+      .filter((o) => o.observations !== null)
+      .flatMap((o) =>
+        o.chunk.prompts
+          .filter((p) => citedIds.has(p.id))
+          .map((p) => ({
+            promptId: p.id,
+            session: `${p.source}:${p.sessionId}`,
+            time: p.timestamp.toString(),
+          })),
+      )
+    const reducePrompt = `promptContext:\n${JSON.stringify(promptContext)}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
     const draft = yield* runner
       .generate({
         system: loadPrompt("reduce"),
@@ -297,6 +311,17 @@ export const analyze = (input: {
         evidenceDropped: 0,
       },
     })
+    const origins = new Map(
+      outcomes
+        .filter((o) => o.observations !== null)
+        .flatMap((o) =>
+          o.chunk.prompts.map(
+            (p) => [p.id, { session: `${p.source}:${p.sessionId}`, week: o.chunk.id }] as const,
+          ),
+        ),
+    )
+    const portrait = verifyPortrait(profile.portrait, texts, origins, counts)
+    const code = portrait ? roleCode(portrait.axes) : null
     const traits = verifyTraits(
       profile.traits,
       texts,
@@ -315,6 +340,10 @@ export const analyze = (input: {
     yield* progress.onVerified(counts.kept, counts.dropped)
     const verifiedProfile: Profile = {
       ...profile,
+      portrait,
+      archetype: portrait
+        ? { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" }
+        : profile.archetype,
       traits,
       dimensions,
       improvements,

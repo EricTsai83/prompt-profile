@@ -57,3 +57,21 @@ adds a requirement the first prompt could have stated). Describe the habit, not 
 - Write `claim` in English. Quotes stay in their original language.
 
 Respond with JSON matching the schema.
+
+## Collaboration episodes
+
+The `session` attribute identifies a conversation. Preserve its boundaries and chronological
+order. Under `work_style` and `communication`, record representative episodes as observations:
+explain the initial ask, later interventions and how the user's requirements develop. Cite
+several short quotes in chronological order when available. Never connect separate sessions
+as one conversation. Only the user's side is available: do not invent assistant responses,
+completion, success, motives or saved time.
+
+Also look for these original collaboration preferences, without treating either pole as better:
+
+- framing: defining outcomes first versus exploring the problem through dialogue;
+- pacing: confirming incremental steps versus handing over a whole task;
+- control: choosing the approach personally versus authorizing the agent to choose;
+- closure: checking predefined criteria versus refining after seeing a result.
+  Record counterexamples and task-dependent differences. Short prompts alone prove none of these.
+  Agent tool use alone does not prove the user requested or understood that technique.

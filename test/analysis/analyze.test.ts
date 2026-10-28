@@ -47,6 +47,7 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
   }>
   const evidence = obs.flatMap((o) => o.evidence)
   return {
+    portrait: null,
     headline: "A steady developer",
     archetype: { name: "The Steady Shipper", description: "Writes every day." },
     dimensions: ["work_style", "communication", "tech_profile", "interests", "growth"].map(
@@ -123,6 +124,50 @@ const run = (
   )
 
 describe("analyze", () => {
+  it.effect("verifies the narrative before translating and assigns a stable role", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({
+        respond: (input) => {
+          const response = respond!(input) as Record<string, unknown>
+          if (input.schemaName !== "LlmProfileDraft") return response
+          const observations = JSON.parse(
+            /observations:\n(.*)\n\nstats:/s.exec(input.prompt)![1]!,
+          ) as Array<{ evidence: Array<{ promptId: string; quote: string }> }>
+          const evidence = observations.flatMap((o) => o.evidence).slice(0, 4)
+          return {
+            ...response,
+            portrait: {
+              introduction: "This developer sets a direction and delegates implementation.",
+              chapters: [
+                {
+                  title: "A clear destination",
+                  body: "They state the goal before choosing a route.",
+                  evidence,
+                },
+                {
+                  title: "Invented episode",
+                  body: "Unsupported.",
+                  evidence: [{ promptId: "missing", quote: "never said" }],
+                },
+              ],
+              axes: ["framing", "pacing", "control", "closure"].map((key) => ({
+                key,
+                pole: "first",
+                explanation: "Observed across conversations.",
+                evidence,
+                counterEvidence: [],
+              })),
+            },
+          }
+        },
+      })
+      const p = yield* run(fake)
+      expect(p.portrait?.chapters).toHaveLength(1)
+      expect(p.archetype.name).toBe("Methodical Director")
+      expect(p.portrait?.axes.every((a) => a.pole === "first")).toBe(true)
+    }),
+  )
+
   it.effect("the reduce step gets weekday counts by name, not by position", () =>
     Effect.gen(function* () {
       const fake = makeFakeLlmRunner({ respond })
@@ -178,7 +223,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "9",
+        analysisVersion: "10",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -295,13 +340,15 @@ describe("analyze", () => {
     if (input.schemaName !== "LlmTranslation") return respond(input)
     const text = JSON.parse(/\nprofile:\n(.*)$/s.exec(input.prompt)![1]!)
     const tr = (x: unknown): unknown =>
-      typeof x === "string"
-        ? `ZH ${x}`
-        : Array.isArray(x)
-          ? x.map(tr)
-          : Object.fromEntries(
-              Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
-            )
+      x === null
+        ? null
+        : typeof x === "string"
+          ? `ZH ${x}`
+          : Array.isArray(x)
+            ? x.map(tr)
+            : Object.fromEntries(
+                Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
+              )
     return tr(text)
   }
 

@@ -19,3 +19,6 @@ Merge duplicates and near-duplicates into fewer, stronger observations:
 - Write `claim` in English.
 
 Respond with JSON matching the schema.
+
+Preserve collaboration episodes: keep their chronological quote order, session boundaries,
+turning points and counterexamples. Do not merge separate events into a fictional conversation.

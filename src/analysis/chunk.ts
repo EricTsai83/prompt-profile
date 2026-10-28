@@ -60,7 +60,7 @@ const localFormatter = (timeZone: string) => {
 export const formatPrompt = (p: SafePrompt, local: ReturnType<typeof localFormatter>): string => {
   const t = local(p.timestamp)
   const project = p.project === null ? "" : ` project="${escapeAttr(p.project)}"`
-  return `<prompt id="${escapeAttr(p.id)}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>`
+  return `<prompt id="${escapeAttr(p.id)}" session="${escapeAttr(`${p.source}:${p.sessionId}`)}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>`
 }
 
 // ---------------------------------------------------------------------------------------

@@ -18,13 +18,15 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
   if (schemaName === "LlmTranslation") {
     // Prefix every string except dimension keys.
     const tr = (x: unknown): unknown =>
-      typeof x === "string"
-        ? `譯 ${x}`
-        : Array.isArray(x)
-          ? x.map(tr)
-          : Object.fromEntries(
-              Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
-            )
+      x === null
+        ? null
+        : typeof x === "string"
+          ? `譯 ${x}`
+          : Array.isArray(x)
+            ? x.map(tr)
+            : Object.fromEntries(
+                Object.entries(x as object).map(([k, v]) => [k, k === "key" ? v : tr(v)]),
+              )
     return tr(JSON.parse(/\nprofile:\n(.*)$/s.exec(prompt)![1]!))
   }
   if (schemaName === "LlmChunkObservations") {
@@ -44,6 +46,7 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
   }>
   const evidence = obs.flatMap((o) => o.evidence)
   return {
+    portrait: null,
     headline: "A focused developer",
     archetype: { name: "The Fixer", description: "Fixes things." },
     dimensions: ["work_style", "communication", "tech_profile", "interests", "growth"].map(

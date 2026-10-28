@@ -1,3 +1,4 @@
+import { AXIS_KEYS } from "./Interaction.ts"
 import { Effect, Schema } from "effect"
 import { SourceId } from "./Source.ts"
 import { Snapshot } from "./Progress.ts"
@@ -8,9 +9,9 @@ import { Stats } from "./Stats.ts"
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
  * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
- * Versions 2–7 are migrated on decode.
+ * 9: evidence-backed collaboration portrait. Versions 2–8 are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 8 as const
+export const PROFILE_SCHEMA_VERSION = 9 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -46,6 +47,31 @@ export const Evidence = Schema.Struct({
   quote: Schema.String.check(Schema.isMaxLength(MAX_QUOTE_LENGTH)),
 })
 export type Evidence = typeof Evidence.Type
+
+/** Evidence-backed narrative and original AI collaboration preferences. */
+export const PortraitText = Schema.Struct({
+  introduction: Schema.String,
+  chapters: Schema.Array(Schema.Struct({ title: Schema.String, body: Schema.String })),
+  axes: Schema.Array(
+    Schema.Struct({ key: Schema.Literals(AXIS_KEYS), explanation: Schema.String }),
+  ),
+})
+export const Portrait = Schema.Struct({
+  introduction: Schema.String,
+  chapters: Schema.Array(
+    Schema.Struct({ title: Schema.String, body: Schema.String, evidence: Schema.Array(Evidence) }),
+  ),
+  axes: Schema.Array(
+    Schema.Struct({
+      key: Schema.Literals(AXIS_KEYS),
+      pole: Schema.Literals(["first", "second", "unclear"]),
+      explanation: Schema.String,
+      evidence: Schema.Array(Evidence),
+      counterEvidence: Schema.Array(Evidence),
+    }),
+  ),
+})
+export type Portrait = typeof Portrait.Type
 
 export const Dimension = Schema.Struct({
   key: DimensionKey,
@@ -125,6 +151,7 @@ const ImprovementText = Schema.Struct({
 
 /** What the translation call returns: every field required (LLM strict-schema subset). */
 export const LlmTranslation = Schema.Struct({
+  portrait: Schema.NullOr(PortraitText),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
   dimensions: Schema.Array(
@@ -137,6 +164,7 @@ export const LlmTranslation = Schema.Struct({
 
 /** Generated text in one non-English language, aligned with the English fields. */
 export const Translation = Schema.Struct({
+  portrait: Schema.optionalKey(Schema.NullOr(PortraitText)),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
   dimensions: Schema.Array(
@@ -152,6 +180,7 @@ export const Translation = Schema.Struct({
 export type Translation = typeof Translation.Type
 
 const ProfileFields = Schema.Struct({
+  portrait: Schema.optionalKey(Schema.NullOr(Portrait)),
   schemaVersion: Schema.Literal(PROFILE_SCHEMA_VERSION),
   /** Offered languages, the default first. */
   languages: Schema.NonEmptyArray(Language),
@@ -174,9 +203,17 @@ const ProfileFields = Schema.Struct({
 
 /** Is `t` the same shape as the English text: same dimension keys, trait and fact counts? */
 export const matchesBase = (
-  base: Pick<typeof ProfileFields.Type, "dimensions" | "traits" | "funFacts" | "improvements">,
+  base: Pick<
+    typeof ProfileFields.Type,
+    "dimensions" | "traits" | "funFacts" | "improvements" | "portrait"
+  >,
   t: Translation,
 ): boolean =>
+  (!base.portrait ||
+    (t.portrait != null &&
+      t.portrait.chapters.length === base.portrait.chapters.length &&
+      t.portrait.axes.length === base.portrait.axes.length &&
+      base.portrait.axes.every((a, i) => t.portrait!.axes[i]?.key === a.key))) &&
   t.traits.length === base.traits.length &&
   t.improvements.length === base.improvements.length &&
   t.funFacts.length === base.funFacts.length &&
@@ -217,7 +254,7 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6, 7].includes(found as number)) {
+    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6, 7, 8].includes(found as number)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.

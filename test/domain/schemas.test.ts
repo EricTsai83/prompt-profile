@@ -85,7 +85,7 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(8)
+      expect(profile.schemaVersion).toBe(9)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
     }),
   )
@@ -98,7 +98,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(8)
+      expect(profile.schemaVersion).toBe(9)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -137,7 +137,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 9, undefined])(
+  it.effect.each([1, "3", 10, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {
@@ -253,6 +253,7 @@ describe("LLM schemas", () => {
     Effect.gen(function* () {
       const sample = yield* decodeProfile(loadSample())
       const draft: LlmProfileDraft = {
+        portrait: null,
         headline: "h",
         archetype: { name: "n", description: "d" },
         dimensions: [

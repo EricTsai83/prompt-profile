@@ -202,6 +202,136 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
       },
       "type": "array",
     },
+    "portrait": {
+      "additionalProperties": false,
+      "properties": {
+        "axes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "counterEvidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "promptId": {
+                      "type": "string",
+                    },
+                    "quote": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "promptId",
+                    "quote",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "promptId": {
+                      "type": "string",
+                    },
+                    "quote": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "promptId",
+                    "quote",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
+              },
+              "explanation": {
+                "type": "string",
+              },
+              "key": {
+                "enum": [
+                  "framing",
+                  "pacing",
+                  "control",
+                  "closure",
+                ],
+                "type": "string",
+              },
+              "pole": {
+                "enum": [
+                  "first",
+                  "second",
+                  "unclear",
+                ],
+                "type": "string",
+              },
+            },
+            "required": [
+              "key",
+              "pole",
+              "explanation",
+              "evidence",
+              "counterEvidence",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "chapters": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "body": {
+                "type": "string",
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "promptId": {
+                      "type": "string",
+                    },
+                    "quote": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "promptId",
+                    "quote",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
+              },
+              "title": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "title",
+              "body",
+              "evidence",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "introduction": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "introduction",
+        "chapters",
+        "axes",
+      ],
+      "type": [
+        "object",
+        "null",
+      ],
+    },
     "traits": {
       "items": {
         "additionalProperties": false,
@@ -252,6 +382,7 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     },
   },
   "required": [
+    "portrait",
     "headline",
     "archetype",
     "dimensions",
@@ -349,6 +480,67 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
       },
       "type": "array",
     },
+    "portrait": {
+      "additionalProperties": false,
+      "properties": {
+        "axes": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "explanation": {
+                "type": "string",
+              },
+              "key": {
+                "enum": [
+                  "framing",
+                  "pacing",
+                  "control",
+                  "closure",
+                ],
+                "type": "string",
+              },
+            },
+            "required": [
+              "key",
+              "explanation",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "chapters": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "body": {
+                "type": "string",
+              },
+              "title": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "title",
+              "body",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "introduction": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "introduction",
+        "chapters",
+        "axes",
+      ],
+      "type": [
+        "object",
+        "null",
+      ],
+    },
     "traits": {
       "items": {
         "additionalProperties": false,
@@ -370,6 +562,7 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
     },
   },
   "required": [
+    "portrait",
     "headline",
     "archetype",
     "dimensions",

@@ -58,3 +58,35 @@ Keep it short: the report is read at a glance, and charts show the numbers.
 - Write all text in English. Quotes stay in their original language.
 
 Respond with JSON matching the schema.
+
+## Portrait: the main reading experience
+
+Write for a reader who may never have met this developer. Use third person, gender-neutral
+language throughout ALL generated fields ("this developer", "they"), replacing the earlier
+second-person instruction. Introduce their work context before discussing their choices.
+
+Return `portrait` with:
+
+- `introduction`: a specific 2–3 sentence introduction to how this person collaborates with AI.
+- `chapters`: 3–5 connected passages, each with `title`, `body` (2–4 sentences) and exact
+  `evidence`. Choose one personal narrative thread, rather than repeating the five dimensions.
+  Start with a representative collaboration episode, then connect it to recurring habits,
+  explain distinctive techniques and judgment, and close with nuance or change if supported.
+  Explain context for an unfamiliar reader. Each passage must lead into the next. Do not
+  invent an episode when the observations contain no sequence; describe supported patterns.
+- `axes`: exactly one entry per key: `framing`, `pacing`, `control`, `closure`.
+  Each contains `pole` (`first`, `second`, or `unclear`), `explanation`, `evidence`, and
+  `counterEvidence` (exact quotes supporting the opposite preference, empty if unobserved).
+  First/second meanings: framing = define/explore; pacing = stepwise/whole task;
+  control = personally direct/delegate decisions; closure = predefined criteria/iterative refinement.
+  Prefer `unclear` for thin, conflicting or task-dependent evidence. A preference needs
+  at least two distinct sessions. `promptContext` supplies source sessions and timestamps;
+  only use it to locate and order existing evidence, never as additional behavioral evidence.
+
+Use only verified input observations. Every narrative claim must be supported by its chapter's
+quotes. Do not infer AI replies or successful outcomes from user requests. Separate frequency,
+technique breadth and understanding: none proves the others. No psychological diagnosis,
+MBTI labels, population ranks, numerical personality scores or claims of validated testing.
+If there is not enough evidence for any narrative, return `portrait: null`.
+The application assigns a stable role name after verification; do not mimic an existing test.
+The archetype description should summarize the person, without introducing new claims.

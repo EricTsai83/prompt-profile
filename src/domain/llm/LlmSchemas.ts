@@ -1,3 +1,4 @@
+import { AXIS_KEYS } from "../Interaction.ts"
 import { Schema } from "effect"
 import type { ChunkObservations } from "../ChunkObservations.ts"
 import {
@@ -37,7 +38,28 @@ export const LlmChunkObservations = Schema.Struct({
 })
 export type LlmChunkObservations = typeof LlmChunkObservations.Type
 
+const LlmPortrait = Schema.Struct({
+  introduction: Schema.String,
+  chapters: Schema.Array(
+    Schema.Struct({
+      title: Schema.String,
+      body: Schema.String,
+      evidence: Schema.Array(LlmEvidence),
+    }),
+  ),
+  axes: Schema.Array(
+    Schema.Struct({
+      key: Schema.Literals(AXIS_KEYS),
+      pole: Schema.Literals(["first", "second", "unclear"]),
+      explanation: Schema.String,
+      evidence: Schema.Array(LlmEvidence),
+      counterEvidence: Schema.Array(LlmEvidence),
+    }),
+  ),
+})
+
 export const LlmProfileDraft = Schema.Struct({
+  portrait: Schema.NullOr(LlmPortrait),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
   dimensions: Schema.Array(
@@ -109,6 +131,21 @@ export interface ProfileExtras {
  */
 export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtras): Profile => ({
   schemaVersion: PROFILE_SCHEMA_VERSION,
+  portrait:
+    draft.portrait === null
+      ? null
+      : {
+          ...draft.portrait,
+          chapters: draft.portrait.chapters.map((c) => ({
+            ...c,
+            evidence: c.evidence.map(toEvidence),
+          })),
+          axes: draft.portrait.axes.map((a) => ({
+            ...a,
+            evidence: a.evidence.map(toEvidence),
+            counterEvidence: a.counterEvidence.map(toEvidence),
+          })),
+        },
   // English only; the analysis adds translations afterwards.
   languages: ["en"],
   translations: {},
