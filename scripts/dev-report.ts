@@ -11,7 +11,19 @@ import { writeReport } from "../src/report/index.ts"
 
 const program = Effect.gen(function* () {
   const json = JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))
-  const profile = yield* decodeProfile(json)
+  const portrait = JSON.parse(readFileSync("test/fixtures/portrait.sample.json", "utf8"))
+  // Keep this preview entirely fictional and English; the older fixture also tests translations.
+  const profile = yield* decodeProfile({
+    ...json,
+    languages: ["en"],
+    translations: {},
+    portrait,
+    archetype: {
+      name: "Collaboration Portrait",
+      description: "A fictional example of evidence-led collaboration.",
+    },
+    headline: "Clear destinations, room to explore the route",
+  })
   console.log(yield* writeReport(profile, join("tmp", "report")))
 })
 
