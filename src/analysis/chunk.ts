@@ -6,6 +6,18 @@ export const MAX_CHUNK_CHARS = 40_000
 export const MIN_CHUNK_CHARS = 8_000
 export const DEFAULT_MAX_CHUNKS = 30
 
+/** Where a prompt sits in its session; turns count every prompt of the session. */
+export interface TurnPosition {
+  /** `${source}:${sessionId}` */
+  readonly session: string
+  /** 1-based */
+  readonly turn: number
+  /** Prompts in the session. */
+  readonly of: number
+  /** The session's prompts are spread over more than one chunk. */
+  readonly split: boolean
+}
+
 export interface Chunk {
   /** sha256 of the ids and texts of its prompts (stable across runs). */
   readonly id: string
@@ -15,6 +27,8 @@ export interface Chunk {
   readonly sessions: number
   readonly start: DateTime.Utc
   readonly end: DateTime.Utc
+  /** Position of each of `prompts` in its session (plan 20 B). */
+  readonly positions: ReadonlyMap<string, TurnPosition>
   /** Formatted text sent to the LLM. */
   readonly text: string
 }
@@ -54,13 +68,18 @@ const localFormatter = (timeZone: string) => {
 }
 
 /**
- * `<prompt id=… time=… project=…>` block. `<` and `>` in the text are escaped so the user's
- * text can never close the tag (prompt-injection guard).
+ * `<prompt id=… session=… turn=… time=… project=…>` block. `<` and `>` in the text are escaped
+ * so the user's text can never close the tag (prompt-injection guard). `turn="3/12"` is the
+ * prompt's place in its session, so prompts outside the chunk are apparent.
  */
-export const formatPrompt = (p: SafePrompt, local: ReturnType<typeof localFormatter>): string => {
+const formatPrompt = (
+  p: SafePrompt,
+  position: TurnPosition,
+  local: ReturnType<typeof localFormatter>,
+): string => {
   const t = local(p.timestamp)
   const project = p.project === null ? "" : ` project="${escapeAttr(p.project)}"`
-  return `<prompt id="${escapeAttr(p.id)}" session="${escapeAttr(`${p.source}:${p.sessionId}`)}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>`
+  return `<prompt id="${escapeAttr(p.id)}" session="${escapeAttr(position.session)}" turn="${position.turn}/${position.of}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>`
 }
 
 // ---------------------------------------------------------------------------------------
@@ -97,7 +116,7 @@ interface Piece {
   readonly size: number
 }
 
-const makeChunk = (piece: Piece): Chunk => {
+const makeChunk = (piece: Piece, positions: ReadonlyMap<string, TurnPosition>): Chunk => {
   const prompts = piece.blocks.map((b) => b.prompt)
   return {
     id: sha256(...piece.blocks.flatMap((b) => [b.prompt.id, b.prompt.text])),
@@ -106,6 +125,7 @@ const makeChunk = (piece: Piece): Chunk => {
     sessions: new Set(prompts.map((p) => `${p.source}:${p.sessionId}`)).size,
     start: prompts[0]!.timestamp,
     end: prompts.at(-1)!.timestamp,
+    positions: new Map(prompts.map((p) => [p.id, positions.get(p.id)!])),
     text: piece.blocks.map((b) => b.text).join("\n\n"),
   }
 }
@@ -141,6 +161,11 @@ export const buildChunks = (
     sessions.set(key, list)
   }
 
+  // turn numbers; `split` is filled in once the chunks are known
+  const turns = new Map<string, { session: string; turn: number; of: number }>()
+  for (const [session, list] of sessions)
+    for (const [i, p] of list.entries()) turns.set(p.id, { session, turn: i + 1, of: list.length })
+
   // week → sessions
   const weeks = new Map<string, { week: WeekKey; sessions: Array<Array<SafePrompt>> }>()
   for (const list of sessions.values()) {
@@ -165,7 +190,10 @@ export const buildChunks = (
       size = 0
     }
     for (const session of list) {
-      const sessionBlocks = session.map((prompt) => ({ prompt, text: formatPrompt(prompt, local) }))
+      const sessionBlocks = session.map((prompt) => ({
+        prompt,
+        text: formatPrompt(prompt, { ...turns.get(prompt.id)!, split: false }, local),
+      }))
       const sessionSize = sessionBlocks.reduce((s, b) => s + b.text.length + 2, 0)
       if (size + sessionSize > max) flush()
       if (sessionSize <= max) {
@@ -208,7 +236,15 @@ export const buildChunks = (
     }
   }
   if (acc) merged.push(acc)
-  return merged.map(makeChunk)
+
+  const pieces = new Map<string, number>()
+  for (const piece of merged)
+    for (const session of new Set(piece.blocks.map((b) => turns.get(b.prompt.id)!.session)))
+      pieces.set(session, (pieces.get(session) ?? 0) + 1)
+  const positions = new Map(
+    [...turns].map(([id, t]) => [id, { ...t, split: (pieces.get(t.session) ?? 0) > 1 }] as const),
+  )
+  return merged.map((piece) => makeChunk(piece, positions))
 }
 
 /**

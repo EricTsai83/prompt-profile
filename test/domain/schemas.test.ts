@@ -14,6 +14,7 @@ import { Stats } from "../../src/domain/Stats.ts"
 import {
   fromLlmChunkObservations,
   fromLlmProfileDraft,
+  LlmChunkAnalysis,
   LlmChunkObservations,
   LlmProfileDraft,
   truncateQuote,
@@ -85,7 +86,7 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(10)
+      expect(profile.schemaVersion).toBe(11)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
     }),
   )
@@ -94,8 +95,37 @@ describe("Profile", () => {
     Effect.gen(function* () {
       const { usage: _usage, ...v9 } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v9, schemaVersion: 9 })
-      expect(profile.schemaVersion).toBe(10)
+      expect(profile.schemaVersion).toBe(11)
       expect(profile.usage).toBeNull()
+    }),
+  )
+
+  it.effect("a version 10 file decodes without episodes, patterns or episode coverage", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as Record<string, any>
+      const { episodes: _e, patterns: _p, ...v10 } = sample
+      const { episodes: _c, ...coverage } = sample["coverage"]
+      const { episodes: _te, patterns: _tp, ...zh } = sample["translations"]["zh-TW"]
+      const profile = yield* decodeProfile({
+        ...v10,
+        schemaVersion: 10,
+        coverage,
+        translations: { "zh-TW": zh },
+      })
+      expect(profile.schemaVersion).toBe(11)
+      expect(profile.episodes).toEqual([])
+      expect(profile.patterns).toEqual([])
+      expect(profile.coverage.episodes).toBeNull()
+      expect(profile.translations["zh-TW"]!.episodes).toEqual([])
+    }),
+  )
+
+  it.effect("a translation must cover every episode and pattern", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as Record<string, any>
+      const zh = { ...sample["translations"]["zh-TW"], episodes: [] }
+      const error = yield* Effect.flip(decodeProfile({ ...sample, translations: { "zh-TW": zh } }))
+      expect(error._tag).toBe("InvalidProfile")
     }),
   )
 
@@ -130,7 +160,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(10)
+      expect(profile.schemaVersion).toBe(11)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -169,7 +199,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 11, undefined])(
+  it.effect.each([1, "3", 12, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {
@@ -231,6 +261,7 @@ describe("ChunkObservations", () => {
 describe("LLM schemas", () => {
   it.each([
     ["LlmChunkObservations", LlmChunkObservations],
+    ["LlmChunkAnalysis", LlmChunkAnalysis],
     ["LlmProfileDraft", LlmProfileDraft],
     ["LlmTranslation", LlmTranslation],
   ] as const)("%s produces a subset-compliant JSON Schema", (_name, schema) => {
@@ -292,6 +323,7 @@ describe("LLM schemas", () => {
           { key: "growth", title: "G", summary: "s", evidence: [] },
           { key: "growth", title: "dup", summary: "s", evidence: [] },
         ],
+        patterns: [],
         improvements: [],
         traits: [],
         funFacts: [],

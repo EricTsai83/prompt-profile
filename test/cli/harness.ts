@@ -29,7 +29,7 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
               )
     return tr(JSON.parse(/\nprofile:\n(.*)$/s.exec(prompt)![1]!))
   }
-  if (schemaName === "LlmChunkObservations") {
+  if (schemaName === "LlmChunkAnalysis") {
     const m = /<prompt id="([^"]+)"[^>]*>\n(.{1,20})/.exec(prompt)!
     return {
       observations: [
@@ -39,6 +39,7 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
           evidence: [{ promptId: m[1], quote: m[2] }],
         },
       ],
+      episodes: [],
     }
   }
   const obs = JSON.parse(/observations:\n(.*)\n\nstats:/s.exec(prompt)![1]!) as Array<{
@@ -61,6 +62,7 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       { name: "Direct", description: "d", confidence: "high", evidence: evidence.slice(0, 2) },
     ],
     funFacts: ["fact"],
+    patterns: [],
     improvements: [
       {
         title: "Name the file",

@@ -44,6 +44,33 @@ describe("final output check", () => {
     }),
   )
 
+  it.effect("episodes: generated text and quotes are checked, session ids are codes", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const [first, ...rest] = p.episodes
+      const session = "codex:0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b"
+      const withEpisode: Profile = {
+        ...p,
+        episodes: [
+          {
+            ...first!,
+            session,
+            task: `Emailing ${EMAIL}`,
+            turns: [{ ...first!.turns[0]!, quote: `token ${TOKEN}` }, ...first!.turns.slice(1)],
+          },
+          ...rest,
+        ],
+      }
+      const r = check(withEpisode, "mask")
+      expect(r.findings.map((f) => [f.location, f.rule])).toEqual([
+        ["Episodes › 1", "email"],
+        ["Episodes › 1", "api-token"],
+      ])
+      expect(r.profile.episodes[0]!.session).toBe(session)
+      expect(r.profile.episodes[0]!.task).not.toContain(EMAIL)
+    }),
+  )
+
   it.effect("usage model ids are codes: a fine-tuned id is neither masked nor reported", () =>
     Effect.gen(function* () {
       const p = yield* sample()

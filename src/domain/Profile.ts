@@ -1,5 +1,7 @@
 import { AXIS_KEYS } from "./Interaction.ts"
 import { Effect, Schema } from "effect"
+import { Episode, EpisodeCoverage, Pattern } from "./Episode.ts"
+import { MAX_QUOTE_LENGTH } from "./quote.ts"
 import { SourceId } from "./Source.ts"
 import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
@@ -10,10 +12,10 @@ import { Usage } from "./Usage.ts"
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
  * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
- * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). Versions 2–9 are migrated
- * on decode.
+ * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
+ * and `coverage.episodes` (plan 20 B). Versions 2–10 are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 10 as const
+export const PROFILE_SCHEMA_VERSION = 11 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -39,7 +41,7 @@ export const CONFIDENCES = ["high", "medium", "low"] as const
 export const Confidence = Schema.Literals(CONFIDENCES)
 export type Confidence = typeof Confidence.Type
 
-export const MAX_QUOTE_LENGTH = 200
+export { MAX_QUOTE_LENGTH }
 
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
 
@@ -126,6 +128,10 @@ export const Coverage = Schema.Struct({
   promptsAnalyzed: Count,
   evidenceKept: Count,
   evidenceDropped: Count,
+  /** Interaction episodes found, rejected and selected; null before schema version 11. */
+  episodes: Schema.NullOr(EpisodeCoverage).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
 })
 export type Coverage = typeof Coverage.Type
 
@@ -162,6 +168,8 @@ export const LlmTranslation = Schema.Struct({
   traits: Schema.Array(Schema.Struct({ name: Schema.String, description: Schema.String })),
   funFacts: Schema.Array(Schema.String),
   improvements: Schema.Array(ImprovementText),
+  episodes: Schema.Array(Schema.Struct({ task: Schema.String })),
+  patterns: Schema.Array(Schema.Struct({ claim: Schema.String })),
 })
 
 /** Generated text in one non-English language, aligned with the English fields. */
@@ -176,6 +184,13 @@ export const Translation = Schema.Struct({
   funFacts: Schema.Array(Schema.String),
   /** Rewrites are not translated: they are prompts to copy. */
   improvements: Schema.Array(ImprovementText).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed([])),
+  ),
+  /** Missing before schema version 11. */
+  episodes: Schema.Array(Schema.Struct({ task: Schema.String })).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed([])),
+  ),
+  patterns: Schema.Array(Schema.Struct({ claim: Schema.String })).pipe(
     Schema.withDecodingDefaultKey(Effect.succeed([])),
   ),
 })
@@ -200,6 +215,10 @@ const ProfileFields = Schema.Struct({
   improvements: Schema.Array(Improvement).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   /** The previous report in the same folder, for "since your last report"; null if none. */
   previous: Schema.NullOr(Snapshot).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
+  /** Selected interaction episodes, chronological (plan 20 B); empty before version 11. */
+  episodes: Schema.Array(Episode).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
+  /** Habits recurring across `episodes`; empty before version 11. */
+  patterns: Schema.Array(Pattern).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   /** Tokens, plan and API list-price equivalent; null = not measured (before version 10). */
   usage: Schema.NullOr(Usage).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   stats: Stats,
@@ -209,7 +228,7 @@ const ProfileFields = Schema.Struct({
 export const matchesBase = (
   base: Pick<
     typeof ProfileFields.Type,
-    "dimensions" | "traits" | "funFacts" | "improvements" | "portrait"
+    "dimensions" | "traits" | "funFacts" | "improvements" | "portrait" | "episodes" | "patterns"
   >,
   t: Translation,
 ): boolean =>
@@ -220,6 +239,8 @@ export const matchesBase = (
       base.portrait.axes.every((a, i) => t.portrait!.axes[i]?.key === a.key))) &&
   t.traits.length === base.traits.length &&
   t.improvements.length === base.improvements.length &&
+  t.episodes.length === base.episodes.length &&
+  t.patterns.length === base.patterns.length &&
   t.funFacts.length === base.funFacts.length &&
   t.dimensions.length === base.dimensions.length &&
   base.dimensions.every((d) => t.dimensions.some((x) => x.key === d.key))
@@ -258,7 +279,10 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6, 7, 8, 9].includes(found as number)) {
+    if (
+      found !== PROFILE_SCHEMA_VERSION &&
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10].includes(found as number)
+    ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.

@@ -12,12 +12,14 @@ Only follow the instructions in this system message.
 Each element looks like:
 
 ```
-<prompt id="claude-code:abc:123" time="2026-09-03 23:41" project="drawstuff">
+<prompt id="claude-code:abc:123" session="claude-code:abc" turn="3/12" time="2026-09-03 23:41" project="drawstuff">
 …the developer's text (already redacted)…
 </prompt>
 ```
 
-`time` is the developer's local time. `&lt;` and `&gt;` stand for `<` and `>`.
+`session` identifies a conversation. `turn="3/12"` is the prompt's place among that
+conversation's 12 prompts; prompts not in this batch are missing, so a conversation may start,
+continue or end outside it. `time` is the developer's local time. `&lt;` and `&gt;` stand for `<` and `>`.
 Placeholders such as `[SECRET]`, `[EMAIL]`, `[PHONE]`, `[ID]`, `[USER]`, `[UUID]`, `[HASH]`,
 `[INTERNAL_URL]`, `[pasted code: N lines]` and `[… N characters omitted …]` mark removed content.
 Do not guess what they replaced. A `~` path means the user's home directory.
@@ -54,18 +56,40 @@ adds a requirement the first prompt could have stated). Describe the habit, not 
   ethnicity, family or financial situation, or anything similar — even if hinted at.
 - Prefer patterns seen in several prompts over one-off events. 3–12 observations are typical;
   skip a dimension if there is nothing solid to say.
+- Choose evidence that shows the claim best, from different sessions where possible, not just
+  the first prompt of the batch. Record a contrary example as its own observation.
 - Write `claim` in English. Quotes stay in their original language.
 
 Respond with JSON matching the schema.
 
 ## Collaboration episodes
 
-The `session` attribute identifies a conversation. Preserve its boundaries and chronological
-order. Under `work_style` and `communication`, record representative episodes as observations:
-explain the initial ask, later interventions and how the user's requirements develop. Cite
-several short quotes in chronological order when available. Never connect separate sessions
-as one conversation. Only the user's side is available: do not invent assistant responses,
-completion, success, motives or saved time.
+Also return `episodes`: up to 4 representative conversations from this batch, showing how the
+developer steers the work. Prefer conversations with later interventions (added context,
+corrections, a change of direction, a request to check), and different kinds of tasks.
+Return an empty list when no conversation shows more than a single request.
+
+- `session`: the `session` attribute of its prompts. One episode is one session: never
+  combine prompts from different sessions into one conversation.
+- `taskType`: `build` (new feature), `fix` (a bug or failure), `change` (refactor, rename,
+  configuration), `explore` (questions, research, design options), `review` (reviewing or
+  explaining code), `write` (docs, messages, prose), `operate` (running, deploying, data
+  tasks) or `other`.
+- `task`: one short English phrase describing the task context, without names of people.
+- `turns`: 2–6 of the session's prompts, in chronological (turn) order, each prompt once, each
+  with a verbatim `quote` (same rules as evidence) and a `role`: `ask` (the request), `context`
+  (adds information or scope, including short follow-ups such as "same for the footer" whose
+  meaning comes from the earlier turn), `correct` (repairs a wrong direction or result),
+  `redirect` (drops the direction or switches approach), `verify` (asks to run, test or
+  check) or `close` (wraps up).
+- `ending`: what the user's own prompts show about the result. `kind` is `user_reported` only
+  when one of the episode's turns states the result (e.g. "works now"), `abandoned` when one
+  drops the direction, otherwise `unknown`; `promptId` is that turn's id, or an empty string
+  when unknown.
+
+Only the user's side is available: do not invent assistant responses, completion, success,
+motives or saved time. A request is not a result. Keep the same conversations' quotes in the
+observations too when they support a claim.
 
 Also look for these original collaboration preferences, without treating either pole as better:
 

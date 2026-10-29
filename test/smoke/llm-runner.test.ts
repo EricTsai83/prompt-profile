@@ -3,19 +3,19 @@ import { describe, expect, it } from "@effect/vitest"
 import { Effect, Schema } from "effect"
 import { randomUUID } from "node:crypto"
 import { join } from "node:path"
-import { LlmChunkObservations, LlmProfileDraft } from "../../src/domain/llm/LlmSchemas.ts"
+import { LlmChunkAnalysis, LlmProfileDraft } from "../../src/domain/llm/LlmSchemas.ts"
 import { makeRunner } from "../../src/llm/detect.ts"
 import { makeLlmSchema, type RunnerId } from "../../src/llm/LlmRunner.ts"
 import { claudeHome, codexHome, filesContaining, hasBinary } from "./helpers.ts"
 
 const OK = makeLlmSchema("Ok", Schema.Struct({ ok: Schema.Boolean }))
-const OBS = makeLlmSchema("LlmChunkObservations", LlmChunkObservations)
+const OBS = makeLlmSchema("LlmChunkAnalysis", LlmChunkAnalysis)
 const DRAFT = makeLlmSchema("LlmProfileDraft", LlmProfileDraft)
 
-const DATA = `<prompt id="p1" time="2026-09-03 23:41" project="demo">
+const DATA = `<prompt id="p1" session="s1" turn="1/2" time="2026-09-03 23:41" project="demo">
 先不要寫 code，幫我把計畫拆成小步驟
 </prompt>
-<prompt id="p2" time="2026-09-04 01:10" project="demo">
+<prompt id="p2" session="s1" turn="2/2" time="2026-09-04 01:10" project="demo">
 no, that's wrong. use a Map instead of an object
 </prompt>`
 
@@ -45,12 +45,12 @@ for (const [id, bin] of [
       }).pipe(Effect.provide(NodeServices.layer)),
     )
 
-    it.effect("accepts LlmChunkObservations", () =>
+    it.effect("accepts LlmChunkAnalysis", () =>
       Effect.gen(function* () {
         const runner = yield* makeRunner(id, {})
         const result = yield* runner.generate({
           system:
-            "Analyse the developer's prompts inside <prompt> tags. Give 2 observations, each quoting a prompt id and a verbatim excerpt.",
+            "Analyse the developer's prompts inside <prompt> tags. Give 2 observations, each quoting a prompt id and a verbatim excerpt, and one episode of session s1 with both turns.",
           prompt: DATA,
           schema: OBS,
         })

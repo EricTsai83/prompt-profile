@@ -1,6 +1,7 @@
 import { AXIS_KEYS } from "../Interaction.ts"
 import { Schema } from "effect"
 import type { ChunkObservations } from "../ChunkObservations.ts"
+import { ENDINGS, TASK_TYPES, TURN_ROLES } from "../Episode.ts"
 import {
   CONFIDENCES,
   DIMENSION_KEYS,
@@ -37,6 +38,28 @@ export const LlmChunkObservations = Schema.Struct({
   ),
 })
 export type LlmChunkObservations = typeof LlmChunkObservations.Type
+
+/** What the map step returns: observations plus interaction episodes (plan 20 B). */
+export const LlmChunkAnalysis = Schema.Struct({
+  observations: LlmChunkObservations.fields.observations,
+  episodes: Schema.Array(
+    Schema.Struct({
+      session: Schema.String,
+      taskType: Schema.Literals(TASK_TYPES),
+      task: Schema.String,
+      turns: Schema.Array(
+        Schema.Struct({
+          promptId: Schema.String,
+          quote: Schema.String,
+          role: Schema.Literals(TURN_ROLES),
+        }),
+      ),
+      /** `promptId` of the turn that shows the ending; an empty string when unknown. */
+      ending: Schema.Struct({ kind: Schema.Literals(ENDINGS), promptId: Schema.String }),
+    }),
+  ),
+})
+export type LlmChunkAnalysis = typeof LlmChunkAnalysis.Type
 
 const LlmPortrait = Schema.Struct({
   introduction: Schema.String,
@@ -79,6 +102,14 @@ export const LlmProfileDraft = Schema.Struct({
     }),
   ),
   funFacts: Schema.Array(Schema.String),
+  /** Habits recurring across the given episodes, cited by episode id. */
+  patterns: Schema.Array(
+    Schema.Struct({
+      claim: Schema.String,
+      episodeIds: Schema.Array(Schema.String),
+      counterEpisodeIds: Schema.Array(Schema.String),
+    }),
+  ),
   improvements: Schema.Array(
     Schema.Struct({
       title: Schema.String,
@@ -107,7 +138,7 @@ const toEvidence = (e: { readonly promptId: string; readonly quote: string }): E
 })
 
 export const fromLlmChunkObservations = (
-  llm: LlmChunkObservations,
+  llm: LlmChunkObservations | LlmChunkAnalysis,
   chunkId: string,
 ): ChunkObservations => ({
   chunkId,
@@ -116,6 +147,18 @@ export const fromLlmChunkObservations = (
     claim: o.claim,
     evidence: o.evidence.map(toEvidence),
   })),
+  episodes:
+    "episodes" in llm
+      ? llm.episodes.map((e) => ({
+          ...e,
+          turns: e.turns.map((t) => ({ ...t, quote: truncateQuote(t.quote) })),
+          ending: {
+            kind: e.ending.kind,
+            promptId:
+              e.ending.kind === "unknown" || e.ending.promptId === "" ? null : e.ending.promptId,
+          },
+        }))
+      : [],
 })
 
 export interface ProfileExtras {
@@ -176,6 +219,9 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     evidence: i.evidence.map(toEvidence),
     rewrite: i.rewrite.promptId === "" || i.rewrite.after.trim() === "" ? null : i.rewrite,
   })),
+  // the analysis fills both after verifying them against the map step's episodes
+  episodes: [],
+  patterns: [],
   previous: null,
   // the CLI fills it from local logs; the analysis never sees usage
   usage: null,

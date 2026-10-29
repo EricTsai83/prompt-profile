@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "languages": [
     "en",
     "zh-TW"
@@ -19,7 +19,20 @@
     "sessionsAnalyzed": 280,
     "promptsAnalyzed": 1290,
     "evidenceKept": 41,
-    "evidenceDropped": 3
+    "evidenceDropped": 3,
+    "episodes": {
+      "found": 14,
+      "kept": 11,
+      "selected": 3,
+      "rejected": {
+        "unknownTurn": 1,
+        "quoteMismatch": 1,
+        "mixedSessions": 1,
+        "reordered": 0
+      },
+      "endingsWithdrawn": 2,
+      "patternsDropped": 1
+    }
   },
   "headline": "A perfectionist who argues with AI about naming at midnight",
   "archetype": {
@@ -265,6 +278,22 @@
           "pattern": "除錯的 prompt 很少說是哪個檔案、哪個錯誤。",
           "impact": "AI 必須先問或先猜，才能幫上忙。",
           "suggestion": "同一個 prompt 裡貼上錯誤那一行，並寫出檔案和函式名稱。"
+        }
+      ],
+      "episodes": [
+        {
+          "task": "規劃畫布匯出功能"
+        },
+        {
+          "task": "排查一段意外執行的 script"
+        },
+        {
+          "task": "比較兩個狀態管理套件"
+        }
+      ],
+      "patterns": [
+        {
+          "claim": "提出第一個需求後，再補上範圍與修正，而不是重寫整個任務"
         }
       ]
     }
@@ -3730,5 +3759,125 @@
         ]
       }
     }
-  }
+  },
+  "episodes": [
+    {
+      "id": "E1",
+      "session": "claude-code:s1",
+      "sessionTurns": 9,
+      "split": false,
+      "taskType": "build",
+      "task": "Planning a canvas export feature",
+      "turns": [
+        {
+          "promptId": "claude-code:s1:u1",
+          "quote": "don't write code yet, break the plan into small steps",
+          "role": "ask",
+          "turn": 1,
+          "time": "2026-09-05T13:02:00.000Z"
+        },
+        {
+          "promptId": "claude-code:s1:u2",
+          "quote": "same for the SVG export",
+          "role": "context",
+          "turn": 2,
+          "time": "2026-09-05T13:10:00.000Z"
+        },
+        {
+          "promptId": "claude-code:s1:u5",
+          "quote": "no, keep the old API",
+          "role": "correct",
+          "turn": 5,
+          "time": "2026-09-05T13:41:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "unknown",
+        "promptId": null
+      }
+    },
+    {
+      "id": "E2",
+      "session": "codex:s2",
+      "sessionTurns": 6,
+      "split": true,
+      "taskType": "fix",
+      "task": "Debugging an unexpected script execution",
+      "turns": [
+        {
+          "promptId": "codex:s2:3",
+          "quote": "<script>alert('x')</script> 這段為什麼會被執行？",
+          "role": "ask",
+          "turn": 3,
+          "time": "2026-09-18T14:20:00.000Z"
+        },
+        {
+          "promptId": "codex:s2:4",
+          "quote": "改完跑一次測試確認",
+          "role": "verify",
+          "turn": 4,
+          "time": "2026-09-18T14:33:00.000Z"
+        },
+        {
+          "promptId": "codex:s2:6",
+          "quote": "好了，這樣可以了",
+          "role": "close",
+          "turn": 6,
+          "time": "2026-09-18T15:02:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "user_reported",
+        "promptId": "codex:s2:6"
+      }
+    },
+    {
+      "id": "E3",
+      "session": "claude-code:s4",
+      "sessionTurns": 7,
+      "split": false,
+      "taskType": "explore",
+      "task": "Comparing two state libraries",
+      "turns": [
+        {
+          "promptId": "claude-code:s4:u4",
+          "quote": "compare zustand and jotai for this canvas",
+          "role": "ask",
+          "turn": 2,
+          "time": "2026-10-08T12:15:00.000Z"
+        },
+        {
+          "promptId": "claude-code:s4:u6",
+          "quote": "forget jotai, let's stay with zustand",
+          "role": "redirect",
+          "turn": 4,
+          "time": "2026-10-08T12:40:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "abandoned",
+        "promptId": "claude-code:s4:u6"
+      }
+    }
+  ],
+  "patterns": [
+    {
+      "claim": "Adds scope and corrections after the first request instead of restating the whole task",
+      "episodeIds": [
+        "E1",
+        "E3"
+      ],
+      "counterEpisodeIds": [
+        "E2"
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 2
+      },
+      "taskTypes": [
+        "build",
+        "explore"
+      ]
+    }
+  ]
 }

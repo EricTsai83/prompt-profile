@@ -37,6 +37,8 @@ export const translationInput = (p: Profile): TranslationType => ({
     impact,
     suggestion,
   })),
+  episodes: p.episodes.map(({ task }) => ({ task })),
+  patterns: p.patterns.map(({ claim }) => ({ claim })),
 })
 
 /** Same shape as the English text, with dimensions in the English order; else null. */

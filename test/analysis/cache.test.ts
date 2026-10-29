@@ -19,7 +19,11 @@ const parts: CacheKeyParts = {
   runner: "claude-code",
   model: null,
 }
-const entry = { ...parts, producedBy: "m", value: { chunkId: "chunk-1", observations: [] } }
+const entry = {
+  ...parts,
+  producedBy: "m",
+  value: { chunkId: "chunk-1", observations: [], episodes: [] },
+}
 
 describe("file cache", () => {
   const dir = join(mkdtempSync(join(tmpdir(), "pp-cache-")), "prompt-profile")

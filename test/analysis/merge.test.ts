@@ -55,3 +55,18 @@ describe("capEvidence", () => {
     expect(capEvidence([o], 4)).toEqual([o])
   })
 })
+
+describe("capEvidence across sessions", () => {
+  it("keeps quotes from other conversations before more quotes from one long session", () => {
+    const o: Observation = {
+      dimension: "communication",
+      claim: "corrects the approach",
+      evidence: ["s1:1", "s1:2", "s1:3", "s1:4", "s2:1", "s3:7"].map((promptId) => ({
+        promptId,
+        quote: promptId,
+      })),
+    }
+    const [capped] = capEvidence([o], 4, (id) => id.split(":")[0]!)
+    expect(capped!.evidence.map((e) => e.promptId)).toEqual(["s1:1", "s1:2", "s2:1", "s3:7"])
+  })
+})

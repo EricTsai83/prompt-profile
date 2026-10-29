@@ -45,24 +45,30 @@ export const groupForMerge = (
 
 /**
  * Keep at most `max` evidence items per observation, in their original order: one per
- * prompt first (different prompts are stronger evidence), then repeats if room is left.
+ * session first, then one per prompt (different conversations, then different prompts, are
+ * stronger evidence), then repeats if room is left. A recurring pattern is not reduced to the
+ * opening quotes of one long conversation.
  */
 export const capEvidence = (
   observations: ReadonlyArray<Observation>,
   max: number = MAX_EVIDENCE_PER_OBSERVATION,
+  sessionOf: (promptId: string) => string = (id) => id,
 ): ReadonlyArray<Observation> =>
   observations.map((o) => {
     if (o.evidence.length <= max) return o
-    const seen = new Set<string>()
-    const firstPerPrompt = o.evidence.map((e) => {
-      const first = !seen.has(e.promptId)
-      seen.add(e.promptId)
-      return first
-    })
+    const firstOf = (key: (e: Observation["evidence"][number]) => string) => {
+      const seen = new Set<string>()
+      return o.evidence.map((e) => {
+        const first = !seen.has(key(e))
+        seen.add(key(e))
+        return first
+      })
+    }
+    const passes = [firstOf((e) => sessionOf(e.promptId)), firstOf((e) => e.promptId), null]
     const keep = new Set<number>()
-    for (const pass of [true, false]) {
-      for (const [i, isFirst] of firstPerPrompt.entries()) {
-        if (keep.size < max && (isFirst || !pass)) keep.add(i)
+    for (const pass of passes) {
+      for (const i of o.evidence.keys()) {
+        if (keep.size < max && (pass === null || pass[i])) keep.add(i)
       }
     }
     return { ...o, evidence: o.evidence.filter((_, i) => keep.has(i)) }

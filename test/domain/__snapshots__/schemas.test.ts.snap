@@ -1,5 +1,152 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`LLM schemas > LlmChunkAnalysis produces a subset-compliant JSON Schema 1`] = `
+{
+  "additionalProperties": false,
+  "properties": {
+    "episodes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "ending": {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "unknown",
+                  "user_reported",
+                  "abandoned",
+                ],
+                "type": "string",
+              },
+              "promptId": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "kind",
+              "promptId",
+            ],
+            "type": "object",
+          },
+          "session": {
+            "type": "string",
+          },
+          "task": {
+            "type": "string",
+          },
+          "taskType": {
+            "enum": [
+              "build",
+              "fix",
+              "change",
+              "explore",
+              "review",
+              "write",
+              "operate",
+              "other",
+            ],
+            "type": "string",
+          },
+          "turns": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+                "role": {
+                  "enum": [
+                    "ask",
+                    "context",
+                    "correct",
+                    "redirect",
+                    "verify",
+                    "close",
+                  ],
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+                "role",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+        },
+        "required": [
+          "session",
+          "taskType",
+          "task",
+          "turns",
+          "ending",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+    "observations": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim": {
+            "type": "string",
+          },
+          "dimension": {
+            "enum": [
+              "work_style",
+              "communication",
+              "tech_profile",
+              "interests",
+              "growth",
+              "prompting",
+            ],
+            "type": "string",
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+        },
+        "required": [
+          "dimension",
+          "claim",
+          "evidence",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+  },
+  "required": [
+    "observations",
+    "episodes",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`LLM schemas > LlmChunkObservations produces a subset-compliant JSON Schema 1`] = `
 {
   "additionalProperties": false,
@@ -202,6 +349,35 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
       },
       "type": "array",
     },
+    "patterns": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim": {
+            "type": "string",
+          },
+          "counterEpisodeIds": {
+            "items": {
+              "type": "string",
+            },
+            "type": "array",
+          },
+          "episodeIds": {
+            "items": {
+              "type": "string",
+            },
+            "type": "array",
+          },
+        },
+        "required": [
+          "claim",
+          "episodeIds",
+          "counterEpisodeIds",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "portrait": {
       "additionalProperties": false,
       "properties": {
@@ -388,6 +564,7 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     "dimensions",
     "traits",
     "funFacts",
+    "patterns",
     "improvements",
   ],
   "type": "object",
@@ -444,6 +621,21 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
       },
       "type": "array",
     },
+    "episodes": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "task": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "task",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "funFacts": {
       "items": {
         "type": "string",
@@ -475,6 +667,21 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
           "pattern",
           "impact",
           "suggestion",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
+    "patterns": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "claim": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "claim",
         ],
         "type": "object",
       },
@@ -569,6 +776,8 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
     "traits",
     "funFacts",
     "improvements",
+    "episodes",
+    "patterns",
   ],
   "type": "object",
 }

@@ -76,6 +76,7 @@ describe("verify", () => {
     const result = verifyObservations(
       {
         chunkId: "c",
+        episodes: [],
         observations: [
           {
             dimension: "work_style",

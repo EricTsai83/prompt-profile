@@ -9,12 +9,22 @@ import type { Stats } from "../domain/Stats.ts"
 import {
   fromLlmChunkObservations,
   fromLlmProfileDraft,
+  LlmChunkAnalysis,
   LlmChunkObservations,
   LlmProfileDraft,
 } from "../domain/llm/LlmSchemas.ts"
 import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
 import { AnalysisCache } from "./cache.ts"
 import type { Chunk } from "./chunk.ts"
+import {
+  emptyEpisodeCounts,
+  episodeCoverage,
+  episodesForReduce,
+  selectEpisodes,
+  toProfileEpisode,
+  verifyEpisodes,
+  verifyPatterns,
+} from "./episodes.ts"
 import { AnalysisFailed, type AnalyzeError } from "./errors.ts"
 import { sha256 } from "./hash.ts"
 import { Progress } from "./progress.ts"
@@ -83,6 +93,7 @@ export {
   type AnalyzeOptions,
 } from "./plan.ts"
 
+const ANALYSIS_SCHEMA = makeLlmSchema("LlmChunkAnalysis", LlmChunkAnalysis)
 const OBSERVATIONS_SCHEMA = makeLlmSchema("LlmChunkObservations", LlmChunkObservations)
 const DRAFT_SCHEMA = makeLlmSchema("LlmProfileDraft", LlmProfileDraft)
 
@@ -151,7 +162,7 @@ export const analyze = (input: {
         }
         yield* progress.onChunkStart(index, total)
         const result = yield* runner
-          .generate({ system: mapSystem, prompt: chunk.text, schema: OBSERVATIONS_SCHEMA })
+          .generate({ system: mapSystem, prompt: chunk.text, schema: ANALYSIS_SCHEMA })
           .pipe(Effect.result)
         if (result._tag === "Failure") {
           const error = result.failure
@@ -209,9 +220,24 @@ export const analyze = (input: {
           ],
     )
     const originalObservations = verified.flatMap((v) => v.observations)
+    const sessionOf = new Map(
+      outcomes.flatMap((o) => o.chunk.prompts.map((p) => [p.id, `${p.source}:${p.sessionId}`])),
+    )
+    const cap = (obs: ReadonlyArray<Observation>) =>
+      capEvidence(obs, undefined, (id) => sessionOf.get(id) ?? id)
     let observations: ReadonlyArray<Observation> = retainOmittedEvidence(
       originalObservations,
-      capEvidence(originalObservations),
+      cap(originalObservations),
+    )
+
+    // ---- episodes: verified per chunk, then a deterministic selection -------------------
+    const episodeCounts = emptyEpisodeCounts()
+    const episodes = selectEpisodes(
+      outcomes.flatMap((o) =>
+        o.observations === null
+          ? []
+          : [verifyEpisodes(o.observations.episodes, o.chunk, episodeCounts)],
+      ),
     )
 
     // ---- intermediate merges when the reduce input is too large -----------------------
@@ -246,7 +272,7 @@ export const analyze = (input: {
                 }),
               )
         const merged = verifyObservations(value, texts).observations
-        return retainOmittedEvidence(group, retainOmittedEvidence(merged, capEvidence(merged)))
+        return retainOmittedEvidence(group, retainOmittedEvidence(merged, cap(merged)))
       })
     for (let round = 0; round < 3; round++) {
       const before = observationsText(observations).length
@@ -271,7 +297,10 @@ export const analyze = (input: {
 
     // ---- reduce ---------------------------------------------------------------------
     yield* progress.onReduceStart
-    const citedIds = new Set(observations.flatMap((o) => o.evidence.map((e) => e.promptId)))
+    const citedIds = new Set([
+      ...observations.flatMap((o) => o.evidence.map((e) => e.promptId)),
+      ...episodes.flatMap((e) => e.turns.map((t) => t.promptId)),
+    ])
     const promptContext = outcomes
       .filter((o) => o.observations !== null)
       .flatMap((o) =>
@@ -283,7 +312,7 @@ export const analyze = (input: {
             time: p.timestamp.toString(),
           })),
       )
-    const reducePrompt = `promptContext:\n${JSON.stringify(promptContext)}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
+    const reducePrompt = `promptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(episodes))}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
     const draft = yield* runner
       .generate({
         system: loadPrompt("reduce"),
@@ -318,6 +347,7 @@ export const analyze = (input: {
         promptsAnalyzed: analyzedPrompts.length,
         evidenceKept: 0,
         evidenceDropped: 0,
+        episodes: null,
       },
     })
     const origins = new Map(
@@ -347,6 +377,7 @@ export const analyze = (input: {
     )
     const dimensions = verifyDimensions(profile.dimensions, finalTexts, counts)
     const improvements = verifyImprovements(profile.improvements, finalTexts, counts)
+    const patterns = verifyPatterns(draft.value.patterns, episodes, episodeCounts)
     yield* progress.onVerified(counts.kept, counts.dropped)
     const summariesUnsafe =
       counts.dropped > 0 ||
@@ -369,7 +400,14 @@ export const analyze = (input: {
       traits,
       dimensions,
       improvements,
-      coverage: { ...profile.coverage, evidenceKept: counts.kept, evidenceDropped: counts.dropped },
+      episodes: episodes.map(toProfileEpisode),
+      patterns,
+      coverage: {
+        ...profile.coverage,
+        evidenceKept: counts.kept,
+        evidenceDropped: counts.dropped,
+        episodes: episodeCoverage(episodeCounts, episodes.length),
+      },
     }
     // ---- translate (verified text only) ---------------------------------------------
     return yield* addTranslations(verifiedProfile, options.languages ?? ["en"])

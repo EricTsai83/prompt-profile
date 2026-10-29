@@ -110,7 +110,7 @@ export const verifyObservations = (
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts = { kept: 0, dropped: 0 },
 ): ChunkObservations => ({
-  chunkId: obs.chunkId,
+  ...obs,
   observations: obs.observations
     .map((o) => ({ ...o, evidence: verifyCompleteEvidence(o.evidence, texts, counts) }))
     .filter((o) => o.evidence.length > 0),

@@ -11,6 +11,19 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "chunksFailed": 0,
     "chunksFromCache": 0,
     "chunksTotal": 12,
+    "episodes": {
+      "endingsWithdrawn": 0,
+      "found": 0,
+      "kept": 0,
+      "patternsDropped": 0,
+      "rejected": {
+        "mixedSessions": 0,
+        "quoteMismatch": 0,
+        "reordered": 0,
+        "unknownTurn": 0,
+      },
+      "selected": 0,
+    },
     "evidenceDropped": 2,
     "evidenceKept": 7,
     "promptsAnalyzed": 80,
@@ -59,10 +72,11 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "12",
+    "analysisVersion": "13",
     "model": "fake-model",
     "runner": "claude-code",
   },
+  "episodes": [],
   "funFacts": [
     "longest streak: 3 days",
   ],
@@ -89,9 +103,10 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "languages": [
     "en",
   ],
+  "patterns": [],
   "portrait": null,
   "previous": null,
-  "schemaVersion": 10,
+  "schemaVersion": 11,
   "stats": {
     "activeDays": 0,
     "activity": {

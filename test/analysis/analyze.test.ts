@@ -20,11 +20,9 @@ const options: AnalyzeOptions = {
 
 /** A fake LLM that quotes the first prompt of each chunk, and builds the profile from observations. */
 const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
-  if (schemaName === "LlmChunkObservations") {
-    if (prompt.startsWith("[")) {
-      // merge step: pass observations through
-      return { observations: JSON.parse(prompt) }
-    }
+  // merge step: pass observations through
+  if (schemaName === "LlmChunkObservations") return { observations: JSON.parse(prompt) }
+  if (schemaName === "LlmChunkAnalysis") {
     const m = /<prompt id="([^"]+)"[^>]*>\n(.{0,30})/.exec(prompt)!
     return {
       observations: [
@@ -39,6 +37,7 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
           evidence: [{ promptId: m[1], quote: "this was never said" }],
         },
       ],
+      episodes: [],
     }
   }
   const obs = JSON.parse(/observations:\n(.*)\n\nstats:/s.exec(prompt)![1]!) as Array<{
@@ -73,6 +72,7 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       },
     ],
     funFacts: ["longest streak: 3 days"],
+    patterns: [],
     improvements: [
       {
         title: "Say the goal first",
@@ -224,7 +224,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "12",
+        analysisVersion: "13",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -241,11 +241,11 @@ describe("analyze", () => {
       const cache = makeMemoryCache()
       const first = makeFakeLlmRunner({ respond })
       yield* run(first, cache)
-      const chunkCalls = first.log.filter((c) => c.schema === "LlmChunkObservations").length
+      const chunkCalls = first.log.filter((c) => c.schema === "LlmChunkAnalysis").length
       expect(chunkCalls).toBeGreaterThan(1)
       const second = makeFakeLlmRunner({ respond })
       const profile = yield* run(second, cache)
-      expect(second.log.filter((c) => c.schema === "LlmChunkObservations")).toHaveLength(0)
+      expect(second.log.filter((c) => c.schema === "LlmChunkAnalysis")).toHaveLength(0)
       expect(second.calls()).toBe(1) // reduce only
       expect(profile.coverage.chunksFromCache).toBe(chunkCalls)
       // --no-cache skips reads
@@ -492,7 +492,7 @@ describe("analyze", () => {
     /** Map: one observation citing every prompt of the chunk (all verifiable). Merge: all
      * evidence of the group in one observation (an LLM ignoring the cap). */
     const greedy: FakeOptions["respond"] = (input) => {
-      if (input.schemaName !== "LlmChunkObservations") return respond(input)
+      if (!input.schemaName.startsWith("LlmChunk")) return respond(input)
       const all = input.prompt.startsWith("[")
         ? (JSON.parse(input.prompt) as Array<{ evidence: Array<unknown> }>).flatMap(
             (o) => o.evidence,
@@ -501,7 +501,10 @@ describe("analyze", () => {
             promptId: m[1],
             quote: m[2],
           }))
-      return { observations: [{ dimension: "work_style", claim: "c", evidence: all }] }
+      return {
+        observations: [{ dimension: "work_style", claim: "c", evidence: all }],
+        episodes: [],
+      }
     }
     it.effect("fails explicitly rather than discarding source evidence to meet an input cap", () =>
       Effect.gen(function* () {
@@ -592,3 +595,136 @@ it.effect("cannot keep an unsupported headline when reduce supplies no body evid
     expect(profile.archetype.description).toBe("")
   }),
 )
+
+describe("interaction episodes", () => {
+  /** Hand-written sessions of three prompts each, one session per day. */
+  const steps = [
+    "Add a CSV export to the invoice list.",
+    "same for the payments table",
+    "No, keep the existing download API.",
+  ]
+  const sessions = Array.from({ length: 4 }, (_, day) =>
+    steps.map((text, turn): SafePrompt => ({
+      id: `claude-code:e${day}:${turn}`,
+      sessionId: `e${day}`,
+      source: "claude-code",
+      timestamp: DateTime.makeUnsafe(Date.UTC(2026, 8, 7 + day * 8, 1, turn * 5)),
+      project: "invoices",
+      text: `${text} ${"x".repeat(2000)}`,
+    })),
+  ).flat()
+
+  const blocks = (chunk: string) =>
+    [
+      ...chunk.matchAll(
+        /<prompt id="([^"]+)" session="([^"]+)" turn="(\d+)\/\d+"[^>]*>\n(.{0,25})/g,
+      ),
+    ].map((m) => ({ promptId: m[1]!, session: m[2]!, quote: m[4]! }))
+
+  const episodeRespond: FakeOptions["respond"] = (input) => {
+    if (input.schemaName === "LlmChunkAnalysis") {
+      const found = blocks(input.prompt)
+      const bySession = new Map<string, typeof found>()
+      for (const b of found) bySession.set(b.session, [...(bySession.get(b.session) ?? []), b])
+      const roles = ["ask", "context", "correct"] as const
+      return {
+        observations: [],
+        episodes: [
+          ...[...bySession].map(([session, turns]) => ({
+            session,
+            taskType: "build",
+            task: "Adding an export",
+            turns: turns.map((t, i) => ({ promptId: t.promptId, quote: t.quote, role: roles[i] })),
+            ending: { kind: "user_reported", promptId: "" },
+          })),
+          // two sessions stitched into one conversation
+          ...(bySession.size > 1
+            ? [
+                {
+                  session: found[0]!.session,
+                  taskType: "fix",
+                  task: "stitched",
+                  turns: [found[0]!, found.at(-1)!].map((t) => ({ ...t, role: "ask" })),
+                  ending: { kind: "unknown", promptId: "" },
+                },
+              ]
+            : []),
+        ],
+      }
+    }
+    if (input.schemaName === "LlmTranslation") {
+      const profile = JSON.parse(/\nprofile:\n(.*)$/s.exec(input.prompt)![1]!)
+      return {
+        ...profile,
+        episodes: profile.episodes.map((e: { task: string }) => ({ task: `zh ${e.task}` })),
+      }
+    }
+    const draft = respond!(input) as Record<string, unknown>
+    if (input.schemaName !== "LlmProfileDraft") return draft
+    const episodes = JSON.parse(/\n\nepisodes:\n(.*)\n\nobservations:/s.exec(input.prompt)![1]!)
+    const ids = episodes.map((e: { id: string }) => e.id)
+    return {
+      ...draft,
+      patterns: [
+        { claim: "Adds scope after the first request", episodeIds: ids, counterEpisodeIds: [] },
+        { claim: "seen once", episodeIds: ids.slice(0, 1), counterEpisodeIds: [] },
+      ],
+    }
+  }
+
+  it.effect("verifies, selects and keeps episodes with their order and spread", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({ respond: episodeRespond })
+      const profile = yield* analyze({
+        prompts: sessions,
+        stats,
+        options: { ...options, languages: ["en", "zh-TW"] },
+      }).pipe(
+        Effect.provide(
+          Layer.mergeAll(
+            Layer.succeed(LlmRunner, fake),
+            Layer.succeed(AnalysisCache, makeMemoryCache()),
+            Layer.succeed(Progress, silentProgress),
+          ),
+        ),
+      )
+      expect(Schema.is(Profile)(profile)).toBe(true)
+      expect(profile.episodes.map((e) => [e.id, e.session])).toEqual([
+        ["E1", "claude-code:e0"],
+        ["E2", "claude-code:e1"],
+        ["E3", "claude-code:e2"],
+        ["E4", "claude-code:e3"],
+      ])
+      expect(profile.episodes[0]!.turns.map((t) => [t.turn, t.role])).toEqual([
+        [1, "ask"],
+        [2, "context"],
+        [3, "correct"],
+      ])
+      // an ending that cites no turn is not a result
+      expect(profile.episodes.every((e) => e.ending.kind === "unknown")).toBe(true)
+      const stitched = profile.coverage.episodes!.rejected.mixedSessions
+      expect(stitched).toBeGreaterThan(0)
+      expect(profile.coverage.episodes).toMatchObject({
+        found: 4 + stitched,
+        kept: 4,
+        selected: 4,
+        endingsWithdrawn: 4,
+        patternsDropped: 1,
+      })
+      expect(profile.patterns).toEqual([
+        {
+          claim: "Adds scope after the first request",
+          episodeIds: ["E1", "E2", "E3", "E4"],
+          counterEpisodeIds: [],
+          support: { sessions: 4, weeks: profile.coverage.chunksAnalyzed },
+          taskTypes: ["build"],
+        },
+      ])
+      expect(profile.translations["zh-TW"]!.episodes[0]).toEqual({ task: "zh Adding an export" })
+      // the reduce step sees turn numbers, never the rejected conversation
+      const reduce = fake.log.find((c) => c.schema === "LlmProfileDraft")!.prompt
+      expect(reduce).toContain('"turn":3,"role":"correct"')
+      expect(reduce).not.toContain("stitched")
+    }),
+  )
+})

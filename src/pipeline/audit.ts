@@ -83,6 +83,13 @@ const MACHINE_KEYS: ReadonlySet<string> = new Set([
   "last",
   "pricingVersion",
   "currency",
+  // interaction episodes (plan 20 B): session ids, turn roles, task types, episode references
+  "session",
+  "role",
+  "taskType",
+  "taskTypes",
+  "episodeIds",
+  "counterEpisodeIds",
 ])
 const DATE_LIKE = /^\d{4}-\d{2}(?:-\d{2})?(?:T[\d:.]+Z?)?$/
 
@@ -101,6 +108,8 @@ const SECTIONS: Readonly<Record<string, string>> = {
   activity: "Projects",
   topProjects: "Projects",
   usage: "Usage",
+  episodes: "Episodes",
+  patterns: "Recurring patterns",
 }
 
 type Path = ReadonlyArray<string | number>
