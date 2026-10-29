@@ -83,8 +83,8 @@ rubrics and a blind review. It found one analysis defect (weekday order), which 
 The [initial gallery](initial-study-gallery.html), [initial prototype](profile-customization-prototype.html)
 and [initial capture manifest](screenshots/manifest.json) remain intact as rejected-design evidence.
 They include the actual current renderer at desktop/mobile widths, the first content/design
-sketches, free-versus-paid flow and the model-study protocol. The original production
-[share card](../sample-card.png) is also preserved for comparison.
+sketches, free-versus-paid flow and the model-study protocol. The current production
+[share card](../sample-card.png), rendered by `pnpm site`, is there for comparison.
 
 The model comparison is still not run. Participant preference, actual sharing behavior and
 production theme/export work remain future research and implementation stages.

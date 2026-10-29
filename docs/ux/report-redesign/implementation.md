@@ -22,7 +22,7 @@ contrary and supporting portrait evidence have separate expanded groups.
   43 passed test files, 484 passed tests. Existing look tests enumerate the expanded registry,
   including all eight card hiding combinations, unchanged report output and card privacy.
 - `pnpm test:package`, exit 0: build and installed-package assets/HTML/PNG check passed.
-- `pnpm exec tsx scripts/template-gallery.ts`: public fictional examples and 1200 × 630 cards.
+- `pnpm site`: public fictional examples and 1200 × 630 cards.
 - `node scripts/template-qa.mjs`: 27 cases: 18 viewport/color combinations plus nine mobile edge profiles; each checks both views and
   both languages, offline requests, horizontal overflow, expanded evidence, independent
   selections and print visibility. Local manifest: `tmp/template-qa/checks.json`.

@@ -1,0 +1,65 @@
+name: Pages
+
+# The public site: hand-written docs/ plus every example report and card, rendered from the
+# fictional fixtures by the current code (scripts/site.ts), so README images never go stale.
+# Pull requests only build it; pushes to main deploy it.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/report/**"
+      - "src/domain/**"
+      - "test/fixtures/profile.sample.json"
+      - "test/fixtures/portrait.sample.json"
+      - "scripts/site.ts"
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "src/report/**"
+      - "src/domain/**"
+      - "test/fixtures/profile.sample.json"
+      - "test/fixtures/portrait.sample.json"
+      - "scripts/site.ts"
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push supersedes a deployment still in progress
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm site dist-site
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist-site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

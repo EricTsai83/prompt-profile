@@ -95,8 +95,8 @@ identity and behaviors. Folio: editorial reading measure and connected evidence.
 original implementations, with no copied third-party code or assets. External reference names
 belong only to research provenance, never the generated template presentation.
 
-Public fictional artifacts: `docs/demo/templates/index.html`; reproduce with
-`pnpm exec tsx scripts/template-gallery.ts`. Browser checks: `node scripts/template-qa.mjs`,
+Public fictional artifacts: `demo/templates/index.html` on the Pages site, built by
+`pnpm site`. Browser checks: `node scripts/template-qa.mjs`,
 with local ignored captures and manifest in `tmp/template-qa/`.
 
 Status: implementation iteration, pending independent review and owner acceptance. The legacy

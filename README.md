@@ -5,17 +5,18 @@ with the `claude` or `codex` CLI you are already logged in to, and get a persona
 Reading, cleaning, redaction and the report happen locally; the selected, redacted prompts are sent
 through that CLI to its model service and use your subscription quota (no API key).
 
-![Synthetic sample share card](docs/sample-card.png)
+![Synthetic sample share card](https://erictsai83.github.io/prompt-profile/sample-card.png)
 
 [Sample HTML report](https://erictsai83.github.io/prompt-profile/sample-report.html)
-· [Sample profile JSON](docs/sample-profile.json) (all sample data is hand-written and fictional).
+· [Sample profile JSON](https://erictsai83.github.io/prompt-profile/sample-profile.json) (all sample data is hand-written and fictional;
+every example is rendered by the current code on each change to `main`).
 
-### A real report
+### Example reports
 
-The author's own report, from about 1,700 real prompts over six months, published as written:
+The same fictional profile, rendered two ways:
 
-- [Full report](https://erictsai83.github.io/prompt-profile/demo/full/report.html): what you see on your own machine, with quotes from
-  real prompts, suggested rewrites, project names, exact dates and fun facts.
+- [Full report](https://erictsai83.github.io/prompt-profile/demo/full/report.html): what you see on your own machine, with prompt
+  quotes, suggested rewrites, project names, exact dates and fun facts.
 - [Shareable report](https://erictsai83.github.io/prompt-profile/demo/without-personal/report.html): the same profile rendered with
   `--exclude personal`: no quotes, rewrites or fun facts, projects shown as "Project A, B…",
   dates by month. This is what you would post publicly.
@@ -28,21 +29,21 @@ in every look (`--look`; render only, no new analysis):
 <table>
   <tr>
     <td width="50%" align="center">
-      <a href="https://erictsai83.github.io/prompt-profile/demo/full/report.html"><img src="docs/demo/card.png" width="420" alt="Classic card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/full/report.html"><img src="https://erictsai83.github.io/prompt-profile/demo/full/card.png" width="420" alt="Classic card"></a><br>
       <a href="https://erictsai83.github.io/prompt-profile/demo/full/report.html">Classic</a> (default)
     </td>
     <td width="50%" align="center">
-      <a href="https://erictsai83.github.io/prompt-profile/demo/signal/report.html"><img src="docs/demo/signal/card.png" width="420" alt="Signal card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/signal/report.html"><img src="https://erictsai83.github.io/prompt-profile/demo/signal/card.png" width="420" alt="Signal card"></a><br>
       <a href="https://erictsai83.github.io/prompt-profile/demo/signal/report.html">Signal</a>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <a href="https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html"><img src="docs/demo/afterhours/card.png" width="420" alt="Afterhours card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html"><img src="https://erictsai83.github.io/prompt-profile/demo/afterhours/card.png" width="420" alt="Afterhours card"></a><br>
       <a href="https://erictsai83.github.io/prompt-profile/demo/afterhours/report.html">Afterhours</a>
     </td>
     <td width="50%" align="center">
-      <a href="https://erictsai83.github.io/prompt-profile/demo/studio/report.html"><img src="docs/demo/studio/card.png" width="420" alt="Studio card"></a><br>
+      <a href="https://erictsai83.github.io/prompt-profile/demo/studio/report.html"><img src="https://erictsai83.github.io/prompt-profile/demo/studio/card.png" width="420" alt="Studio card"></a><br>
       <a href="https://erictsai83.github.io/prompt-profile/demo/studio/report.html">Studio</a>
     </td>
   </tr>
@@ -403,7 +404,7 @@ analysis. `pnpm dev:report` renders an entirely fictional portrait for local ins
 - **Slate** combines a compact identity workspace with precise activity charts.
 - **Folio** gives the portrait and evidence a quieter, connected reading rhythm.
 
-Each includes a matching 1200 × 630 card. [Browse fictional examples](docs/demo/templates/index.html).
+Each includes a matching 1200 × 630 card. [Browse fictional examples](https://erictsai83.github.io/prompt-profile/demo/templates/index.html).
 Existing looks and the classic default remain available. Change presentation without reanalysis:
 
 ```bash

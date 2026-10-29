@@ -8,6 +8,7 @@ prompt-profile-report/
 *.log
 .DS_Store
 dist-bin/
+dist-site/
 
 # Reproducible local PDF review exports.
 /output/pdf/

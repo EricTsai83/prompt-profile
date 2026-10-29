@@ -53,7 +53,7 @@ parent review. No independent review was performed by this implementation agent.
 
 ## Reproduction and checks
 
-- `pnpm exec tsx scripts/template-gallery.ts` refreshes fictional production HTML.
+- `pnpm exec tsx scripts/template-gallery.ts` refreshes the fictional captures in `tmp/template-edges/`.
 - `PLAYWRIGHT_CORE=<module path> node scripts/pdf-qa.mjs` exports the six PDFs from file URLs.
 - `uv run --with pymupdf python scripts/pdf-inspect.py` checks A4, nonblank pages and text bounds,
   and renders all pages. `tmp/pdfs/inventory.json` lists every PDF and PNG.

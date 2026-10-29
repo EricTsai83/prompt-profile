@@ -12,15 +12,7 @@ const results = []
 for (const look of ["classic", "prism", "slate", "folio"]) {
   for (const lang of ["en", "zh-TW"]) {
     const page = await browser.newPage()
-    await page.goto(
-      pathToFileURL(
-        resolve(
-          look === "classic"
-            ? "tmp/template-edges/classic.html"
-            : `docs/demo/templates/${look}/report.html`,
-        ),
-      ).href,
-    )
+    await page.goto(pathToFileURL(resolve(`tmp/template-edges/${look}.html`)).href)
     await page.locator(`label[for="lang-${lang}"]`).first().click()
     await page.emulateMedia({ media: "print", colorScheme: "light" })
     const state = await page.evaluate(

@@ -54,17 +54,14 @@ New CLI flags may require a newer version than the minimum Node runtime.
 
 ## Report preview
 
-`pnpm dev:report` renders the synthetic sample into `tmp/report/`. The checked-in example in
-[docs/sample-report.html](docs/sample-report.html) and [docs/sample-card.png](docs/sample-card.png)
-comes only from `test/fixtures/profile.sample.json`. Regenerate it after changing report layout:
+`pnpm dev:report` renders the synthetic sample into `tmp/report/`.
 
-```sh
-pnpm dev render test/fixtures/profile.sample.json --out tmp/sample-preview
-mv tmp/sample-preview/report.html docs/sample-report.html
-mv tmp/sample-preview/card.png docs/sample-card.png
-mv tmp/sample-preview/profile.json docs/sample-profile.json
-pnpm format
-```
+The public examples (README images, sample report, every look's report and card) are not
+committed. `pnpm site` renders them from `test/fixtures/profile.sample.json` and
+`portrait.sample.json` into `dist-site/`, together with the hand-written `docs/`;
+[`pages.yml`](.github/workflows/pages.yml) builds that site on pull requests and deploys it to
+GitHub Pages on every push to `main`, so they always match the current code. Run `pnpm site`
+locally to preview them.
 
 ## Releasing (maintainer)
 

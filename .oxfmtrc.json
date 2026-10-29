@@ -7,7 +7,7 @@
     "test/fixtures/**",
     "pnpm-lock.yaml",
     "**/__snapshots__/**",
-    "docs/demo/**"
+    "dist-site/**"
   ],
   "embeddedLanguageFormatting": "off"
 }

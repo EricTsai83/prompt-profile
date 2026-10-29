@@ -42,6 +42,7 @@
     "eval:compare": "tsx scripts/eval-compare.ts",
     "inspect:openings": "tsx scripts/inspect-openings.ts",
     "dev:report": "tsx scripts/dev-report.ts",
+    "site": "tsx scripts/site.ts",
     "test:package": "pnpm build && node scripts/test-package.mjs",
     "build:binaries": "tsx scripts/build-binaries.ts",
     "test:binary": "node scripts/test-binary.mjs"
