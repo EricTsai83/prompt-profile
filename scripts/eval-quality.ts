@@ -1,3 +1,5 @@
+import { verifyEvidence } from "../src/analysis/verify.ts"
+import type { Evidence } from "../src/domain/Profile.ts"
 import type { Profile } from "../src/domain/Profile.ts"
 
 /** Deterministic regression checks, not a substitute for reading the persona's expected.md. */
@@ -59,5 +61,38 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     evidenceRetention,
     emptyDimensions,
     overgeneralisations,
+  }
+}
+
+/** Mechanical evidence checks only; semantic judgments require a separate human review.
+ * Available source counts describe the supplied evaluation slice, never full history.
+ */
+export const inspectClaimSupport = (
+  evidence: ReadonlyArray<Evidence>,
+  prompts: ReadonlyArray<{ readonly id: string; readonly session: string; readonly text: string }>,
+) => {
+  const source = new Map(prompts.map((prompt) => [prompt.id, prompt]))
+  const counts = { kept: 0, dropped: 0 }
+  const verified = verifyEvidence(
+    evidence,
+    new Map(prompts.map((prompt) => [prompt.id, prompt.text])),
+    counts,
+  )
+  return {
+    quoteValidity: counts,
+    selectedEvidence: {
+      prompts: new Set(verified.map((item) => item.promptId)).size,
+      sessions: new Set(verified.map((item) => source.get(item.promptId)!.session)).size,
+    },
+    availableSource: {
+      prompts: source.size,
+      sessions: new Set([...source.values()].map((prompt) => prompt.session)).size,
+    },
+    manualReview: {
+      semanticSupport: "unreviewed",
+      specificity: "unreviewed",
+      contradictions: "unreviewed",
+      uncertainty: "unreviewed",
+    },
   }
 }
