@@ -110,7 +110,7 @@ describe("looks: report", () => {
         expect(out).toContain("1 chunk failed and was skipped")
         expect(out.match(/<blockquote[ >]/g)?.length).toBe(base.match(/<blockquote[ >]/g)?.length)
         for (const t of p.traits) expect(out).toContain(t.name)
-        expect(out).toContain("High confidence")
+        expect(out).toContain("Selected evidence")
         expect(out).not.toMatch(/https?:\/\/(?!www\.w3\.org)/)
         if (look !== "classic") {
           expect(out).toContain("src:url(data:font/woff;base64,")
@@ -231,7 +231,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 2,
         look: "afterhours",
-        lookVersion: 16,
+        lookVersion: 17,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

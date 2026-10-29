@@ -91,6 +91,7 @@ export interface Messages {
   readonly chapters: string
   readonly chapterRange: (from: string, to: string) => string
   readonly moreTraits: string
+  readonly supportUnknown: string
   readonly support: (sessions: number, weeks: number, quotes: number) => string
   readonly howMeasured: string
   readonly projectAnon: string
@@ -252,8 +253,10 @@ const en: Messages = {
   chapters: "Chapters",
   chapterRange: (a, b) => (a === b ? a : `${a} – ${b}`),
   moreTraits: "More traits",
+  supportUnknown:
+    "Session spread is unavailable for these selected quotes; confidence is a model estimate.",
   support: (se, w, q) =>
-    `${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "week", "weeks")}`,
+    `Selected evidence: ${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "week", "weeks")}; not full-history frequencies. Context and exceptions are in the quoted prompts.`,
   howMeasured: "How this was measured",
   projectAnon: "Project",
   cardActive: "most active",
@@ -458,7 +461,9 @@ const zhTW: Messages = {
   chapters: "章節",
   chapterRange: (a, b) => (a === b ? a : `${a} – ${b}`),
   moreTraits: "其他特質",
-  support: (se, w, q) => `${q} 段引文，來自 ${se} 個 session、${w} 週`,
+  supportUnknown: "這些所選引文的對話分布未知；信心程度是模型的估計。",
+  support: (se, w, q) =>
+    `所選證據：${q} 段引文，來自 ${se} 個對話、${w} 週；不代表完整歷史中的頻率。情境與例外請參照引文。`,
   howMeasured: "這份報告怎麼量的",
   projectAnon: "專案",
   cardActive: "最活躍時段",

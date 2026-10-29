@@ -176,9 +176,20 @@ const meter = (t: Trait, loc: Loc): Raw =>
     ></span
   >`
 
+const knownSupport = (t: Trait): boolean => {
+  if (t.support === null) return false
+  const prompts = new Set(t.evidence.map((e) => e.promptId)).size
+  return (
+    t.support.sessions > 0 &&
+    t.support.weeks > 0 &&
+    t.support.sessions <= prompts &&
+    t.support.weeks <= prompts
+  )
+}
+
 const supportLine = (t: Trait, loc: Loc): Raw =>
-  t.support === null
-    ? html``
+  !knownSupport(t)
+    ? html`<p class="support">${loc.text((m) => m.supportUnknown)}</p>`
     : html`<p class="support">
         ${loc.text((m) => m.support(t.support!.sessions, t.support!.weeks, t.evidence.length))}
       </p>`
@@ -189,7 +200,7 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: S
   return html`<article class="trait">
     <header>
       <h3>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h3>
-      ${meter(t, loc)}
+      ${!knownSupport(t) ? meter(t, loc) : ""}
     </header>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
     ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${makeVerbatim(loc, v, scrub)(t.evidence[0].quote)}</blockquote>` : ""}
@@ -209,9 +220,10 @@ const minorTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub
   const t = p.traits[i]!
   return html`<li class="minor">
     <div class="minor-head">
-      <b>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</b>${meter(t, loc)}
+      <b>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</b>${!knownSupport(t) ? meter(t, loc) : ""}
     </div>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
+    ${supportLine(t, loc)}
     ${
       v.quotes && t.evidence.length > 0
         ? html`<details open>

@@ -2830,9 +2830,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     </header>
     <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
-    <p class="support">
-        <span data-l="en" lang="en">2 quotes from 4 sessions in 3 weeks</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文，來自 4 個 session、3 週</span>
-      </p>
+    <p class="support"><span data-l="en" lang="en">Session spread is unavailable for these selected quotes; confidence is a model estimate.</span><span data-l="zh-TW" lang="zh-Hant-TW">這些所選引文的對話分布未知；信心程度是模型的估計。</span></p>
     <details open>
             <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
             <ul class="evidence">
@@ -2842,17 +2840,12 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </article><article class="trait">
     <header>
       <h3><span data-l="en" lang="en">Straight talker</span><span data-l="zh-TW" lang="zh-Hant-TW">直來直往</span></h3>
-      <span class="meter medium"
-    ><i class="on"></i><i class="on"></i><i class=""></i><span
-      class="meter-label"
-      ><span data-l="en" lang="en">Medium confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">中信心</span></span
-    ></span
-  >
+
     </header>
     <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
     <p class="support">
-        <span data-l="en" lang="en">2 quotes from 2 sessions in 2 weeks</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文，來自 2 個 session、2 週</span>
+        <span data-l="en" lang="en">Selected evidence: 2 quotes from 2 sessions in 2 weeks; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：2 段引文，來自 2 個對話、2 週；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
       </p>
     <details open>
             <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
@@ -2863,17 +2856,12 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </article><article class="trait">
     <header>
       <h3><span data-l="en" lang="en">Type purist</span><span data-l="zh-TW" lang="zh-Hant-TW">型別潔癖</span></h3>
-      <span class="meter low"
-    ><i class="on"></i><i class=""></i><i class=""></i><span
-      class="meter-label"
-      ><span data-l="en" lang="en">Low confidence</span><span data-l="zh-TW" lang="zh-Hant-TW">低信心</span></span
-    ></span
-  >
+
     </header>
     <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
     <p class="support">
-        <span data-l="en" lang="en">1 quote from 1 session in 1 week</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文，來自 1 個 session、1 週</span>
+        <span data-l="en" lang="en">Selected evidence: 1 quote from 1 session in 1 week; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：1 段引文，來自 1 個對話、1 週；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
       </p>
 
   </article>
