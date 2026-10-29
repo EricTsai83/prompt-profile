@@ -11,11 +11,23 @@ const original = [
   { dimension: "work_style" as const, claim: "Planning depends on the task.", evidence },
 ]
 
-it("restores contrary quotes and their context after a merge or evidence cap omits them", () => {
-  const merged = [{ ...original[0]!, claim: "They plan first.", evidence: [evidence[0]!] }]
-  expect(retainOmittedEvidence(original, merged)).toContainEqual(original[0])
-  expect(retainOmittedEvidence(original, capEvidence(original, 1))).toContainEqual(original[0])
+it("restores an observation a merge dropped entirely, with its context", () => {
+  const other = {
+    dimension: "growth" as const,
+    claim: "Learns Rust.",
+    evidence: [{ promptId: "c", quote: "Explain lifetimes again." }],
+  }
+  const merged = [{ ...original[0]!, claim: "Planning depends on the task.", evidence }]
+  expect(retainOmittedEvidence([...original, other], merged)).toEqual([...merged, other])
   expect(retainOmittedEvidence(original, original)).toEqual(original)
+})
+
+it("lets a merge or evidence cap trim the quotes of a claim it keeps, so merging can shrink", () => {
+  const merged = [{ ...original[0]!, evidence: [evidence[0]!] }]
+  expect(retainOmittedEvidence(original, merged)).toEqual(merged)
+  expect(retainOmittedEvidence(original, capEvidence(original, 1))).toEqual(
+    capEvidence(original, 1),
+  )
 })
 
 it("rejects an entire compound assertion when any citation is fabricated", () => {

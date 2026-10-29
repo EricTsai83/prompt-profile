@@ -74,9 +74,12 @@ export const capEvidence = (
     return { ...o, evidence: o.evidence.filter((_, i) => keep.has(i)) }
   })
 
-/** A cap/LLM merge must not silently erase a counterexample or its source context.
- * Quote validity does not tell us which quotes are contrary, so restore the full source
- * observation whenever any of its quotes disappears. Oversized inputs fail explicitly.
+/**
+ * A cap or LLM merge must not silently erase a whole observation: when none of an
+ * observation's quotes survive, restore it with its claim and context. A claim that keeps at
+ * least one quote may lose its other quotes; restoring those too meant merging could not
+ * shrink the input of a large history (every merge drops quotes). Contrary examples are kept
+ * as their own observations by the map and merge prompts.
  */
 export const retainOmittedEvidence = (
   original: ReadonlyArray<Observation>,
@@ -84,5 +87,5 @@ export const retainOmittedEvidence = (
 ): ReadonlyArray<Observation> => {
   const key = (e: Observation["evidence"][number]) => JSON.stringify([e.promptId, e.quote])
   const retained = new Set(merged.flatMap((o) => o.evidence.map(key)))
-  return [...merged, ...original.filter((o) => o.evidence.some((e) => !retained.has(key(e))))]
+  return [...merged, ...original.filter((o) => o.evidence.every((e) => !retained.has(key(e))))]
 }

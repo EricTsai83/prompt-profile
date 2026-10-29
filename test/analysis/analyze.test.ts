@@ -506,7 +506,7 @@ describe("analyze", () => {
         episodes: [],
       }
     }
-    it.effect("fails explicitly rather than discarding source evidence to meet an input cap", () =>
+    it.effect("fails explicitly when the observations cannot fit the input cap", () =>
       Effect.gen(function* () {
         const cache = makeMemoryCache()
         const opts = { ...options, reduceInputLimit: 2_000 }
@@ -516,6 +516,46 @@ describe("analyze", () => {
           expect(error).toMatchObject({ reason: "input-too-large" })
           expect(fake.log.some((c) => c.schema === "LlmProfileDraft")).toBe(false)
         }
+      }),
+    )
+
+    /** Map: one observation per chunk with two quotes. Merge: one claim per group, keeping
+     * the first quote of each observation (as a real merge keeps at most 4 per claim). */
+    const trimmingMerge: FakeOptions["respond"] = (input) => {
+      if (input.schemaName === "LlmChunkAnalysis") {
+        const [a, b] = [...input.prompt.matchAll(/<prompt id="([^"]+)"[^>]*>\n(.{0,30})/g)]
+        return {
+          observations: [
+            {
+              dimension: "work_style",
+              claim: "works in small steps",
+              evidence: [a!, b ?? a!].map((m) => ({ promptId: m[1], quote: m[2] })),
+            },
+          ],
+          episodes: [],
+        }
+      }
+      if (input.schemaName === "LlmChunkObservations") {
+        const group = JSON.parse(input.prompt) as Array<{ evidence: Array<unknown> }>
+        return {
+          observations: [
+            {
+              dimension: "work_style",
+              claim: "works in small steps",
+              evidence: group.map((o) => o.evidence[0]),
+            },
+          ],
+        }
+      }
+      return respond(input)
+    }
+    it.effect("a merge that trims quotes of the claims it keeps shrinks a large history", () =>
+      Effect.gen(function* () {
+        const fake = makeFakeLlmRunner({ respond: trimmingMerge })
+        const profile = yield* run(fake, makeMemoryCache(), { ...options, reduceInputLimit: 2_500 })
+        expect(fake.log.some((c) => c.prompt.startsWith("["))).toBe(true)
+        expect(fake.log.some((c) => c.schema === "LlmProfileDraft")).toBe(true)
+        expect(profile.dimensions.length).toBe(5)
       }),
     )
 
