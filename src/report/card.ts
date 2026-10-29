@@ -11,6 +11,7 @@ import { lookOf, type CardTokens, type Theme } from "./theme.ts"
 import { contentIn } from "./content.ts"
 import { chronotype, nightShare } from "./derive.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
+import { isLimitedEvidence, limitedView } from "./evidence.ts"
 import { MESSAGES } from "./messages.ts"
 import type { Language } from "../domain/Profile.ts"
 
@@ -563,8 +564,13 @@ export const cardTree = (
 ): Node => {
   // Project visibility is the same user choice for the report and its card.
   const v = visibilityOf(options)
-  const p = v.projects ? profile : scrubIdentity(profile, makeScrub(profile, v), lang)
-  return TREES[theme.card.composition](p, theme, options.cardHide, lang)
+  // Limited evidence: the limits instead of a role, and no trait chips (plan 24).
+  const shown = limitedView(profile)
+  const p = v.projects ? shown : scrubIdentity(shown, makeScrub(shown, v), lang)
+  const hide: RenderOptions["cardHide"] = isLimitedEvidence(profile)
+    ? [...new Set([...options.cardHide, "traits" as const])]
+    : options.cardHide
+  return TREES[theme.card.composition](p, theme, hide, lang)
 }
 
 let wasmReady: Promise<void> | null = null

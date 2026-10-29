@@ -23,6 +23,7 @@ import { DEFAULT_RENDER_OPTIONS, excludedParts, type RenderOptions } from "./loo
 import { lookOf, type Theme } from "./theme.ts"
 import { displayStyle, themeAttributes, themeCss } from "./theme-css.ts"
 import { MESSAGES, type Messages } from "./messages.ts"
+import { isLimitedEvidence, limitedView } from "./evidence.ts"
 import { triggeredSignals } from "./signals.ts"
 import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
@@ -556,11 +557,14 @@ const languageStyle = (langs: ReadonlyArray<Language>): string =>
 
 /** Render a self-contained, offline HTML report (no external requests, no JavaScript). */
 export const renderHtml = (
-  profile: Profile,
+  input: Profile,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
   // Every look-specific choice comes from the theme; tests pass one that is not registered.
   theme: Theme = lookOf(options.look),
 ) => {
+  // Limited evidence: no role or coaching, the hero states the limits instead (plan 24).
+  const limited = isLimitedEvidence(input)
+  const profile = limitedView(input)
   const identity = theme.identity
   const clock = theme.layout.hero === "clock"
   const loc = makeLoc(profile)
@@ -599,8 +603,10 @@ export const renderHtml = (
   const signature = order.slice(0, 3)
   const minor = order.slice(3)
   const every = correctionEvery(s)
-  const signals = v.coaching ? signalRow(profile, loc) : null
-  const progress = v.coaching ? progressBlock(profile, loc, v, scrub) : null
+  // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
+  const coaching = v.coaching && !limited
+  const signals = coaching ? signalRow(profile, loc) : null
+  const progress = coaching ? progressBlock(profile, loc, v, scrub) : null
   const story = portraitStory(profile, loc, v, scrub)
   const preferences = preferenceEvidence(profile, loc, v, scrub)
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
@@ -913,7 +919,7 @@ export const renderHtml = (
           }
 
           ${
-            v.coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
+            coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
               ? html`<section class="coaching">
                   <div class="section-head">
                     <h2>${loc.text((m) => m.coaching)}</h2>

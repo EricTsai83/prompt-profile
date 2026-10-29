@@ -160,7 +160,7 @@ const en: Messages = {
   analyzed: "Analyzed",
   leftOut: (parts) => `Left out: ${parts}`,
   months: (n) => plural(n, "month", "months"),
-  coverage: (p, s) => `${p.toLocaleString("en")} prompts · ${s.toLocaleString("en")} sessions`,
+  coverage: (p, s) => `${plural(p, "prompt", "prompts")} · ${plural(s, "session", "sessions")}`,
   sampled: (a, t) => `${a} of ${t} weeks sampled`,
   totalPrompts: "Prompts",
   activeDays: "Active days",
@@ -213,7 +213,7 @@ const en: Messages = {
   chunksSkipped: (n) =>
     `${n} chunk${n === 1 ? "" : "s"} failed and ${n === 1 ? "was" : "were"} skipped`,
   privacy:
-    "Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.",
+    "Privacy: prompts were read, cleaned and redacted on this computer. Selected redacted prompts were then sent through the logged-in Claude Code or Codex CLI to its model service, using that subscription's quota (no API key). prompt-profile never uploads this report.",
   project: "prompt-profile",
   none: "—",
   madeFrom: "Made from my prompts.",
@@ -420,7 +420,7 @@ const zhTW: Messages = {
     `已驗證 ${k} 段證據${d > 0 ? `（移除 ${d} 段無效或重複的引文）` : ""}`,
   chunksSkipped: (n) => `${n} 段分析失敗，已略過`,
   privacy:
-    "隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。",
+    "隱私：prompt 在這台電腦上讀取、清理並遮蔽敏感資訊；選出的 prompt 遮蔽後，才透過已登入的 Claude Code 或 Codex CLI 送到它的模型服務分析，使用該訂閱方案的額度（不需要 API key）。prompt-profile 不會上傳這份報告。",
   project: "prompt-profile",
   none: "—",
   madeFrom: "用我的 prompt 做成。",
@@ -667,6 +667,25 @@ export const VIEW_MESSAGES = {
     mixed: "混合偏好／證據不足",
     first: "觀察到的偏好",
     noPortrait: "這份 profile 尚未包含協作側寫；「事實與證據」頁仍可閱讀既有的觀察與證據。",
+  },
+} as const
+
+/**
+ * A profile with limited evidence (plan 24, `evidence.ts`): fixed text replaces the generated
+ * role, and the hero states what is left out and why.
+ */
+export const LIMITED_MESSAGES = {
+  en: {
+    title: "Early observations",
+    headline: "Not enough verified evidence yet for a collaboration role.",
+    body: (prompts: number, sessions: number) =>
+      `Based on ${plural(prompts, "prompt", "prompts")} in ${plural(sessions, "session", "sessions")}. A role, featured observations and prompt coaching each need verified quotes from at least two sessions; none has that yet, so they are left out. The observations and measurements below are what the records support. A longer --since range or more history adds evidence.`,
+  },
+  "zh-TW": {
+    title: "初步觀察",
+    headline: "已驗證的證據還不足以描述協作角色。",
+    body: (prompts: number, sessions: number) =>
+      `根據 ${prompts.toLocaleString("zh-TW")} 則提示、${sessions.toLocaleString("zh-TW")} 段對話。協作角色、精選觀察與提示建議都需要至少兩段對話中經過驗證的引述，目前都還不足，因此不列出。以下的觀察與量測是紀錄能支持的內容；改用更長的 --since 範圍或累積更多紀錄，就能增加證據。`,
   },
 } as const
 

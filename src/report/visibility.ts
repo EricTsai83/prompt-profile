@@ -1,6 +1,7 @@
 import type { Language, Profile } from "../domain/Profile.ts"
 import { excludedParts, type RenderOptions, type ReportPart } from "./looks.ts"
 import { MESSAGES } from "./messages.ts"
+import { limitedView } from "./evidence.ts"
 
 /**
  * What the report shows, from `--exclude` (plan 18). Everything by default: the report stays
@@ -92,8 +93,10 @@ export interface ReportContents {
   readonly usage: boolean
 }
 
-export const reportContents = (p: Profile, options: RenderOptions): ReportContents => {
+export const reportContents = (profile: Profile, options: RenderOptions): ReportContents => {
   const v = visibilityOf(options)
+  // A limited profile renders without suggestions (plan 24).
+  const p = limitedView(profile)
   const evidence = (xs: ReadonlyArray<{ readonly evidence: ReadonlyArray<unknown> }>) =>
     xs.reduce((sum, x) => sum + x.evidence.length, 0)
   const names = new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)])

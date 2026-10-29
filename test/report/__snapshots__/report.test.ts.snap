@@ -3795,7 +3795,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                     <span data-l="en" lang="en">41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">已驗證 41 段證據（移除 3 段無效或重複的引文） · 1 段分析失敗，已略過</span>
                   </p>
 
-                  <p><span data-l="en" lang="en">Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。</span></p>
+                  <p><span data-l="en" lang="en">Privacy: prompts were read, cleaned and redacted on this computer. Selected redacted prompts were then sent through the logged-in Claude Code or Codex CLI to its model service, using that subscription&#39;s quota (no API key). prompt-profile never uploads this report.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 在這台電腦上讀取、清理並遮蔽敏感資訊；選出的 prompt 遮蔽後，才透過已登入的 Claude Code 或 Codex CLI 送到它的模型服務分析，使用該訂閱方案的額度（不需要 API key）。prompt-profile 不會上傳這份報告。</span></p>
                 </section>
           <label class="page-turn" for="report-overview"><span data-l="en" lang="en">← Back to the introduction</span><span data-l="zh-TW" lang="zh-Hant-TW">← 回到人物介紹</span></label>
           </section>
