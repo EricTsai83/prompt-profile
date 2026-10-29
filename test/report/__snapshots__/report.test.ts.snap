@@ -306,6 +306,21 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .usage-table thead th{font-size:var(--text-2xs);font-weight:600;color:var(--muted)}
 @media (max-width:760px){.usage-tools,.usage-share-grid{grid-template-columns:1fr}}
 @media print{.usage-scroll{overflow:visible}.usage-table th,.usage-table td{white-space:normal}}
+
+.episodes>h2{font-size:var(--text-xl);margin:36px 0 0}
+.episodes>.note{margin:8px 0 0;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
+.episodes h3{font-size:var(--text-base);margin:20px 0 8px}
+.episode-patterns,.episode-list,.episode-turns{list-style:none;margin:0;padding:0}
+.episode-patterns>li{padding:12px 0;border-top:1px solid var(--border)}
+.episode-patterns .note{margin-top:4px;color:var(--muted);font-size:var(--text-sm)}
+.episode{padding:16px 0;border-top:1px solid var(--border);break-inside:avoid}
+.episode-id{font-size:var(--text-sm);color:var(--muted);margin-right:6px}
+.episode-meta,.turn-meta,.turn-gap,.episode-ending{color:var(--muted);font-size:var(--text-sm)}
+.episode-turns{margin:10px 0 0 4px;padding-left:16px;border-left:2px solid var(--border)}
+.episode-turns>li{margin:10px 0}
+.episode-turns blockquote{margin:4px 0 0;line-height:1.7;overflow-wrap:anywhere}
+.turn-gap{font-style:italic}
+.episode-ending{margin-top:8px}
 .page [data-l]{display:none}
 #lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:var(--on-accent)}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
 #lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:var(--on-accent)}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
@@ -2870,6 +2885,72 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           </section>
 
 
+
+          <section class="episodes">
+    <h2><span data-l="en" lang="en">How conversations unfolded</span><span data-l="zh-TW" lang="zh-Hant-TW">對話如何展開</span></h2>
+    <p class="note"><span data-l="en" lang="en">Showing 3 of 11 verified episodes, chosen to spread over time, conversations and kinds of task. They come from the 280 analysed conversations, not all 312 in the history.</span><span data-l="zh-TW" lang="zh-Hant-TW">從 11 個通過驗證的片段中選出 3 個，盡量分散在不同時間、對話與任務類型。它們來自分析過的 280 段對話，而非紀錄中全部的 312 段。</span></p><p class="note"><span data-l="en" lang="en">Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。</span></p><p class="note"><span data-l="en" lang="en">3 proposed episodes were rejected: a turn was invented, misquoted, out of order or from another conversation.</span><span data-l="zh-TW" lang="zh-Hant-TW">有 3 個提出的片段未採用：其中有捏造、引述不符、順序錯亂或混入其他對話的提示。</span></p><p class="note"><span data-l="en" lang="en">2 stated results were withdrawn because no prompt in the episode showed them.</span><span data-l="zh-TW" lang="zh-Hant-TW">有 2 個聲稱的結果已撤回，因為片段中沒有任何提示呈現該結果。</span></p>
+    <h3><span data-l="en" lang="en">Recurring across conversations</span><span data-l="zh-TW" lang="zh-Hant-TW">在多段對話中反覆出現</span></h3>
+          <ul class="episode-patterns">
+            <li>
+                <p><span data-l="en" lang="en">Adds scope and corrections after the first request instead of restating the whole task</span><span data-l="zh-TW" lang="zh-Hant-TW">提出第一個需求後，再補上範圍與修正，而不是重寫整個任務</span></p>
+                <p class="note"><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span> · <span data-l="en" lang="en">Episodes</span><span data-l="zh-TW" lang="zh-Hant-TW">片段</span>: <a href="#episode-E1">E1</a>, <a href="#episode-E3">E3</a> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">反例</span>: <a href="#episode-E2">E2</a></p>
+              </li>
+          </ul>
+    <ol class="episode-list">
+          <li class="episode" id="episode-E1">
+              <h3><span class="episode-id">E1</span> <span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></h3>
+              <p class="episode-meta"><span data-l="en" lang="en">New feature · Conversation 1 · 9 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">新功能 · 第 1 段對話 · 共 9 則提示</span></p>
+              <ol class="episode-turns">
+
+    <li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 1 of 9 · Request · Sep 5, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 1／9 則提示 · 提出需求 · 2026年9月5日</span></p>
+        <blockquote><span data-l="en" lang="en">don&#39;t write code yet, break the plan into small steps</span><span data-l="zh-TW" lang="zh-Hant-TW">don&#39;t write code yet, break the plan into small steps</span></blockquote>
+      </li><li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 2 of 9 · Adds context · Sep 5, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 2／9 則提示 · 補充脈絡 · 2026年9月5日</span></p>
+        <blockquote><span data-l="en" lang="en">same for the SVG export</span><span data-l="zh-TW" lang="zh-Hant-TW">same for the SVG export</span></blockquote>
+      </li><li class="turn-gap"><span data-l="en" lang="en">2 prompts not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過 2 則提示</span></li><li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 5 of 9 · Correction · Sep 5, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 5／9 則提示 · 修正方向 · 2026年9月5日</span></p>
+        <blockquote><span data-l="en" lang="en">no, keep the old API</span><span data-l="zh-TW" lang="zh-Hant-TW">no, keep the old API</span></blockquote>
+      </li>
+    <li class="turn-gap"><span data-l="en" lang="en">4 later prompts not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過後面 4 則提示</span></li>
+  </ol>
+              <p class="episode-ending"><span data-l="en" lang="en">Result not visible in the record.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄中看不到結果。</span></p>
+            </li><li class="episode" id="episode-E2">
+              <h3><span class="episode-id">E2</span> <span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span></h3>
+              <p class="episode-meta"><span data-l="en" lang="en">Fixing a problem · Conversation 2 · 6 prompts · continues in another analysed part</span><span data-l="zh-TW" lang="zh-Hant-TW">修正問題 · 第 2 段對話 · 共 6 則提示 · 這段對話也出現在其他分析區段</span></p>
+              <ol class="episode-turns">
+    <li class="turn-gap"><span data-l="en" lang="en">2 earlier prompts not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過前面 2 則提示</span></li>
+    <li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 3 of 6 · Request · Sep 18, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 3／6 則提示 · 提出需求 · 2026年9月18日</span></p>
+        <blockquote><span data-l="en" lang="en">&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</span><span data-l="zh-TW" lang="zh-Hant-TW">&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</span></blockquote>
+      </li><li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 4 of 6 · Asks to check · Sep 18, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 4／6 則提示 · 要求驗證 · 2026年9月18日</span></p>
+        <blockquote><span data-l="en" lang="en">改完跑一次測試確認</span><span data-l="zh-TW" lang="zh-Hant-TW">改完跑一次測試確認</span></blockquote>
+      </li><li class="turn-gap"><span data-l="en" lang="en">1 prompt not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過 1 則提示</span></li><li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 6 of 6 · Wraps up · Sep 18, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 6／6 則提示 · 收尾 · 2026年9月18日</span></p>
+        <blockquote><span data-l="en" lang="en">好了，這樣可以了</span><span data-l="zh-TW" lang="zh-Hant-TW">好了，這樣可以了</span></blockquote>
+      </li>
+
+  </ol>
+              <p class="episode-ending"><span data-l="en" lang="en">The user reported the result in prompt 6.</span><span data-l="zh-TW" lang="zh-Hant-TW">使用者在第 6 則提示中回報結果。</span></p>
+            </li><li class="episode" id="episode-E3">
+              <h3><span class="episode-id">E3</span> <span data-l="en" lang="en">Comparing two state libraries</span><span data-l="zh-TW" lang="zh-Hant-TW">比較兩個狀態管理套件</span></h3>
+              <p class="episode-meta"><span data-l="en" lang="en">Exploring · Conversation 3 · 7 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">探索研究 · 第 3 段對話 · 共 7 則提示</span></p>
+              <ol class="episode-turns">
+    <li class="turn-gap"><span data-l="en" lang="en">1 earlier prompt not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過前面 1 則提示</span></li>
+    <li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 2 of 7 · Request · Oct 8, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 2／7 則提示 · 提出需求 · 2026年10月8日</span></p>
+        <blockquote><span data-l="en" lang="en">compare zustand and jotai for this canvas</span><span data-l="zh-TW" lang="zh-Hant-TW">compare zustand and jotai for this canvas</span></blockquote>
+      </li><li class="turn-gap"><span data-l="en" lang="en">1 prompt not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過 1 則提示</span></li><li>
+        <p class="turn-meta"><span data-l="en" lang="en">Prompt 4 of 7 · Change of direction · Oct 8, 2026</span><span data-l="zh-TW" lang="zh-Hant-TW">第 4／7 則提示 · 改變方向 · 2026年10月8日</span></p>
+        <blockquote><span data-l="en" lang="en">forget jotai, let&#39;s stay with zustand</span><span data-l="zh-TW" lang="zh-Hant-TW">forget jotai, let&#39;s stay with zustand</span></blockquote>
+      </li>
+    <li class="turn-gap"><span data-l="en" lang="en">3 later prompts not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過後面 3 則提示</span></li>
+  </ol>
+              <p class="episode-ending"><span data-l="en" lang="en">The user dropped this direction in prompt 4.</span><span data-l="zh-TW" lang="zh-Hant-TW">使用者在第 4 則提示中放棄這個方向。</span></p>
+            </li>
+        </ol>
+  </section>
 
           <section>
             <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>

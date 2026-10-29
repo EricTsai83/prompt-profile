@@ -29,6 +29,7 @@ import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
 import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibility.ts"
 import { usageSection, usageStyle } from "./usage.ts"
+import { episodesSection, episodesStyle } from "./episodes.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -621,6 +622,9 @@ export const renderHtml = (
   const progress = coaching ? progressBlock(profile, loc, v, scrub) : null
   const story = portraitStory(profile, loc, v, scrub)
   const preferences = preferenceEvidence(profile, loc, v, scrub)
+  const episodes = episodesSection(profile, loc, v, scrub, (t, l) =>
+    v.dates ? formatDate(t, tz, MESSAGES[l].locale) : formatMonth(t, tz, MESSAGES[l].locale),
+  )
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
   // the usage's own period: it is summed over the whole window, not only the prompts' days
@@ -640,7 +644,7 @@ export const renderHtml = (
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
@@ -911,6 +915,8 @@ export const renderHtml = (
           </section>
 
           ${preferences ?? ""}
+
+          ${episodes ?? ""}
 
           <section>
             <h2>${loc.text((m) => m.dimensions)}</h2>

@@ -108,7 +108,8 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
         (p.portrait
           ? evidence(p.portrait.chapters) +
             p.portrait.axes.reduce((n, a) => n + a.evidence.length + a.counterEvidence.length, 0)
-          : 0)
+          : 0) +
+        p.episodes.reduce((n, e) => n + e.turns.length, 0)
       : 0,
     projects: v.projects ? names.size : 0,
     exactDates: v.dates,

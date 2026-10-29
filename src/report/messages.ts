@@ -836,3 +836,97 @@ export const CARD_MESSAGES = {
     attribution: "由 prompt-profile 產生",
   },
 } as const
+
+/** The facts page's interaction episodes (plan 20 B): user turns only, results only when stated. */
+export const EPISODE_MESSAGES = {
+  en: {
+    title: "How conversations unfolded",
+    note: (selected: number, kept: number, analysed: number, total: number) =>
+      `Showing ${selected} of ${kept} verified ${kept === 1 ? "episode" : "episodes"}, chosen to spread over time, conversations and kinds of task. They come from the ${analysed} analysed conversations, not all ${total} in the history.`,
+    userOnly:
+      "Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.",
+    rejected: (n: number) =>
+      `${n} proposed ${n === 1 ? "episode was" : "episodes were"} rejected: a turn was invented, misquoted, out of order or from another conversation.`,
+    withdrawn: (n: number) =>
+      `${n} stated ${n === 1 ? "result was" : "results were"} withdrawn because no prompt in the episode showed ${n === 1 ? "it" : "them"}.`,
+    none: "No conversation in the analysed prompts showed more than a single request.",
+    patterns: "Recurring across conversations",
+    spread: (sessions: number, weeks: number) =>
+      `In ${sessions} conversations across ${weeks} analysed ${weeks === 1 ? "period" : "periods"}`,
+    shownIn: "Episodes",
+    against: "Went the other way",
+    conversation: (n: number, prompts: number) =>
+      `Conversation ${n} · ${prompts} ${prompts === 1 ? "prompt" : "prompts"}`,
+    split: "continues in another analysed part",
+    turn: (turn: number, of: number) => `Prompt ${turn} of ${of}`,
+    gap: (n: number) => `${n} ${n === 1 ? "prompt" : "prompts"} not shown`,
+    earlier: (n: number) => `${n} earlier ${n === 1 ? "prompt" : "prompts"} not shown`,
+    later: (n: number) => `${n} later ${n === 1 ? "prompt" : "prompts"} not shown`,
+    ending: {
+      unknown: () => "Result not visible in the record.",
+      user_reported: (turn: number) => `The user reported the result in prompt ${turn}.`,
+      abandoned: (turn: number) => `The user dropped this direction in prompt ${turn}.`,
+    },
+    roles: {
+      ask: "Request",
+      context: "Adds context",
+      correct: "Correction",
+      redirect: "Change of direction",
+      verify: "Asks to check",
+      close: "Wraps up",
+    },
+    taskTypes: {
+      build: "New feature",
+      fix: "Fixing a problem",
+      change: "Changing existing work",
+      explore: "Exploring",
+      review: "Review or explanation",
+      write: "Writing",
+      operate: "Running or operating",
+      other: "Other task",
+    },
+  },
+  "zh-TW": {
+    title: "對話如何展開",
+    note: (selected: number, kept: number, analysed: number, total: number) =>
+      `從 ${kept} 個通過驗證的片段中選出 ${selected} 個，盡量分散在不同時間、對話與任務類型。它們來自分析過的 ${analysed} 段對話，而非紀錄中全部的 ${total} 段。`,
+    userOnly: "紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。",
+    rejected: (n: number) =>
+      `有 ${n} 個提出的片段未採用：其中有捏造、引述不符、順序錯亂或混入其他對話的提示。`,
+    withdrawn: (n: number) => `有 ${n} 個聲稱的結果已撤回，因為片段中沒有任何提示呈現該結果。`,
+    none: "分析過的提示中，沒有任何一段對話超出單一請求。",
+    patterns: "在多段對話中反覆出現",
+    spread: (sessions: number, weeks: number) => `出現在 ${sessions} 段對話、${weeks} 個分析時段`,
+    shownIn: "片段",
+    against: "反例",
+    conversation: (n: number, prompts: number) => `第 ${n} 段對話 · 共 ${prompts} 則提示`,
+    split: "這段對話也出現在其他分析區段",
+    turn: (turn: number, of: number) => `第 ${turn}／${of} 則提示`,
+    gap: (n: number) => `略過 ${n} 則提示`,
+    earlier: (n: number) => `略過前面 ${n} 則提示`,
+    later: (n: number) => `略過後面 ${n} 則提示`,
+    ending: {
+      unknown: () => "紀錄中看不到結果。",
+      user_reported: (turn: number) => `使用者在第 ${turn} 則提示中回報結果。`,
+      abandoned: (turn: number) => `使用者在第 ${turn} 則提示中放棄這個方向。`,
+    },
+    roles: {
+      ask: "提出需求",
+      context: "補充脈絡",
+      correct: "修正方向",
+      redirect: "改變方向",
+      verify: "要求驗證",
+      close: "收尾",
+    },
+    taskTypes: {
+      build: "新功能",
+      fix: "修正問題",
+      change: "調整既有內容",
+      explore: "探索研究",
+      review: "審閱或說明",
+      write: "撰寫文字",
+      operate: "執行或維運",
+      other: "其他任務",
+    },
+  },
+} as const
