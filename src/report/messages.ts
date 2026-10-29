@@ -264,7 +264,8 @@ const en: Messages = {
   suggested: "Suggested rewrite",
   signalsTitle: "Signals worth a look",
   techniques: "How I work with AI",
-  techniquesNote: "Measured from tool metadata and prompt text; hover for definitions",
+  techniquesNote:
+    "Tool records show activity; prompt wording shows requests. Neither proves expertise or completed work. Hover for individual definitions.",
   workflow: "Workflow",
   promptCraft: "Prompt craft",
   ofSessions: (p) => `${p}% of sessions`,
@@ -468,7 +469,8 @@ const zhTW: Messages = {
   suggested: "建議的寫法",
   signalsTitle: "值得注意的訊號",
   techniques: "我怎麼用 AI",
-  techniquesNote: "從工具中繼資料與 prompt 文字量出來；滑過看定義",
+  techniquesNote:
+    "工具紀錄顯示活動，提示文字顯示要求；兩者都不能證明專業程度或工作已完成。滑過各項可查看定義。",
   workflow: "工作流程",
   promptCraft: "prompt 寫法",
   ofSessions: (p) => `${p}% 的 session`,
@@ -562,6 +564,8 @@ export const MESSAGES: Record<Language, Messages> = { en, "zh-TW": zhTW }
 export const PORTRAIT_MESSAGES = {
   en: {
     title: "A portrait of collaboration",
+    evidenceFor: "Supporting evidence",
+    evidenceAgainst: "Contrary evidence",
     preferences: "Observed collaboration preferences",
     note: "Preferences observed in these conversations, not a psychological assessment or an ability score. They may change with the task and the available history.",
     supporting: "Supporting patterns, activity and practical suggestions",
@@ -575,6 +579,8 @@ export const PORTRAIT_MESSAGES = {
   },
   "zh-TW": {
     title: "一個人如何與 AI 共事",
+    evidenceFor: "支持證據",
+    evidenceAgainst: "反向證據",
     preferences: "對話中展現的協作偏好",
     note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分；可能隨任務與可取得的紀錄改變。",
     supporting: "更多行為證據、使用紀錄與實用建議",
@@ -602,13 +608,20 @@ export const VIEW_MESSAGES = {
       "Read the interactions, supporting quotes and tools behind the overview. Evidence is expanded by default.",
     next: "Read the profile and evidence →",
     back: "← Back to the visual overview",
-    tools: "Workflow in practice",
-    promptTechniques: "How prompts are shaped",
+    tools: "Which tools appear in conversations?",
+    promptTechniques: "What do the prompts ask for?",
     toolsNote:
-      "Share of sessions with available tool metadata. These describe agent activity, not an ability score.",
+      "A session is one recorded conversation. Tool records describe agent activity, not the person’s ability. Categories overlap; percentages need not add to 100%.",
     promptsNote:
-      "Share of cleaned prompts matching each writing technique. Heuristic signals, not quality grades.",
-    noTools: "No tool metadata is available for this period.",
+      "Rules detect wording in prompts after cleaning removes injected content. Categories overlap; a match is not a quality grade or proof the request was completed.",
+    noTools: "0 sessions have tool metadata. Tool use is unknown, not zero.",
+    missingTechniques:
+      "Technique measurements are not stored in this profile. Tool use and prompt patterns are unknown.",
+    noPrompts: "No cleaned prompts are available. There is no denominator for these percentages.",
+    toolCoverage: (covered: number, total: number) =>
+      `Source: local tool records. ${covered} of ${total} sessions have metadata. Each value shows the percentage and sessions using that tool / covered sessions. Uncovered sessions are unknown.`,
+    promptCoverage: (n: number) =>
+      `Source: wording rules applied to ${n} cleaned prompts (the denominator). Each value is the share matching that rule. Exact matching prompt counts are not stored; percentages are rounded.`,
     mixed: "Mixed / insufficient evidence",
     first: "Observed preference",
     noPortrait:
@@ -624,11 +637,19 @@ export const VIEW_MESSAGES = {
     detailNote: "閱讀總覽背後的互動、原文引述與使用工具。證據預設展開，不必逐一點開。",
     next: "閱讀人物側寫與證據 →",
     back: "← 回到圖表總覽",
-    tools: "工作流程中的工具",
-    promptTechniques: "Prompt 的表達習慣",
-    toolsNote: "比例以具備工具紀錄的 session 為分母；呈現 agent 活動，不代表能力評分。",
-    promptsNote: "各項表達技巧在清理後 prompt 中的出現比例，屬於規則偵測結果，並非品質評分。",
-    noTools: "這段期間沒有可用的工具紀錄。",
+    tools: "對話中出現哪些工具？",
+    promptTechniques: "提示中提出哪些要求？",
+    toolsNote:
+      "一個 session 是一段對話紀錄。工具紀錄呈現 AI 助手的活動，不代表使用者的能力。類別可重疊，百分比不必合計為 100%。",
+    promptsNote:
+      "先移除注入內容，再以規則偵測提示文字。類別可重疊；符合規則不代表品質較好，也不代表要求已完成。",
+    noTools: "有工具紀錄的對話為 0 段。工具使用情況未知，並非沒有使用。",
+    missingTechniques: "這份報告未儲存技巧量測資料，工具使用與提示模式皆未知。",
+    noPrompts: "沒有清理後的提示，無法計算這些百分比。",
+    toolCoverage: (covered: number, total: number) =>
+      `來源：本機工具紀錄。共 ${total} 段對話，其中 ${covered} 段有工具紀錄。每項列出比例，以及使用該工具的對話數／有紀錄的對話數。其餘對話的使用情況未知。`,
+    promptCoverage: (n: number) =>
+      `來源：以文字規則檢查 ${n} 則清理後提示，以此為分母。每項數值是符合該規則的比例。報告未儲存各項符合的確切則數，百分比經過四捨五入。`,
     mixed: "混合偏好／證據不足",
     first: "觀察到的偏好",
     noPortrait: "這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。",

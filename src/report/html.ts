@@ -1,3 +1,6 @@
+import { documentLayoutStyle } from "./document-layout.ts"
+import { identitySignatures, productStyle } from "./templates.ts"
+import { isProductLook } from "./looks.ts"
 import { portraitSection, portraitStyle } from "./portrait.ts"
 import { VIEW_MESSAGES } from "./messages.ts"
 import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
@@ -650,7 +653,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
           ${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(lookStyle(look))}${raw(
             languageStyle(loc.langs),
           )}
-        </style>
+        ${isProductLook(options.look) ? raw(productStyle) : ""}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
         <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
@@ -735,7 +738,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                 </div>
               </dl>
             </div>
-            ${
+            ${isProductLook(options.look) ? identitySignatures(profile, loc, scrub) : ""}${
               graphic
                 ? html`<img
                     class="graphic"

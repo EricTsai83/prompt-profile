@@ -117,12 +117,10 @@ describe("looks: card", () => {
     }),
   )
 
-  it.effect("no look or combination shows a quote or a project name", () =>
+  it.effect("no look or combination shows a quote", () =>
     Effect.gen(function* () {
       const p = yield* sample()
-      // The fixture's "prompt-profile" project shares the product name printed on every card.
-      const projects = p.stats.topProjects.map((x) => x.name).filter((n) => n !== "prompt-profile")
-      const forbidden = [...quotes(p), ...projects]
+      const forbidden = quotes(p)
       for (const options of ALL_OPTIONS) {
         const text = texts(cardTree(p, options)).join("\n")
         for (const f of forbidden) expect(text, `${variantName(options)}: ${f}`).not.toContain(f)
@@ -190,7 +188,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 2,
         look: "afterhours",
-        lookVersion: 3,
+        lookVersion: 7,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

@@ -33,7 +33,7 @@ export const visibilityOf = (options: RenderOptions): Visibility => {
 /** Replaces project names in generated text (the model may mention them). */
 export type Scrub = (text: string, lang: Language) => string
 
-/** Identity when project names are shown; "Project A"… otherwise, as in the charts. */
+/** Identity when project names are shown; "Project A"… otherwise, including short names. */
 export const makeScrub = (p: Profile, v: Visibility): Scrub => {
   if (v.projects) return (text) => text
   const names = [
@@ -43,7 +43,7 @@ export const makeScrub = (p: Profile, v: Visibility): Scrub => {
     names.reduce((out, name, i) => {
       const index = p.stats.activity.projects.indexOf(name)
       const label = `${MESSAGES[lang].projectAnon} ${"ABCDEFGHIJ"[index === -1 ? i : index] ?? "?"}`
-      return name.length < 3
+      return name.length === 0
         ? out
         : out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), label)
     }, text)

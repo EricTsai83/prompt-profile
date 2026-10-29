@@ -264,12 +264,13 @@ const stageCard = (
       : null
   if (tools.length + prompts.length + extra.length === 0 && parallel === null) return null
   return html`<article class="cap cap-${stage.id}">
-    <header>
+    <div class="cap-lead"><header>
       <h3>${loc.text((m) => m.stages[stage.id][0])}</h3>
       <p>${loc.text((m) => m.stages[stage.id][1])}</p>
     </header>
     ${parallel ?? ""}
     ${tools.length + prompts.length > 0 ? html`<ul class="cap-ms">${tools}${prompts}</ul>` : ""}
+    </div>
     ${extra}
   </article>`
 }
@@ -296,6 +297,7 @@ export const techniquesSection = (s: Stats, loc: Loc, v: Visibility, say: Say): 
 }
 
 export const techniqueStyle = `
+.cap-lead{display:flex;flex-direction:column;gap:12px}
 .cap-note{margin:-6px 0 12px}
 .tech-callout{display:inline-block;margin:0;padding:5px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600;align-self:flex-start}
 .tech-time{display:grid;grid-template-columns:minmax(9em,13em) repeat(var(--months),minmax(0,1fr));gap:3px;align-items:center}

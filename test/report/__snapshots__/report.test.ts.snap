@@ -25,13 +25,13 @@ exports[`renderHtml > matches snapshot 1`] = `
 .overview-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 36px}
 .overview-charts h2,.preference-map h2{font-size:20px}.overview-charts .note,.preference-map>.note{margin-top:12px;line-height:1.7;font-size:13px;color:var(--muted)}
 .overview-bars{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:16px}
-.overview-bars li{display:grid;grid-template-columns:minmax(80px,1fr) minmax(40px,1fr) 44px;gap:12px;align-items:center;font-size:13px}
-.overview-bars b{text-align:right;font-variant-numeric:tabular-nums}
+.overview-bars li{display:grid;grid-template-columns:minmax(80px,1fr) minmax(40px,1fr) minmax(44px,max-content);gap:12px;align-items:center;font-size:13px}
+.overview-bars small{display:block;font-size:11px;font-weight:400;color:var(--muted);white-space:nowrap}.overview-bars b{text-align:right;font-variant-numeric:tabular-nums}
 .overview-bar-track{height:8px;border-radius:8px;background:var(--accent-soft);overflow:hidden}.overview-bar-track i{display:block;height:100%;background:var(--accent);border-radius:8px}
 .preference-map{margin:28px 0}.preference-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 44px;margin-top:28px}
 .preference-row h3{font-size:14px}.preference-rail{height:6px;background:linear-gradient(90deg,var(--accent-soft),var(--border),var(--accent-soft));border-radius:8px;position:relative;margin:22px 8px 14px}
 .preference-rail i{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:var(--card);border:2px dashed var(--muted)}
-.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
+.preference-rail.unclear{background:var(--border)}.preference-rail.unclear i{display:none}.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
 .preference-ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}.preference-status{font-size:12px;margin-top:10px;color:var(--muted)}
 .page-turn{margin:28px 0;border:1px solid var(--border)}
 .report-view-detail .portrait{margin-top:32px}.report-view-detail details[open]>summary{margin-bottom:14px}.report-view-detail blockquote{line-height:1.85}
@@ -250,6 +250,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .stack{height:140px;gap:2px}
 }
 
+.cap-lead{display:flex;flex-direction:column;gap:12px}
 .cap-note{margin:-6px 0 12px}
 .tech-callout{display:inline-block;margin:0;padding:5px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:600;align-self:flex-start}
 .tech-time{display:grid;grid-template-columns:minmax(9em,13em) repeat(var(--months),minmax(0,1fr));gap:3px;align-items:center}
@@ -287,7 +288,151 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .hero{--id-bg:var(--card);--id-fg:var(--fg);--id-muted:var(--muted);--id-split:transparent}.page [data-l]{display:none}
 #lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:#fff}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
 #lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:#fff}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
-        </style>
+
+:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--reading:65ch;--gutter:clamp(20px,4vw,48px)}
+html:root .page{padding:var(--space-8) var(--gutter) var(--space-12)}
+html:root .report-view{line-height:1.75}
+html:root .view-heading{margin:var(--space-8) 0 var(--space-6)}
+html:root .view-heading p{max-width:var(--reading);margin-top:var(--space-2)}
+html:root .hero{padding:var(--space-8)}
+html[data-look=folio] .hero{padding:var(--space-8) 0}
+html:root .hero .desc{max-width:var(--reading)}
+html:root .hero h1{line-height:1.12}
+html:root .identity-signatures{margin-top:var(--space-6);margin-bottom:0}
+html[data-look=slate] .identity-signatures{margin:0}
+html:root .grid,html:root .overview-charts{gap:var(--space-6);margin:0 0 var(--space-8)}
+html:root .panel{padding:var(--space-6);margin-bottom:0}
+html:root .wide{margin-bottom:var(--space-6)}
+html:root .grid>.panel,html:root .overview-charts>.panel{margin:0}
+html:root section>h2,html:root .section-head h2{margin:var(--space-12) 0 var(--space-4);line-height:1.3}
+html:root .panel-head{margin-bottom:var(--space-4)}
+html:root .overview-bars{margin-top:var(--space-4);gap:var(--space-3)}
+html:root .overview-charts .note,html:root .preference-map>.note{margin-top:var(--space-3)}
+html:root .preference-map{margin:var(--space-8) 0}
+html:root .preference-rows{gap:var(--space-6) var(--space-8);margin-top:var(--space-6)}
+html:root .portrait{max-width:var(--reading);margin:var(--space-8) auto var(--space-12)}
+html:root .portrait h2{margin-top:0}
+html:root .portrait-intro{margin-top:var(--space-4);line-height:1.65}
+html:root .portrait-chapter{margin-top:var(--space-8)}
+html:root .portrait-chapter h3{margin-bottom:var(--space-3);line-height:1.4}
+html:root .portrait-chapter>p{font-size:16px;line-height:1.8}
+html:root .portrait-evidence blockquote{margin:var(--space-3) 0;padding:var(--space-2) var(--space-4)}
+html:root .traits,html:root .improves,html:root .caps{gap:var(--space-6)}
+html:root .trait,html:root .improve{padding:var(--space-6);border-radius:8px}
+html:root .dim-body{padding:0 var(--space-6) var(--space-6)}
+html:root .dimension>summary{padding:var(--space-4) var(--space-6)}
+html:root .about{margin-top:var(--space-12);padding:var(--space-6);line-height:1.75}
+html:root .foot{margin-top:var(--space-6)}
+@media(max-width:640px){html:root .page{padding:var(--space-4) 20px var(--space-8)}html:root .hero,html:root .panel,html:root .trait,html:root .improve{padding:var(--space-4)}html[data-look=folio] .hero{padding:var(--space-6) 0}html:root .grid{grid-template-columns:1fr}html:root .portrait-chapter>p{font-size:15px}}
+/* Open composition: statistics are a strip, comparisons share a field, prose follows rules. */
+html:root :is(.sig,.panel,.trait,.dimension,.fact,.about,.minor,.improve,.cap,.cap-item,.signals li,.chg){background:transparent;border:0;border-radius:0;box-shadow:none}
+html:root .sigs{background:transparent;border:0;border-radius:0;overflow:visible;gap:24px;border-block:1px solid var(--border);padding:18px 0}
+html:root .sig{padding:0;min-width:0}
+html:root .panel{padding:24px 0;border-top:1px solid var(--border)}
+html:root .overview-charts{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:40px}
+html:root .traits{grid-template-columns:1fr;gap:0}
+html:root .trait{display:grid;grid-template-columns:minmax(160px,1fr) minmax(0,2fr);column-gap:32px;padding:24px 0;border-top:1px solid var(--border)}
+html:root .trait>header{grid-column:1;grid-row:span 3;display:block}
+html:root .trait>header .badge{display:inline-block;margin-top:8px}
+html:root .trait>:not(header){grid-column:2}
+html:root .trait blockquote{margin-top:12px}
+html:root .dimension{border-top:1px solid var(--border)}
+html:root .dimension>summary,html:root .dimension.static{padding:18px 0}
+html:root .dim-body{padding:0 0 24px}
+html:root .caps{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px 40px}
+html:root .cap{padding:24px 0;border-top:2px solid var(--border)}
+html:root .cap-item{padding:10px 0;border-top:1px solid var(--border)}
+html:root .improves{gap:0;max-width:var(--reading)}
+html:root .improve{padding:24px 0;border-top:1px solid var(--border)}
+html:root .signals li{padding:12px 0;border-top:1px solid var(--border)}
+html:root .chg{padding:10px 0;border-bottom:1px solid var(--border)}
+html:root .improve-impact{margin-top:8px}
+html:root .about{padding:24px 0;border-top:1px solid var(--border);max-width:var(--reading)}
+html[data-look=slate] .panel{padding-top:16px}
+html[data-look=folio] .overview-charts{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+@media(min-width:900px){html:root .report-view-detail .portrait{max-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:48px}html:root .portrait>h2,html:root .portrait>.portrait-intro{grid-column:1/-1;max-width:var(--reading)}html:root .portrait-chapter{grid-column:1;max-width:var(--reading)}html:root .portrait-preferences{grid-column:2;grid-row:3 / span 12;align-self:start;margin-top:32px;font-size:13px}}
+@media(max-width:760px){html:root .caps,html:root .overview-charts,html[data-look=folio] .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
+@page{size:A4;margin:16mm 17mm 18mm}
+@media print{
+html:root{--bg:#fff;--card:#fff;--fg:#17212b;--muted:#46515b;--border:#bdc5cc;--accent:#304d6a;--accent-soft:#e6ebef;color-scheme:light}
+html:root body{font-size:10pt;line-height:1.5;background:white;color:var(--fg)}
+html:root .page{max-width:none;padding:0;margin:0}
+html:root .topbar,html:root .view-nav,html:root .page-turn,html:root .switch{display:none!important}
+html:root .report-view{display:block!important;line-height:1.5}
+html:root .report-view-detail{break-before:auto;max-width:none;margin:0}
+html:root .hero{padding:5mm;border-radius:0;display:block;break-inside:auto;min-height:0}
+html[data-look=folio] .hero{padding:0 0 5mm}
+html:root .hero h1{font-size:25pt;line-height:1.15}
+html:root .hero .tagline{font-size:13pt;line-height:1.45}
+html:root .hero .desc{font-size:10pt;line-height:1.5}
+html:root .identity-signatures{margin-top:4mm;gap:4mm;break-inside:auto}
+html:root .identity-signatures article{padding:3mm 0;break-inside:avoid}
+html:root .identity-signatures h2{font-size:10pt}
+html:root .identity-signatures p{font-size:9pt;line-height:1.5}
+html:root .view-heading{margin:6mm 0 4mm;break-inside:avoid;break-after:avoid}
+html:root .view-heading h2,html:root section>h2,html:root .section-head h2{font-size:16pt;margin:6mm 0 3mm}
+html:root h2,html:root h3,html:root h4,html:root summary{break-after:avoid}
+p,li,blockquote{orphans:3;widows:3}
+html:root .grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:4mm}
+html:root .grid>.panel{break-inside:avoid}
+html:root .overview-charts{margin-bottom:4mm}
+html:root .overview-charts .overview-bars{margin-top:3mm;gap:2mm}
+html:root .overview-charts .note{margin-top:2mm;line-height:1.4}
+html:root .preference-map{margin:4mm 0}
+html:root .preference-rows{margin-top:3mm;gap:3mm 5mm}
+html:root .preference-rail{margin:12px 8px 8px}
+html:root .measured{grid-template-columns:repeat(3,minmax(0,1fr))}
+html:root .measured .panel{padding:3mm}
+html:root .measured .donut{gap:8px;flex-wrap:wrap}
+html:root .measured .donut svg{width:70px}
+html:root .measured .legend{font-size:8pt}
+html:root .measured .shares li{grid-template-columns:minmax(42px,1fr) 1fr 45px;font-size:8pt}
+html:root .sigs{margin:4mm 0}
+html:root .sig{padding:3mm}
+html:root .hero .copy{max-width:none}
+html:root .hero .graphic,html:root .hero-clock{display:none}
+html:root .cap-lead,html:root .progress{break-inside:avoid}
+html:root .cap-lead>*+*{margin-top:3mm}
+html:root .dims{display:block;columns:2;column-gap:4mm}
+html:root .dimension{display:inline-block;width:100%;position:relative}
+html:root .dimension>summary{display:block}
+html:root .dimension>summary::after{display:none}
+html:root .dimension .dim-name{display:block;padding-right:60px;margin:0;font-size:7.5pt}
+html:root .dimension .dim-main{display:block;margin-top:2mm;font-size:8.5pt;line-height:1.45}
+html:root .dimension .badge{position:absolute;top:2mm;right:3mm;margin:0;font-size:7pt;padding:1px 4px}
+html:root .about h2{font-size:12pt;margin:0 0 3mm}
+html:root .dimension{margin-bottom:3mm;break-inside:avoid}
+html:root .dimension>summary{padding:2mm 3mm}
+html:root .dim-body{padding:0 3mm 2mm}
+html:root .dim-body blockquote{font-size:8.5pt;line-height:1.4;padding:2px 8px}
+html:root .about{border:0;border-radius:0;border-top:1px solid var(--border);padding:4mm 0;break-inside:avoid}
+
+html:root .cols,html:root .stack{height:100px}
+html:root .heat-c{height:14px}
+html:root .cap p,html:root .trait p,html:root .dim-body p,html:root .improve p{font-size:9pt;line-height:1.5}
+html:root .overview-bars li{font-size:9pt;gap:8px}
+html:root .panel .note{font-size:8pt;line-height:1.5}
+html:root .panel{padding:4mm;margin-bottom:4mm;border-radius:0;break-inside:auto}
+html:root .overview-charts{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+html:root .overview-charts>.panel{margin-bottom:0;break-inside:avoid}
+html:root .panel:has(.heat),html:root .panel:has(.cal),html:root .panel:has(.cols),html:root .panel:has(.stack){break-inside:avoid}
+html:root .cap{display:block}
+html:root .cap>*+*{margin-top:3mm}
+html:root .portrait{display:block;max-width:none;margin:5mm 0}
+html:root .portrait-intro{font-size:12pt;line-height:1.6}
+html:root .portrait-chapter{margin-top:5mm;padding-top:0;break-inside:auto}
+html:root .portrait-chapter h3{font-size:12pt}
+html:root .portrait-chapter>p{font-size:10pt;line-height:1.6}
+html:root .portrait-axis,html:root .cap,html:root .improve{break-inside:auto}
+html:root .traits,html:root .caps,html:root .improves{display:block}
+html:root .trait,html:root .cap,html:root .improve{display:block;margin-bottom:4mm;padding:3mm 0}
+html:root blockquote,html:root .cap-item,html:root .preference-row,html:root svg{break-inside:avoid}
+html:root blockquote{font-size:9pt;line-height:1.5}
+html:root .about{margin-top:4mm;font-size:8.5pt;line-height:1.45;padding:3mm 0}
+html:root .tip::after,html:root .tip::before{display:none!important}
+html:root .tech-time{overflow:visible;font-size:8pt}
+}
+</style>
       </head>
       <body>
         <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="Visual overview" checked />
@@ -402,49 +547,49 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 
           <p class="note"><span data-l="en" lang="en">A collaboration portrait is not available in this profile. The detail page contains the available observations.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。</span></p>
           <div class="overview-charts">
-    <article class="panel"><h2><span data-l="en" lang="en">Workflow in practice</span><span data-l="zh-TW" lang="zh-Hant-TW">工作流程中的工具</span></h2>
-      <p class="note"><span data-l="en" lang="en">Share of sessions with available tool metadata. These describe agent activity, not an ability score.</span><span data-l="zh-TW" lang="zh-Hant-TW">比例以具備工具紀錄的 session 為分母；呈現 agent 活動，不代表能力評分。</span></p>
-      <ul class="overview-bars"><li>
+    <article class="panel"><h2><span data-l="en" lang="en">Which tools appear in conversations?</span><span data-l="zh-TW" lang="zh-Hant-TW">對話中出現哪些工具？</span></h2>
+      <p class="note"><span data-l="en" lang="en">A session is one recorded conversation. Tool records describe agent activity, not the person’s ability. Categories overlap; percentages need not add to 100%.</span><span data-l="zh-TW" lang="zh-Hant-TW">一個 session 是一段對話紀錄。工具紀錄呈現 AI 助手的活動，不代表使用者的能力。類別可重疊，百分比不必合計為 100%。</span></p>
+      <p class="note"><span data-l="en" lang="en">Source: local tool records. 180 of 312 sessions have metadata. Each value shows the percentage and sessions using that tool / covered sessions. Uncovered sessions are unknown.</span><span data-l="zh-TW" lang="zh-Hant-TW">來源：本機工具紀錄。共 312 段對話，其中 180 段有工具紀錄。每項列出比例，以及使用該工具的對話數／有紀錄的對話數。其餘對話的使用情況未知。</span></p><ul class="overview-bars"><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Ships pull requests</span><span data-l="zh-TW" lang="zh-Hant-TW">發 pull request</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:27%"></i></span>
-  <b>27%</b>
+  <b>27%<small>48 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:26%"></i></span>
-  <b>26%</b>
+  <b>26%<small>47 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Researches the web</span><span data-l="zh-TW" lang="zh-Hant-TW">上網查資料</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:12%"></i></span>
-  <b>12%</b>
+  <b>12%<small>22 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Connects MCP tools</span><span data-l="zh-TW" lang="zh-Hant-TW">串接 MCP 工具</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:11%"></i></span>
-  <b>11%</b>
+  <b>11%<small>20 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Uses skills</span><span data-l="zh-TW" lang="zh-Hant-TW">使用 skills</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:10%"></i></span>
-  <b>10%</b>
+  <b>10%<small>18 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Plans in plan mode</span><span data-l="zh-TW" lang="zh-Hant-TW">用 plan 模式規劃</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:8%"></i></span>
-  <b>8%</b>
+  <b>8%<small>14 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Lets the agent ask</span><span data-l="zh-TW" lang="zh-Hant-TW">讓 agent 反問</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:8%"></i></span>
-  <b>8%</b>
+  <b>8%<small>14 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Runs background work</span><span data-l="zh-TW" lang="zh-Hant-TW">跑背景任務</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:7%"></i></span>
-  <b>7%</b>
+  <b>7%<small>13 / 180</small></b>
 </li><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Isolates work in worktrees</span><span data-l="zh-TW" lang="zh-Hant-TW">用 worktree 隔離工作</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:5%"></i></span>
-  <b>5%</b>
+  <b>5%<small>9 / 180</small></b>
 </li></ul>
     </article>
-    <article class="panel"><h2><span data-l="en" lang="en">How prompts are shaped</span><span data-l="zh-TW" lang="zh-Hant-TW">Prompt 的表達習慣</span></h2>
-      <p class="note"><span data-l="en" lang="en">Share of cleaned prompts matching each writing technique. Heuristic signals, not quality grades.</span><span data-l="zh-TW" lang="zh-Hant-TW">各項表達技巧在清理後 prompt 中的出現比例，屬於規則偵測結果，並非品質評分。</span></p>
-      <ul class="overview-bars"><li>
+    <article class="panel"><h2><span data-l="en" lang="en">What do the prompts ask for?</span><span data-l="zh-TW" lang="zh-Hant-TW">提示中提出哪些要求？</span></h2>
+      <p class="note"><span data-l="en" lang="en">Rules detect wording in prompts after cleaning removes injected content. Categories overlap; a match is not a quality grade or proof the request was completed.</span><span data-l="zh-TW" lang="zh-Hant-TW">先移除注入內容，再以規則偵測提示文字。類別可重疊；符合規則不代表品質較好，也不代表要求已完成。</span></p>
+      <p class="note"><span data-l="en" lang="en">Source: wording rules applied to 1412 cleaned prompts (the denominator). Each value is the share matching that rule. Exact matching prompt counts are not stored; percentages are rounded.</span><span data-l="zh-TW" lang="zh-Hant-TW">來源：以文字規則檢查 1412 則清理後提示，以此為分母。每項數值是符合該規則的比例。報告未儲存各項符合的確切則數，百分比經過四捨五入。</span></p><ul class="overview-bars"><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">States constraints</span><span data-l="zh-TW" lang="zh-Hant-TW">說明限制</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:36%"></i></span>
   <b>36%</b>
@@ -2687,7 +2832,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
           <section class="techniques">
                   <div class="section-head">
                     <h2><span data-l="en" lang="en">How I work with AI</span><span data-l="zh-TW" lang="zh-Hant-TW">我怎麼用 AI</span></h2>
-                    <p class="note"><span data-l="en" lang="en">Measured from tool metadata and prompt text; hover for definitions</span><span data-l="zh-TW" lang="zh-Hant-TW">從工具中繼資料與 prompt 文字量出來；滑過看定義</span></p>
+                    <p class="note"><span data-l="en" lang="en">Tool records show activity; prompt wording shows requests. Neither proves expertise or completed work. Hover for individual definitions.</span><span data-l="zh-TW" lang="zh-Hant-TW">工具紀錄顯示活動，提示文字顯示要求；兩者都不能證明專業程度或工作已完成。滑過各項可查看定義。</span></p>
                   </div>
                   <p class="note cap-note"><span data-l="en" lang="en">Workflow shares cover the 180 sessions whose transcripts are still on disk (Claude Code deletes old ones)</span><span data-l="zh-TW" lang="zh-Hant-TW">工作流程的比例只涵蓋還保留完整紀錄的 180 個 session（Claude Code 會刪除舊紀錄）</span></p>
     <article class="panel wide">
@@ -2969,7 +3114,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
   </div>
           </article>
     <div class="caps"><article class="cap cap-plan">
-    <header>
+    <div class="cap-lead"><header>
       <h3><span data-l="en" lang="en">Plan</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃</span></h3>
       <p><span data-l="en" lang="en">Does the work start from a plan?</span><span data-l="zh-TW" lang="zh-Hant-TW">工作是不是從計畫開始？</span></p>
     </header>
@@ -2991,9 +3136,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="share-track"><span class="share-fill" style="width:12%"></span></span>
     <b>12%</b>
   </li></ul>
+    </div>
 
   </article><article class="cap cap-delegate">
-    <header>
+    <div class="cap-lead"><header>
       <h3><span data-l="en" lang="en">Delegate</span><span data-l="zh-TW" lang="zh-Hant-TW">委派</span></h3>
       <p><span data-l="en" lang="en">How much is handed to agents, and how?</span><span data-l="zh-TW" lang="zh-Hant-TW">交給 agent 多少、怎麼交？</span></p>
     </header>
@@ -3015,6 +3161,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="share-track"><span class="share-fill" style="width:8%"></span></span>
     <b>8%</b>
   </li></ul>
+    </div>
     <div class="cap-named">
         <h4><span data-l="en" lang="en">Subagent types</span><span data-l="zh-TW" lang="zh-Hant-TW">子代理類型</span></h4>
         <ul><li class="cap-chip tip" data-tip-en="31 sessions" data-tip-zh-TW="31 個 session" tabindex="-1">
@@ -3027,7 +3174,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 
       </div>
   </article><article class="cap cap-extend">
-    <header>
+    <div class="cap-lead"><header>
       <h3><span data-l="en" lang="en">Extend</span><span data-l="zh-TW" lang="zh-Hant-TW">擴充</span></h3>
       <p><span data-l="en" lang="en">Which skills and tools extend the agent?</span><span data-l="zh-TW" lang="zh-Hant-TW">用了哪些 skills 和工具擴充 agent？</span></p>
     </header>
@@ -3045,6 +3192,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="share-track"><span class="share-fill" style="width:12%"></span></span>
     <b>12%</b>
   </li></ul>
+    </div>
     <div class="cap-named">
         <h4><span data-l="en" lang="en">Skills used</span><span data-l="zh-TW" lang="zh-Hant-TW">用過的 skills</span></h4>
         <ul><li class="cap-item">
@@ -3101,7 +3249,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 
       </div>
   </article><article class="cap cap-verify">
-    <header>
+    <div class="cap-lead"><header>
       <h3><span data-l="en" lang="en">Verify</span><span data-l="zh-TW" lang="zh-Hant-TW">驗證</span></h3>
       <p><span data-l="en" lang="en">Is the AI given context and asked to check its work?</span><span data-l="zh-TW" lang="zh-Hant-TW">有沒有給 AI 足夠脈絡、要求它檢查？</span></p>
     </header>
@@ -3135,9 +3283,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="share-track"><span class="share-fill" style="width:7%"></span></span>
     <b>7%</b>
   </li></ul>
+    </div>
 
   </article><article class="cap cap-ship">
-    <header>
+    <div class="cap-lead"><header>
       <h3><span data-l="en" lang="en">Ship</span><span data-l="zh-TW" lang="zh-Hant-TW">交付</span></h3>
       <p><span data-l="en" lang="en">Does the work end in a pull request?</span><span data-l="zh-TW" lang="zh-Hant-TW">工作是不是以 pull request 收尾？</span></p>
     </header>
@@ -3147,6 +3296,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
     <span class="share-track"><span class="share-fill" style="width:27%"></span></span>
     <b>144 PR</b>
   </li></ul>
+    </div>
     <div class="cap-named">
         <h4><span data-l="en" lang="en">Models</span><span data-l="zh-TW" lang="zh-Hant-TW">模型</span></h4>
         <ul><li class="cap-chip tip" data-tip-en="180 sessions" data-tip-zh-TW="180 個 session" tabindex="-1">

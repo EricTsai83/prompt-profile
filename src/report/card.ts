@@ -10,6 +10,7 @@ import {
   CLASSIC_TOKENS,
   DEFAULT_RENDER_OPTIONS,
   lookOf,
+  isProductLook,
   type Look,
   type RenderOptions,
 } from "./looks.ts"
@@ -350,6 +351,192 @@ const lookTree = (
   )
 }
 
+/** Product cards use a quiet identity column and a separate activity/support surface. */
+const productTree = (
+  p: Profile,
+  look: Look,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+): Node => {
+  const c = contentIn(p, lang)
+  const k = look.light
+  const folio = look.id === "folio"
+  const slate = look.id === "slate"
+  const graphic = graphicSvg("bars", p.stats.hourHistogram, look.identity)
+  const traits = p.traits
+    .map((t, i) => ({ t, i }))
+    .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
+    .slice(0, 2)
+  return h(
+    "div",
+    {
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      display: "flex",
+      flexDirection: "column",
+      padding: 48,
+      position: "relative",
+      boxSizing: "border-box",
+      backgroundColor: k.bg,
+      color: k.fg,
+      fontFamily: "Inter",
+      borderTop: `8px solid ${k.accent}`,
+    },
+    [
+      h(
+        "div",
+        {
+          display: "flex",
+          width: 1104,
+          justifyContent: "space-between",
+          fontSize: 18,
+          color: k.muted,
+        },
+        [h("div", {}, MESSAGES[lang].project), h("div", {}, look.id.toUpperCase())],
+      ),
+      h(
+        "div",
+        {
+          display: "flex",
+          position: "absolute",
+          left: 48,
+          top: 120,
+          width: 1104,
+          height: 390,
+          gap: 40,
+        },
+        [
+          h(
+            "div",
+            {
+              display: "flex",
+              flexDirection: "column",
+              width: 700,
+              flexShrink: 0,
+              height: 390,
+              overflow: "hidden",
+            },
+            [
+              h(
+                "div",
+                {
+                  fontFamily: folio ? DISPLAY_FONT : "Inter",
+                  fontSize: 48,
+                  fontWeight: 700,
+                  lineHeight: 1.12,
+                  letterSpacing: -1.5,
+                  width: 700,
+                  maxHeight: 108,
+                  flexShrink: 0,
+                  lineClamp: 2,
+                  overflow: "hidden",
+                  wordBreak: "break-all",
+                },
+                clip(c.archetype.name.replace(/\s+/g, " "), 52),
+              ),
+              h(
+                "div",
+                {
+                  fontSize: 23,
+                  lineHeight: 1.5,
+                  color: k.muted,
+                  marginTop: 18,
+                  width: 700,
+                  maxHeight: 70,
+                  flexShrink: 0,
+                  lineClamp: 2,
+                  overflow: "hidden",
+                  wordBreak: "break-all",
+                },
+                clip(c.headline.replace(/\s+/g, " "), 105),
+              ),
+              hide.includes("traits")
+                ? null
+                : h(
+                    "div",
+                    {
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                      marginTop: 28,
+                      fontSize: 18,
+                    },
+                    traits.map(({ i }) =>
+                      h(
+                        "div",
+                        {
+                          display: "block",
+                          paddingTop: 10,
+                          borderTop: `1px solid ${k.border}`,
+                          width: 700,
+                          maxHeight: 36,
+                          flexShrink: 0,
+                          lineHeight: 1.3,
+                          lineClamp: 1,
+                          overflow: "hidden",
+                          wordBreak: "break-all",
+                        },
+                        clip(c.trait(i).name.replace(/\s+/g, " "), 48),
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+          h(
+            "div",
+            {
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: folio ? "flex-end" : "center",
+              width: 340,
+              padding: slate ? 20 : 0,
+              backgroundColor: slate ? k.card : k.bg,
+            },
+            [
+              hide.includes("graphic")
+                ? null
+                : { type: "img", props: { src: svgDataUrl(graphic.svg), width: 260, height: 180 } },
+              hide.includes("stats")
+                ? null
+                : h(
+                    "div",
+                    { display: "flex", flexDirection: "column", gap: 14, marginTop: 26 },
+                    cardMetrics(p, lang, 2).map(([label, value]) =>
+                      h(
+                        "div",
+                        {
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: 16,
+                          color: k.muted,
+                        },
+                        [label, h("b", { color: k.fg }, value)],
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+        ],
+      ),
+      h(
+        "div",
+        {
+          display: "flex",
+          position: "absolute",
+          left: 48,
+          bottom: 30,
+          width: 1104,
+          borderTop: `1px solid ${k.border}`,
+          paddingTop: 18,
+          fontSize: 15,
+          color: k.muted,
+        },
+        "npx prompt-profile",
+      ),
+    ],
+  )
+}
+
 /**
  * Card content: archetype, headline, up to 3 trait names and a few numbers.
  * **Never any prompt text** — the card is meant to be shared publicly.
@@ -360,11 +547,14 @@ export const cardTree = (
   lang: Language = profile.languages[0],
 ): Node => {
   const look = lookOf(options.look)
+  // Project visibility is the same user choice for the report and its card.
   const v = visibilityOf(options)
   const p = v.projects ? profile : scrubIdentity(profile, makeScrub(profile, v), lang)
   return look === null
     ? classicTree(p, options.cardHide, lang)
-    : lookTree(p, look, options.cardHide, lang)
+    : isProductLook(look.id)
+      ? productTree(p, look, options.cardHide, lang)
+      : lookTree(p, look, options.cardHide, lang)
 }
 
 let wasmReady: Promise<void> | null = null

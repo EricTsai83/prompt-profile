@@ -37,7 +37,9 @@ const verbose = Flag.Boolean("verbose").pipe(
 )
 
 const look = Flag.Literals("look", LOOK_IDS).pipe(
-  Flag.withDescription("Report and card design (render only; no extra LLM calls)"),
+  Flag.withDescription(
+    "Report and card design: prism (clear overview), slate (compact workspace), folio (narrative reading); classic is default (render only)",
+  ),
   Flag.withDefault("classic" as const),
 )
 const lang = Flag.String("lang").pipe(

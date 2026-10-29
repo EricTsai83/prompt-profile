@@ -4,7 +4,15 @@
  * plans 12 and 18 (deleted when done; in git history).
  */
 
-export const LOOK_IDS = ["classic", "signal", "afterhours", "studio"] as const
+export const LOOK_IDS = [
+  "classic",
+  "signal",
+  "afterhours",
+  "studio",
+  "prism",
+  "slate",
+  "folio",
+] as const
 export type LookId = (typeof LOOK_IDS)[number]
 
 /** Card parts a user may leave out of the card (`--card-hide`). */
@@ -110,7 +118,7 @@ export interface Look {
 export const LOOKS: ReadonlyArray<Look> = [
   {
     id: "signal",
-    version: 3,
+    version: 7,
     light: {
       bg: "#f5f7ff",
       fg: "#14204c",
@@ -147,7 +155,7 @@ export const LOOKS: ReadonlyArray<Look> = [
   },
   {
     id: "afterhours",
-    version: 3,
+    version: 7,
     light: {
       bg: "#eef3f8",
       fg: "#10243a",
@@ -184,7 +192,7 @@ export const LOOKS: ReadonlyArray<Look> = [
   },
   {
     id: "studio",
-    version: 3,
+    version: 7,
     light: {
       bg: "#fff7f4",
       fg: "#252323",
@@ -219,7 +227,122 @@ export const LOOKS: ReadonlyArray<Look> = [
       graphicDetail: "#ff654b",
     },
   },
+  {
+    id: "prism",
+    version: 7,
+    light: {
+      bg: "#f8fafc",
+      fg: "#172338",
+      muted: "#626d78",
+      card: "#ffffff",
+      border: "#dfe3e7",
+      accent: "#5265d8",
+      accentSoft: "#edf0ff",
+      warn: "#8a5300",
+      empty: "#edf0f2",
+    },
+    dark: {
+      bg: "#101827",
+      fg: "#edf0f3",
+      muted: "#aab5be",
+      card: "#242c32",
+      border: "#3c464f",
+      accent: "#b3c7e8",
+      accentSoft: "#354250",
+      warn: "#ffd98a",
+      empty: "#303942",
+    },
+    identity: {
+      background: "#f8fafc",
+      split: null,
+      text: "#172338",
+      muted: "#626d78",
+      chipBorder: "#dfe3e7",
+      chipBackground: "#ffffff",
+      graphic: "bars",
+      graphicColor: "#5265d8",
+      graphicDetail: "#5265d8",
+    },
+  },
+  {
+    id: "slate",
+    version: 7,
+    light: {
+      bg: "#f4f5f6",
+      fg: "#20272c",
+      muted: "#626d78",
+      card: "#ffffff",
+      border: "#dfe3e7",
+      accent: "#367d77",
+      accentSoft: "#e6f1ef",
+      warn: "#8a5300",
+      empty: "#edf0f2",
+    },
+    dark: {
+      bg: "#141b20",
+      fg: "#edf0f3",
+      muted: "#aab5be",
+      card: "#242c32",
+      border: "#3c464f",
+      accent: "#b3c7e8",
+      accentSoft: "#354250",
+      warn: "#ffd98a",
+      empty: "#303942",
+    },
+    identity: {
+      background: "#f4f5f6",
+      split: null,
+      text: "#20272c",
+      muted: "#626d78",
+      chipBorder: "#dfe3e7",
+      chipBackground: "#ffffff",
+      graphic: "bars",
+      graphicColor: "#367d77",
+      graphicDetail: "#367d77",
+    },
+  },
+  {
+    id: "folio",
+    version: 7,
+    light: {
+      bg: "#faf9f5",
+      fg: "#302e2a",
+      muted: "#626d78",
+      card: "#ffffff",
+      border: "#dfe3e7",
+      accent: "#98613d",
+      accentSoft: "#f1e8dd",
+      warn: "#8a5300",
+      empty: "#edf0f2",
+    },
+    dark: {
+      bg: "#201f1c",
+      fg: "#edf0f3",
+      muted: "#aab5be",
+      card: "#242c32",
+      border: "#3c464f",
+      accent: "#b3c7e8",
+      accentSoft: "#354250",
+      warn: "#ffd98a",
+      empty: "#303942",
+    },
+    identity: {
+      background: "#faf9f5",
+      split: null,
+      text: "#302e2a",
+      muted: "#626d78",
+      chipBorder: "#dfe3e7",
+      chipBackground: "#ffffff",
+      graphic: "bars",
+      graphicColor: "#98613d",
+      graphicDetail: "#98613d",
+    },
+  },
 ]
+
+/** Original product layouts; colors are shared by report and card. */
+export const PRODUCT_LOOK_IDS = ["prism", "slate", "folio"] as const
+export const isProductLook = (id: LookId): boolean => PRODUCT_LOOK_IDS.some((x) => x === id)
 
 /** The look's data, or null for `classic`. */
 export const lookOf = (id: LookId): Look | null => LOOKS.find((l) => l.id === id) ?? null

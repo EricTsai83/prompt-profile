@@ -44,7 +44,8 @@ export const portraitSection = (p: Profile, loc: Loc, v: Visibility, scrub: Scru
         <b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[axis.key][0])}</b>
         <span>${loc.text((_m, _c, l) => (axis.pole === "unclear" ? PORTRAIT_MESSAGES[l].unclear : PORTRAIT_MESSAGES[l].axes[axis.key][axis.pole === "first" ? 1 : 2]))}</span>
         ${axis.evidence.length > 0 ? html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.portrait?.axes.find((a) => a.key === axis.key)?.explanation ?? axis.explanation, l))}</p>` : ""}
-        ${evidence([...axis.evidence, ...axis.counterEvidence])}
+        ${axis.evidence.length > 0 && v.quotes ? html`<div class="supporting-evidence"><h4>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].evidenceFor)}</h4>${evidence(axis.evidence)}</div>` : ""}
+        ${axis.counterEvidence.length > 0 && v.quotes ? html`<div class="counter-evidence"><h4>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].evidenceAgainst)}</h4>${evidence(axis.counterEvidence)}</div>` : ""}
       </div>`,
       )}
     </aside>

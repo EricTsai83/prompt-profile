@@ -37,15 +37,15 @@ export const workflowCharts = (p: Profile, loc: Loc): Raw => {
       <p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].toolsNote)}</p>
       ${
         !t || t.coveredSessions === 0
-          ? html`<p class="empty">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noTools)}</p>`
-          : html`<ul class="overview-bars">${TOOL_TECHNIQUES.toSorted(
+          ? html`<p class="empty">${loc.text((_m, _c, l) => (!t ? VIEW_MESSAGES[l].missingTechniques : VIEW_MESSAGES[l].noTools))}</p>`
+          : html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].toolCoverage(t.coveredSessions, p.stats.totalSessions))}</p><ul class="overview-bars">${TOOL_TECHNIQUES.toSorted(
               (a, b) => t.tools[b].sessions - t.tools[a].sessions,
             ).map((key) => {
               const share = Math.min(1, t.tools[key].sessions / t.coveredSessions)
               return bar(
                 loc.text((m) => m.toolNames[key][0]),
                 share,
-                html`${Math.round(100 * share)}%`,
+                html`${Math.round(100 * share)}%<small>${t.tools[key].sessions} / ${t.coveredSessions}</small>`,
               )
             })}</ul>`
       }
@@ -54,15 +54,19 @@ export const workflowCharts = (p: Profile, loc: Loc): Raw => {
       t
         ? html`<article class="panel"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptTechniques)}</h2>
       <p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptsNote)}</p>
-      <ul class="overview-bars">${PROMPT_TECHNIQUES.toSorted(
-        (a, b) => t.prompts[b] - t.prompts[a],
-      ).map((key) =>
-        bar(
-          loc.text((m) => m.promptNames[key][0]),
-          t.prompts[key],
-          html`${Math.round(100 * t.prompts[key])}%`,
-        ),
-      )}</ul>
+      ${
+        p.stats.analyzedPrompts === 0
+          ? html`<p class="empty">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noPrompts)}</p>`
+          : html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptCoverage(p.stats.analyzedPrompts))}</p><ul class="overview-bars">${PROMPT_TECHNIQUES.toSorted(
+              (a, b) => t.prompts[b] - t.prompts[a],
+            ).map((key) =>
+              bar(
+                loc.text((m) => m.promptNames[key][0]),
+                t.prompts[key],
+                html`${Math.round(100 * t.prompts[key])}%`,
+              ),
+            )}</ul>`
+      }
     </article>`
         : ""
     }
@@ -81,13 +85,13 @@ export const viewStyle = `
 .overview-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 36px}
 .overview-charts h2,.preference-map h2{font-size:20px}.overview-charts .note,.preference-map>.note{margin-top:12px;line-height:1.7;font-size:13px;color:var(--muted)}
 .overview-bars{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:16px}
-.overview-bars li{display:grid;grid-template-columns:minmax(80px,1fr) minmax(40px,1fr) 44px;gap:12px;align-items:center;font-size:13px}
-.overview-bars b{text-align:right;font-variant-numeric:tabular-nums}
+.overview-bars li{display:grid;grid-template-columns:minmax(80px,1fr) minmax(40px,1fr) minmax(44px,max-content);gap:12px;align-items:center;font-size:13px}
+.overview-bars small{display:block;font-size:11px;font-weight:400;color:var(--muted);white-space:nowrap}.overview-bars b{text-align:right;font-variant-numeric:tabular-nums}
 .overview-bar-track{height:8px;border-radius:8px;background:var(--accent-soft);overflow:hidden}.overview-bar-track i{display:block;height:100%;background:var(--accent);border-radius:8px}
 .preference-map{margin:28px 0}.preference-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 44px;margin-top:28px}
 .preference-row h3{font-size:14px}.preference-rail{height:6px;background:linear-gradient(90deg,var(--accent-soft),var(--border),var(--accent-soft));border-radius:8px;position:relative;margin:22px 8px 14px}
 .preference-rail i{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:var(--card);border:2px dashed var(--muted)}
-.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
+.preference-rail.unclear{background:var(--border)}.preference-rail.unclear i{display:none}.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
 .preference-ends{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}.preference-status{font-size:12px;margin-top:10px;color:var(--muted)}
 .page-turn{margin:28px 0;border:1px solid var(--border)}
 .report-view-detail .portrait{margin-top:32px}.report-view-detail details[open]>summary{margin-bottom:14px}.report-view-detail blockquote{line-height:1.85}
