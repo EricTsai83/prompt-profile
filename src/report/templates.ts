@@ -26,16 +26,16 @@ const D = "[data-composition=document]"
  */
 export const variantStyle = `
 html${D} .identity-signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0 8px}
-.identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:16px;line-height:1.5}.identity-signatures p{font-size:13px;line-height:1.8;color:var(--muted);margin-top:8px}
+.identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:var(--text-base);line-height:1.5}.identity-signatures p{font-size:var(--text-sm);line-height:1.8;color:var(--muted);margin-top:8px}
 ${D} .hero{background:var(--card);color:var(--fg);overflow:visible}
 ${D} .hero .copy{max-width:none}
-${D} .hero .tagline{color:var(--fg);max-width:760px;font-size:20px;line-height:1.6}
+${D} .hero .tagline{color:var(--fg);max-width:760px;font-size:var(--text-xl);line-height:1.6}
 ${D} .hero .desc{color:var(--muted);max-width:760px;line-height:1.8}
 ${D} .hero .graphic,${D} .hero .chrono{display:none}
-${D} .hero .report-facts{border-top:1px solid var(--border);padding-top:16px;margin-top:22px;color:var(--muted);font-size:11px}
+${D} .hero .report-facts{border-top:1px solid var(--border);padding-top:var(--space-4);margin-top:var(--space-6);color:var(--muted);font-size:var(--text-xs)}
 ${D} .hero .report-facts dt{color:var(--muted);font-size:10px}
-${D} .view-heading h2{font-size:22px}
-${D} .view-heading p{font-size:13px}
+${D} .view-heading h2{font-size:var(--text-xl)}
+${D} .view-heading p{font-size:var(--text-sm)}
 :where(${D}) .preference-row:has(.unclear) .preference-rail,:where(${D}) .preference-row:has(.unclear) .preference-ends{display:none}
 [data-hero=split] .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px}html[data-signatures=stacked] .identity-signatures{display:grid!important;grid-template-columns:1fr;gap:0;margin:0}html[data-signatures=stacked] .identity-signatures article{padding:12px 0;border-top:1px solid var(--border)}html[data-signatures=stacked] .identity-signatures article:first-child{border-top:0}html[data-signatures=stacked] .identity-signatures p{margin-top:4px}
 [data-hero=editorial] .hero{background:transparent}html[data-signatures=ledger] .identity-signatures{grid-template-columns:1fr;gap:0;max-width:var(--column)}html[data-signatures=ledger] .identity-signatures article{display:grid;grid-template-columns:200px 1fr;gap:24px;border-top:1px solid var(--border);padding:16px 0}html[data-signatures=ledger] .identity-signatures p{margin:0}[data-detail-width=reading] .report-view-detail{max-width:var(--column);margin:auto}[data-detail-width=reading] .portrait-intro{font-family:var(--prose-font);font-size:var(--prose-intro)}[data-detail-width=reading] .portrait-chapter{border-top:1px solid var(--border);padding-top:28px}

@@ -250,17 +250,17 @@ export const usageStyle = `
 .usage-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
 .usage-tool{display:flex;flex-direction:column;gap:10px}
 .usage-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px;margin:0}
-.usage-facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.usage-facts dt{font-size:var(--text-2xs);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .usage-facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
-.usage-none{font-size:13px;color:var(--muted)}
+.usage-none{font-size:var(--text-sm);color:var(--muted)}
 .usage-kinds li{grid-template-columns:minmax(7em,11em) 1fr minmax(4.5em,auto)}
-.usage-state{font-size:13px;color:var(--warn);margin:0}
+.usage-state{font-size:var(--text-sm);color:var(--warn);margin:0}
 .usage-share-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .usage-scroll{overflow-x:auto}.usage-scroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.usage-table table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.usage-table table{width:100%;border-collapse:collapse;font-size:var(--text-sm);font-variant-numeric:tabular-nums}
 .usage-table th,.usage-table td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
 .usage-table th:first-child,.usage-table td:first-child{text-align:left}
-.usage-table thead th{font-size:11px;font-weight:600;color:var(--muted)}
+.usage-table thead th{font-size:var(--text-2xs);font-weight:600;color:var(--muted)}
 @media (max-width:760px){.usage-tools,.usage-share-grid{grid-template-columns:1fr}}
 @media print{.usage-scroll{overflow:visible}.usage-table th,.usage-table td{white-space:normal}}
 `

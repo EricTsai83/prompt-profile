@@ -388,7 +388,7 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding-bottom:20px;outline:none}
 .col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity var(--motion-fast) var(--ease-out)}
 .col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
-.col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
+.col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:var(--text-2xs);color:var(--muted);white-space:nowrap}
 .heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
 .heat-top{position:relative;height:56px;display:flex;align-items:flex-end;outline:none}
 .heat-top i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.35}
@@ -401,15 +401,15 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .clock-dial{fill:none;stroke:var(--id-muted,var(--muted));stroke-opacity:.25}
 .clock-bar{stroke:var(--id-accent,var(--accent));stroke-width:7;stroke-linecap:round;stroke-opacity:.35}
 .clock-bar.on{stroke-opacity:1}
-.clock-tick{fill:var(--id-muted,var(--muted));font-size:11px}
-.clock figcaption{font-size:13px;color:var(--id-muted,var(--muted));text-align:center}
+.clock-tick{fill:var(--id-muted,var(--muted));font-size:var(--text-2xs)}
+.clock figcaption{font-size:var(--text-sm);color:var(--id-muted,var(--muted));text-align:center}
 .chapters{display:flex;gap:6px;list-style:none;margin:6px 0 18px;padding:0}
 .chapters li{min-width:0;display:flex;flex-direction:column;gap:4px}
 .ch-bar{height:10px;border-radius:5px;background:var(--c)}
-.ch-name{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ch-when{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-name{font-weight:600;font-size:var(--text-sm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ch-when{font-size:var(--text-xs);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .heat-h{font-size:10px;color:var(--muted);text-align:left}
-.heat-d{font-size:11px;color:var(--muted);align-self:center}
+.heat-d{font-size:var(--text-2xs);color:var(--muted);align-self:center}
 .heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none;transition:box-shadow var(--motion-fast) var(--ease-out)}
 .heat-c{height:22px}
 .cal-d{aspect-ratio:1}
@@ -422,19 +422,19 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .cal-w{display:grid;grid-template-rows:16px repeat(7,auto);gap:3px;flex:1;min-width:0;max-width:30px}
 .cal-m{font-size:10px;color:var(--muted);white-space:nowrap;overflow:visible}
 .cal-d.out{background:transparent}
-.scale{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--muted);margin-top:10px}
+.scale{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:var(--text-2xs);color:var(--muted);margin-top:10px}
 .scale i{width:11px;height:11px;border-radius:3px;background:var(--empty)}
 .scale i:first-of-type{margin-left:6px}.scale i:last-of-type{margin-right:6px}
 .ranks{list-style:none;margin:0;padding:0}
-.ranks li{display:grid;grid-template-columns:minmax(0,10em) 1fr 38px;align-items:center;gap:10px;font-size:13px;margin:9px 0}
+.ranks li{display:grid;grid-template-columns:minmax(0,10em) 1fr 38px;align-items:center;gap:10px;font-size:var(--text-sm);margin:9px 0}
 .rank-name{display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ranks b{text-align:right;font-size:12px}
+.ranks b{text-align:right;font-size:var(--text-xs)}
 .stack{display:flex;align-items:flex-end;gap:3px;height:170px;margin-top:8px}
 .stack-w{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;outline:none}
 .stack-bar{display:flex;flex-direction:column-reverse;width:100%;border-radius:3px;overflow:hidden;opacity:.9;transition:opacity var(--motion-fast) var(--ease-out),box-shadow var(--motion-fast) var(--ease-out)}
 .stack-w:hover .stack-bar,.stack-w:focus .stack-bar{opacity:1;box-shadow:0 0 0 2px var(--fg)}
 .tip{cursor:default}
-.tip:hover::after,.tip:focus::after{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:min(240px,80vw);padding:6px 9px;border-radius:var(--radius-xs);background:var(--fg);color:var(--bg);font-size:12px;line-height:1.4;font-weight:500;white-space:normal;text-align:left;pointer-events:none;box-shadow:0 4px 14px var(--shadow);animation:fade-in var(--motion-base) var(--ease-out)}
+.tip:hover::after,.tip:focus::after{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:min(240px,80vw);padding:6px 9px;border-radius:var(--radius-xs);background:var(--fg);color:var(--bg);font-size:var(--text-xs);line-height:1.4;font-weight:500;white-space:normal;text-align:left;pointer-events:none;box-shadow:0 4px 14px var(--shadow);animation:fade-in var(--motion-base) var(--ease-out)}
 .tip-l:hover::after,.tip-l:focus::after{left:0;transform:none}
 .tip-r:hover::after,.tip-r:focus::after{left:auto;right:0;transform:none}
 ${

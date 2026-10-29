@@ -54,18 +54,18 @@ export const portraitSection = (p: Profile, loc: Loc, v: Visibility, scrub: Scru
 
 export const portraitStyle = `
 .portrait{max-width:740px;margin:48px auto 64px}
-.portrait h2{font-size:clamp(24px,4vw,36px);letter-spacing:-.03em}
-.portrait-intro{font-size:20px;line-height:1.85;margin-top:24px}
+.portrait h2{font-size:clamp(var(--text-xl),4vw,var(--text-2xl));letter-spacing:-.03em}
+.portrait-intro{font-size:var(--text-xl);line-height:1.85;margin-top:24px}
 .portrait-chapter{margin-top:36px}
-.portrait-chapter h3{font-size:21px;margin-bottom:14px}
-.portrait-chapter>p{font-size:17px;line-height:1.95;white-space:pre-line}
+.portrait-chapter h3{font-size:var(--text-xl);margin-bottom:14px}
+.portrait-chapter>p{font-size:var(--text-lg);line-height:1.95;white-space:pre-line}
 .portrait-evidence{margin-top:14px;color:var(--muted)}
-.portrait-evidence summary{cursor:pointer;font-size:13px}
+.portrait-evidence summary{cursor:pointer;font-size:var(--text-sm)}
 .portrait-evidence blockquote{margin:14px 0;padding:4px 20px;border-left:2px solid var(--accent);line-height:1.8;overflow-wrap:anywhere}
 .portrait-preferences{margin-top:40px;padding-top:28px;border-top:1px solid var(--border)}
 .portrait-preferences .note{margin:12px 0 20px}
 .portrait-axis{padding:16px 0;border-top:1px solid var(--border)}
-.portrait-axis>span{float:right;font-size:13px;color:var(--muted)}
+.portrait-axis>span{float:right;font-size:var(--text-sm);color:var(--muted)}
 .portrait-axis>p{clear:both;margin-top:8px;line-height:1.8}
 @media(max-width:520px){.portrait-axis>span{float:none;display:block;margin-top:6px}}
 `

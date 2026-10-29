@@ -28,7 +28,7 @@ html:root .portrait h2{margin-top:0}
 html:root .portrait-intro{margin-top:var(--space-4);line-height:1.65}
 html:root .portrait-chapter{margin-top:var(--space-8)}
 html:root .portrait-chapter h3{margin-bottom:var(--space-3);line-height:1.4}
-html:root .portrait-chapter>p{font-size:16px;line-height:1.8}
+html:root .portrait-chapter>p{font-size:var(--text-base);line-height:1.8}
 html:root .portrait-evidence blockquote{margin:var(--space-3) 0;padding:var(--space-2) var(--space-4)}
 html:root .traits,html:root .improves,html:root .caps{gap:var(--space-6)}
 html:root .trait,html:root .improve{padding:var(--space-6);border-radius:var(--radius-xs)}
@@ -36,7 +36,7 @@ html:root .dim-body{padding:0 var(--space-6) var(--space-6)}
 html:root .dimension>summary{padding:var(--space-4) var(--space-6)}
 html:root .about{margin-top:var(--space-12);padding:var(--space-6);line-height:1.75}
 html:root .foot{margin-top:var(--space-6)}
-@media(max-width:640px){html:root .page{padding:var(--space-4) 20px var(--space-8)}html:root .hero,html:root .panel,html:root .trait,html:root .improve{padding:var(--space-4)}html[data-hero=editorial] .hero{padding:var(--space-6) 0}html:root .grid{grid-template-columns:1fr}html:root .portrait-chapter>p{font-size:15px}}
+@media(max-width:640px){html:root .page{padding:var(--space-4) 20px var(--space-8)}html:root .hero,html:root .panel,html:root .trait,html:root .improve{padding:var(--space-4)}html[data-hero=editorial] .hero{padding:var(--space-6) 0}html:root .grid{grid-template-columns:1fr}html:root .portrait-chapter>p{font-size:var(--text-base)}}
 /* Open composition: statistics are a strip, comparisons share a field, prose follows rules. */
 html:root :is(.sig,.panel,.trait,.dimension,.fact,.about,.minor,.improve,.cap,.cap-item,.signals li,.chg){background:transparent;border:0;border-radius:0;box-shadow:none}
 html:root .sigs{background:transparent;border:0;border-radius:0;overflow:visible;gap:24px;border-block:1px solid var(--border);padding:18px 0}
@@ -62,7 +62,7 @@ html:root .chg{padding:10px 0;border-bottom:1px solid var(--border)}
 html:root .improve-impact{margin-top:8px}
 html:root .about{padding:24px 0;border-top:1px solid var(--border);max-width:var(--reading)}
 html:root .panel{padding-top:var(--panel-top)}
-@media(min-width:900px){html:root .report-view-detail .portrait{max-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:48px}html:root .portrait>h2,html:root .portrait>.portrait-intro{grid-column:1/-1;max-width:var(--reading)}html:root .portrait-chapter{grid-column:1;max-width:var(--reading)}html:root .portrait-preferences{grid-column:2;grid-row:3 / span 12;align-self:start;margin-top:32px;font-size:13px}}
+@media(min-width:900px){html:root .report-view-detail .portrait{max-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:48px}html:root .portrait>h2,html:root .portrait>.portrait-intro{grid-column:1/-1;max-width:var(--reading)}html:root .portrait-chapter{grid-column:1;max-width:var(--reading)}html:root .portrait-preferences{grid-column:2;grid-row:3 / span 12;align-self:start;margin-top:32px;font-size:var(--text-sm)}}
 @media(max-width:760px){html:root .caps,html:root .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
 @page{size:A4;margin:16mm 17mm 18mm}
 @media print{

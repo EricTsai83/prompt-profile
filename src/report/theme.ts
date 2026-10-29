@@ -90,6 +90,15 @@ export interface TypeTokens {
   }
   /** Long-form prose of the reading layout (portrait introduction). */
   readonly prose: { readonly family: string; readonly introSize: string }
+  /**
+   * Text sizes of the report's screen styles, `--text-<step>`, smallest first: chart axes and
+   * eyebrow labels (`2xs`), notes, legends and badges (`xs`), secondary text, tables and
+   * controls (`sm`), card body (`md`), body (`base`), card titles (`lg`), section titles (`xl`),
+   * view titles and signature numbers (`2xl`). The hero title has its own `title.size`.
+   */
+  readonly scale: Readonly<
+    Record<"2xs" | "xs" | "sm" | "md" | "base" | "lg" | "xl" | "2xl", string>
+  >
   /** Card font families (satori names); each must be an embedded font (fonts.ts). */
   readonly card: { readonly body: string; readonly display: string }
 }
@@ -265,6 +274,17 @@ const DOCUMENT_TITLE = {
   measure: "850px",
 }
 const BODY_PROSE = { family: BODY_STACK, introSize: "20px" }
+/** One text scale for every look: looks differ in faces and the hero, not in reading sizes. */
+const TYPE_SCALE: TypeTokens["scale"] = {
+  "2xs": "11px",
+  xs: "12px",
+  sm: "13px",
+  md: "14px",
+  base: "15px",
+  lg: "17px",
+  xl: "20px",
+  "2xl": "26px",
+}
 
 /** Type of the share-first looks: Bricolage for titles and numbers. */
 const SHOWCASE_TYPE: TypeTokens = {
@@ -272,6 +292,7 @@ const SHOWCASE_TYPE: TypeTokens = {
   display: BRICOLAGE,
   title: { family: BRICOLAGE.stack, weight: BRICOLAGE.weight, ...SHOWCASE_TITLE },
   prose: BODY_PROSE,
+  scale: TYPE_SCALE,
   card: CARD_FONTS,
 }
 const DOCUMENT_TYPE: TypeTokens = { ...SHOWCASE_TYPE, title: DOCUMENT_TITLE }
@@ -398,7 +419,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 3,
+  version: 4,
   color: {
     light: {
       bg: "#f6f6f3",
@@ -444,6 +465,7 @@ const CLASSIC: Theme = {
     display: null,
     title: { family: BODY_STACK, weight: 700, ...SHOWCASE_TITLE },
     prose: BODY_PROSE,
+    scale: TYPE_SCALE,
     card: CARD_FONTS,
   },
   shape: {
@@ -472,7 +494,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   CLASSIC,
   {
     id: "signal",
-    version: 9,
+    version: 10,
     color: {
       light: {
         bg: "#f5f7ff",
@@ -521,7 +543,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "afterhours",
-    version: 9,
+    version: 10,
     color: {
       light: {
         bg: "#eef3f8",
@@ -570,7 +592,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "studio",
-    version: 9,
+    version: 10,
     color: {
       light: {
         bg: "#fff7f4",
@@ -619,7 +641,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "prism",
-    version: 9,
+    version: 10,
     color: {
       light: { ...PRISM_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#101827"),
@@ -638,7 +660,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "slate",
-    version: 9,
+    version: 10,
     color: {
       light: { ...SLATE_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#141b20"),
@@ -654,7 +676,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "folio",
-    version: 9,
+    version: 10,
     color: {
       light: { ...FOLIO_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#201f1c"),

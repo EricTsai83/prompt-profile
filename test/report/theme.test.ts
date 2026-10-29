@@ -92,6 +92,24 @@ describe("generated stylesheet", () => {
     }),
   )
 
+  it.effect("screen text sizes come from the type scale tokens, in every look", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      for (const look of LOOK_IDS) {
+        const theme = lookOf(look)
+        const css = styleOf(renderHtml(p, { look, cardHide: [], exclude: [] }))
+        for (const step of ["2xs", "xs", "sm", "md", "base", "lg", "xl", "2xl"])
+          expect(themeCss(theme)).toContain(`--text-${step}:${theme.type.scale[step as "sm"]}`)
+        // print rules use points; tiny SVG chart labels keep fixed sizes below the scale
+        const screen = css.replace(/@media print\{(?:[^{}]|\{[^{}]*\})*\}/g, "")
+        const raw = [...screen.matchAll(/font-size:\s*([\d.]+px)/g)]
+          .map((m) => m[1]!)
+          .filter((size) => Number.parseFloat(size) >= 11)
+        expect({ look, raw }).toEqual({ look, raw: [] })
+      }
+    }),
+  )
+
   it.effect("animates hover, tooltips and views, and stops for reduced motion", () =>
     Effect.gen(function* () {
       const p = yield* sample()

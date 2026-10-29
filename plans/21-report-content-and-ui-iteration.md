@@ -249,3 +249,8 @@ and cost in the factual report only.
 
 - The "Usage during this period" section (`src/report/usage.ts`) works and passes the template
   QA (layout, axe, motion), but the owner deferred its visual fine-tuning to this plan.
+- Report text now has a type scale (`TypeTokens.scale`, `--text-2xs` … `--text-2xl`); a test
+  rejects raw pixel font sizes in screen styles. The view switch and page-turn controls were made
+  compact (13 px, the language switch's size) and view titles capped at `--text-2xl`, after the
+  owner found the switch oversized. Size and hierarchy work here should adjust these tokens
+  rather than add component-level sizes.

@@ -18,6 +18,7 @@ const metrics = ({ type, shape, motion, space }: Theme) =>
     `--title-measure:${type.title.measure}`,
     `--prose-font:${type.prose.family}`,
     `--prose-intro:${type.prose.introSize}`,
+    ...Object.entries(type.scale).map(([step, value]) => `--text-${step}:${value}`),
     ...(type.display === null
       ? []
       : [`--font-display:${type.display.stack}`, `--display-weight:${type.display.weight}`]),
