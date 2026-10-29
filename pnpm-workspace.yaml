@@ -6,6 +6,8 @@ blockExoticSubdeps: true
 
 catalog:
   "@effect/platform-node": 4.0.6
+  # A direct pin: @effect/platform-node asks for ^4.0.6, and 4.1.0 dropped exports it imports.
+  "@effect/platform-node-shared": 4.0.6
   "@effect/vitest": 4.0.6
   "@resvg/resvg-wasm": 2.6.2
   "@types/node": ^24.19.2
