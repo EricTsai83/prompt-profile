@@ -30,6 +30,7 @@ export const REPORT_PARTS = [
   "coaching",
   "funfacts",
   "custom-names",
+  "usage",
 ] as const
 export type ReportPart = (typeof REPORT_PARTS)[number]
 

@@ -64,7 +64,7 @@ const allow = Flag.String("allow").pipe(
 )
 const exclude = Flag.String("exclude").pipe(
   Flag.withDescription(
-    "Leave parts out of the report: comma list of quotes, projects, dates, coaching, funfacts, custom-names, or personal (all of them)",
+    "Leave parts out of the report: comma list of quotes, projects, dates, coaching, funfacts, custom-names, usage, or personal (all of them)",
   ),
   Flag.optional,
 )

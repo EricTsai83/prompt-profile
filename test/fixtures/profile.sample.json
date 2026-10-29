@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "languages": [
     "en",
     "zh-TW"
@@ -268,6 +268,374 @@
         }
       ]
     }
+  },
+  "usage": {
+    "pricingVersion": "2026-10-29",
+    "range": {
+      "from": "2026-05-03T02:00:00.000Z",
+      "to": "2026-10-12T03:29:00.000Z"
+    },
+    "currency": "USD",
+    "sources": [
+      {
+        "source": "claude-code",
+        "plan": {
+          "kind": "subscription",
+          "name": "max",
+          "detail": "default_claude_max_5x"
+        },
+        "totals": {
+          "requests": 11700,
+          "tokens": {
+            "input": 9624000,
+            "output": 18220000,
+            "cacheRead": 617100000,
+            "cacheWrite5m": 4410000,
+            "cacheWrite1h": 22690000,
+            "cacheWriteUnknown": 0,
+            "reasoning": 0
+          },
+          "cost": 829.0285,
+          "unpricedRequests": 0,
+          "fastRequests": 0
+        },
+        "byMonth": [
+          {
+            "month": "2026-05",
+            "usage": {
+              "requests": 900,
+              "tokens": {
+                "input": 810000,
+                "output": 1260000,
+                "cacheRead": 37800000,
+                "cacheWrite5m": 1890000,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 66.2625,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "month": "2026-06",
+            "usage": {
+              "requests": 1400,
+              "tokens": {
+                "input": 1120000,
+                "output": 2240000,
+                "cacheRead": 67200000,
+                "cacheWrite5m": 2520000,
+                "cacheWrite1h": 560000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 116.55,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "month": "2026-07",
+            "usage": {
+              "requests": 1800,
+              "tokens": {
+                "input": 1260000,
+                "output": 2700000,
+                "cacheRead": 91800000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 4680000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 166.5,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "month": "2026-08",
+            "usage": {
+              "requests": 2200,
+              "tokens": {
+                "input": 1430000,
+                "output": 3740000,
+                "cacheRead": 121000000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 5280000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 146.96,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "month": "2026-09",
+            "usage": {
+              "requests": 3300,
+              "tokens": {
+                "input": 3660000,
+                "output": 4500000,
+                "cacheRead": 164900000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 6500000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 179.54,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "month": "2026-10",
+            "usage": {
+              "requests": 2100,
+              "tokens": {
+                "input": 1344000,
+                "output": 3780000,
+                "cacheRead": 134400000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 5670000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 153.216,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          }
+        ],
+        "byModel": [
+          {
+            "model": "claude-opus-5-5",
+            "usage": {
+              "requests": 6900,
+              "tokens": {
+                "input": 4334000,
+                "output": 11810000,
+                "cacheRead": 414000000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 17450000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 475.936,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "model": "claude-opus-5",
+            "usage": {
+              "requests": 3200,
+              "tokens": {
+                "input": 2380000,
+                "output": 4940000,
+                "cacheRead": 159000000,
+                "cacheWrite5m": 2520000,
+                "cacheWrite1h": 5240000,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 283.05,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "model": "claude-opus-4-8",
+            "usage": {
+              "requests": 900,
+              "tokens": {
+                "input": 810000,
+                "output": 1260000,
+                "cacheRead": 37800000,
+                "cacheWrite5m": 1890000,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 66.2625,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          },
+          {
+            "model": "claude-haiku-4-5-20251001",
+            "usage": {
+              "requests": 700,
+              "tokens": {
+                "input": 2100000,
+                "output": 210000,
+                "cacheRead": 6300000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": 3.78,
+              "unpricedRequests": 0,
+              "fastRequests": 0
+            }
+          }
+        ],
+        "unpricedModels": [],
+        "diagnostics": {
+          "unreadableFiles": 0,
+          "badLines": 2,
+          "duplicates": 4100,
+          "markerSessions": 3
+        }
+      },
+      {
+        "source": "codex",
+        "plan": {
+          "kind": "subscription",
+          "name": "plus",
+          "detail": null
+        },
+        "totals": {
+          "requests": 3490,
+          "tokens": {
+            "input": 13369000,
+            "output": 3768000,
+            "cacheRead": 159940000,
+            "cacheWrite5m": 0,
+            "cacheWrite1h": 0,
+            "cacheWriteUnknown": 0,
+            "reasoning": 1770000
+          },
+          "cost": 116.496,
+          "unpricedRequests": 90,
+          "fastRequests": 698
+        },
+        "byMonth": [
+          {
+            "month": "2026-08",
+            "usage": {
+              "requests": 600,
+              "tokens": {
+                "input": 2520000,
+                "output": 540000,
+                "cacheRead": 22800000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 240000
+              },
+              "cost": 36,
+              "unpricedRequests": 0,
+              "fastRequests": 120
+            }
+          },
+          {
+            "month": "2026-09",
+            "usage": {
+              "requests": 1500,
+              "tokens": {
+                "input": 5850000,
+                "output": 1650000,
+                "cacheRead": 69000000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 750000
+              },
+              "cost": 42.12,
+              "unpricedRequests": 0,
+              "fastRequests": 300
+            }
+          },
+          {
+            "month": "2026-10",
+            "usage": {
+              "requests": 1390,
+              "tokens": {
+                "input": 4999000,
+                "output": 1578000,
+                "cacheRead": 68140000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 780000
+              },
+              "cost": 38.376,
+              "unpricedRequests": 90,
+              "fastRequests": 278
+            }
+          }
+        ],
+        "byModel": [
+          {
+            "model": "gpt-6.1-sol",
+            "usage": {
+              "requests": 2800,
+              "tokens": {
+                "input": 10660000,
+                "output": 3210000,
+                "cacheRead": 136600000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 1530000
+              },
+              "cost": 80.496,
+              "unpricedRequests": 0,
+              "fastRequests": 560
+            }
+          },
+          {
+            "model": "gpt-5.6-sol",
+            "usage": {
+              "requests": 600,
+              "tokens": {
+                "input": 2520000,
+                "output": 540000,
+                "cacheRead": 22800000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 240000
+              },
+              "cost": 36,
+              "unpricedRequests": 0,
+              "fastRequests": 120
+            }
+          },
+          {
+            "model": "codex-auto-review",
+            "usage": {
+              "requests": 90,
+              "tokens": {
+                "input": 189000,
+                "output": 18000,
+                "cacheRead": 540000,
+                "cacheWrite5m": 0,
+                "cacheWrite1h": 0,
+                "cacheWriteUnknown": 0,
+                "reasoning": 0
+              },
+              "cost": null,
+              "unpricedRequests": 90,
+              "fastRequests": 18
+            }
+          }
+        ],
+        "unpricedModels": [
+          "codex-auto-review"
+        ],
+        "diagnostics": {
+          "unreadableFiles": 0,
+          "badLines": 0,
+          "duplicates": 12,
+          "markerSessions": 1
+        }
+      }
+    ]
   },
   "stats": {
     "window": {

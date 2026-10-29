@@ -85,8 +85,40 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(9)
+      expect(profile.schemaVersion).toBe(10)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
+    }),
+  )
+
+  it.effect("a version 9 file decodes with usage not measured (null, not zero)", () =>
+    Effect.gen(function* () {
+      const { usage: _usage, ...v9 } = loadSample() as Record<string, unknown>
+      const profile = yield* decodeProfile({ ...v9, schemaVersion: 9 })
+      expect(profile.schemaVersion).toBe(10)
+      expect(profile.usage).toBeNull()
+    }),
+  )
+
+  it.effect("the sample carries a measured usage section", () =>
+    Effect.gen(function* () {
+      const profile = yield* decodeProfile(loadSample())
+      expect(profile.usage?.sources.map((s) => s.source)).toEqual(["claude-code", "codex"])
+    }),
+  )
+
+  it.effect("a negative token count → InvalidProfile", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as { usage: { sources: Array<Record<string, unknown>> } }
+      const [first, ...rest] = sample.usage.sources
+      const totals = first!["totals"] as { tokens: Record<string, number> }
+      const bad = {
+        ...first,
+        totals: { ...totals, tokens: { ...totals.tokens, input: -1 } },
+      }
+      const error = yield* Effect.flip(
+        decodeProfile({ ...sample, usage: { ...sample.usage, sources: [bad, ...rest] } }),
+      )
+      expect(error._tag).toBe("InvalidProfile")
     }),
   )
 
@@ -98,7 +130,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(9)
+      expect(profile.schemaVersion).toBe(10)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -137,7 +169,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 10, undefined])(
+  it.effect.each([1, "3", 11, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {

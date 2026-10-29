@@ -27,6 +27,7 @@ import { triggeredSignals } from "./signals.ts"
 import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
 import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibility.ts"
+import { usageSection, usageStyle } from "./usage.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -576,6 +577,17 @@ export const renderHtml = (
     window === null ? m.none : m.chronotype(hh(window.start), hh(window.end)),
   )
   const period = s.dateRange
+  /** A period as the hero shows it: exact dates, or months with `--exclude dates`. */
+  const periodOf =
+    (range: { readonly from: DateTime.Utc; readonly to: DateTime.Utc } | null) =>
+    (m: Messages): string => {
+      if (range === null) return m.none
+      const days = daysBetween(range.from, range.to, tz)
+      return v.dates
+        ? `${m.period(formatDate(range.from, tz, m.locale), formatDate(range.to, tz, m.locale))} · ${m.days(days)}`
+        : `${m.period(formatMonth(range.from, tz, m.locale), formatMonth(range.to, tz, m.locale))} · ${days < 45 ? m.days(days) : m.months(Math.round(days / 30.44))}`
+    }
+  const periodText = periodOf(period)
   const cal = v.dates ? calendar(s, loc, view) : null
   const ranking = projectRanking(s, loc, view)
   const weekly = projectWeeks(s, loc, view)
@@ -592,6 +604,9 @@ export const renderHtml = (
   const portrait = portraitSection(profile, loc, v, scrub)
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
+  // the usage's own period: it is summed over the whole window, not only the prompts' days
+  const usagePeriod = periodOf(profile.usage?.range ?? null)
+  const usage = usageSection(profile, loc, v, (l) => usagePeriod(MESSAGES[l]))
   const graphic = !clock ? graphicSvg(identity.graphic, s.hourHistogram, identity) : null
 
   const page = html`<!doctype html>
@@ -606,7 +621,7 @@ export const renderHtml = (
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
@@ -657,13 +672,7 @@ export const renderHtml = (
                 <div>
                   <dt>${loc.text((m) => m.dataPeriod)}</dt>
                   <dd>
-                    ${loc.text((m) => {
-                      if (period === null) return m.none
-                      const days = daysBetween(period.from, period.to, tz)
-                      return v.dates
-                        ? `${m.period(formatDate(period.from, tz, m.locale), formatDate(period.to, tz, m.locale))} · ${m.days(days)}`
-                        : `${m.period(formatMonth(period.from, tz, m.locale), formatMonth(period.to, tz, m.locale))} · ${days < 45 ? m.days(days) : m.months(Math.round(days / 30.44))}`
-                    })}
+                    ${loc.text(periodText)}
                   </dd>
                 </div>
                 <div>
@@ -919,6 +928,8 @@ export const renderHtml = (
               ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
             </div>
           </section>
+
+          ${usage ?? ""}
 
           <section class="about">
                   <h2>${loc.text((m) => m.howMeasured)}</h2>

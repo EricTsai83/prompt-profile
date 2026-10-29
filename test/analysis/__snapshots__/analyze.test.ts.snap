@@ -91,7 +91,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   ],
   "portrait": null,
   "previous": null,
-  "schemaVersion": 9,
+  "schemaVersion": 10,
   "stats": {
     "activeDays": 0,
     "activity": {
@@ -983,5 +983,6 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "translations": {},
+  "usage": null,
 }
 `;

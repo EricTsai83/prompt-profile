@@ -87,20 +87,21 @@ cli ──► analysis ──► llm ──► domain
 
 ### Version numbers
 
-There are three independent version numbers. Bump them whenever the corresponding thing changes; the cache and `render` depend on them:
+These version numbers are independent. Bump them whenever the corresponding thing changes; the cache and `render` depend on them:
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 9 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 10 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | 11 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 2, others 8 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 3, others 9 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–19 are done and
-deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
+in the change that finishes it; it stays in git history. Plans 01–19 and 23 are done
+and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
 
@@ -112,7 +113,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
 | 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Production templates reviewed; current design approved; reader walkthrough pending |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 23 | [Usage, plan and API-equivalent cost](23-usage-plan-and-api-equivalent-cost.md) | Claude Code and Codex plan, tokens and API list-price equivalent, side by side in the factual report | Existing adapters and report; output placement coordinates with plan 21 | Planned |
 
 ## Shared rules for every plan
 
@@ -139,6 +139,8 @@ Ideas, not planned yet:
 
 - Homebrew: `EricTsai83/homebrew-tap` with a formula pointing to the GitHub Releases binaries.
 - `install.sh`: `curl -fsSL …/install.sh | sh`.
+- Experiments (plan 22) could show the API list-price equivalent per case, reusing
+  `pipeline/pricing.ts` with its `PRICING_VERSION`; `render` could offer an explicit re-price.
 - New adapters: Gemini CLI, Cursor, opencode… (see ccusage's `rust/adapters/`); implement
   `SourceAdapter` and register it in `adapters/registry.ts`.
 

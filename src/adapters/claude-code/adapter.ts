@@ -12,7 +12,9 @@ import type { TechniqueEvent } from "../../domain/Techniques.ts"
 import { createHash } from "node:crypto"
 import { firstMatch, slashCommandName } from "../common/rules.ts"
 import { CLAUDE_RULES, type ClaudeCandidate } from "./rules.ts"
-import { ClaudeLine, HistoryLine } from "./schema.ts"
+import { ClaudeLine, HistoryLine, responseOf, usageCounts } from "./schema.ts"
+import type { ServiceTier, TokenCounts, UsageEvent } from "../../domain/Usage.ts"
+import { readClaudePlanHint } from "./plan.ts"
 
 const SOURCE = "claude-code" as const
 const READ_CONCURRENCY = 8
@@ -25,6 +27,16 @@ export const resolveClaudeRoot = (
   home: string,
   path: Path.Path,
 ): string => env["CLAUDE_CONFIG_DIR"] || path.join(home, ".claude")
+
+/** Claude Code's config file: inside CLAUDE_CONFIG_DIR when set, otherwise `~/.claude.json`. */
+export const resolveClaudeConfigFile = (
+  env: Readonly<Record<string, string | undefined>>,
+  home: string,
+  path: Path.Path,
+): string =>
+  env["CLAUDE_CONFIG_DIR"]
+    ? path.join(env["CLAUDE_CONFIG_DIR"], ".claude.json")
+    : path.join(home, ".claude.json")
 
 export const toOrigin = (entrypoint: string | null | undefined): Origin =>
   entrypoint === "cli" ? "interactive" : entrypoint?.startsWith("sdk") ? "sdk" : "unknown"
@@ -83,6 +95,66 @@ interface ReadState {
   readonly transcriptSessions: Set<string>
   readonly modelSessions: Set<string>
   readonly skillDescriptions: Map<string, { ms: number; description: string }>
+  /** Sessions of prompt-profile's own analysis calls: their usage is left out. */
+  readonly markerSessions: Set<string>
+  readonly usage: { badLines: number; duplicates: number }
+}
+
+/** A response's usage; `key` (message id + request id) identifies copies of one response. */
+interface UsageCandidate {
+  readonly key: string | null
+  readonly event: UsageEvent
+}
+
+/**
+ * The usage of an assistant line. Synthetic messages are not API responses. A cache write is
+ * split into 5-minute and 1-hour writes when the line says so; the rest has an unknown duration.
+ */
+/** `usage.speed`: "fast" is fast mode; missing or "standard" is standard; anything else unknown. */
+const tierOf = (speed: unknown): ServiceTier =>
+  speed === "fast"
+    ? "fast"
+    : speed === undefined || speed === null || speed === "standard"
+      ? "standard"
+      : "other"
+
+const usageOf = (
+  line: ClaudeLine,
+  value: unknown,
+  state: ReadState,
+): UsageCandidate | undefined => {
+  if (line.type !== "assistant") return undefined
+  const response = responseOf(value)
+  if (response.usage === undefined) return undefined
+  const model = typeof line.message?.model === "string" ? line.message.model : null
+  if (model === "<synthetic>") return undefined
+  const u = usageCounts(response.usage)
+  const ms = line.timestamp === undefined ? Number.NaN : Date.parse(line.timestamp)
+  if (u === null || line.sessionId === undefined || Number.isNaN(ms)) {
+    state.usage.badLines++
+    return undefined
+  }
+  const tokens: TokenCounts = {
+    input: u.input,
+    output: u.output,
+    cacheRead: u.cacheRead,
+    cacheWrite5m: u.cache5m,
+    cacheWrite1h: u.cache1h,
+    cacheWriteUnknown: Math.max(0, u.cacheCreation - u.cache5m - u.cache1h),
+    reasoning: 0,
+  }
+  const { id, requestId } = response
+  return {
+    key: typeof id === "string" && typeof requestId === "string" ? `${id}\u0000${requestId}` : null,
+    event: {
+      source: SOURCE,
+      sessionId: line.sessionId,
+      timestampMs: ms,
+      model,
+      tokens,
+      tier: tierOf((response.usage as { speed?: unknown }).speed),
+    },
+  }
 }
 
 /** Lines that can carry a workflow technique; everything else is skipped unparsed. */
@@ -172,6 +244,15 @@ const noteTechniques = (line: ClaudeLine, file: { lastMs: number | null }, state
   }
 }
 
+/** `readJsonl` callbacks that also count a broken line mentioning usage as lost usage. */
+const usageCallbacks = (diag: DiagnosticsCollector, state: ReadState) => ({
+  ...jsonlCallbacks(diag),
+  onBadLine: (raw: string) => {
+    diag.badLines++
+    if (raw.includes('"usage"')) state.usage.badLines++
+  },
+})
+
 const noteSlashCommand = (state: ReadState, sessionId: string, name: string): void => {
   const list = state.slashCommands.get(sessionId) ?? []
   list.push(name)
@@ -191,6 +272,8 @@ const countSlashCommands = (state: ReadState): void => {
 
 export const makeClaudeCodeAdapter = (
   root: string,
+  /** Default: `<root>/.claude.json`. */
+  configFile?: string,
 ): Effect.Effect<SourceAdapter, never, FileSystem.FileSystem | Path.Path> =>
   Effect.gen(function* () {
     const fs = yield* FileSystem.FileSystem
@@ -205,6 +288,19 @@ export const makeClaudeCodeAdapter = (
       for (const dir of (yield* listDir(fs, projectsDir)).toSorted()) {
         for (const name of (yield* listDir(fs, path.join(projectsDir, dir))).toSorted()) {
           if (name.endsWith(".jsonl")) files.push(path.join(projectsDir, dir, name))
+        }
+      }
+      return files
+    })
+
+    /** Subagent transcripts, `projects/<project>/<session>/subagents/*.jsonl`: usage only. */
+    const subagentFiles = Effect.gen(function* () {
+      const files: Array<string> = []
+      for (const dir of (yield* listDir(fs, projectsDir)).toSorted()) {
+        for (const session of (yield* listDir(fs, path.join(projectsDir, dir))).toSorted()) {
+          const sub = path.join(projectsDir, dir, session, "subagents")
+          for (const name of (yield* listDir(fs, sub)).toSorted())
+            if (name.endsWith(".jsonl")) files.push(path.join(sub, name))
         }
       }
       return files
@@ -237,6 +333,8 @@ export const makeClaudeCodeAdapter = (
       const rule = firstMatch(CLAUDE_RULES, candidate)
       if (rule) {
         diag.exclude(rule.name)
+        if (rule.name === "analysis-marker" && line.sessionId !== undefined)
+          state.markerSessions.add(line.sessionId)
         return undefined
       }
       const timestamp = parseTimestamp(line.timestamp)
@@ -278,6 +376,7 @@ export const makeClaudeCodeAdapter = (
       const { text, hasImage } = restorePasted(h.display, h.pastedContents)
       if (isAnalysisPrompt(text)) {
         diag.exclude("analysis-marker")
+        state.markerSessions.add(h.sessionId)
         return undefined
       }
       if (text.trim() === "" && !hasImage) {
@@ -318,33 +417,65 @@ export const makeClaudeCodeAdapter = (
         transcriptSessions: new Set(),
         modelSessions: new Set(),
         skillDescriptions: new Map(),
+        markerSessions: new Set(),
+        usage: { badLines: 0, duplicates: 0 },
       }
       const { diag } = state
       // Files are read and parsed concurrently — each line is reduced to a small record right
       // away, so big tool results are not kept — but de-duplicated in path order, so the
       // copy kept for a uuid is deterministic.
+      // Usage copies are de-duplicated in path order too: subagent files after the sessions.
+      // A response's first copy is written while it streams, so its output count can still be
+      // low: the copy with the most output (the final count) is the one kept.
+      const responseIndex = new Map<string, number>()
+      const usageEvents: Array<UsageEvent> = []
+      const keepUsage = (usage: ReadonlyArray<UsageCandidate>) => {
+        for (const { key, event } of usage) {
+          const at = key === null ? undefined : responseIndex.get(key)
+          if (at === undefined) {
+            if (key !== null) responseIndex.set(key, usageEvents.length)
+            usageEvents.push(event)
+            continue
+          }
+          state.usage.duplicates++
+          const kept = usageEvents[at]!
+          if (event.tokens.output > kept.tokens.output)
+            usageEvents[at] = { ...kept, tokens: { ...kept.tokens, output: event.tokens.output } }
+        }
+      }
       const projects = Stream.fromIterable(files).pipe(
         Stream.mapEffect(
           (file) => {
             diag.filesRead++
             const fileState = { lastMs: null as number | null }
+            const usage: Array<UsageCandidate> = []
             return readJsonl(fs, file, {
-              ...jsonlCallbacks(diag),
-              prefilter: ['"user"', ...TECHNIQUE_NEEDLES],
+              ...usageCallbacks(diag, state),
+              // "usage" last: a line found by it alone carries no technique
+              prefilter: ['"user"', ...TECHNIQUE_NEEDLES, '"usage"'],
             }).pipe(
               Stream.map((l) => {
                 const decoded = decodeLine(l.value)
-                if (Option.isSome(decoded)) noteTechniques(decoded.value, fileState, state)
+                if (Option.isSome(decoded)) {
+                  // only the lines techniques were read from before usage was added
+                  if (l.needle !== '"usage"') noteTechniques(decoded.value, fileState, state)
+                  const u = usageOf(decoded.value, l.value, state)
+                  if (u !== undefined) usage.push(u)
+                }
                 // prompts (and known sessions) come only from lines mentioning "user", as before
                 return l.raw.includes('"user"') ? fromProjectLine(l.value, state) : undefined
               }),
               Stream.filter((c) => c !== undefined),
               Stream.runCollect,
+              Effect.map((candidates) => ({ candidates, usage })),
             )
           },
           { concurrency: READ_CONCURRENCY },
         ),
-        Stream.flatMap((candidates) => Stream.fromIterable(candidates)),
+        Stream.flatMap(({ candidates, usage }) => {
+          keepUsage(usage)
+          return Stream.fromIterable(candidates)
+        }),
         Stream.map(({ uuid, record }) => {
           if (state.seenUuids.has(uuid)) {
             diag.exclude("duplicate-uuid")
@@ -367,12 +498,37 @@ export const makeClaudeCodeAdapter = (
           }),
         ),
       )
-      const records = yield* Stream.runCollect(
+      // read alongside the sessions; kept after them, so the copy kept is deterministic
+      const readSubagents = Stream.fromIterable(yield* subagentFiles).pipe(
+        Stream.mapEffect(
+          (file) => {
+            diag.filesRead++
+            return readJsonl(fs, file, {
+              ...usageCallbacks(diag, state),
+              prefilter: '"usage"',
+            }).pipe(
+              Stream.map((l) => {
+                const decoded = decodeLine(l.value)
+                return Option.isSome(decoded) ? usageOf(decoded.value, l.value, state) : undefined
+              }),
+              Stream.filter((u) => u !== undefined),
+              Stream.runCollect,
+            )
+          },
+          { concurrency: READ_CONCURRENCY },
+        ),
+        Stream.runCollect,
+      )
+      const readRecords = Stream.runCollect(
         Stream.concat(projects, history).pipe(
           Stream.filter((r): r is PromptRecord => r !== undefined),
         ),
       )
+      const [records, subagentUsage] = yield* Effect.all([readRecords, readSubagents], {
+        concurrency: 2,
+      })
       countSlashCommands(state)
+      for (const usage of subagentUsage) keepUsage(usage)
       return {
         records,
         diagnostics: diag.snapshot(),
@@ -380,6 +536,10 @@ export const makeClaudeCodeAdapter = (
         skillDescriptions: Object.fromEntries(
           [...state.skillDescriptions].map(([name, x]) => [name, x.description]),
         ),
+        usage: {
+          events: usageEvents.filter((e) => !state.markerSessions.has(e.sessionId)),
+          diagnostics: { ...state.usage, markerSessions: state.markerSessions.size },
+        },
       }
     })
 
@@ -388,5 +548,6 @@ export const makeClaudeCodeAdapter = (
       displayName: "Claude Code",
       locations: [projectsDir, historyFile],
       read,
+      plan: readClaudePlanHint(fs, configFile ?? path.join(root, ".claude.json")),
     }
   })

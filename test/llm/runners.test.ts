@@ -20,6 +20,7 @@ import {
   chooseRunner,
   detectRunner,
   parseClaudeAuth,
+  parseClaudePlan,
   parseCodexLogin,
 } from "../../src/llm/detect.ts"
 import { makeFakeSpawner, type Respond } from "./fakeSpawner.ts"
@@ -314,6 +315,31 @@ describe("detect", () => {
     expect(parseClaudeAuth('{"loggedIn": false}')).toBe(false)
     expect(parseClaudeAuth("garbage")).toBeNull()
   })
+  it("reads only the plan from claude auth status, never the email or organization", () => {
+    const stdout = JSON.stringify({
+      loggedIn: true,
+      authMethod: "claude.ai",
+      email: "dev@example.com",
+      orgId: "org-123",
+      orgName: "Example Org",
+      subscriptionType: "team",
+    })
+    const plan = parseClaudePlan(stdout)
+    expect(plan).toEqual({ kind: "subscription", name: "team", detail: null })
+    for (const secret of ["dev@example.com", "org-123", "Example Org"])
+      expect(JSON.stringify(plan)).not.toContain(secret)
+    expect(parseClaudePlan('{"loggedIn": true, "authMethod": "api_key"}')).toEqual({
+      kind: "api-key",
+      name: null,
+      detail: null,
+    })
+    expect(parseClaudePlan('{"loggedIn": true}')).toEqual({
+      kind: "unknown",
+      name: null,
+      detail: null,
+    })
+    expect(parseClaudePlan("garbage")).toBeNull()
+  })
   it("parses codex login status", () => {
     expect(parseCodexLogin({ exitCode: 0, stdout: "Logged in using ChatGPT", stderr: "" })).toBe(
       true,
@@ -330,18 +356,19 @@ describe("detect", () => {
       return detectRunner("claude-code").pipe(Effect.provide(spawner.layer))
     }
 
-    it.effect("reads the version and the login state", () =>
+    it.effect("reads the version, the login state and the plan", () =>
       Effect.gen(function* () {
         const status = yield* detect((r) =>
           r.args[0] === "--version"
             ? { exitCode: 0, stdout: "2.1.309 (Claude Code)" }
-            : { exitCode: 0, stdout: '{"loggedIn": true}' },
+            : { exitCode: 0, stdout: '{"loggedIn": true, "subscriptionType": "max"}' },
         )
         expect(status).toEqual({
           id: "claude-code",
           installed: true,
           version: "2.1.309",
           loggedIn: true,
+          plan: { kind: "subscription", name: "max", detail: null },
         })
       }),
     )

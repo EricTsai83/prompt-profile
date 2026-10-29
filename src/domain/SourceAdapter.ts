@@ -2,6 +2,7 @@ import type { Effect } from "effect"
 import type { PromptRecord } from "./PromptRecord.ts"
 import type { SourceId } from "./Source.ts"
 import type { SKILL_ORIGINS, TechniqueEvent } from "./Techniques.ts"
+import type { PlanInfo, UsageDiagnostics, UsageEvent } from "./Usage.ts"
 
 export type SkillOrigin = (typeof SKILL_ORIGINS)[number]
 
@@ -30,6 +31,14 @@ export interface SourceRead {
   readonly skillDescriptions?: Readonly<Record<string, string>>
   /** Skill name → where it comes from, when the listing says so (Codex lists file paths). */
   readonly skillOrigins?: Readonly<Record<string, SkillOrigin>>
+  /**
+   * One event per model response (plan 23): token counts and model only, never any text.
+   * De-duplicated; prompt-profile's own analysis sessions are left out.
+   */
+  readonly usage?: {
+    readonly events: ReadonlyArray<UsageEvent>
+    readonly diagnostics: UsageDiagnostics
+  }
 }
 
 export interface SourceAdapter {
@@ -42,4 +51,9 @@ export interface SourceAdapter {
    * Every run is independent (reads may run concurrently).
    */
   readonly read: Effect.Effect<SourceRead>
+  /**
+   * The plan from the source's local files, if it has any (plan 23); never fails, and never
+   * returns a token, email or account id.
+   */
+  readonly plan?: Effect.Effect<PlanInfo>
 }

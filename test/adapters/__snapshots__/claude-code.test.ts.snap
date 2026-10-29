@@ -16,7 +16,7 @@ exports[`Claude Code adapter (fixture) > parses the fixture directory > diagnost
     "system-notification": 2,
     "tool-result-only": 1,
   },
-  "filesRead": 3,
+  "filesRead": 4,
   "slashCommands": {
     "/clear": 2,
     "/model": 1,

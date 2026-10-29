@@ -124,6 +124,9 @@ Written to `./prompt-profile-report/` (change it with `--out`):
   - what changed since your last report, a daily calendar and a weekday × hour heatmap (hover
     or tap for the count and main projects), project chapters, the five dimensions, and how it
     was measured
+  - **usage during this period** (on the "Profile & evidence" page only): Claude Code and Codex
+    side by side with the plan each runs on, tokens by kind, the share of each tool, months and
+    models, and the **API list-price equivalent** in USD; never on the card or the overview
   - a language switch when there is more than one language
 
   It shows everything by default, quotes and project folder names included. To share it, leave
@@ -145,6 +148,7 @@ Written to `./prompt-profile-report/` (change it with `--out`):
 | `coaching`     | "Improve your prompts" and "since your last report"                                                  |
 | `funfacts`     | Fun facts                                                                                            |
 | `custom-names` | Names and descriptions of your own skills, custom agent types and private MCP servers (only counted) |
+| `usage`        | Plans, token counts and API list-price equivalents                                                   |
 | `personal`     | All of the above                                                                                     |
 
 ```bash
@@ -221,6 +225,20 @@ CLI · `5` rate limited · `130` interrupted (a re-run resumes from the cache).
 | Claude Code | `~/.claude/projects/*/*.jsonl`, `~/.claude/history.jsonl` (`CLAUDE_CONFIG_DIR`)                                    |
 | Codex       | `~/.codex/sessions/**/rollout-*.jsonl` (and zstd-compressed `.jsonl.zst`), `~/.codex/history.jsonl` (`CODEX_HOME`) |
 
+**Usage and plan** (the "Usage during this period" section): token counts and model names from
+the same logs (Claude Code subagent transcripts in `projects/*/*/subagents/` included), the plan
+from `claude auth status --json` (`subscriptionType` only), an undocumented rate-limit hint from
+`~/.claude.json` (`oauthAccount.userRateLimitTier` only), and the ChatGPT plan type from
+`~/.codex/auth.json`, decoded locally from the id token's payload. No token, API key, email,
+account or organization id is stored, cached, logged or sent; a missing or unreadable file gives
+"unknown", never an error. Usage, plans and amounts stay on your machine: they are not sent to
+the LLM. Amounts are computed from an embedded list-price table (no download) and are an **API
+list-price equivalent**: what the usage would cost on the public API, not what you paid. Neither
+provider offers a way to read a subscription's usage as a bill, so this is how every local usage
+tool works (Claude Code's own session cost does the same); responses in fast mode (Claude
+`speed: "fast"`, Codex priority) use the fast-mode list prices, and a model or tier without a
+listed price stays "unknown" rather than being estimated.
+
 **Prompt selection and preprocessing**: adapters select user prompts, excluding recognized system
 messages, tool output and sub-agent conversations, then:
 
@@ -235,7 +253,7 @@ messages, tool output and sub-agent conversations, then:
 
 Selected, cleaned and redacted prompt text is sent **off your machine** through your logged-in
 CLI to its model service, along with project basenames. Intermediate observations, supporting
-quotes and usage statistics are sent during merge/final analysis. Text that does not match a
+quotes and prompt statistics are sent during merge/final analysis. Text that does not match a
 redaction rule can remain unchanged, including names and confidential prose.
 
 Reports, `profile.json`, dry-run exports and analysis caches are written locally and are not

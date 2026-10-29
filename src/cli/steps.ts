@@ -11,6 +11,8 @@ import { withSkillCatalog } from "../pipeline/techniques.ts"
 import { readSkillCatalog } from "../adapters/claude-code/skills.ts"
 import { resolveClaudeRoot } from "../adapters/claude-code/adapter.ts"
 import { Environment } from "../platform/Environment.ts"
+import { UNKNOWN_PLAN } from "../domain/Usage.ts"
+import type { SourceUsageInput } from "../pipeline/usage.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
 import { writeReport, type RenderOptions } from "../report/index.ts"
@@ -66,6 +68,8 @@ export interface Collected {
   readonly events: ReadonlyArray<TechniqueEvent>
   readonly skillDescriptions: Readonly<Record<string, string>>
   readonly skillOrigins: Readonly<Record<string, SkillOrigin>>
+  /** Per source: usage events, the plan from local files, and what could not be read. */
+  readonly usage: ReadonlyArray<SourceUsageInput>
 }
 
 /** Read every source and print one line per source. No records at all → `NoData`. */
@@ -80,6 +84,7 @@ export const readSources = Effect.gen(function* () {
   const events: Array<TechniqueEvent> = []
   const skillDescriptions: Record<string, string> = {}
   const skillOrigins: Record<string, SkillOrigin> = {}
+  const usage: Array<SourceUsageInput> = []
   for (const source of yield* readAdapters(adapters)) {
     const { adapter, diagnostics: diag } = source
     locations.push(...adapter.locations)
@@ -89,6 +94,17 @@ export const readSources = Effect.gen(function* () {
     for (const e of source.events) events.push(e)
     Object.assign(skillDescriptions, source.skillDescriptions ?? {})
     Object.assign(skillOrigins, source.skillOrigins ?? {})
+    usage.push({
+      source: adapter.id,
+      events: source.usage?.events ?? [],
+      plan: adapter.plan ? yield* adapter.plan : UNKNOWN_PLAN,
+      diagnostics: {
+        unreadableFiles: diag.unreadableFiles,
+        badLines: source.usage?.diagnostics.badLines ?? 0,
+        duplicates: source.usage?.diagnostics.duplicates ?? 0,
+        markerSessions: source.usage?.diagnostics.markerSessions ?? 0,
+      },
+    })
     const sessions = new Set(source.records.map((r) => r.sessionId)).size
     yield* out.line(t.sourceLine(adapter.displayName, source.records.length, sessions))
     yield* out.debug(
@@ -103,6 +119,7 @@ export const readSources = Effect.gen(function* () {
     events,
     skillDescriptions,
     skillOrigins,
+    usage,
   } satisfies Collected
 })
 
@@ -137,6 +154,8 @@ export const runPipelineStep = (collected: Collected, since: string) =>
     if (result.prompts.length === 0) {
       return yield* new NoData({ reason: "out-of-range", locations: collected.locations })
     }
+    // the window usage is summed over: the same as the prompts'
+    const window = { since: sinceDate, now, timezone: env.timezone }
     // Skill descriptions come from local SKILL.md files (front matter only).
     const techniques = result.stats.techniques
     if (techniques !== null && techniques.details.skills.length > 0) {
@@ -153,10 +172,11 @@ export const runPipelineStep = (collected: Collected, since: string) =>
       })
       return {
         ...result,
+        window,
         stats: { ...result.stats, techniques: withSkillCatalog(techniques, catalog) },
       }
     }
-    return result
+    return { ...result, window }
   })
 
 /** `--out` relative to the working directory. */

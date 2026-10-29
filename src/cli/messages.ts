@@ -128,8 +128,9 @@ export const containsLine = (c: ReportContents): string => {
     c.exactDates ? "exact dates" : null,
     c.improvements > 0 ? count(c.improvements, "improvement", "improvements") : null,
     c.funFacts > 0 ? count(c.funFacts, "fun fact", "fun facts") : null,
+    c.usage ? "plans, usage and API list-price equivalent" : null,
   ].filter((x) => x !== null)
-  const personal = c.quotes > 0 || c.projects > 0 || c.exactDates
+  const personal = c.quotes > 0 || c.projects > 0 || c.exactDates || c.usage
   return `  Contains  ${personal ? parts.join(" · ") : ["no quotes, project names or exact dates", ...parts].join(" · ")}`
 }
 
@@ -142,5 +143,7 @@ export const summaryLines = (
   containsLine(c),
   ...checkLines(findings),
   ...(c.quotes > 0 ? [messages.skimHint] : []),
-  ...(c.quotes > 0 || c.projects > 0 || c.exactDates ? [messages.excludeHint(profile)] : []),
+  ...(c.quotes > 0 || c.projects > 0 || c.exactDates || c.usage
+    ? [messages.excludeHint(profile)]
+    : []),
 ]

@@ -35,3 +35,25 @@ export const CodexHistoryLine = Schema.Struct({
   ts: Schema.Number,
   text: Schema.String,
 })
+
+const Tokens = Schema.optional(Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)))
+
+/**
+ * `total_token_usage` / `last_token_usage` of a `token_count` event. Input and output are
+ * required: an empty or partial running total would reset the baseline the next delta is
+ * taken from, and count everything before it again.
+ */
+export const CodexTokenUsage = Schema.Struct({
+  input_tokens: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  cached_input_tokens: Tokens,
+  cache_write_input_tokens: Tokens,
+  output_tokens: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  reasoning_output_tokens: Tokens,
+})
+export type CodexTokenUsage = typeof CodexTokenUsage.Type
+
+/** `event_msg` payload `{ type: "token_count", info }`; `info` is null before the first response. */
+export const TokenCountInfo = Schema.Struct({
+  total_token_usage: Schema.optional(CodexTokenUsage),
+  last_token_usage: Schema.optional(CodexTokenUsage),
+})

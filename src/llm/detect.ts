@@ -13,6 +13,7 @@ import {
   type RunnerId,
 } from "./LlmRunner.ts"
 import type { FileSystem, Path } from "effect"
+import { planCode, type PlanInfo } from "../domain/Usage.ts"
 
 export interface RunnerStatus {
   readonly id: RunnerId
@@ -20,6 +21,8 @@ export interface RunnerStatus {
   readonly version: string | null
   /** `null` when it could not be determined (we then let the first call decide). */
   readonly loggedIn: boolean | null
+  /** Claude Code only: the plan `claude auth status` reports (plan 23). */
+  readonly plan?: PlanInfo
 }
 
 interface CommandResult {
@@ -79,6 +82,22 @@ export const parseCodexLogin = (result: CommandResult): boolean | null => {
   return result.exitCode === 0 ? null : false
 }
 
+/**
+ * The plan in `claude auth status --json`: `subscriptionType` (e.g. "team"), or an API-key
+ * login. Nothing else is read: the output also has the email and organization.
+ */
+export const parseClaudePlan = (stdout: string): PlanInfo | null => {
+  const json = tryParseJson(stdout) as
+    | { subscriptionType?: unknown; authMethod?: unknown }
+    | undefined
+  if (typeof json !== "object" || json === null) return null
+  const name = planCode(json.subscriptionType)
+  if (name !== null) return { kind: "subscription", name, detail: null }
+  if (typeof json.authMethod === "string" && /api.?key/i.test(json.authMethod))
+    return { kind: "api-key", name: null, detail: null }
+  return { kind: "unknown", name: null, detail: null }
+}
+
 const VERSION_RE = /\d+\.\d+\.\d+/
 
 /** Detect installation (via `--version`) and login state, without sending any prompt. */
@@ -96,11 +115,13 @@ export const detectRunner = (
     const v = VERSION_RE.exec(version.stdout)?.[0] ?? null
     if (id === "claude-code") {
       const auth = yield* run("claude", ["auth", "status", "--json"])
+      const plan = auth._tag === "Done" ? parseClaudePlan(auth.stdout) : null
       return {
         id,
         installed: true,
         version: v,
         loggedIn: auth._tag === "Done" ? parseClaudeAuth(auth.stdout) : null,
+        ...(plan === null ? {} : { plan }),
       }
     }
     const login = yield* run("codex", ["login", "status"])

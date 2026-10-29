@@ -189,10 +189,11 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const variant = join(h.root, "variants", "classic-without-personal")
       const report = readFileSync(join(variant, "report.html"), "utf8")
       expect(report).not.toContain("<blockquote")
+      expect(report).not.toContain('class="usage"')
       expect(existsSync(join(variant, "share.html"))).toBe(false)
       expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
         renderVersion: 2,
-        excluded: ["quotes", "projects", "dates", "coaching", "funfacts", "custom-names"],
+        excluded: ["quotes", "projects", "dates", "coaching", "funfacts", "custom-names", "usage"],
       })
       const r2 = yield* h.run(["render", profile, "--exclude", "dates,quotes"])
       expect(r2.code).toBe(0)

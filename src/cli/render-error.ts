@@ -31,7 +31,7 @@ const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
   "--allow":
     "Use a comma list of email, home-path, username, internal-url, tw-national-id, credit-card, phone. Secrets cannot be allowed.",
   "--exclude":
-    "Use a comma list of quotes, projects, dates, coaching, funfacts, custom-names, or personal (all of them).",
+    "Use a comma list of quotes, projects, dates, coaching, funfacts, custom-names, usage, or personal (all of them).",
   "--lang": "Use a comma list of en, zh-TW (the first is the default).",
 }
 

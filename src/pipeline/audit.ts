@@ -81,6 +81,8 @@ const MACHINE_KEYS: ReadonlySet<string> = new Set([
   "month",
   "first",
   "last",
+  "pricingVersion",
+  "currency",
 ])
 const DATE_LIKE = /^\d{4}-\d{2}(?:-\d{2})?(?:T[\d:.]+Z?)?$/
 
@@ -98,6 +100,7 @@ const SECTIONS: Readonly<Record<string, string>> = {
   models: "Models",
   activity: "Projects",
   topProjects: "Projects",
+  usage: "Usage",
 }
 
 type Path = ReadonlyArray<string | number>
@@ -115,10 +118,14 @@ const locationOf = (path: Path): string => {
   return `${section}${typeof index === "number" ? ` › ${index + 1}` : ""}${lang ? ` (${lang})` : ""}`
 }
 
-/** Model ids (`engine.model`, `stats.techniques.details.models[].name`): codes, not text. */
+/**
+ * Model ids (`engine.model`, `stats.techniques.details.models[].name`, the usage models): codes,
+ * not text. A dated snapshot id must not look like a phone number to the rules.
+ */
 const isModelId = (path: Path): boolean =>
   (path.length === 2 && path[0] === "engine" && path[1] === "model") ||
-  (path.at(-1) === "name" && path.at(-3) === "models")
+  (path.at(-1) === "name" && path.at(-3) === "models") ||
+  (path[0] === "usage" && (path.at(-1) === "model" || path.at(-2) === "unpricedModels"))
 
 /**
  * A masked quote can grow past the quote limit (`a@b.co` → `[EMAIL]`): cut it with "…", never

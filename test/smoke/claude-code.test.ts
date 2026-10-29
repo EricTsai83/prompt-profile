@@ -28,7 +28,8 @@ describe.skipIf(!existsSync(join(root, "projects")))("Claude Code adapter (real 
       expect(records.length).toBeGreaterThan(0)
       const encode = Schema.encodeUnknownSync(PromptRecord)
       for (const r of records) encode(r)
-      expect(elapsed).toBeLessThan(5000)
+      // 7 s since plan 23: subagent transcripts are read too (for usage), about a fifth more data
+      expect(elapsed).toBeLessThan(7000)
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 })

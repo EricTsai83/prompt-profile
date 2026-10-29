@@ -177,5 +177,7 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     rewrite: i.rewrite.promptId === "" || i.rewrite.after.trim() === "" ? null : i.rewrite,
   })),
   previous: null,
+  // the CLI fills it from local logs; the analysis never sees usage
+  usage: null,
   stats: extras.stats,
 })

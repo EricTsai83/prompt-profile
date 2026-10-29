@@ -190,6 +190,7 @@ describe("--exclude", () => {
         exactDates: true,
         improvements: 2,
         funFacts: 2,
+        usage: true,
       })
       expect(reportContents(p, { look: "classic", cardHide: [], exclude: ["coaching"] })).toEqual({
         quotes: 9,
@@ -197,6 +198,7 @@ describe("--exclude", () => {
         exactDates: true,
         improvements: 0,
         funFacts: 2,
+        usage: true,
       })
       expect(reportContents(p, { look: "classic", cardHide: [], exclude: REPORT_PARTS })).toEqual({
         quotes: 0,
@@ -204,6 +206,7 @@ describe("--exclude", () => {
         exactDates: false,
         improvements: 0,
         funFacts: 0,
+        usage: false,
       })
     }),
   )

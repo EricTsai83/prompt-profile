@@ -3,15 +3,17 @@ import { Effect, Schema } from "effect"
 import { SourceId } from "./Source.ts"
 import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
+import { Usage } from "./Usage.ts"
 
 /**
  * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
  * languages carry translated generated text only). 4: `stats.activity` (per day and per
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
  * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
- * 9: evidence-backed collaboration portrait. Versions 2–8 are migrated on decode.
+ * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). Versions 2–9 are migrated
+ * on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 9 as const
+export const PROFILE_SCHEMA_VERSION = 10 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -198,6 +200,8 @@ const ProfileFields = Schema.Struct({
   improvements: Schema.Array(Improvement).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   /** The previous report in the same folder, for "since your last report"; null if none. */
   previous: Schema.NullOr(Snapshot).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
+  /** Tokens, plan and API list-price equivalent; null = not measured (before version 10). */
+  usage: Schema.NullOr(Usage).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   stats: Stats,
 })
 
@@ -254,7 +258,7 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6, 7, 8].includes(found as number)) {
+    if (found !== PROFILE_SCHEMA_VERSION && ![2, 3, 4, 5, 6, 7, 8, 9].includes(found as number)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.

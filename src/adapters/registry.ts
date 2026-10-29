@@ -1,6 +1,10 @@
 import { Effect, type FileSystem, Path } from "effect"
 import type { SourceAdapter, SourceRead } from "../domain/SourceAdapter.ts"
-import { makeClaudeCodeAdapter, resolveClaudeRoot } from "./claude-code/adapter.ts"
+import {
+  makeClaudeCodeAdapter,
+  resolveClaudeConfigFile,
+  resolveClaudeRoot,
+} from "./claude-code/adapter.ts"
 import { makeCodexAdapter, resolveCodexRoot } from "./codex/adapter.ts"
 
 export interface AdapterEnv {
@@ -15,7 +19,10 @@ export const makeAdapters = (
   Effect.gen(function* () {
     const path = yield* Path.Path
     return [
-      yield* makeClaudeCodeAdapter(resolveClaudeRoot(config.env, config.home, path)),
+      yield* makeClaudeCodeAdapter(
+        resolveClaudeRoot(config.env, config.home, path),
+        resolveClaudeConfigFile(config.env, config.home, path),
+      ),
       yield* makeCodexAdapter(resolveCodexRoot(config.env, config.home, path)),
     ]
   })

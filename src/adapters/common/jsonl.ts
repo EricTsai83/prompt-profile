@@ -20,6 +20,8 @@ export interface JsonlLine {
   readonly raw: string
   /** 1-based line number within the file. */
   readonly lineNumber: number
+  /** With `prefilter`: the first needle (in the given order) the line contains. */
+  readonly needle?: string
 }
 
 /**
@@ -36,7 +38,8 @@ export const readJsonl = (
   fs: FileSystem.FileSystem,
   path: string,
   options: {
-    readonly onBadLine: () => void
+    /** Gets the raw line, e.g. to tell which kind of data was lost. */
+    readonly onBadLine: (raw: string) => void
     readonly onUnreadable: () => void
     readonly prefilter?: string | ReadonlyArray<string>
   },
@@ -56,11 +59,17 @@ export const readJsonl = (
       Stream.map((line): JsonlLine | undefined => {
         lineNumber++
         if (line.trim() === "") return undefined
-        if (needles !== undefined && !needles.some((n) => line.includes(n))) return undefined
+        const needle = needles?.find((n) => line.includes(n))
+        if (needles !== undefined && needle === undefined) return undefined
         try {
-          return { value: JSON.parse(line) as unknown, raw: line, lineNumber }
+          return {
+            value: JSON.parse(line) as unknown,
+            raw: line,
+            lineNumber,
+            ...(needle === undefined ? {} : { needle }),
+          }
         } catch {
-          options.onBadLine()
+          options.onBadLine(line)
           return undefined
         }
       }),

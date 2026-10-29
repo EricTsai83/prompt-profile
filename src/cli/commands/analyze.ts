@@ -10,6 +10,8 @@ import { Environment } from "../../platform/Environment.ts"
 import type { CheckMode } from "../../pipeline/audit.ts"
 import type { LookId } from "../../report/looks.ts"
 import { VERSION } from "../../version.ts"
+import { summarizeUsage, type SourceUsageInput } from "../../pipeline/usage.ts"
+import type { RunnerStatus } from "../../llm/detect.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, summaryLines, type Messages } from "../messages.ts"
 import { reportContents } from "../../report/index.ts"
@@ -76,6 +78,21 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
     yield* writeFileOrFail(path.join(outDir, "plan.json"), `${JSON.stringify(summary, null, 2)}\n`)
   })
 
+/**
+ * The plan a CLI reports wins over the hint from local files; the file's extra detail is kept.
+ * Detection never blocks a report: no answer leaves the file's view (or "unknown").
+ */
+const withDetectedPlans = (
+  usage: ReadonlyArray<SourceUsageInput>,
+  statuses: ReadonlyArray<RunnerStatus>,
+): ReadonlyArray<SourceUsageInput> =>
+  usage.map((u) => {
+    const detected = statuses.find((s) => s.id === u.source)?.plan
+    return detected === undefined || detected.kind === "unknown"
+      ? u
+      : { ...u, plan: { ...detected, detail: detected.detail ?? u.plan.detail } }
+  })
+
 /** Progress bar on the status line; timings only with --verbose. */
 const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressShape => {
   let done = 0
@@ -122,7 +139,7 @@ export const runMain = (options: MainOptions) =>
     yield* out.line("")
 
     const collected = yield* readSources
-    const { prompts, stats } = yield* runPipelineStep(collected, options.since)
+    const { prompts, stats, window } = yield* runPipelineStep(collected, options.since)
 
     const analyzeOptions: AnalyzeOptions = {
       timezone: env.timezone,
@@ -147,7 +164,8 @@ export const runMain = (options: MainOptions) =>
     }
 
     // Pick the engine (no prompt is sent to check login).
-    const status = yield* chooseRunner(yield* provider.detect, options.engine ?? null)
+    const statuses = yield* provider.detect
+    const status = yield* chooseRunner(statuses, options.engine ?? null)
     const base = yield* provider.make(status.id, { model: options.model })
     const runner = withRetry(maxCalls === null ? base : withCallBudget(base, maxCalls))
 
@@ -177,12 +195,20 @@ export const runMain = (options: MainOptions) =>
       Effect.onInterrupt(() => out.error(`\n${t.interrupted}`)),
     )
 
+    // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
+    const usage = summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
     // The report in this folder before this run, if any: "since your last report".
     const previous = yield* previousSnapshot(outDir)
-    const files = yield* writeReportFiles({ ...profile, previous }, outDir, renderOptions, null, {
-      mode: options.check ?? "mask",
-      allow,
-    })
+    const files = yield* writeReportFiles(
+      { ...profile, previous, usage },
+      outDir,
+      renderOptions,
+      null,
+      {
+        mode: options.check ?? "mask",
+        allow,
+      },
+    )
     const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
     yield* out.line("")
     yield* out.line(t.done)

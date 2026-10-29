@@ -655,3 +655,108 @@ export const VIEW_MESSAGES = {
     noPortrait: "這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。",
   },
 } as const
+
+/**
+ * The "Usage during this period" section (plan 23). Every amount is an API list-price
+ * equivalent, never what the person paid; usage is described, never ranked or praised.
+ */
+export const USAGE_MESSAGES = {
+  en: {
+    title: "Usage during this period",
+    note: (period: string, version: string) =>
+      `${period}. Source: local Claude Code and Codex logs, read on this computer. Amounts are API list-price equivalents in USD (price table ${version}): what this usage would cost on the public API, not what was paid. Subscriptions are not billed per token.`,
+    notMeasured:
+      "Not measured. This profile was made before usage was recorded; this is not zero. Analyse again to add it.",
+    nothing: "No model responses were found in the local logs for this period.",
+    noneForTool: "No model responses found in this period.",
+    plan: "Plan",
+    planUnknown: "Unknown (the tool did not report it)",
+    planApiKey: "API key login",
+    planHint: (detail: string) => `local hint: ${detail}`,
+    totalTokens: "Tokens",
+    responses: "Model responses",
+    cost: "API list-price equivalent",
+    costUnknown: "Unknown (no list price)",
+    costPartial: (amount: string, n: string) => `${amount} + ${n} unpriced responses`,
+    kinds: {
+      input: "Input",
+      output: "Output",
+      cacheRead: "Cache reads",
+      cacheWrite5m: "Cache writes (5 min)",
+      cacheWrite1h: "Cache writes (1 h)",
+      cacheWriteUnknown: "Cache writes (duration unknown)",
+      reasoning: "of which reasoning",
+    },
+    kindsNote: "Tokens by kind. Reasoning is part of output and is not counted twice.",
+    fast: (n: string) =>
+      `${n} responses ran in fast mode (Codex priority) and are priced at fast-mode rates.`,
+    unpriced: (models: string) =>
+      `No list price for ${models}: their tokens are shown, their cost is left out, never estimated from another model.`,
+    unreadable: (files: number, lines: number) =>
+      `${[
+        files > 0 ? `${files} log ${files === 1 ? "file" : "files"} could not be read` : null,
+        lines > 0
+          ? `${lines} unreadable usage ${lines === 1 ? "line was" : "lines were"} skipped`
+          : null,
+      ]
+        .filter((x) => x !== null)
+        .join(" and ")}: totals may be lower than the real usage.`,
+    share: "Share between the tools",
+    shareTokens: "Tokens",
+    shareCost: "API list-price equivalent",
+    byMonth: "By month",
+    byModel: "By model",
+    month: "Month",
+    tool: "Tool",
+    model: "Model",
+    unknownModel: "Not recorded",
+    monthNote: (zone: string) => `Months in ${zone}.`,
+  },
+  "zh-TW": {
+    title: "這段期間的用量",
+    note: (period: string, version: string) =>
+      `${period}。來源：在這台電腦上讀取的本機 Claude Code 與 Codex 紀錄。金額為美元計的 API 牌價等值（價格表 ${version}）：表示這些用量若走公開 API 的費用，並非實際支付的金額；訂閱方案不按 token 計費。`,
+    notMeasured: "未測量。這份 profile 產生時尚未記錄用量，這不代表用量為零。重新分析即可加入。",
+    nothing: "本機紀錄中找不到這段期間的模型回應。",
+    noneForTool: "這段期間找不到模型回應。",
+    plan: "方案",
+    planUnknown: "未知（工具未回報）",
+    planApiKey: "API key 登入",
+    planHint: (detail: string) => `本機提示：${detail}`,
+    totalTokens: "Token 數",
+    responses: "模型回應次數",
+    cost: "API 牌價等值",
+    costUnknown: "未知（沒有牌價）",
+    costPartial: (amount: string, n: string) => `${amount}，另有 ${n} 次回應未計價`,
+    kinds: {
+      input: "輸入",
+      output: "輸出",
+      cacheRead: "快取讀取",
+      cacheWrite5m: "快取寫入（5 分鐘）",
+      cacheWrite1h: "快取寫入（1 小時）",
+      cacheWriteUnknown: "快取寫入（時效未知）",
+      reasoning: "其中推理",
+    },
+    kindsNote: "依種類列出 token。推理是輸出的一部分，不重複計算。",
+    fast: (n: string) => `其中 ${n} 次回應使用快速模式（Codex priority），以快速模式牌價計算。`,
+    unpriced: (models: string) =>
+      `${models} 沒有牌價：仍列出其 token，但不計入費用，也不會借用其他模型的價格估算。`,
+    unreadable: (files: number, lines: number) =>
+      `${[
+        files > 0 ? `有 ${files} 個紀錄檔無法讀取` : null,
+        lines > 0 ? `${lines} 行無法解讀的用量紀錄被略過` : null,
+      ]
+        .filter((x) => x !== null)
+        .join("、")}：總數可能低於實際用量。`,
+    share: "兩個工具的占比",
+    shareTokens: "Token 數",
+    shareCost: "API 牌價等值",
+    byMonth: "每月",
+    byModel: "各模型",
+    month: "月份",
+    tool: "工具",
+    model: "模型",
+    unknownModel: "未記錄",
+    monthNote: (zone: string) => `月份以 ${zone} 時區計算。`,
+  },
+} as const

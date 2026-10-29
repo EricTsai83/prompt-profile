@@ -44,6 +44,32 @@ describe("final output check", () => {
     }),
   )
 
+  it.effect("usage model ids are codes: a fine-tuned id is neither masked nor reported", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const id = "ft:gpt-4o:org-a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"
+      const [claude, codex] = p.usage!.sources
+      const withId: Profile = {
+        ...p,
+        usage: {
+          ...p.usage!,
+          sources: [
+            claude!,
+            {
+              ...codex!,
+              byModel: [{ ...codex!.byModel[0]!, model: id }, ...codex!.byModel.slice(1)],
+              unpricedModels: [id],
+            },
+          ],
+        },
+      }
+      const r = check(withId, "strict")
+      expect(r.findings).toEqual([])
+      expect(r.profile.usage!.sources[1]!.byModel[0]!.model).toBe(id)
+      expect(r.profile.usage!.sources[1]!.unpricedModels).toEqual([id])
+    }),
+  )
+
   it.effect("mask: masks secrets and personal data, and says where", () =>
     Effect.gen(function* () {
       const r = check(leaky(yield* sample()), "mask")

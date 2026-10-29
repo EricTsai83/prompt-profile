@@ -16,6 +16,8 @@ export interface Visibility {
   readonly funFacts: boolean
   /** Names and descriptions of personal / project skills, custom agents and other servers. */
   readonly customNames: boolean
+  /** Plans, token counts and API list-price equivalents (plan 23). */
+  readonly usage: boolean
 }
 
 export const visibilityOf = (options: RenderOptions): Visibility => {
@@ -27,6 +29,7 @@ export const visibilityOf = (options: RenderOptions): Visibility => {
     coaching: !out.has("coaching"),
     funFacts: !out.has("funfacts"),
     customNames: !out.has("custom-names"),
+    usage: !out.has("usage"),
   }
 }
 
@@ -85,6 +88,8 @@ export interface ReportContents {
   readonly exactDates: boolean
   readonly improvements: number
   readonly funFacts: number
+  /** Plans, tokens and API list-price equivalents are shown. */
+  readonly usage: boolean
 }
 
 export const reportContents = (p: Profile, options: RenderOptions): ReportContents => {
@@ -106,5 +111,6 @@ export const reportContents = (p: Profile, options: RenderOptions): ReportConten
     exactDates: v.dates,
     improvements: v.coaching ? p.improvements.length : 0,
     funFacts: v.funFacts ? p.funFacts.length : 0,
+    usage: v.usage && p.usage !== null,
   }
 }

@@ -289,6 +289,23 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .cap-chip b{color:var(--accent);margin-left:4px}
 .cap-hidden{font-size:12px;color:var(--muted);margin-top:6px}
 @media (max-width:760px){.caps{grid-template-columns:1fr}.cap-extend{grid-row:auto}.tech-time{grid-template-columns:minmax(7em,9em) repeat(var(--months),minmax(0,1fr))}.tt-name{font-size:12px}}
+
+.usage-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.usage-tool{display:flex;flex-direction:column;gap:10px}
+.usage-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px;margin:0}
+.usage-facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.usage-facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
+.usage-none{font-size:13px;color:var(--muted)}
+.usage-kinds li{grid-template-columns:minmax(7em,11em) 1fr minmax(4.5em,auto)}
+.usage-state{font-size:13px;color:var(--warn);margin:0}
+.usage-share-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.usage-scroll{overflow-x:auto}.usage-scroll:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.usage-table table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.usage-table th,.usage-table td{padding:6px 10px;border-bottom:1px solid var(--border);text-align:right;white-space:nowrap}
+.usage-table th:first-child,.usage-table td:first-child{text-align:left}
+.usage-table thead th{font-size:11px;font-weight:600;color:var(--muted)}
+@media (max-width:760px){.usage-tools,.usage-share-grid{grid-template-columns:1fr}}
+@media print{.usage-scroll{overflow:visible}.usage-table th,.usage-table td{white-space:normal}}
 .page [data-l]{display:none}
 #lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:var(--on-accent)}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
 #lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:var(--on-accent)}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
@@ -3485,6 +3502,274 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </details>
             </div>
           </section>
+
+          <section class="usage">
+    <div class="section-head">
+      <h2><span data-l="en" lang="en">Usage during this period</span><span data-l="zh-TW" lang="zh-Hant-TW">這段期間的用量</span></h2>
+      <p class="note"><span data-l="en" lang="en">May 3, 2026 – Oct 12, 2026 · 163 days. Source: local Claude Code and Codex logs, read on this computer. Amounts are API list-price equivalents in USD (price table 2026-10-29): what this usage would cost on the public API, not what was paid. Subscriptions are not billed per token.</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年5月3日 – 2026年10月12日 · 163 天。來源：在這台電腦上讀取的本機 Claude Code 與 Codex 紀錄。金額為美元計的 API 牌價等值（價格表 2026-10-29）：表示這些用量若走公開 API 的費用，並非實際支付的金額；訂閱方案不按 token 計費。</span></p>
+    </div>
+
+    <div class="usage-tools"><article class="panel usage-tool">
+    <h3>Claude Code</h3>
+    <dl class="usage-facts">
+      <div><dt><span data-l="en" lang="en">Plan</span><span data-l="zh-TW" lang="zh-Hant-TW">方案</span></dt><dd><span data-l="en" lang="en">max (local hint: default_claude_max_5x)</span><span data-l="zh-TW" lang="zh-Hant-TW">max (本機提示：default_claude_max_5x)</span></dd></div>
+      <div><dt><span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></dt><dd><span data-l="en" lang="en">672M</span><span data-l="zh-TW" lang="zh-Hant-TW">6.7億</span></dd></div>
+              <div><dt><span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></dt><dd><span data-l="en" lang="en">$829.03</span><span data-l="zh-TW" lang="zh-Hant-TW">$829.03</span></dd></div>
+              <div><dt><span data-l="en" lang="en">Model responses</span><span data-l="zh-TW" lang="zh-Hant-TW">模型回應次數</span></dt><dd><span data-l="en" lang="en">11,700</span><span data-l="zh-TW" lang="zh-Hant-TW">11,700</span></dd></div>
+    </dl>
+
+    <ul class="shares usage-kinds" aria-label="Tokens by kind. Reasoning is part of output and is not counted twice.">
+            <li>
+                <span class="share-label"><span data-l="en" lang="en">Input</span><span data-l="zh-TW" lang="zh-Hant-TW">輸入</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:1.4%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">9.6M</span><span data-l="zh-TW" lang="zh-Hant-TW">962.4萬</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Output</span><span data-l="zh-TW" lang="zh-Hant-TW">輸出</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:2.7%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">18.2M</span><span data-l="zh-TW" lang="zh-Hant-TW">1822萬</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Cache reads</span><span data-l="zh-TW" lang="zh-Hant-TW">快取讀取</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:91.8%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">617.1M</span><span data-l="zh-TW" lang="zh-Hant-TW">6.2億</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Cache writes (5 min)</span><span data-l="zh-TW" lang="zh-Hant-TW">快取寫入（5 分鐘）</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:0.7%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">4.4M</span><span data-l="zh-TW" lang="zh-Hant-TW">441萬</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Cache writes (1 h)</span><span data-l="zh-TW" lang="zh-Hant-TW">快取寫入（1 小時）</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:3.4%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">22.7M</span><span data-l="zh-TW" lang="zh-Hant-TW">2269萬</span></b>
+              </li>
+          </ul>
+          <p class="note"><span data-l="en" lang="en">Tokens by kind. Reasoning is part of output and is not counted twice.</span><span data-l="zh-TW" lang="zh-Hant-TW">依種類列出 token。推理是輸出的一部分，不重複計算。</span></p>
+
+
+    <p class="usage-state"><span data-l="en" lang="en">2 unreadable usage lines were skipped: totals may be lower than the real usage.</span><span data-l="zh-TW" lang="zh-Hant-TW">2 行無法解讀的用量紀錄被略過：總數可能低於實際用量。</span></p>
+  </article><article class="panel usage-tool">
+    <h3>Codex</h3>
+    <dl class="usage-facts">
+      <div><dt><span data-l="en" lang="en">Plan</span><span data-l="zh-TW" lang="zh-Hant-TW">方案</span></dt><dd><span data-l="en" lang="en">plus</span><span data-l="zh-TW" lang="zh-Hant-TW">plus</span></dd></div>
+      <div><dt><span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></dt><dd><span data-l="en" lang="en">177.1M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.8億</span></dd></div>
+              <div><dt><span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></dt><dd><span data-l="en" lang="en">$116.50 + 90 unpriced responses</span><span data-l="zh-TW" lang="zh-Hant-TW">$116.50，另有 90 次回應未計價</span></dd></div>
+              <div><dt><span data-l="en" lang="en">Model responses</span><span data-l="zh-TW" lang="zh-Hant-TW">模型回應次數</span></dt><dd><span data-l="en" lang="en">3,490</span><span data-l="zh-TW" lang="zh-Hant-TW">3,490</span></dd></div>
+    </dl>
+
+    <ul class="shares usage-kinds" aria-label="Tokens by kind. Reasoning is part of output and is not counted twice.">
+            <li>
+                <span class="share-label"><span data-l="en" lang="en">Input</span><span data-l="zh-TW" lang="zh-Hant-TW">輸入</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:7.5%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">13.4M</span><span data-l="zh-TW" lang="zh-Hant-TW">1336.9萬</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Output</span><span data-l="zh-TW" lang="zh-Hant-TW">輸出</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:2.1%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">3.8M</span><span data-l="zh-TW" lang="zh-Hant-TW">376.8萬</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">Cache reads</span><span data-l="zh-TW" lang="zh-Hant-TW">快取讀取</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:90.3%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">159.9M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.6億</span></b>
+              </li><li>
+                <span class="share-label"><span data-l="en" lang="en">of which reasoning</span><span data-l="zh-TW" lang="zh-Hant-TW">其中推理</span></span>
+                <span class="share-track"
+                  ><span
+                    class="share-fill"
+                    style="width:1.0%"
+                  ></span
+                ></span>
+                <b><span data-l="en" lang="en">1.8M</span><span data-l="zh-TW" lang="zh-Hant-TW">177萬</span></b>
+              </li>
+          </ul>
+          <p class="note"><span data-l="en" lang="en">Tokens by kind. Reasoning is part of output and is not counted twice.</span><span data-l="zh-TW" lang="zh-Hant-TW">依種類列出 token。推理是輸出的一部分，不重複計算。</span></p>
+    <p class="note"><span data-l="en" lang="en">698 responses ran in fast mode (Codex priority) and are priced at fast-mode rates.</span><span data-l="zh-TW" lang="zh-Hant-TW">其中 698 次回應使用快速模式（Codex priority），以快速模式牌價計算。</span></p>
+    <p class="usage-state"><span data-l="en" lang="en">No list price for codex-auto-review: their tokens are shown, their cost is left out, never estimated from another model.</span><span data-l="zh-TW" lang="zh-Hant-TW">codex-auto-review 沒有牌價：仍列出其 token，但不計入費用，也不會借用其他模型的價格估算。</span></p>
+
+  </article></div>
+    <article class="panel usage-share">
+            <h3><span data-l="en" lang="en">Share between the tools</span><span data-l="zh-TW" lang="zh-Hant-TW">兩個工具的占比</span></h3>
+            <div class="usage-share-grid">
+              <div>
+                <p class="sub"><span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></p>
+                <ul class="shares"><li>
+      <span class="share-label">Claude Code</span>
+      <span class="share-track"><span class="share-fill" style="width:79.1%"></span></span>
+      <b>79%</b>
+    </li><li>
+      <span class="share-label">Codex</span>
+      <span class="share-track"><span class="share-fill" style="width:20.9%"></span></span>
+      <b>21%</b>
+    </li></ul>
+              </div>
+              <div>
+                      <p class="sub"><span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></p>
+                      <ul class="shares"><li>
+      <span class="share-label">Claude Code</span>
+      <span class="share-track"><span class="share-fill" style="width:87.7%"></span></span>
+      <b>88%</b>
+    </li><li>
+      <span class="share-label">Codex</span>
+      <span class="share-track"><span class="share-fill" style="width:12.3%"></span></span>
+      <b>12%</b>
+    </li></ul>
+                    </div>
+            </div>
+          </article>
+    <article class="panel usage-table">
+            <h3><span data-l="en" lang="en">By month</span><span data-l="zh-TW" lang="zh-Hant-TW">每月</span></h3>
+            <div
+              class="usage-scroll"
+              role="region"
+              tabindex="0"
+              aria-label="By month"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col"><span data-l="en" lang="en">Month</span><span data-l="zh-TW" lang="zh-Hant-TW">月份</span></th>
+                    <th scope="col">Claude Code · <span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></th>
+                          <th scope="col">Claude Code · <span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></th><th scope="col">Codex · <span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></th>
+                          <th scope="col">Codex · <span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <th scope="row">2026-05</th>
+                      <td><span data-l="en" lang="en">41.8M</span><span data-l="zh-TW" lang="zh-Hant-TW">4176萬</span></td>
+                              <td><span data-l="en" lang="en">$66.26</span><span data-l="zh-TW" lang="zh-Hant-TW">$66.26</span></td><td>—</td><td>—</td>
+                    </tr><tr>
+                      <th scope="row">2026-06</th>
+                      <td><span data-l="en" lang="en">73.6M</span><span data-l="zh-TW" lang="zh-Hant-TW">7364萬</span></td>
+                              <td><span data-l="en" lang="en">$116.55</span><span data-l="zh-TW" lang="zh-Hant-TW">$116.55</span></td><td>—</td><td>—</td>
+                    </tr><tr>
+                      <th scope="row">2026-07</th>
+                      <td><span data-l="en" lang="en">100.4M</span><span data-l="zh-TW" lang="zh-Hant-TW">1億</span></td>
+                              <td><span data-l="en" lang="en">$166.50</span><span data-l="zh-TW" lang="zh-Hant-TW">$166.50</span></td><td>—</td><td>—</td>
+                    </tr><tr>
+                      <th scope="row">2026-08</th>
+                      <td><span data-l="en" lang="en">131.5M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.3億</span></td>
+                              <td><span data-l="en" lang="en">$146.96</span><span data-l="zh-TW" lang="zh-Hant-TW">$146.96</span></td><td><span data-l="en" lang="en">25.9M</span><span data-l="zh-TW" lang="zh-Hant-TW">2586萬</span></td>
+                              <td><span data-l="en" lang="en">$36.00</span><span data-l="zh-TW" lang="zh-Hant-TW">$36.00</span></td>
+                    </tr><tr>
+                      <th scope="row">2026-09</th>
+                      <td><span data-l="en" lang="en">179.6M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.8億</span></td>
+                              <td><span data-l="en" lang="en">$179.54</span><span data-l="zh-TW" lang="zh-Hant-TW">$179.54</span></td><td><span data-l="en" lang="en">76.5M</span><span data-l="zh-TW" lang="zh-Hant-TW">7650萬</span></td>
+                              <td><span data-l="en" lang="en">$42.12</span><span data-l="zh-TW" lang="zh-Hant-TW">$42.12</span></td>
+                    </tr><tr>
+                      <th scope="row">2026-10</th>
+                      <td><span data-l="en" lang="en">145.2M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.5億</span></td>
+                              <td><span data-l="en" lang="en">$153.22</span><span data-l="zh-TW" lang="zh-Hant-TW">$153.22</span></td><td><span data-l="en" lang="en">74.7M</span><span data-l="zh-TW" lang="zh-Hant-TW">7471.7萬</span></td>
+                              <td><span data-l="en" lang="en">$38.38 + 90 unpriced responses</span><span data-l="zh-TW" lang="zh-Hant-TW">$38.38，另有 90 次回應未計價</span></td>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="note"><span data-l="en" lang="en">Months in Asia/Taipei.</span><span data-l="zh-TW" lang="zh-Hant-TW">月份以 Asia/Taipei 時區計算。</span></p>
+          </article>
+          <article class="panel usage-table">
+            <h3><span data-l="en" lang="en">By model</span><span data-l="zh-TW" lang="zh-Hant-TW">各模型</span></h3>
+            <div
+              class="usage-scroll"
+              role="region"
+              tabindex="0"
+              aria-label="By model"
+            >
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col"><span data-l="en" lang="en">Model</span><span data-l="zh-TW" lang="zh-Hant-TW">模型</span></th>
+                    <th scope="col"><span data-l="en" lang="en">Tool</span><span data-l="zh-TW" lang="zh-Hant-TW">工具</span></th>
+                    <th scope="col"><span data-l="en" lang="en">Tokens</span><span data-l="zh-TW" lang="zh-Hant-TW">Token 數</span></th>
+                    <th scope="col"><span data-l="en" lang="en">Model responses</span><span data-l="zh-TW" lang="zh-Hant-TW">模型回應次數</span></th>
+                    <th scope="col"><span data-l="en" lang="en">API list-price equivalent</span><span data-l="zh-TW" lang="zh-Hant-TW">API 牌價等值</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                        <th scope="row">claude-opus-5-5</th>
+                        <td>Claude Code</td>
+                        <td><span data-l="en" lang="en">447.6M</span><span data-l="zh-TW" lang="zh-Hant-TW">4.5億</span></td>
+                        <td><span data-l="en" lang="en">6,900</span><span data-l="zh-TW" lang="zh-Hant-TW">6,900</span></td>
+                        <td><span data-l="en" lang="en">$475.94</span><span data-l="zh-TW" lang="zh-Hant-TW">$475.94</span></td>
+                      </tr><tr>
+                        <th scope="row">claude-opus-5</th>
+                        <td>Claude Code</td>
+                        <td><span data-l="en" lang="en">174.1M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.7億</span></td>
+                        <td><span data-l="en" lang="en">3,200</span><span data-l="zh-TW" lang="zh-Hant-TW">3,200</span></td>
+                        <td><span data-l="en" lang="en">$283.05</span><span data-l="zh-TW" lang="zh-Hant-TW">$283.05</span></td>
+                      </tr><tr>
+                        <th scope="row">claude-opus-4-8</th>
+                        <td>Claude Code</td>
+                        <td><span data-l="en" lang="en">41.8M</span><span data-l="zh-TW" lang="zh-Hant-TW">4176萬</span></td>
+                        <td><span data-l="en" lang="en">900</span><span data-l="zh-TW" lang="zh-Hant-TW">900</span></td>
+                        <td><span data-l="en" lang="en">$66.26</span><span data-l="zh-TW" lang="zh-Hant-TW">$66.26</span></td>
+                      </tr><tr>
+                        <th scope="row">claude-haiku-4-5-20251001</th>
+                        <td>Claude Code</td>
+                        <td><span data-l="en" lang="en">8.6M</span><span data-l="zh-TW" lang="zh-Hant-TW">861萬</span></td>
+                        <td><span data-l="en" lang="en">700</span><span data-l="zh-TW" lang="zh-Hant-TW">700</span></td>
+                        <td><span data-l="en" lang="en">$3.78</span><span data-l="zh-TW" lang="zh-Hant-TW">$3.78</span></td>
+                      </tr><tr>
+                        <th scope="row">gpt-6.1-sol</th>
+                        <td>Codex</td>
+                        <td><span data-l="en" lang="en">150.5M</span><span data-l="zh-TW" lang="zh-Hant-TW">1.5億</span></td>
+                        <td><span data-l="en" lang="en">2,800</span><span data-l="zh-TW" lang="zh-Hant-TW">2,800</span></td>
+                        <td><span data-l="en" lang="en">$80.50</span><span data-l="zh-TW" lang="zh-Hant-TW">$80.50</span></td>
+                      </tr><tr>
+                        <th scope="row">gpt-5.6-sol</th>
+                        <td>Codex</td>
+                        <td><span data-l="en" lang="en">25.9M</span><span data-l="zh-TW" lang="zh-Hant-TW">2586萬</span></td>
+                        <td><span data-l="en" lang="en">600</span><span data-l="zh-TW" lang="zh-Hant-TW">600</span></td>
+                        <td><span data-l="en" lang="en">$36.00</span><span data-l="zh-TW" lang="zh-Hant-TW">$36.00</span></td>
+                      </tr><tr>
+                        <th scope="row">codex-auto-review</th>
+                        <td>Codex</td>
+                        <td><span data-l="en" lang="en">747K</span><span data-l="zh-TW" lang="zh-Hant-TW">74.7萬</span></td>
+                        <td><span data-l="en" lang="en">90</span><span data-l="zh-TW" lang="zh-Hant-TW">90</span></td>
+                        <td><span data-l="en" lang="en">Unknown (no list price)</span><span data-l="zh-TW" lang="zh-Hant-TW">未知（沒有牌價）</span></td>
+                      </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+  </section>
 
           <section class="about">
                   <h2><span data-l="en" lang="en">How this was measured</span><span data-l="zh-TW" lang="zh-Hant-TW">這份報告怎麼量的</span></h2>

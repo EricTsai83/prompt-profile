@@ -242,5 +242,10 @@ outputs matter, defined by purpose rather than file format:
 
 Today the "Profile & evidence" view comes closest to the factual role, and the visual overview
 plus the card come closest to the identity role. Remaining composition work should restructure
-the outputs around these two roles. [Plan 23](23-usage-plan-and-api-equivalent-cost.md) already
-places usage, plan and cost in the factual report only.
+the outputs around these two roles. Plan 23 (done; in git history) already places usage, plan
+and cost in the factual report only.
+
+## Follow-up from plan 23 (2026-10-29)
+
+- The "Usage during this period" section (`src/report/usage.ts`) works and passes the template
+  QA (layout, axe, motion), but the owner deferred its visual fine-tuning to this plan.
