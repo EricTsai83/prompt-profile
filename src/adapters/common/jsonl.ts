@@ -1,4 +1,18 @@
-import { type FileSystem, Stream } from "effect"
+import { Effect, type FileSystem, Stream } from "effect"
+import { zstdDecompressSync } from "node:zlib"
+
+/**
+ * The file's bytes; a `.zst` file (Codex compresses older rollouts with zstd) is decompressed
+ * whole. A file that cannot be decompressed fails like an unreadable one.
+ */
+const bytesOf = (fs: FileSystem.FileSystem, path: string): Stream.Stream<Uint8Array, unknown> =>
+  path.endsWith(".zst")
+    ? Stream.fromEffect(
+        fs
+          .readFile(path)
+          .pipe(Effect.flatMap((data) => Effect.try(() => zstdDecompressSync(data)))),
+      )
+    : fs.stream(path)
 
 export interface JsonlLine {
   readonly value: unknown
@@ -36,7 +50,7 @@ export const readJsonl = (
         : typeof options.prefilter === "string"
           ? [options.prefilter]
           : options.prefilter
-    return fs.stream(path).pipe(
+    return bytesOf(fs, path).pipe(
       Stream.decodeText,
       Stream.splitLines,
       Stream.map((line): JsonlLine | undefined => {

@@ -64,9 +64,15 @@ export const resolveCodexRoot = (
   path: Path.Path,
 ): string => env["CODEX_HOME"] || path.join(home, ".codex")
 
-/** Session id from the rollout file name: `rollout-<time>-<uuid>.jsonl`. */
+/** Session id from the rollout file name: `rollout-<time>-<uuid>.jsonl` (or `.jsonl.zst`). */
 const idFromFileName = (name: string): string | undefined =>
-  /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.jsonl$/i.exec(name)?.[1]
+  /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.jsonl(?:\.zst)?$/i.exec(
+    name,
+  )?.[1]
+
+/** Rollouts, plain or compressed: Codex compresses older ones with zstd. */
+const isRollout = (name: string): boolean =>
+  name.startsWith("rollout-") && (name.endsWith(".jsonl") || name.endsWith(".jsonl.zst"))
 
 export const toCandidate = (
   content: ReadonlyArray<{ readonly type: string; readonly text?: string | undefined }>,
@@ -306,12 +312,7 @@ export const makeCodexAdapter = (
 
     const read: Effect.Effect<SourceRead> = Effect.gen(function* () {
       const diag = new DiagnosticsCollector()
-      const files = yield* findFiles(
-        fs,
-        path,
-        sessionsDir,
-        (n) => n.startsWith("rollout-") && n.endsWith(".jsonl"),
-      )
+      const files = yield* findFiles(fs, path, sessionsDir, isRollout)
       const known = new Set<string>()
       for (const f of files) {
         const id = idFromFileName(path.basename(f))

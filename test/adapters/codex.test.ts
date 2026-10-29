@@ -4,6 +4,7 @@ import { Effect, Path } from "effect"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { zstdCompressSync } from "node:zlib"
 import {
   makeCodexAdapter,
   resolveCodexRoot,
@@ -176,6 +177,46 @@ describe("Codex adapter (fixture)", () => {
       const path = yield* Path.Path
       expect(resolveCodexRoot({ CODEX_HOME: "/c" }, "/home/x", path)).toBe("/c")
       expect(resolveCodexRoot({}, "/home/x", path)).toBe("/home/x/.codex")
+    }).pipe(Effect.provide(NodeServices.layer)),
+  )
+})
+
+describe("Codex compressed rollouts", () => {
+  it.effect("reads `.jsonl.zst` rollouts like plain ones; a broken one is unreadable", () =>
+    Effect.gen(function* () {
+      const root = mkdtempSync(join(tmpdir(), "pp-codex-zst-"))
+      const dir = join(root, "sessions", "2026", "06", "09")
+      mkdirSync(dir, { recursive: true })
+      const id = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee"
+      const lines = [
+        {
+          timestamp: "2026-06-09T10:00:00.000Z",
+          type: "session_meta",
+          payload: { id, cwd: "/home/dev/delta", originator: "codex_cli_rs", source: "cli" },
+        },
+        {
+          timestamp: "2026-06-09T10:00:01.000Z",
+          type: "response_item",
+          payload: {
+            type: "message",
+            role: "user",
+            content: [{ type: "input_text", text: "make the cache key stable" }],
+          },
+        },
+      ]
+      // Codex compresses older rollouts with zstd
+      writeFileSync(
+        join(dir, `rollout-2026-06-09T10-00-00-${id}.jsonl.zst`),
+        zstdCompressSync(Buffer.from(lines.map((l) => JSON.stringify(l)).join("\n") + "\n")),
+      )
+      writeFileSync(
+        join(dir, "rollout-2026-06-09T11-00-00-ffffffff-ffff-4fff-8fff-ffffffffffff.jsonl.zst"),
+        "not zstd",
+      )
+      const adapter = yield* makeCodexAdapter(root)
+      const { records, diagnostics } = yield* adapter.read
+      expect(records.map((r) => [r.sessionId, r.text])).toEqual([[id, "make the cache key stable"]])
+      expect(diagnostics.unreadableFiles).toBe(1)
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 })

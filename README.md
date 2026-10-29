@@ -216,10 +216,10 @@ CLI · `5` rate limited · `130` interrupted (a re-run resumes from the cache).
 
 **Files read** (read-only):
 
-| Source      | Paths (override with an environment variable)                                   |
-| ----------- | ------------------------------------------------------------------------------- |
-| Claude Code | `~/.claude/projects/*/*.jsonl`, `~/.claude/history.jsonl` (`CLAUDE_CONFIG_DIR`) |
-| Codex       | `~/.codex/sessions/**/rollout-*.jsonl`, `~/.codex/history.jsonl` (`CODEX_HOME`) |
+| Source      | Paths (override with an environment variable)                                                                      |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| Claude Code | `~/.claude/projects/*/*.jsonl`, `~/.claude/history.jsonl` (`CLAUDE_CONFIG_DIR`)                                    |
+| Codex       | `~/.codex/sessions/**/rollout-*.jsonl` (and zstd-compressed `.jsonl.zst`), `~/.codex/history.jsonl` (`CODEX_HOME`) |
 
 **Prompt selection and preprocessing**: adapters select user prompts, excluding recognized system
 messages, tool output and sub-agent conversations, then:
