@@ -62,7 +62,7 @@ of both views in English and Traditional Chinese were inspected for Classic, Pri
 
 The owner accepted the current result and explicitly closed plan 21. This records an owner
 scope decision, not a completed unfamiliar-reader study or exhaustive visual acceptance.
-Reader research continues in plan 32; remaining purpose/export integration belongs to plan 25.
+External reader research was later removed by owner decision; purpose/export integration was completed in plan 25.
 Plan 21's critique, content matrix, direction studies and iteration records remain in this folder.
 
 ## Purpose-specific opening — owner review, 2026-10-29
@@ -106,4 +106,4 @@ The owner accepted the revised PNG and explicitly closed plan 25 after the earli
 purpose-interaction review. Centered navigation, purpose-specific openings, aligned story
 headings and the measured share-card summary are delivered. The durable
 [purpose contract](purpose-contract.md) records sources, fallbacks, exclusions and validation.
-Character art continues in plan 20 D; unfamiliar-reader research continues in plan 32.
+Character art continues in plan 20 D; further report iteration uses owner feedback.

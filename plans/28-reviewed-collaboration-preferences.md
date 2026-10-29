@@ -30,7 +30,7 @@ artifact; exporting them must not mutate the source profile or any existing agen
 - [ ] Export a portable English Markdown document with clear instructions and provenance outside the instruction body; honor supported privacy choices.
 - [ ] Never write AGENTS.md, CLAUDE.md or global settings automatically. Existing destination files are preserved unless an explicit supported replacement flow is chosen.
 - [ ] Verify private atomic writes, hostile generated text, path handling, cancellation, rerun conflicts and zero changes to source profiles/configuration.
-- [ ] Document manual installation and limitations without claiming that exported instructions improve outcomes; validate usefulness through plan 32.
+- [ ] Document manual installation and limitations without claiming that exported instructions improve outcomes; iterate on usefulness through owner use and feedback.
 
 ## Implementation and verification
 
