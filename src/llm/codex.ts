@@ -18,6 +18,7 @@ import {
   SYSTEM_PREAMBLE,
   type GenerateInput,
   type LlmRunnerShape,
+  type ModelSource,
 } from "./LlmRunner.ts"
 import { runProcess } from "./process.ts"
 
@@ -147,9 +148,12 @@ export const makeCodexRunner = (
         const value = yield* decodeValue(RUNNER, input.schema, yield* parseJson(RUNNER, text))
         const usage = events.findLast((e) => e.type === "turn.completed")?.usage
         const end = yield* Clock.currentTimeMillis
+        // Codex never reports its model: a name here is only the requested one echoed back.
+        const modelSource: ModelSource = options.model ? "requested" : null
         return {
           value,
           model: options.model ?? null,
+          modelSource,
           usage: {
             inputTokens: usage?.input_tokens ?? null,
             outputTokens: usage?.output_tokens ?? null,

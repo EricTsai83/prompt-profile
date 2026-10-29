@@ -59,6 +59,7 @@ export const makeFakeLlmRunner = (options: FakeOptions = {}): FakeLlmRunner => {
         Effect.map((value) => ({
           value,
           model: options.model ?? "fake-model",
+          modelSource: "reported" as const,
           usage: { inputTokens: null, outputTokens: null, costUsd: null },
           durationMs: 0,
         })),

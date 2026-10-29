@@ -45,6 +45,7 @@ describe("ClaudeCodeRunner", () => {
       const result = yield* runner.generate(input)
       expect(result.value).toEqual({ ok: true })
       expect(result.model).toBe("claude-opus-5-5")
+      expect(result.modelSource).toBe("reported")
       expect(result.usage).toEqual({ inputTokens: 1175, outputTokens: 52, costUsd: 0.0105593 })
       const rec = fake.records[0]!
       expect(rec.command).toBe("claude")
@@ -121,6 +122,34 @@ describe("ClaudeCodeRunner", () => {
       expect(error._tag).toBe("Timeout")
       expect(fake.records[0]!.killed).toBe(true)
       expect(existsSync(fake.records[0]!.cwd!)).toBe(false)
+    }).pipe(Effect.provide(fake.layer))
+  })
+})
+
+describe("model provenance", () => {
+  it.effect("Claude without modelUsage echoes the requested model, labelled as requested", () => {
+    const { modelUsage: _, ...rest } = JSON.parse(fixture("claude-output.success.json"))
+    const fake = withSpawner(() => ({ exitCode: 0, stdout: JSON.stringify(rest) }))
+    return Effect.gen(function* () {
+      const runner = yield* makeClaudeCodeRunner({ model: "opus" })
+      const result = yield* runner.generate(input)
+      expect(result.model).toBe("opus")
+      expect(result.modelSource).toBe("requested")
+    }).pipe(Effect.provide(fake.layer))
+  })
+
+  it.effect("Codex never reports its model: a requested one is labelled as requested", () => {
+    const fake = withSpawner((rec) => {
+      writeFileSync(rec.args[rec.args.indexOf("-o") + 1]!, '{"ok":true}')
+      return { exitCode: 0, stdout: fixture("codex-events.success.jsonl") }
+    })
+    return Effect.gen(function* () {
+      const requested = yield* (yield* makeCodexRunner({ model: "gpt-test" })).generate(input)
+      expect(requested.model).toBe("gpt-test")
+      expect(requested.modelSource).toBe("requested")
+      const defaulted = yield* (yield* makeCodexRunner()).generate(input)
+      expect(defaulted.model).toBeNull()
+      expect(defaulted.modelSource).toBeNull()
     }).pipe(Effect.provide(fake.layer))
   })
 })

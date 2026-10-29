@@ -44,9 +44,16 @@ export interface Usage {
   readonly costUsd: number | null
 }
 
+/**
+ * Where `model` came from: `reported` by the CLI's own output, or only the `requested` value
+ * echoed back (Codex never reports its model). `null` when `model` is null; absent = unknown.
+ */
+export type ModelSource = "reported" | "requested" | null
+
 export interface GenerateResult<A> {
   readonly value: A
   readonly model: string | null
+  readonly modelSource?: ModelSource
   readonly usage: Usage
   readonly durationMs: number
 }

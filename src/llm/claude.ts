@@ -18,6 +18,7 @@ import {
   SYSTEM_PREAMBLE,
   type GenerateInput,
   type LlmRunnerShape,
+  type ModelSource,
 } from "./LlmRunner.ts"
 import { runProcess } from "./process.ts"
 
@@ -144,9 +145,14 @@ export const makeClaudeCodeRunner = (
         }
         const value = yield* decodeValue(RUNNER, input.schema, raw)
         const end = yield* Clock.currentTimeMillis
+        const reported = mainModel(parsed)
+        const model = reported ?? options.model ?? null
+        const modelSource: ModelSource =
+          reported !== null ? "reported" : model !== null ? "requested" : null
         return {
           value,
-          model: mainModel(parsed) ?? options.model ?? null,
+          model,
+          modelSource,
           usage: {
             inputTokens: sumTokens(parsed.usage),
             outputTokens: parsed.usage?.output_tokens ?? null,
