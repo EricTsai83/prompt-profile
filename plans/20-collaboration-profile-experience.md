@@ -1,6 +1,6 @@
 # Collaboration profile experience
 
-Status: planned
+Status: in progress; phase B (interaction episodes) delivered
 
 ## Outcome
 
@@ -109,26 +109,44 @@ Implementation: `cli/commands/analyze.ts`, `cli/commands/render.ts`, `cli/steps.
 The current prompts ask the model to preserve episodes, but the schema still stores generic
 observations and chapter-level evidence. Make chronology and provenance explicit data.
 
-- [ ] Add domain structures for an episode (session, ordered turns, task context, user
+- [x] Add domain structures for an episode (session, ordered turns, task context, user
       interventions, observable ending or unknown outcome) and a pattern (supporting episodes,
       spread, counterexamples, and task context). Use redacted excerpts, not a second raw transcript.
-- [ ] Carry source session, timestamp, and turn order through chunking, map, merge, and reduce.
+- [x] Carry source session, timestamp, and turn order through chunking, map, merge, and reduce.
       A session split across chunks must remain identifiable; omitted turns must be apparent.
-- [ ] Verify quoted text, session membership and chronological order. Reject invented turns,
+- [x] Verify quoted text, session membership and chronological order. Reject invented turns,
       reordered evidence, or multiple sessions presented as a single conversation; count rejections.
-- [ ] Keep user requests separate from observed outcomes. With user-only prompts, never invent
+- [x] Keep user requests separate from observed outcomes. With user-only prompts, never invent
       assistant replies, successful completion, saved time, or causality that the record cannot show.
-- [ ] Preserve contradictory examples and recurring patterns through evidence caps and merging,
+- [x] Preserve contradictory examples and recurring patterns through evidence caps and merging,
       instead of retaining only the easiest opening quote from each chunk.
-- [ ] Define how sampling selects representative episodes across time and task contexts. Expose
+- [x] Define how sampling selects representative episodes across time and task contexts. Expose
       coverage and missing data, and distinguish analyzed evidence from full-history statistics.
-- [ ] Test repairs, abandoned directions, short but well-contextualized follow-ups, split sessions,
+- [x] Test repairs, abandoned directions, short but well-contextualized follow-ups, split sessions,
       missing turns, mixed task types, and injected instructions using hand-written data.
-- [ ] Bump profile/analysis versions as needed, migrate older reports, and invalidate affected caches.
+- [x] Bump profile/analysis versions as needed, migrate older reports, and invalidate affected caches.
 
 Implementation: `domain/`, `analysis/chunk.ts`, map/merge/reduce schemas and prompts,
 `analysis/verify.ts`, and `analysis/portrait.ts`. Change adapters/pipeline only when needed;
 run real-data smoke checks if those modules change, without logging personal content.
+
+Delivered (profile schema 11, analysis 13):
+
+- `domain/Episode.ts` holds episodes (session, turns with role, turn number and time, task type
+  and context, ending), patterns (supporting and contrary episodes, spread, task types) and
+  episode coverage. Chunks number each prompt within its session (`turn="3/12"`), so turns
+  outside a chunk and sessions split over chunks stay visible.
+- The map step proposes episodes; `analysis/episodes.ts` rejects invented, misquoted,
+  reordered and stitched conversations (counted per reason), resets endings no user turn
+  shows to unknown, selects up to 8 episodes spread over time, sessions and task types, and
+  keeps reduce patterns only when they cite selected episodes from two or more sessions.
+  Episodes bypass merging; capped observation evidence prefers different sessions first.
+- The facts page shows patterns and episodes with prompt numbers, prompts not shown, dates
+  (months with `--exclude dates`), endings limited to what the user wrote, and coverage that
+  separates analysed conversations from the whole history. `--exclude quotes` keeps the
+  structure without quotes; the output check covers the new text.
+- Not done here: paid real-CLI runs of the new map/reduce schemas (`pnpm test:smoke:llm`) and
+  real-history evaluation of episode quality belong to the plan 22 / phase F evaluations.
 
 ## C. Finish the collaboration-role product
 

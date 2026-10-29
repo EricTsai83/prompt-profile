@@ -91,8 +91,8 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 10 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 12 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 11 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 13 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 11, others 17 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
@@ -110,7 +110,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
+| 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | B (episodes) delivered; A, C–F planned |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
 | 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements; plan 20 B enriches evidence later | Ready for contract and fixtures; calibration baseline delivered |
 | 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Completed claim calibration; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |
@@ -142,7 +142,7 @@ plan 21 is closed by owner decision (see the [closeout](../docs/ux/report-redesi
    [README](../README.md#small-histories-and-stopped-runs)), plan 25 (identity/factual purposes; done, see the
    [purpose contract](../docs/ux/report-redesign/purpose-contract.md)). Claim calibration is also complete; see the
    [cases, safeguards and limitations](../docs/ux/model-comparison/claim-support.md).
-2. **Make the portrait specific and trustworthy:** plan 20 B (episodes), the completed
+2. **Make the portrait specific and trustworthy:** plan 20 B (episodes; delivered), the completed
    [claim calibration](../docs/ux/model-comparison/claim-support.md), and plan 20 C (contextual roles/signature moves). Ship a bounded episode-to-report
    slice before expanding the catalog. Plan 22's local-history snapshots support optional evaluation.
 3. **Make reports useful after reading:** plan 27 (one experiment), plan 20 A (history library),
