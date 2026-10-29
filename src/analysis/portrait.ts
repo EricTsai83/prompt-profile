@@ -24,24 +24,23 @@ export const verifyPortrait = (
   let rejectedAxis = false
   const axes = INTERACTION_AXES.map(({ key }) => {
     const axis = portrait.axes.find((a) => a.key === key)
-    const evidence = verifyCompleteEvidence(axis?.evidence ?? [], texts, counts)
-    const counterEvidence = verifyCompleteEvidence(axis?.counterEvidence ?? [], texts, counts)
-    if (
-      axis &&
-      ((axis.evidence.length > 0 && evidence.length === 0) ||
-        (axis.counterEvidence.length > 0 && counterEvidence.length === 0))
-    )
-      rejectedAxis = true
-    const sessions = new Set(
-      evidence.flatMap((e) => {
-        const origin = origins.get(e.promptId)
-        return origin ? [origin.session] : []
-      }),
-    ).size
-    // Contradictions are surfaced, never resolved by the volume of one long session.
-    const pole =
-      sessions >= 2 && counterEvidence.length === 0 ? (axis?.pole ?? "unclear") : "unclear"
-    return { key, pole, explanation: axis?.explanation ?? "", evidence, counterEvidence }
+    // At most one side per pole; each is checked on its own and counted by conversation, so
+    // both ways of working can stand: different contexts, not a contradiction.
+    const sides = (["first", "second"] as const).flatMap((pole) => {
+      const side = axis?.sides.find((s) => s.pole === pole)
+      if (!side) return []
+      const evidence = verifyCompleteEvidence(side.evidence, texts, counts)
+      if (side.evidence.length > 0 && evidence.length === 0) rejectedAxis = true
+      if (evidence.length === 0) return []
+      const sessions = new Set(
+        evidence.flatMap((e) => {
+          const origin = origins.get(e.promptId)
+          return origin ? [origin.session] : []
+        }),
+      ).size
+      return [{ ...side, evidence, sessions }]
+    })
+    return { key, explanation: axis?.explanation ?? "", sides }
   })
   return rejectedAxis ? reject() : { ...portrait, chapters, axes }
 }

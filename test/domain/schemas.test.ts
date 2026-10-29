@@ -86,7 +86,7 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(11)
+      expect(profile.schemaVersion).toBe(12)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
     }),
   )
@@ -95,7 +95,7 @@ describe("Profile", () => {
     Effect.gen(function* () {
       const { usage: _usage, ...v9 } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v9, schemaVersion: 9 })
-      expect(profile.schemaVersion).toBe(11)
+      expect(profile.schemaVersion).toBe(12)
       expect(profile.usage).toBeNull()
     }),
   )
@@ -112,11 +112,73 @@ describe("Profile", () => {
         coverage,
         translations: { "zh-TW": zh },
       })
-      expect(profile.schemaVersion).toBe(11)
+      expect(profile.schemaVersion).toBe(12)
       expect(profile.episodes).toEqual([])
       expect(profile.patterns).toEqual([])
       expect(profile.coverage.episodes).toBeNull()
       expect(profile.translations["zh-TW"]!.episodes).toEqual([])
+    }),
+  )
+
+  it.effect("a version 11 portrait becomes ways of working; unresolved axes keep only text", () =>
+    Effect.gen(function* () {
+      const sample = loadSample() as Record<string, any>
+      const quote = (id: string) => ({ promptId: id, quote: "q" })
+      const axis = (
+        key: string,
+        pole: string,
+        evidence: Array<object>,
+        counter: Array<object>,
+      ) => ({
+        key,
+        pole,
+        explanation: `${key} text`,
+        evidence,
+        counterEvidence: counter,
+      })
+      const portrait = {
+        introduction: "i",
+        chapters: [{ title: "t", body: "b", evidence: [quote("codex:s1:1")] }],
+        axes: [
+          axis("framing", "first", [quote("codex:s1:1"), quote("codex:s2:4")], []),
+          axis("pacing", "second", [quote("codex:s1:1")], [quote("claude-code:s3:u2")]),
+          axis("control", "unclear", [quote("codex:s1:1")], [quote("codex:s2:4")]),
+          axis("closure", "unclear", [], []),
+        ],
+      }
+      const zh = {
+        ...sample["translations"]["zh-TW"],
+        portrait: {
+          introduction: "i",
+          chapters: [{ title: "t", body: "b" }],
+          axes: portrait.axes.map(({ key }) => ({ key, explanation: "說明" })),
+        },
+      }
+      const profile = yield* decodeProfile({
+        ...sample,
+        schemaVersion: 11,
+        portrait,
+        translations: { "zh-TW": zh },
+      })
+      expect(
+        profile.portrait!.axes.map((a) => [a.key, a.sides.map((s) => [s.pole, s.sessions])]),
+      ).toEqual([
+        ["framing", [["first", 2]]],
+        [
+          "pacing",
+          [
+            ["first", 1],
+            ["second", 1],
+          ],
+        ],
+        ["control", []],
+        ["closure", []],
+      ])
+      expect(profile.portrait!.axes[2]!.explanation).toBe("control text")
+      expect(profile.translations["zh-TW"]!.portrait!.axes[1]!.sides).toEqual([
+        { context: "" },
+        { context: "" },
+      ])
     }),
   )
 
@@ -160,7 +222,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(11)
+      expect(profile.schemaVersion).toBe(12)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -199,7 +261,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 12, undefined])(
+  it.effect.each([1, "3", 13, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {

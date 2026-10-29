@@ -7,17 +7,50 @@ export const INTERACTION_AXES = [
 ] as const
 export const AXIS_KEYS = ["framing", "pacing", "control", "closure"] as const
 export type AxisKey = (typeof AXIS_KEYS)[number]
-export type Pole = "first" | "second" | "unclear"
+export type Pole = "first" | "second"
 
-/** No complete role is assigned when even one preference is unobserved or mixed. */
+/**
+ * A way of working counts as characteristic once it shows in this many conversations. Both
+ * poles of an axis can be characteristic: a person may work differently in different projects
+ * or tasks, and neither way is a counterexample of the other.
+ */
+export const MIN_SIDE_SESSIONS = 2
+
+interface SideLike {
+  readonly pole: Pole
+  /** Distinct conversations behind the side. */
+  readonly sessions: number
+}
+
+/** The characteristic ways of working on one axis, in pole order. */
+export const establishedPoles = (axis: {
+  readonly sides: ReadonlyArray<SideLike>
+}): ReadonlyArray<Pole> =>
+  (["first", "second"] as const).filter((pole) =>
+    axis.sides.some((s) => s.pole === pole && s.sessions >= MIN_SIDE_SESSIONS),
+  )
+
+/** `both`: two characteristic ways in different contexts; `none`: not enough evidence yet. */
+export type AxisState = Pole | "both" | "none"
+
+export const axisState = (axis: { readonly sides: ReadonlyArray<SideLike> }): AxisState => {
+  const poles = establishedPoles(axis)
+  return poles.length === 2 ? "both" : (poles[0] ?? "none")
+}
+
+/**
+ * A complete role only when every axis has exactly one characteristic way of working. A
+ * person with both ways on an axis gets no role rather than one chosen arbitrarily.
+ */
 export const roleCode = (
-  axes: ReadonlyArray<{ readonly key: AxisKey; readonly pole: Pole }>,
+  axes: ReadonlyArray<{ readonly key: AxisKey; readonly sides: ReadonlyArray<SideLike> }>,
 ): string | null => {
   let code = ""
   for (const axis of INTERACTION_AXES) {
     const found = axes.find((a) => a.key === axis.key)
-    if (!found || found.pole === "unclear") return null
-    code += axis.codes[found.pole === "first" ? 0 : 1]
+    const state = found ? axisState(found) : "none"
+    if (state === "both" || state === "none") return null
+    code += axis.codes[state === "first" ? 0 : 1]
   }
   return code
 }

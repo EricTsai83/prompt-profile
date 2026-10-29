@@ -1,24 +1,44 @@
-import { INTERACTION_AXES } from "../domain/Interaction.ts"
+import { axisState, INTERACTION_AXES, MIN_SIDE_SESSIONS } from "../domain/Interaction.ts"
 import type { Profile } from "../domain/Profile.ts"
 import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
+import type { Scrub } from "./visibility.ts"
 
 /** Categorical preferences: marker positions are not numerical personality scores. */
-export const preferenceMap = (p: Profile, loc: Loc): Raw => {
+export const preferenceMap = (p: Profile, loc: Loc, scrub: Scrub): Raw => {
   if (!p.portrait)
     return html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noPortrait)}</p>`
   return html`<article class="preference-map panel">
     <h2>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].preferences)}</h2>
     <p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note)}</p>
     <div class="preference-rows">${INTERACTION_AXES.map(({ key }) => {
-      const pole = p.portrait!.axes.find((a) => a.key === key)?.pole ?? "unclear"
+      const index = p.portrait!.axes.findIndex((a) => a.key === key)
+      const axis = p.portrait!.axes[index]
+      const state = axis ? axisState(axis) : "none"
+      // Each characteristic way of working, in its own context: both may show.
+      const sides = (axis?.sides ?? []).flatMap((side, i) =>
+        side.sessions >= MIN_SIDE_SESSIONS ? [{ side, i }] : [],
+      )
       return html`<div class="preference-row">
         <h3>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[key][0])}</h3>
-        <div class="preference-rail ${pole}" aria-hidden="true"><i></i></div>
+        <div class="preference-rail ${state === "none" ? "unclear" : state}" aria-hidden="true">${state === "first" || state === "both" ? html`<i class="at-first"></i>` : ""}${state === "second" || state === "both" ? html`<i class="at-second"></i>` : ""}</div>
         <div class="preference-ends"><span>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[key][1])}</span><span>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[key][2])}</span></div>
-        <p class="preference-status">${loc.text((_m, _c, l) => (pole === "unclear" ? VIEW_MESSAGES[l].mixed : PORTRAIT_MESSAGES[l].axes[key][pole === "first" ? 1 : 2]))}</p>
+        ${
+          sides.length === 0
+            ? html`<p class="preference-status">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].notObserved)}</p>`
+            : html`<ul class="preference-sides">${sides.map(
+                ({ side, i }) =>
+                  html`<li><b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[key][side.pole === "first" ? 1 : 2])}</b>${loc.text(
+                    (_m, _c, l) => {
+                      const context =
+                        p.translations[l]?.portrait?.axes[index]?.sides[i]?.context ?? side.context
+                      return context ? ` · ${scrub(context, l)}` : ""
+                    },
+                  )}</li>`,
+              )}</ul>`
+        }
       </div>`
     })}</div>
   </article>`
@@ -92,7 +112,8 @@ export const viewStyle = `
 .preference-map{margin:28px 0}.preference-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 44px;margin-top:28px}
 .preference-row h3{font-size:var(--text-md)}.preference-rail{height:6px;background:linear-gradient(90deg,var(--accent-soft),var(--border),var(--accent-soft));border-radius:999px;position:relative;margin:22px 8px 14px}
 .preference-rail i{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:var(--card);border:2px dashed var(--muted)}
-.preference-rail.unclear{background:var(--border)}.preference-rail.unclear i{display:none}.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
+.preference-rail.unclear{background:var(--border)}.preference-rail i.at-first{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail i.at-second{left:100%;border:2px solid var(--accent);background:var(--accent)}
+.preference-sides{list-style:none;margin:10px 0 0;padding:0;font-size:var(--text-xs);color:var(--muted);line-height:1.6}.preference-sides b{color:var(--fg);font-weight:600}
 .preference-ends{display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--muted)}.preference-status{font-size:var(--text-xs);margin-top:10px;color:var(--muted)}
 .page-turn{margin:var(--space-6) 0;padding:var(--space-2) var(--space-4);border:1px solid var(--border)}
 .report-view details[open]>summary{margin-bottom:14px}.report-view blockquote{line-height:1.85}

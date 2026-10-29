@@ -153,10 +153,8 @@ describe("analyze", () => {
                 ],
                 axes: ["framing", "pacing", "control", "closure"].map((key) => ({
                   key,
-                  pole: "first",
                   explanation: "Observed across conversations.",
-                  evidence,
-                  counterEvidence: [],
+                  sides: [{ pole: "first", context: "c", evidence }],
                 })),
               },
             }
@@ -224,7 +222,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "13",
+        analysisVersion: "14",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

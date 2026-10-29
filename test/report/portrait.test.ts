@@ -26,13 +26,7 @@ describe("portrait report", () => {
           },
         ],
         axes: [
-          {
-            key: "framing" as const,
-            pole: "first" as const,
-            explanation: "They define the outcome first.",
-            evidence: [],
-            counterEvidence: [],
-          },
+          { key: "framing" as const, explanation: "They define the outcome first.", sides: [] },
         ],
       },
     }
@@ -49,5 +43,78 @@ describe("portrait report", () => {
     const input = translationInput(p)
     expect(input.portrait?.chapters[0]?.body).toBe(p.portrait.chapters[0]!.body)
     expect(JSON.stringify(input)).not.toContain("UNIQUE_PRIVATE_QUOTE")
+  })
+
+  describe("preferences with more than one way of working", () => {
+    const quote = (n: number) => ({ promptId: `claude-code:s${n}:1`, quote: `QUOTE_${n}` })
+    const withAxes = async () => {
+      const base = await sample()
+      return {
+        ...base,
+        languages: ["en"] as const,
+        translations: {},
+        portrait: {
+          introduction: "Intro.",
+          chapters: [{ title: "Chapter", body: "Body.", evidence: [quote(1)] }],
+          axes: [
+            {
+              key: "pacing" as const,
+              explanation: "Step by step when learning, whole batches for repairs.",
+              sides: [
+                {
+                  pole: "first" as const,
+                  context: "when learning a new library",
+                  evidence: [quote(1), quote(2)],
+                  sessions: 2,
+                },
+                {
+                  pole: "second" as const,
+                  context: "batches of small repairs",
+                  evidence: [quote(3), quote(4), quote(5)],
+                  sessions: 3,
+                },
+              ],
+            },
+            {
+              key: "control" as const,
+              explanation: "Seen once.",
+              sides: [
+                {
+                  pole: "first" as const,
+                  context: "a migration",
+                  evidence: [quote(6)],
+                  sessions: 1,
+                },
+              ],
+            },
+          ],
+        },
+      }
+    }
+    const overview = (html: string) =>
+      html.slice(
+        html.indexOf('class="preference-map'),
+        html.indexOf("</article>", html.indexOf('class="preference-map')),
+      )
+
+    it("shows both ways of working, each in its context, without calling either a counterexample", async () => {
+      const out = renderHtml(await withAxes())
+      const map = overview(out)
+      expect(map).toContain("Step by step</b> · when learning a new library")
+      expect(map).toContain("Whole task</b> · batches of small repairs")
+      expect(map).toContain('class="preference-rail both"')
+      expect(out).not.toMatch(/[Cc]ontrary evidence|[Cc]ounter-?evidence|Mixed \/ insufficient/)
+    })
+
+    it("does not call a way seen in one conversation characteristic", async () => {
+      const out = renderHtml(await withAxes())
+      expect(overview(out)).not.toContain("a migration")
+      expect(overview(out)).toContain("Not seen in two or more conversations yet")
+      // the facts page still lists it, as seen once, with its quote
+      const facts = out.slice(out.indexOf('class="preference-evidence"'))
+      expect(facts).toContain("Direct · a migration · seen in one conversation only")
+      expect(facts).toContain("Whole task · batches of small repairs · in 3 conversations")
+      expect(facts).toContain("QUOTE_6")
+    })
   })
 })

@@ -107,7 +107,10 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
         (v.coaching ? evidence(p.improvements) : 0) +
         (p.portrait
           ? evidence(p.portrait.chapters) +
-            p.portrait.axes.reduce((n, a) => n + a.evidence.length + a.counterEvidence.length, 0)
+            p.portrait.axes.reduce(
+              (n, a) => n + a.sides.reduce((m, s) => m + s.evidence.length, 0),
+              0,
+            )
           : 0) +
         p.episodes.reduce((n, e) => n + e.turns.length, 0)
       : 0,

@@ -97,7 +97,9 @@ Also look for these original collaboration preferences, without treating either 
 - pacing: confirming incremental steps versus handing over a whole task;
 - control: choosing the approach personally versus authorizing the agent to choose;
 - closure: checking predefined criteria versus refining after seeing a result.
-  Record counterexamples and task-dependent differences. Short prompts alone prove none of these.
+  A person may work one way in one project or kind of task and the other way elsewhere: both
+  are characteristic of them, not a contradiction. Record each way with the context it shows in
+  (the project, the kind of task or the situation). Short prompts alone prove none of these.
   Agent tool use alone does not prove the user requested or understood that technique.
 
 ## Claim calibration

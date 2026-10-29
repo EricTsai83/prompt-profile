@@ -82,13 +82,19 @@ Return `portrait` with:
   Explain context for an unfamiliar reader. Each passage must lead into the next. Do not
   invent an episode when the observations contain no sequence; describe supported patterns.
 - `axes`: exactly one entry per key: `framing`, `pacing`, `control`, `closure`.
-  Each contains `pole` (`first`, `second`, or `unclear`), `explanation`, `evidence`, and
-  `counterEvidence` (exact quotes supporting the opposite preference, empty if unobserved).
   First/second meanings: framing = define/explore; pacing = stepwise/whole task;
   control = personally direct/delegate decisions; closure = predefined criteria/iterative refinement.
-  Prefer `unclear` for thin, conflicting or task-dependent evidence. A preference needs
-  at least two distinct sessions. `promptContext` supplies source sessions and timestamps;
-  only use it to locate and order existing evidence, never as additional behavioral evidence.
+  Each contains `sides`: every way of working the developer shows on that axis, at most one
+  per pole, each with a `pole`, a short `context` (the kind of task, project or situation it
+  shows in, e.g. "when learning a new library", "in quick UI fixes") and exact `evidence`.
+  Different projects and tasks call for different approaches, so both poles can be
+  characteristic of the same person: never treat one side as a counterexample of the other,
+  and describe each in its own context. Only include a side its quotes support; a side needs
+  quotes from at least two distinct sessions to count as characteristic. Leave `sides` empty
+  when the axis is not observed. `explanation` says in 1–2 sentences how the observed sides
+  fit together, or that the axis is not observed yet. `promptContext` supplies source sessions
+  and timestamps; only use it to locate and order existing evidence, never as additional
+  behavioral evidence.
 
 Use only verified input observations. Every narrative claim must be supported by its chapter's
 quotes. Do not infer AI replies or successful outcomes from user requests. Separate frequency,

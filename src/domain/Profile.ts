@@ -13,9 +13,11 @@ import { Usage } from "./Usage.ts"
  * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
  * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
- * and `coverage.episodes` (plan 20 B). Versions 2–10 are migrated on decode.
+ * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
+ * working (`sides`) instead of one pole with counter-evidence. Versions 2–11 are migrated on
+ * decode.
  */
-export const PROFILE_SCHEMA_VERSION = 11 as const
+export const PROFILE_SCHEMA_VERSION = 12 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -57,9 +59,28 @@ export const PortraitText = Schema.Struct({
   introduction: Schema.String,
   chapters: Schema.Array(Schema.Struct({ title: Schema.String, body: Schema.String })),
   axes: Schema.Array(
-    Schema.Struct({ key: Schema.Literals(AXIS_KEYS), explanation: Schema.String }),
+    Schema.Struct({
+      key: Schema.Literals(AXIS_KEYS),
+      explanation: Schema.String,
+      sides: Schema.Array(Schema.Struct({ context: Schema.String })),
+    }),
   ),
 })
+
+/**
+ * One way of working observed on an axis, with the context it shows in (a kind of task, a
+ * project, a situation). Both poles may appear: they describe the person in different
+ * contexts, not a contradiction.
+ */
+export const AxisSide = Schema.Struct({
+  pole: Schema.Literals(["first", "second"]),
+  context: Schema.String,
+  evidence: Schema.Array(Evidence),
+  /** Distinct conversations of the verified evidence (filled by the program). */
+  sessions: Count,
+})
+export type AxisSide = typeof AxisSide.Type
+
 export const Portrait = Schema.Struct({
   introduction: Schema.String,
   chapters: Schema.Array(
@@ -68,10 +89,9 @@ export const Portrait = Schema.Struct({
   axes: Schema.Array(
     Schema.Struct({
       key: Schema.Literals(AXIS_KEYS),
-      pole: Schema.Literals(["first", "second", "unclear"]),
       explanation: Schema.String,
-      evidence: Schema.Array(Evidence),
-      counterEvidence: Schema.Array(Evidence),
+      /** At most one per pole. */
+      sides: Schema.Array(AxisSide),
     }),
   ),
 })
@@ -236,7 +256,11 @@ export const matchesBase = (
     (t.portrait != null &&
       t.portrait.chapters.length === base.portrait.chapters.length &&
       t.portrait.axes.length === base.portrait.axes.length &&
-      base.portrait.axes.every((a, i) => t.portrait!.axes[i]?.key === a.key))) &&
+      base.portrait.axes.every(
+        (a, i) =>
+          t.portrait!.axes[i]?.key === a.key &&
+          t.portrait!.axes[i]?.sides.length === a.sides.length,
+      ))) &&
   t.traits.length === base.traits.length &&
   t.improvements.length === base.improvements.length &&
   t.episodes.length === base.episodes.length &&
@@ -281,12 +305,12 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     // Version 2 had English text only; missing newer fields decode to their defaults.
-    const current =
+    const migrated =
       found === 2
         ? {
             ...(input as object),
@@ -297,10 +321,88 @@ export const decodeProfile = (
         : found !== PROFILE_SCHEMA_VERSION
           ? { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
           : input
+    const current =
+      typeof found === "number" && found < 12 ? migrateAxes(migrated as Legacy) : migrated
     return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(
       Effect.mapError((e) => new InvalidProfile({ message: e.message })),
     )
   })
+
+interface LegacyAxis {
+  readonly key: string
+  readonly pole?: string
+  readonly explanation?: string
+  readonly evidence?: ReadonlyArray<{ readonly promptId: string }>
+  readonly counterEvidence?: ReadonlyArray<{ readonly promptId: string }>
+}
+interface Legacy {
+  readonly portrait?: { readonly axes?: ReadonlyArray<LegacyAxis> } | null
+  readonly translations?: Record<string, { readonly portrait?: { readonly axes?: unknown } | null }>
+}
+
+/** `${source}:${sessionId}:${n}` → `${source}:${sessionId}` (the adapters' id format). */
+const sessionOfPromptId = (id: string): string => id.slice(0, Math.max(0, id.lastIndexOf(":")))
+
+/**
+ * Before version 12 an axis had one pole and counter-evidence. A resolved pole becomes a side
+ * and its counter-evidence the other side, both without a stated context; an unresolved axis
+ * did not say which quotes belonged to which pole, so it keeps only its explanation.
+ */
+const migrateAxes = (input: Legacy): Legacy => {
+  const axes = input.portrait?.axes
+  if (!axes) return input
+  const side = (pole: string, evidence: ReadonlyArray<{ readonly promptId: string }>) =>
+    evidence.length === 0
+      ? []
+      : [
+          {
+            pole,
+            context: "",
+            evidence,
+            sessions: new Set(evidence.map((e) => sessionOfPromptId(e.promptId))).size,
+          },
+        ]
+  const sides = axes.map((a) =>
+    a.pole === "first" || a.pole === "second"
+      ? [
+          ...side(a.pole, a.evidence ?? []),
+          ...side(a.pole === "first" ? "second" : "first", a.counterEvidence ?? []),
+        ].toSorted((x, y) => (x.pole === y.pole ? 0 : x.pole === "first" ? -1 : 1))
+      : [],
+  )
+  const translations = Object.fromEntries(
+    Object.entries(input.translations ?? {}).map(([lang, t]) => {
+      const tAxes = t.portrait?.axes
+      return [
+        lang,
+        !Array.isArray(tAxes)
+          ? t
+          : {
+              ...t,
+              portrait: {
+                ...t.portrait,
+                axes: tAxes.map((a: object, i: number) => ({
+                  ...a,
+                  sides: (sides[i] ?? []).map(() => ({ context: "" })),
+                })),
+              },
+            },
+      ]
+    }),
+  )
+  return {
+    ...input,
+    portrait: {
+      ...input.portrait,
+      axes: axes.map(({ key, explanation }, i) => ({
+        key,
+        explanation: explanation ?? "",
+        sides: sides[i]!,
+      })),
+    },
+    ...(input.translations ? { translations } : {}),
+  }
+}
 
 export const encodeProfile = (profile: Profile): ProfileEncoded =>
   Schema.encodeSync(Profile)(profile)

@@ -23,25 +23,23 @@ describe("diffProfiles", () => {
     expect(d.decisions).toEqual([])
   })
 
-  it("reports a changed axis pole and the resulting role as decisions", () => {
+  it("reports a changed way of working and the resulting role as decisions", () => {
     const portrait = base.portrait!
-    const resolved = {
+    const only = (pole: "first" | "second") => [
+      { pole, context: "c", evidence: portrait.chapters[0]!.evidence, sessions: 2 },
+    ]
+    const withSides = (sides: (i: number) => ReturnType<typeof only>) => ({
       ...base,
-      portrait: { ...portrait, axes: portrait.axes.map((a) => ({ ...a, pole: "first" as const })) },
-    }
-    const flipped = {
-      ...resolved,
-      portrait: {
-        ...resolved.portrait,
-        axes: resolved.portrait.axes.map((a, i) =>
-          i === 0 ? { ...a, pole: "second" as const } : a,
-        ),
-      },
-    }
+      portrait: { ...portrait, axes: portrait.axes.map((a, i) => ({ ...a, sides: sides(i) })) },
+    })
+    const resolved = withSides(() => only("first"))
+    const flipped = withSides((i) => only(i === 0 ? "second" : "first"))
+    const both = withSides((i) => (i === 0 ? [...only("first"), ...only("second")] : only("first")))
     const d = diffProfiles(resolved, flipped, "en")
-    const fields = d.decisions.map((c) => c.field)
-    expect(fields).toEqual(["role", `axis ${portrait.axes[0]!.key}`])
+    expect(d.decisions.map((c) => c.field)).toEqual(["role", `axis ${portrait.axes[0]!.key}`])
     expect(structureOf(resolved).role).not.toBeNull()
+    expect(structureOf(both).role).toBeNull()
+    expect(structureOf(both).axes[portrait.axes[0]!.key]).toBe("both")
     expect(d.wording).toEqual([])
   })
 

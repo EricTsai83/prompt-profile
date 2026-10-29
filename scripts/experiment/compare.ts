@@ -3,7 +3,7 @@
  * structured decisions and missing content are kept apart; nothing here ranks a winner, and
  * longer prose or more claims is never treated as better.
  */
-import { roleCode } from "../../src/domain/Interaction.ts"
+import { axisState, roleCode } from "../../src/domain/Interaction.ts"
 import type { Language, Profile } from "../../src/domain/Profile.ts"
 import type { CaseResult } from "./execute.ts"
 
@@ -26,10 +26,11 @@ export const structureOf = (p: Profile): Structure => {
     p.dimensions.reduce((n, d) => n + d.evidence.length, 0) +
     p.improvements.reduce((n, i) => n + i.evidence.length, 0) +
     (portrait?.chapters.reduce((n, c) => n + c.evidence.length, 0) ?? 0) +
-    (portrait?.axes.reduce((n, a) => n + a.evidence.length + a.counterEvidence.length, 0) ?? 0)
+    (portrait?.axes.reduce((n, a) => n + a.sides.reduce((m, s) => m + s.evidence.length, 0), 0) ??
+      0)
   return {
     role: portrait ? roleCode(portrait.axes) : null,
-    axes: Object.fromEntries((portrait?.axes ?? []).map((a) => [a.key, a.pole])),
+    axes: Object.fromEntries((portrait?.axes ?? []).map((a) => [a.key, axisState(a)])),
     traits: p.traits.map((t) => t.name),
     traitCount: p.traits.length,
     improvementCount: p.improvements.length,

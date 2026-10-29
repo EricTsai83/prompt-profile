@@ -740,7 +740,7 @@ export const renderHtml = (
 
           <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewNote)}</p></header>
           ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
-          ${preferenceMap(profile, loc)}
+          ${preferenceMap(profile, loc, scrub)}
           ${story ?? ""}
           ${
             v.funFacts && profile.funFacts.length > 0

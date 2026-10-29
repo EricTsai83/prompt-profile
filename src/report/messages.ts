@@ -569,12 +569,13 @@ export const MESSAGES: Record<Language, Messages> = { en, "zh-TW": zhTW }
 export const PORTRAIT_MESSAGES = {
   en: {
     title: "A portrait of collaboration",
-    evidenceFor: "Supporting evidence",
-    evidenceAgainst: "Contrary evidence",
     preferences: "Observed collaboration preferences",
-    note: "Preferences observed in these conversations, not a psychological assessment or an ability score. They may change with the task and the available history.",
+    note: "Preferences observed in these conversations, not a psychological assessment or an ability score. Both ways of working on a line can be characteristic, each in its own kind of task or project.",
     supporting: "Supporting patterns, activity and practical suggestions",
-    unclear: "Mixed or insufficient evidence",
+    notObserved: "Not seen in two or more conversations yet",
+    both: "Both, depending on the context",
+    seenIn: (n: number) => `in ${n} ${n === 1 ? "conversation" : "conversations"}`,
+    seenOnce: "seen in one conversation only, not counted as characteristic yet",
     axes: {
       framing: ["Starting point", "Define first", "Explore first"],
       pacing: ["Pace", "Step by step", "Whole task"],
@@ -584,12 +585,13 @@ export const PORTRAIT_MESSAGES = {
   },
   "zh-TW": {
     title: "一個人如何與 AI 共事",
-    evidenceFor: "支持證據",
-    evidenceAgainst: "反向證據",
     preferences: "對話中展現的協作偏好",
-    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分；可能隨任務與可取得的紀錄改變。",
+    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分。同一條線的兩種做法都可能是這個人的特色，各自出現在不同的任務或專案中。",
     supporting: "更多行為證據、使用紀錄與實用建議",
-    unclear: "偏好混合或證據不足",
+    notObserved: "尚未在兩段以上的對話中看到",
+    both: "兩種都有，視情境而定",
+    seenIn: (n: number) => `出現在 ${n} 段對話`,
+    seenOnce: "只在一段對話中看到，尚不算特色",
     axes: {
       framing: ["起手方式", "先定義", "先探索"],
       pacing: ["推進節奏", "分步推進", "整包交付"],
@@ -633,7 +635,6 @@ export const VIEW_MESSAGES = {
       `Source: local tool records. ${covered} of ${total} sessions have metadata. Each value shows the percentage and sessions using that tool / covered sessions. Uncovered sessions are unknown.`,
     promptCoverage: (n: number) =>
       `Source: wording rules applied to ${n} cleaned prompts (the denominator). Each value is the share matching that rule. Exact matching prompt counts are not stored; percentages are rounded.`,
-    mixed: "Mixed / insufficient evidence",
     first: "Observed preference",
     noPortrait:
       "A collaboration portrait is not available in this profile. The Facts & evidence page contains the available observations.",
@@ -669,7 +670,6 @@ export const VIEW_MESSAGES = {
       `來源：本機工具紀錄。共 ${total} 段對話，其中 ${covered} 段有工具紀錄。每項列出比例，以及使用該工具的對話數／有紀錄的對話數。其餘對話的使用情況未知。`,
     promptCoverage: (n: number) =>
       `來源：以文字規則檢查 ${n} 則清理後提示，以此為分母。每項數值是符合該規則的比例。報告未儲存各項符合的確切則數，百分比經過四捨五入。`,
-    mixed: "混合偏好／證據不足",
     first: "觀察到的偏好",
     noPortrait: "這份 profile 尚未包含協作側寫；「事實與證據」頁仍可閱讀既有的觀察與證據。",
   },

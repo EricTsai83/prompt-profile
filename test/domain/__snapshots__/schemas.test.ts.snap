@@ -385,44 +385,6 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
           "items": {
             "additionalProperties": false,
             "properties": {
-              "counterEvidence": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "promptId": {
-                      "type": "string",
-                    },
-                    "quote": {
-                      "type": "string",
-                    },
-                  },
-                  "required": [
-                    "promptId",
-                    "quote",
-                  ],
-                  "type": "object",
-                },
-                "type": "array",
-              },
-              "evidence": {
-                "items": {
-                  "additionalProperties": false,
-                  "properties": {
-                    "promptId": {
-                      "type": "string",
-                    },
-                    "quote": {
-                      "type": "string",
-                    },
-                  },
-                  "required": [
-                    "promptId",
-                    "quote",
-                  ],
-                  "type": "object",
-                },
-                "type": "array",
-              },
               "explanation": {
                 "type": "string",
               },
@@ -435,21 +397,54 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
                 ],
                 "type": "string",
               },
-              "pole": {
-                "enum": [
-                  "first",
-                  "second",
-                  "unclear",
-                ],
-                "type": "string",
+              "sides": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "context": {
+                      "type": "string",
+                    },
+                    "evidence": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "promptId": {
+                            "type": "string",
+                          },
+                          "quote": {
+                            "type": "string",
+                          },
+                        },
+                        "required": [
+                          "promptId",
+                          "quote",
+                        ],
+                        "type": "object",
+                      },
+                      "type": "array",
+                    },
+                    "pole": {
+                      "enum": [
+                        "first",
+                        "second",
+                      ],
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "pole",
+                    "context",
+                    "evidence",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
               },
             },
             "required": [
               "key",
-              "pole",
               "explanation",
-              "evidence",
-              "counterEvidence",
+              "sides",
             ],
             "type": "object",
           },
@@ -706,10 +701,26 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
                 ],
                 "type": "string",
               },
+              "sides": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "context": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "context",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
+              },
             },
             "required": [
               "key",
               "explanation",
+              "sides",
             ],
             "type": "object",
           },

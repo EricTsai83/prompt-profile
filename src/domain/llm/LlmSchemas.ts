@@ -73,10 +73,15 @@ const LlmPortrait = Schema.Struct({
   axes: Schema.Array(
     Schema.Struct({
       key: Schema.Literals(AXIS_KEYS),
-      pole: Schema.Literals(["first", "second", "unclear"]),
       explanation: Schema.String,
-      evidence: Schema.Array(LlmEvidence),
-      counterEvidence: Schema.Array(LlmEvidence),
+      /** Each way of working observed, at most one per pole, with the context it shows in. */
+      sides: Schema.Array(
+        Schema.Struct({
+          pole: Schema.Literals(["first", "second"]),
+          context: Schema.String,
+          evidence: Schema.Array(LlmEvidence),
+        }),
+      ),
     }),
   ),
 })
@@ -183,10 +188,14 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
             ...c,
             evidence: c.evidence.map(toEvidence),
           })),
+          // `sessions` is counted by the analysis when it verifies the evidence
           axes: draft.portrait.axes.map((a) => ({
             ...a,
-            evidence: a.evidence.map(toEvidence),
-            counterEvidence: a.counterEvidence.map(toEvidence),
+            sides: a.sides.map((side) => ({
+              ...side,
+              evidence: side.evidence.map(toEvidence),
+              sessions: 0,
+            })),
           })),
         },
   // English only; the analysis adds translations afterwards.

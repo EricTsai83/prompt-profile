@@ -44,12 +44,7 @@ for (const look of LOOK_IDS) {
         ...profile,
         portrait: {
           ...portrait,
-          axes: portrait.axes.map((a: { key: string }) => ({
-            ...a,
-            pole: "unclear",
-            evidence: [],
-            counterEvidence: [],
-          })),
+          axes: portrait.axes.map((a: { key: string }) => ({ ...a, sides: [] })),
         },
       },
       [],

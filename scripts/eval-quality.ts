@@ -95,10 +95,12 @@ export const scoreProfile = (
                     path: `portrait.chapters[${i}]`,
                     evidence: item.evidence,
                   })),
-                  ...profile.portrait.axes.flatMap((item, i) => [
-                    { path: `portrait.axes[${i}]`, evidence: item.evidence },
-                    { path: `portrait.axes[${i}].counterEvidence`, evidence: item.counterEvidence },
-                  ]),
+                  ...profile.portrait.axes.flatMap((item, i) =>
+                    item.sides.map((side, j) => ({
+                      path: `portrait.axes[${i}].sides[${j}]`,
+                      evidence: side.evidence,
+                    })),
+                  ),
                 ]
               : []),
           ].map(({ path, evidence }) => ({ path, ...inspectClaimSupport(evidence, sources) })),

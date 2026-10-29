@@ -4,23 +4,117 @@
     {
       "title": "The work starts before the code",
       "body": "A fictional interface task begins with a pause: the developer asks for steps and risks before implementation. The request gives the agent a concrete role in clarifying the work. It also creates a point where the developer can choose a direction before changes accumulate.",
-      "evidence": [{ "promptId": "demo:one:1", "quote": "Before editing, outline the steps and the risks. Wait for my choice." }]
+      "evidence": [
+        {
+          "promptId": "demo:one:1",
+          "quote": "Before editing, outline the steps and the risks. Wait for my choice."
+        }
+      ]
     },
     {
       "title": "Freedom within a clear boundary",
       "body": "Once the direction is agreed, they give the agent room to choose the implementation. The boundary concerns the observable result: an existing API must keep working. In this conversation, delegation and control coexist because they apply to different decisions.",
-      "evidence": [{ "promptId": "demo:one:2", "quote": "Choose the implementation, but preserve the existing API." }]
+      "evidence": [
+        {
+          "promptId": "demo:one:2",
+          "quote": "Choose the implementation, but preserve the existing API."
+        }
+      ]
     },
     {
       "title": "Verification is part of the handoff",
       "body": "A separate task shows the same attention to completion conditions. The developer asks for checks and a description of their limits. This demonstrates a request for evidence, rather than proving that the implementation succeeded. Together, the conversations suggest a collaborator who delegates execution while keeping the final judgment close.",
-      "evidence": [{ "promptId": "demo:two:1", "quote": "Run the relevant checks and explain what they do not cover." }]
+      "evidence": [
+        {
+          "promptId": "demo:two:1",
+          "quote": "Run the relevant checks and explain what they do not cover."
+        }
+      ]
     }
   ],
   "axes": [
-    { "key": "framing", "pole": "first", "explanation": "These examples foreground steps, risks and completion conditions.", "evidence": [{ "promptId": "demo:one:1", "quote": "Before editing, outline the steps and the risks. Wait for my choice." }, { "promptId": "demo:two:1", "quote": "Run the relevant checks and explain what they do not cover." }], "counterEvidence": [] },
-    { "key": "pacing", "pole": "unclear", "explanation": "One planning checkpoint does not establish a consistent pace across tasks.", "evidence": [{ "promptId": "demo:one:1", "quote": "Before editing, outline the steps and the risks. Wait for my choice." }], "counterEvidence": [] },
-    { "key": "control", "pole": "unclear", "explanation": "They choose the direction in one moment and delegate implementation in another. The available examples do not establish a dominant preference.", "evidence": [{ "promptId": "demo:one:1", "quote": "Before editing, outline the steps and the risks. Wait for my choice." }], "counterEvidence": [{ "promptId": "demo:one:2", "quote": "Choose the implementation, but preserve the existing API." }] },
-    { "key": "closure", "pole": "unclear", "explanation": "The examples mention compatibility and checks, but show little of how the developer reacts to delivered results.", "evidence": [{ "promptId": "demo:two:1", "quote": "Run the relevant checks and explain what they do not cover." }], "counterEvidence": [] }
+    {
+      "key": "framing",
+      "explanation": "These examples foreground steps, risks and completion conditions.",
+      "sides": [
+        {
+          "pole": "first",
+          "context": "before changing an interface or running checks",
+          "evidence": [
+            {
+              "promptId": "demo:one:1",
+              "quote": "Before editing, outline the steps and the risks. Wait for my choice."
+            },
+            {
+              "promptId": "demo:two:1",
+              "quote": "Run the relevant checks and explain what they do not cover."
+            }
+          ],
+          "sessions": 2
+        }
+      ]
+    },
+    {
+      "key": "pacing",
+      "explanation": "One planning checkpoint does not establish a consistent pace across tasks.",
+      "sides": [
+        {
+          "pole": "first",
+          "context": "when a change touches an interface",
+          "evidence": [
+            {
+              "promptId": "demo:one:1",
+              "quote": "Before editing, outline the steps and the risks. Wait for my choice."
+            }
+          ],
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "key": "control",
+      "explanation": "They choose the direction themselves, then delegate the implementation within a boundary.",
+      "sides": [
+        {
+          "pole": "first",
+          "context": "choosing the direction of a change",
+          "evidence": [
+            {
+              "promptId": "demo:one:1",
+              "quote": "Before editing, outline the steps and the risks. Wait for my choice."
+            }
+          ],
+          "sessions": 1
+        },
+        {
+          "pole": "second",
+          "context": "implementation details within an agreed boundary",
+          "evidence": [
+            {
+              "promptId": "demo:one:2",
+              "quote": "Choose the implementation, but preserve the existing API."
+            }
+          ],
+          "sessions": 1
+        }
+      ]
+    },
+    {
+      "key": "closure",
+      "explanation": "The examples mention compatibility and checks, but show little of how the developer reacts to delivered results.",
+      "sides": [
+        {
+          "pole": "first",
+          "context": "finishing a change",
+          "evidence": [
+            {
+              "promptId": "demo:two:1",
+              "quote": "Run the relevant checks and explain what they do not cover."
+            }
+          ],
+          "sessions": 1
+        }
+      ]
+    }
   ]
 }

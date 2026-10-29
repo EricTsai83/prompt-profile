@@ -1,5 +1,5 @@
-import { roleCode } from "../domain/Interaction.ts"
-import type { Profile } from "../domain/Profile.ts"
+import { axisState, MIN_SIDE_SESSIONS, roleCode } from "../domain/Interaction.ts"
+import type { Language, Profile } from "../domain/Profile.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
@@ -48,7 +48,10 @@ export const portraitStory = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub)
   </section>`
 }
 
-/** The factual view's record of each preference: its explanation, supporting and contrary quotes. */
+/**
+ * The factual view's record of each preference: its explanation, then every observed way of
+ * working with its context, its conversations and its quotes. Ways seen once are listed as such.
+ */
 export const preferenceEvidence = (
   p: Profile,
   loc: Loc,
@@ -61,15 +64,32 @@ export const preferenceEvidence = (
   return html`<section class="preference-evidence">
     <h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>
     <p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note)}</p>
-    ${portrait.axes.map(
-      (axis) => html`<div class="portrait-axis">
+    ${portrait.axes.map((axis, a) => {
+      const state = axisState(axis)
+      const translated = (l: Language) => p.translations[l]?.portrait?.axes[a]
+      return html`<div class="portrait-axis">
       <b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[axis.key][0])}</b>
-      <span>${loc.text((_m, _c, l) => (axis.pole === "unclear" ? PORTRAIT_MESSAGES[l].unclear : PORTRAIT_MESSAGES[l].axes[axis.key][axis.pole === "first" ? 1 : 2]))}</span>
-      ${axis.evidence.length > 0 ? html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.portrait?.axes.find((a) => a.key === axis.key)?.explanation ?? axis.explanation, l))}</p>` : ""}
-      ${axis.evidence.length > 0 && v.quotes ? html`<div class="supporting-evidence"><h3>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].evidenceFor)}</h3>${evidenceList(axis.evidence, loc, v, scrub)}</div>` : ""}
-      ${axis.counterEvidence.length > 0 && v.quotes ? html`<div class="counter-evidence"><h3>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].evidenceAgainst)}</h3>${evidenceList(axis.counterEvidence, loc, v, scrub)}</div>` : ""}
-    </div>`,
-    )}
+      <span>${loc.text((_m, _c, l) => (state === "none" ? PORTRAIT_MESSAGES[l].notObserved : state === "both" ? PORTRAIT_MESSAGES[l].both : PORTRAIT_MESSAGES[l].axes[axis.key][state === "first" ? 1 : 2]))}</span>
+      ${axis.explanation ? html`<p>${loc.text((_m, _c, l) => scrub(translated(l)?.explanation ?? axis.explanation, l))}</p>` : ""}
+      ${axis.sides.map(
+        (side, i) => html`<div class="axis-side">
+        <h3>${loc.text((_m, _c, l) => {
+          const m = PORTRAIT_MESSAGES[l]
+          const context = translated(l)?.sides[i]?.context ?? side.context
+          const seen = side.sessions >= MIN_SIDE_SESSIONS ? m.seenIn(side.sessions) : m.seenOnce
+          return [
+            m.axes[axis.key][side.pole === "first" ? 1 : 2],
+            context ? scrub(context, l) : null,
+            seen,
+          ]
+            .filter((x) => x !== null)
+            .join(" · ")
+        })}</h3>
+        ${evidenceList(side.evidence, loc, v, scrub)}
+      </div>`,
+      )}
+    </div>`
+    })}
   </section>`
 }
 

@@ -23,7 +23,11 @@ export const translationInput = (p: Profile): TranslationType => ({
     ? {
         introduction: p.portrait.introduction,
         chapters: p.portrait.chapters.map(({ title, body }) => ({ title, body })),
-        axes: p.portrait.axes.map(({ key, explanation }) => ({ key, explanation })),
+        axes: p.portrait.axes.map(({ key, explanation, sides }) => ({
+          key,
+          explanation,
+          sides: sides.map(({ context }) => ({ context })),
+        })),
       }
     : null,
   headline: p.headline,

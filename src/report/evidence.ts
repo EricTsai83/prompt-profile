@@ -1,3 +1,4 @@
+import { axisState } from "../domain/Interaction.ts"
 import type { Language, Profile } from "../domain/Profile.ts"
 import { LIMITED_MESSAGES } from "./messages.ts"
 
@@ -5,7 +6,7 @@ import { LIMITED_MESSAGES } from "./messages.ts"
  * Limited evidence (plan 24): nothing in the profile has verified support from two or more
  * sessions. This reuses what the analysis verified instead of a prompt or session count: a
  * trait's verified quotes spread over 2+ sessions (`verifyTraits` records `support`), or a
- * resolved preference axis (2+ sessions without counter-evidence, `verifyPortrait`).
+ * characteristic way of working on a preference axis (2+ sessions, `verifyPortrait`).
  */
 export const isLimitedEvidence = (p: Profile): boolean =>
   !p.traits.some(
@@ -14,7 +15,7 @@ export const isLimitedEvidence = (p: Profile): boolean =>
       // The verified spread when recorded: the model may state "low" despite it. Profiles
       // before `support` was stored only have the capped confidence.
       (t.support ? t.support.sessions >= 2 : t.confidence !== "low"),
-  ) && !(p.portrait?.axes.some((a) => a.pole !== "unclear") ?? false)
+  ) && !(p.portrait?.axes.some((a) => axisState(a) !== "none") ?? false)
 
 /**
  * What the report and card show for a limited profile: fixed text in place of the generated
