@@ -31,6 +31,7 @@ import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibili
 import { usageSection, usageStyle } from "./usage.ts"
 import { episodesSection, episodesStyle } from "./episodes.ts"
 import { steeringSection, steeringStyle } from "./steering.ts"
+import { defined, definition, definitionStyle, defText } from "./definition.ts"
 import { STEERING_MESSAGES } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
@@ -399,9 +400,10 @@ const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw |
   </div>`
 }
 
-const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
-  html`<div class="sig tip ${i === 0 ? "tip-l" : i === 3 ? "tip-r" : ""}" ${tip} tabindex="-1">
-    <b>${value}</b><span>${label}</span>
+/** A headline number with its label and, folded behind an ⓘ, its definition. */
+const signatureTile = (value: Raw, label: Raw, def: Raw): Raw =>
+  html`<div class="sig">
+    <b>${value}</b><span class="sig-label">${label} ${def}</span>
   </div>`
 
 // ---- styles -------------------------------------------------------------------------------
@@ -618,6 +620,7 @@ export const renderHtml = (
   const signature = order.slice(0, 3)
   const minor = order.slice(3)
   const every = correctionEvery(s)
+  const def = defText(loc)
   const steer = profile.steering
   const steering = steeringSection(profile, loc, v, scrub)
   // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
@@ -649,7 +652,7 @@ export const renderHtml = (
         <title>${scrub(profile.archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
-        ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
+        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
         <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
@@ -699,7 +702,10 @@ export const renderHtml = (
               ${clock ? "" : html`<p class="chrono">${windowText}</p>`}
               <dl class="report-facts">
                 <div>
-                  <dt>${loc.text((m) => m.dataPeriod)}</dt>
+                  <dt>${loc.text((m) => m.dataPeriod)} ${definition(
+                    loc,
+                    def((m) => m.dataPeriod),
+                  )}</dt>
                   <dd>
                     ${loc.text(periodText)}
                   </dd>
@@ -715,7 +721,10 @@ export const renderHtml = (
                   </dd>
                 </div>
                 <div>
-                  <dt>${loc.text((m) => m.analyzed)}</dt>
+                  <dt>${loc.text((m) => m.analyzed)} ${definition(
+                    loc,
+                    def((m) => m.analyzed),
+                  )}</dt>
                   <dd>
                     ${loc.text((m) =>
                       [
@@ -768,14 +777,18 @@ export const renderHtml = (
             ${signatureTile(
               html`${percent(nightShare(s))}%`,
               loc.text((m) => m.nightShare),
-              loc.tip((m) => m.nightShareDef),
-              0,
+              definition(
+                loc,
+                def((m) => m.nightShare),
+              ),
             )}
             ${signatureTile(
               loc.text((m) => m.characters(Math.round(s.promptLength.median))),
               loc.text((m) => m.medianPrompt),
-              loc.tip((m) => m.medianPromptDef),
-              1,
+              definition(
+                loc,
+                def((m) => m.medianPrompt),
+              ),
             )}
             ${
               // per conversation when measured; the rule-based rate for older profiles
@@ -785,21 +798,30 @@ export const renderHtml = (
                       STEERING_MESSAGES[l].tile(steer.steer.conversations, steer.withFollowUps),
                     ),
                     loc.text((_m, _c, l) => STEERING_MESSAGES[l].tileLabel),
-                    loc.tip((_m, _c, l) => STEERING_MESSAGES[l].tileDef),
-                    2,
+                    definition(
+                      loc,
+                      loc.text((_m, _c, l) => STEERING_MESSAGES[l].tileDef),
+                      loc.text((_m, _c, l) =>
+                        STEERING_MESSAGES[l].denominator(steer.withFollowUps, steer.conversations),
+                      ),
+                    ),
                   )
                 : signatureTile(
                     loc.text((m) => m.corrections(every)),
                     loc.text((m) => m.correctionsLabel),
-                    loc.tip((m) => m.correctionsDef),
-                    2,
+                    definition(
+                      loc,
+                      def((m) => m.corrections),
+                    ),
                   )
             }
             ${signatureTile(
               html`${perSession === null ? "—" : perSession}`,
               loc.text((m) => m.perSession),
-              loc.tip((m) => m.perSessionDef),
-              3,
+              definition(
+                loc,
+                def((m) => m.perSession),
+              ),
             )}
           </section>
 
@@ -810,7 +832,13 @@ export const renderHtml = (
               cal
                 ? html`<article class="panel wide">
                     <div class="panel-head">
-                      <h3>${loc.text((m) => m.daily)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.daily)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.volume),
+                        ),
+                      )}
                       <p class="note">
                         ${loc.text((m) => m.volume(s.totalPrompts, s.activeDays, s.longestStreakDays))}
                       </p>
@@ -821,15 +849,24 @@ export const renderHtml = (
             }
             <article class="panel wide">
               <div class="panel-head">
-                <h3>${loc.text((m) => m.heatmap)}</h3>
-                <p class="note">${loc.text((m) => m.heatmapNote)}</p>
+                ${defined(
+                  html`<h3>${loc.text((m) => m.heatmap)}</h3>`,
+                  definition(
+                    loc,
+                    def((m) => m.heatmap),
+                  ),
+                )}
               </div>
               ${heatmap(s, loc, view)}
               ${
                 window
-                  ? html`<p class="note">
-                      ${windowText} · ${loc.text((m) => m.chronotypeShare(percent(window.share)))}
-                    </p>`
+                  ? html`<div class="note def-head">
+                      <span>${windowText} · ${loc.text((m) => m.chronotypeShare(percent(window.share)))}</span>
+                      ${definition(
+                        loc,
+                        def((m) => m.window),
+                      )}
+                    </div>`
                   : ""
               }
             </article>
@@ -841,13 +878,24 @@ export const renderHtml = (
                   <h2>${loc.text((m) => m.chapters)}</h2>
                   <div class="grid g-2r">
                     <article class="panel">
-                      <h3>${loc.text((m) => m.projects)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.projects)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.projects),
+                        ),
+                      )}
                       ${ranking}
-                      ${v.projects ? html`<p class="note">${loc.text((m) => m.projectsNote)}</p>` : ""}
                     </article>
                     <article class="panel">
                       ${strip}
-                      <h3>${loc.text((m) => m.projectsByWeek)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.projectsByWeek)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.projectsByWeek),
+                        ),
+                      )}
                       ${weekly}
                     </article>
                   </div>
@@ -857,7 +905,13 @@ export const renderHtml = (
 
                   <div class="grid g-3 measured">
                     <article class="panel">
-                      <h3>${loc.text((m) => m.languageMix)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.languageMix)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.languageMix),
+                        ),
+                      )}
                       ${donut([
                         { value: s.languageMix.zh, label: loc.text((m) => m.languageNames.zh) },
                         { value: s.languageMix.en, label: loc.text((m) => m.languageNames.en) },
@@ -868,7 +922,13 @@ export const renderHtml = (
                       ])}
                     </article>
                     <article class="panel">
-                      <h3>${loc.text((m) => m.sources)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.sources)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.sources),
+                        ),
+                      )}
                       ${shareBars(
                         Object.entries(s.bySource).map(([id, count]) => ({
                           label: html`${RUNNER_NAMES[id as keyof typeof RUNNER_NAMES] ?? id}`,
@@ -884,7 +944,13 @@ export const renderHtml = (
                       )}
                     </article>
                     <article class="panel">
-                      <h3>${loc.text((m) => m.habits)}</h3>
+                      ${defined(
+                        html`<h3>${loc.text((m) => m.habits)}</h3>`,
+                        definition(
+                          loc,
+                          def((m) => m.habits),
+                        ),
+                      )}
                       <div class="rings">${ring(
                         s.imageRate,
                         loc.text((m) => m.imageRate),
@@ -916,7 +982,13 @@ export const renderHtml = (
                   </div>
 
           <section>
-            <h2>${loc.text((m) => m.traits)}</h2>
+            ${defined(
+              html`<h2>${loc.text((m) => m.traits)}</h2>`,
+              definition(
+                loc,
+                def((m) => m.traits),
+              ),
+            )}
             <div class="traits">
               ${signature.map((i) => signatureTrait(profile, i, loc, v, scrub))}
             </div>
@@ -937,7 +1009,13 @@ export const renderHtml = (
           ${episodes ?? ""}
 
           <section>
-            <h2>${loc.text((m) => m.dimensions)}</h2>
+            ${defined(
+              html`<h2>${loc.text((m) => m.dimensions)}</h2>`,
+              definition(
+                loc,
+                def((m) => m.dimensions),
+              ),
+            )}
             <div class="dims">
               ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
             </div>
@@ -947,8 +1025,16 @@ export const renderHtml = (
             tech
               ? html`<section class="techniques">
                   <div class="section-head">
-                    <h2>${loc.text((m) => m.techniques)}</h2>
-                    <p class="note">${loc.text((m) => m.techniquesNote)}</p>
+                    ${defined(
+                      html`<h2>${loc.text((m) => m.techniques)}</h2>`,
+                      definition(
+                        loc,
+                        loc.text((m) => m.techniquesNote),
+                        ...(s.techniques
+                          ? [loc.text((m) => m.coverageNote(s.techniques!.coveredSessions))]
+                          : []),
+                      ),
+                    )}
                   </div>
                   ${tech}
                 </section>`
@@ -959,8 +1045,13 @@ export const renderHtml = (
             coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
               ? html`<section class="coaching">
                   <div class="section-head">
-                    <h2>${loc.text((m) => m.coaching)}</h2>
-                    <p class="note">${loc.text((m) => m.coachingNote)}</p>
+                    ${defined(
+                      html`<h2>${loc.text((m) => m.coaching)}</h2>`,
+                      definition(
+                        loc,
+                        loc.text((m) => m.coachingNote),
+                      ),
+                    )}
                   </div>
                   <div class="improves">
                     ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc, v, scrub))}

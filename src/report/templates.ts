@@ -3,6 +3,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { VIEW_MESSAGES } from "./messages.ts"
 import type { Scrub } from "./visibility.ts"
+import { defined, definition } from "./definition.ts"
 
 /** Only verified, higher-confidence observations introduce the person: trait indexes, at most 3. */
 const signatureTraits = (p: Profile): ReadonlyArray<number> =>
@@ -35,8 +36,14 @@ export const identityMoves = (
 ): Raw => {
   const selected = signatureTraits(p)
   return html`<section class="identity-moves">
-    <h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].moves)}</h2>
-    <p class="note">${loc.text((_m, _c, l) => (selected.length === 0 ? VIEW_MESSAGES[l].noMoves : VIEW_MESSAGES[l].movesNote))}</p>
+    ${defined(
+      html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].moves)}</h2>`,
+      definition(
+        loc,
+        loc.text((_m, _c, l) => VIEW_MESSAGES[l].movesNote),
+      ),
+    )}
+    ${selected.length === 0 ? html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noMoves)}</p>` : ""}
     ${
       selected.length === 0
         ? ""

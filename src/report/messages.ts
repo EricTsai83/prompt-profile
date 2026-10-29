@@ -38,7 +38,6 @@ export interface Messages {
   readonly p90: string
   readonly characters: (n: number) => string
   readonly heatmap: string
-  readonly heatmapNote: string
   readonly traits: string
   readonly confidence: Record<Confidence, string>
   readonly showEvidence: (n: number) => string
@@ -68,7 +67,6 @@ export interface Messages {
   readonly more: string
   readonly prompts: (n: number) => string
   readonly projects: string
-  readonly projectsNote: string
   readonly projectsByWeek: string
   readonly other: string
   readonly weekOf: (date: string) => string
@@ -76,14 +74,10 @@ export interface Messages {
   readonly hourTip: (hour: string, n: number) => string
   readonly signature: string
   readonly nightShare: string
-  readonly nightShareDef: string
   readonly medianPrompt: string
-  readonly medianPromptDef: string
   readonly corrections: (every: number | null) => string
   readonly correctionsLabel: string
-  readonly correctionsDef: string
   readonly perSession: string
-  readonly perSessionDef: string
   readonly chronotype: (from: string, to: string) => string
   readonly chronotypeShare: (pct: number) => string
   readonly rhythm: string
@@ -190,7 +184,6 @@ const en: Messages = {
   p90: "longest 10%",
   characters: (n) => `${n.toLocaleString("en")} chars`,
   heatmap: "Weekly rhythm",
-  heatmapNote: "Weekday × hour, darker = more prompts",
   traits: "Traits",
   confidence: { high: "High confidence", medium: "Medium confidence", low: "Low confidence" },
   showEvidence: (n) => `${plural(n, "quote", "quotes")} as evidence`,
@@ -229,7 +222,6 @@ const en: Messages = {
   more: "More",
   prompts: (n) => plural(n, "prompt", "prompts"),
   projects: "Projects",
-  projectsNote: "Top projects by prompts (folder names)",
   projectsByWeek: "Projects by week",
   other: "Other folders",
   weekOf: (d) => `Week of ${d}`,
@@ -237,14 +229,10 @@ const en: Messages = {
   hourTip: (h, n) => `${h} · ${plural(n, "prompt", "prompts")}`,
   signature: "Measured signature",
   nightShare: "at night",
-  nightShareDef: "Share of prompts sent between 22:00 and 04:59",
   medianPrompt: "typical prompt",
-  medianPromptDef: "Median prompt length in characters, after cleaning",
   corrections: (e) => (e === null ? "none" : `1 in ${e}`),
   correctionsLabel: "prompts corrects the AI",
-  correctionsDef: "Prompts that push back on the AI's answer (e.g. \"no, that's wrong\")",
   perSession: "prompts per session",
-  perSessionDef: "Average number of prompts in one conversation",
   chronotype: (a, b) => `Most active ${a}–${b}`,
   chronotypeShare: (p) => `${p}% of prompts in these four hours`,
   rhythm: "Rhythm",
@@ -400,7 +388,6 @@ const zhTW: Messages = {
   p90: "最長的 10%",
   characters: (n) => `${n.toLocaleString("zh-TW")} 字`,
   heatmap: "一週節奏",
-  heatmapNote: "星期 × 時段，顏色越深代表 prompt 越多",
   traits: "特質",
   confidence: { high: "高信心", medium: "中信心", low: "低信心" },
   showEvidence: (n) => `${n} 段引文佐證`,
@@ -438,7 +425,6 @@ const zhTW: Messages = {
   more: "多",
   prompts: (n) => `${n.toLocaleString("zh-TW")} 個 prompt`,
   projects: "專案",
-  projectsNote: "依 prompt 數排序的專案（資料夾名稱）",
   projectsByWeek: "每週的專案分布",
   other: "其他資料夾",
   weekOf: (d) => `${d} 那一週`,
@@ -446,14 +432,10 @@ const zhTW: Messages = {
   hourTip: (h, n) => `${h} · ${n.toLocaleString("zh-TW")} 個 prompt`,
   signature: "量出來的特徵",
   nightShare: "在深夜",
-  nightShareDef: "22:00 到 04:59 之間送出的 prompt 比例",
   medianPrompt: "典型 prompt 長度",
-  medianPromptDef: "清理後 prompt 長度的中位數（字元）",
   corrections: (e) => (e === null ? "沒有" : `每 ${e} 則`),
   correctionsLabel: "prompt 就有一次糾正 AI",
-  correctionsDef: "反駁 AI 回答的 prompt，例如「不對」「錯了」",
   perSession: "每個 session 的 prompt 數",
-  perSessionDef: "一次對話平均有幾則 prompt",
   chronotype: (a, b) => `最活躍在 ${a}–${b}`,
   chronotypeShare: (p) => `${p}% 的 prompt 集中在這四小時`,
   rhythm: "節奏",
@@ -576,6 +558,7 @@ export const PORTRAIT_MESSAGES = {
     both: "Both, depending on the context",
     seenIn: (n: number) => `in ${n} ${n === 1 ? "conversation" : "conversations"}`,
     seenOnce: "seen in one conversation only, not counted as characteristic yet",
+    rule: "A way of working counts as characteristic once verified quotes show it in two or more conversations. A complete role is named only when every line has exactly one characteristic way.",
     axes: {
       framing: ["Starting point", "Define first", "Explore first"],
       pacing: ["Pace", "Step by step", "Whole task"],
@@ -592,6 +575,7 @@ export const PORTRAIT_MESSAGES = {
     both: "兩種都有，視情境而定",
     seenIn: (n: number) => `出現在 ${n} 段對話`,
     seenOnce: "只在一段對話中看到，尚不算特色",
+    rule: "一種做法要在兩段以上的對話中有已驗證的引述，才算特色。只有每一條線都剛好只有一種特色做法時，才會給出完整的角色名稱。",
     axes: {
       framing: ["起手方式", "先定義", "先探索"],
       pacing: ["推進節奏", "分步推進", "整包交付"],
@@ -973,5 +957,73 @@ export const STEERING_MESSAGES = {
     method: "由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。",
     rejected: (n: number) => `有 ${n} 個標記未通過比對。`,
     sentenceGap: "",
+  },
+} as const
+
+/** What each measurement means, shown folded behind an ⓘ (`definition.ts`). */
+export const DEFINITION_MESSAGES = {
+  en: {
+    label: "What this means",
+    dataPeriod:
+      "The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.",
+    analyzed:
+      "Prompts and conversations the analysing model read. With a large history, week-sized chunks spread over the range are sampled. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.",
+    nightShare:
+      "Share of all cleaned prompts in the range sent between 22:00 and 04:59, your local time.",
+    medianPrompt:
+      "Median length of a cleaned prompt in characters: half of the prompts are shorter. Pasted code and injected content are removed before counting.",
+    perSession:
+      "All cleaned prompts in the range divided by the conversations (sessions) they belong to.",
+    corrections:
+      "Share of prompts matching correction phrases such as “no, that’s wrong” or “still failing”. Keyword-based and counted per prompt, so people who write more follow-ups look as if they correct less. Newer reports measure steering per conversation instead.",
+    volume:
+      "Cleaned prompts in the whole range, not only the analysed sample. An active day is a calendar day in your time zone with at least one prompt; the streak is the longest run of consecutive active days.",
+    heatmap:
+      "Each cell counts the prompts sent in that weekday and hour, your local time; darker cells have more prompts.",
+    window:
+      "The four consecutive hours with the most prompts, and their share of all prompts in the range.",
+    projects:
+      "Share of prompts by working folder; only the folder’s last name is kept. Smaller folders are grouped as other folders.",
+    projectsByWeek: "Prompts per week, coloured by working folder.",
+    languageMix:
+      "Each prompt is classified by script: half or more in Chinese characters is Chinese, 15% or less is English, anything between is mixed. A Chinese character weighs about as much as an English word.",
+    sources:
+      "Share of prompts by tool (Claude Code or Codex), then by client from the marker each record carries: terminal, desktop app or SDK, scripted runs.",
+    habits:
+      "Share of prompts with an attached image, and prompt length in characters after cleaning: the median (half are shorter) and the 90th percentile (the longest 10% start here).",
+    traits:
+      "Confidence is capped by how widely the verified quotes spread: high needs quotes from 3 conversations over 2 weeks, medium from 2 conversations, otherwise low. Quotes are selected evidence, not full-history frequencies.",
+    dimensions:
+      "Short summaries written by the analysing model, each backed by verified quotes; without a verified quote a dimension shows insufficient evidence.",
+  },
+  "zh-TW": {
+    label: "這是什麼意思",
+    dataPeriod:
+      "所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。",
+    analyzed:
+      "分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內平均抽出以週為單位的區段。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。",
+    nightShare: "範圍內所有清理後的提示中，在當地時間 22:00 到 04:59 送出的比例。",
+    medianPrompt:
+      "清理後提示長度（字元數）的中位數：有一半的提示比它短。計算前會先移除貼上的程式碼與自動注入的內容。",
+    perSession: "範圍內所有清理後的提示數，除以它們所屬的對話（session）數。",
+    corrections:
+      "符合「不對」「還是不行」等糾正字詞的提示比例。這是以關鍵字、逐則提示計算，後續提示寫得越多的人，看起來就越少糾正。新版報告改以對話為單位計算如何引導 AI。",
+    volume:
+      "整個範圍內清理後的提示數，不只是分析樣本。活躍日是你所在時區內至少有一則提示的日期；連續天數是最長的連續活躍日。",
+    heatmap: "每一格是該星期幾、該小時（當地時間）送出的提示數，顏色越深代表越多。",
+    window: "提示最多的連續四個小時，以及它們佔範圍內所有提示的比例。",
+    projects:
+      "依工作資料夾計算的提示比例，只保留資料夾的最後一層名稱。較小的資料夾合併為其他資料夾。",
+    projectsByWeek: "每週的提示數，依工作資料夾上色。",
+    languageMix:
+      "依文字判斷每則提示的語言：中文字佔一半以上為中文，15% 以下為英文，介於兩者之間為混合。一個中文字的權重約等於一個英文單字。",
+    sources:
+      "依工具（Claude Code 或 Codex）計算的提示比例，再依每筆紀錄的用戶端標記區分：終端機、桌面 App 或 SDK、腳本執行。",
+    habits:
+      "附有圖片的提示比例，以及清理後的提示長度（字元數）：中位數（一半的提示比它短）與第 90 百分位數（最長的 10% 從這裡開始）。",
+    traits:
+      "信心程度受已驗證引述的分布範圍限制：高需要來自 3 段對話、跨 2 週的引述；中需要 2 段對話；其餘為低。引述是挑選出的證據，不代表在全部紀錄中出現的頻率。",
+    dimensions:
+      "由分析模型寫的簡短摘要，每項都有已驗證的引述支持；沒有已驗證引述的項目會顯示證據不足。",
   },
 } as const

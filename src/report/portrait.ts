@@ -4,6 +4,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
+import { defined, definition } from "./definition.ts"
 
 type Portrait = NonNullable<Profile["portrait"]>
 
@@ -62,8 +63,14 @@ export const preferenceEvidence = (
   if (!portrait || portrait.chapters.length === 0) return null
   const code = roleCode(portrait.axes)
   return html`<section class="preference-evidence">
-    <h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>
-    <p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note)}</p>
+    ${defined(
+      html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>`,
+      definition(
+        loc,
+        loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note),
+        loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].rule),
+      ),
+    )}
     ${portrait.axes.map((axis, a) => {
       const state = axisState(axis)
       const translated = (l: Language) => p.translations[l]?.portrait?.axes[a]

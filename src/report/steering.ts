@@ -3,6 +3,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { STEERING_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
+import { defined, definition } from "./definition.ts"
 
 type SteeringMessages = (typeof STEERING_MESSAGES)[Language]
 
@@ -19,17 +20,29 @@ export const steeringSection = (p: Profile, loc: Loc, v: Visibility, scrub: Scru
   const kind = (key: "steer" | "repair", note: "steerNote" | "repairNote") => {
     const k = s[key]
     return html`<div class="steering-kind">
-      <h3>${text((m) => m[key])} <small>${text((m) => m.counts(k.conversations, k.prompts))}</small></h3>
-      <p class="note">${text((m) => m[note])}</p>
+      ${defined(
+        html`<h3>${text((m) => m[key])} <small>${text((m) => m.counts(k.conversations, k.prompts))}</small></h3>`,
+        definition(
+          loc,
+          text((m) => m[note]),
+        ),
+      )}
       ${v.quotes ? k.examples.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}</blockquote>`) : ""}
     </div>`
   }
   return html`<section class="steering">
-    <h2>${text((m) => m.title)}</h2>
-    <p class="note">${text((m) => m.denominator(s.withFollowUps, s.conversations))}</p>
+    ${defined(
+      html`<h2>${text((m) => m.title)}</h2>`,
+      definition(
+        loc,
+        text((m) => m.denominator(s.withFollowUps, s.conversations)),
+        text((m) =>
+          [m.method, ...(s.rejected > 0 ? [m.rejected(s.rejected)] : [])].join(m.sentenceGap),
+        ),
+      ),
+    )}
     ${kind("steer", "steerNote")}
     ${kind("repair", "repairNote")}
-    <p class="note">${text((m) => [m.method, ...(s.rejected > 0 ? [m.rejected(s.rejected)] : [])].join(m.sentenceGap))}</p>
   </section>`
 }
 

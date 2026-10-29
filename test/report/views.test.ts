@@ -64,7 +64,8 @@ describe("report views", () => {
       "Contrary evidence",
     ])
       expect(identity).not.toContain(factual)
-    expect(html).not.toMatch(/<details(?![^>]*\bopen\b)[^>]*>/)
+    // evidence starts expanded; only measurement definitions (ⓘ) are folded
+    expect(html).not.toMatch(/<details(?![^>]*(?:\bopen\b|class="def"))[^>]*>/)
     expect(html).toContain("@media print")
     expect(html).not.toContain("<script")
   })

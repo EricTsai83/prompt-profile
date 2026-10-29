@@ -5,14 +5,21 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
 import type { Scrub } from "./visibility.ts"
+import { defined, definition } from "./definition.ts"
 
 /** Categorical preferences: marker positions are not numerical personality scores. */
 export const preferenceMap = (p: Profile, loc: Loc, scrub: Scrub): Raw => {
   if (!p.portrait)
     return html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noPortrait)}</p>`
   return html`<article class="preference-map panel">
-    <h2>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].preferences)}</h2>
-    <p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note)}</p>
+    ${defined(
+      html`<h2>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].preferences)}</h2>`,
+      definition(
+        loc,
+        loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note),
+        loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].rule),
+      ),
+    )}
     <div class="preference-rows">${INTERACTION_AXES.map(({ key }) => {
       const index = p.portrait!.axes.findIndex((a) => a.key === key)
       const axis = p.portrait!.axes[index]
@@ -53,12 +60,24 @@ const bar = (name: Raw, share: number, value: Raw): Raw => html`<li>
 export const workflowCharts = (p: Profile, loc: Loc): Raw => {
   const t = p.stats.techniques
   return html`<div class="overview-charts">
-    <article class="panel"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].tools)}</h2>
-      <p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].toolsNote)}</p>
+    <article class="panel">${defined(
+      html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].tools)}</h2>`,
+      definition(
+        loc,
+        loc.text((_m, _c, l) => VIEW_MESSAGES[l].toolsNote),
+        ...(t && t.coveredSessions > 0
+          ? [
+              loc.text((_m, _c, l) =>
+                VIEW_MESSAGES[l].toolCoverage(t.coveredSessions, p.stats.totalSessions),
+              ),
+            ]
+          : []),
+      ),
+    )}
       ${
         !t || t.coveredSessions === 0
           ? html`<p class="empty">${loc.text((_m, _c, l) => (!t ? VIEW_MESSAGES[l].missingTechniques : VIEW_MESSAGES[l].noTools))}</p>`
-          : html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].toolCoverage(t.coveredSessions, p.stats.totalSessions))}</p><ul class="overview-bars">${TOOL_TECHNIQUES.toSorted(
+          : html`<ul class="overview-bars">${TOOL_TECHNIQUES.toSorted(
               (a, b) => t.tools[b].sessions - t.tools[a].sessions,
             ).map((key) => {
               const share = Math.min(1, t.tools[key].sessions / t.coveredSessions)
@@ -72,12 +91,24 @@ export const workflowCharts = (p: Profile, loc: Loc): Raw => {
     </article>
     ${
       t
-        ? html`<article class="panel"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptTechniques)}</h2>
-      <p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptsNote)}</p>
+        ? html`<article class="panel">${defined(
+            html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptTechniques)}</h2>`,
+            definition(
+              loc,
+              loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptsNote),
+              ...(p.stats.analyzedPrompts > 0
+                ? [
+                    loc.text((_m, _c, l) =>
+                      VIEW_MESSAGES[l].promptCoverage(p.stats.analyzedPrompts),
+                    ),
+                  ]
+                : []),
+            ),
+          )}
       ${
         p.stats.analyzedPrompts === 0
           ? html`<p class="empty">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noPrompts)}</p>`
-          : html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].promptCoverage(p.stats.analyzedPrompts))}</p><ul class="overview-bars">${PROMPT_TECHNIQUES.toSorted(
+          : html`<ul class="overview-bars">${PROMPT_TECHNIQUES.toSorted(
               (a, b) => t.prompts[b] - t.prompts[a],
             ).map((key) =>
               bar(

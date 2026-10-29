@@ -284,15 +284,14 @@ export const techniquesSection = (s: Stats, loc: Loc, v: Visibility, say: Say): 
   )
   if (cards.length === 0) return null
   const time = timeline(t, loc)
-  return html`<p class="note cap-note">${loc.text((m) => m.coverageNote(t.coveredSessions))}</p>
-    ${
-      time
-        ? html`<article class="panel wide">
+  return html`${
+    time
+      ? html`<article class="panel wide">
             <h3>${loc.text((m) => m.adoption)}</h3>
             ${time}
           </article>`
-        : ""
-    }
+      : ""
+  }
     <div class="caps">${cards}</div>`
 }
 

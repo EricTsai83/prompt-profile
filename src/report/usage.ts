@@ -3,6 +3,7 @@ import { TOKEN_KINDS, totalTokens, type SourceUsage, type UsageBucket } from "..
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { MESSAGES, USAGE_MESSAGES } from "./messages.ts"
+import { defined, definition } from "./definition.ts"
 import type { Visibility } from "./visibility.ts"
 
 /**
@@ -60,7 +61,17 @@ const toolCard = (s: SourceUsage, loc: Loc): Raw => {
   const kinds = TOKEN_KINDS.filter((k) => s.totals.tokens[k] > 0)
   const d = s.diagnostics
   return html`<article class="panel usage-tool">
-    <h3>${TOOL_NAMES[s.source]}</h3>
+    ${
+      kinds.length > 0
+        ? defined(
+            html`<h3>${TOOL_NAMES[s.source]}</h3>`,
+            definition(
+              loc,
+              u((t) => t.kindsNote),
+            ),
+          )
+        : html`<h3>${TOOL_NAMES[s.source]}</h3>`
+    }
     <dl class="usage-facts">
       <div><dt>${u((t) => t.plan)}</dt><dd>${u((_t, l) => planText(s, l))}</dd></div>
       ${
@@ -87,8 +98,7 @@ const toolCard = (s: SourceUsage, loc: Loc): Raw => {
                 <b>${u((_t, l) => tokensText(s.totals.tokens[k], l))}</b>
               </li>`,
             )}
-          </ul>
-          <p class="note">${u((t) => t.kindsNote)}</p>`
+          </ul>`
         : ""
     }
     ${
@@ -131,8 +141,7 @@ export const usageSection = (
   const u = (pick: (t: (typeof USAGE_MESSAGES)[Language], l: Language) => string) =>
     loc.text((_m, _c, l) => pick(USAGE_MESSAGES[l], l))
   const head = (note: Raw | null) => html`<div class="section-head">
-      <h2>${u((t) => t.title)}</h2>
-      ${note === null ? "" : html`<p class="note">${note}</p>`}
+      ${note === null ? html`<h2>${u((t) => t.title)}</h2>` : defined(html`<h2>${u((t) => t.title)}</h2>`, definition(loc, note))}
     </div>`
   if (p.usage === null)
     return html`<section class="usage">
@@ -172,7 +181,13 @@ export const usageSection = (
     ${
       months.length > 0
         ? html`<article class="panel usage-table">
-            <h3>${u((t) => t.byMonth)}</h3>
+            ${defined(
+              html`<h3>${u((t) => t.byMonth)}</h3>`,
+              definition(
+                loc,
+                u((t) => t.monthNote(p.stats.timezone)),
+              ),
+            )}
             <div
               class="usage-scroll"
               role="region"
@@ -206,7 +221,6 @@ export const usageSection = (
                 </tbody>
               </table>
             </div>
-            <p class="note">${u((t) => t.monthNote(p.stats.timezone))}</p>
           </article>
           <article class="panel usage-table">
             <h3>${u((t) => t.byModel)}</h3>

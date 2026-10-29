@@ -5,6 +5,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { EPISODE_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
+import { defined, definition } from "./definition.ts"
 
 type EpisodeMessages = (typeof EPISODE_MESSAGES)[Language]
 
@@ -56,15 +57,17 @@ export const episodesSection = (
   const text = (pick: (m: EpisodeMessages, l: Language) => string) =>
     loc.text((_m, _c, l) => pick(EPISODE_MESSAGES[l], l))
   const notes = [
-    (m: EpisodeMessages) =>
-      p.episodes.length === 0
-        ? m.none
-        : m.note(
-            p.episodes.length,
-            coverage?.kept ?? p.episodes.length,
-            p.coverage.sessionsAnalyzed,
-            p.stats.totalSessions,
-          ),
+    ...(p.episodes.length === 0
+      ? []
+      : [
+          (m: EpisodeMessages) =>
+            m.note(
+              p.episodes.length,
+              coverage?.kept ?? p.episodes.length,
+              p.coverage.sessionsAnalyzed,
+              p.stats.totalSessions,
+            ),
+        ]),
     (m: EpisodeMessages) => m.userOnly,
     ...(rejected > 0 ? [(m: EpisodeMessages) => m.rejected(rejected)] : []),
     ...(coverage && coverage.endingsWithdrawn > 0
@@ -74,8 +77,8 @@ export const episodesSection = (
   const links = (ids: ReadonlyArray<string>) =>
     ids.map((id, i) => html`${i > 0 ? ", " : ""}<a href="#episode-${id}">${id}</a>`)
   return html`<section class="episodes">
-    <h2>${text((m) => m.title)}</h2>
-    ${notes.map((pick) => html`<p class="note">${text(pick)}</p>`)}
+    ${defined(html`<h2>${text((m) => m.title)}</h2>`, definition(loc, ...notes.map((pick) => text(pick))))}
+    ${p.episodes.length === 0 ? html`<p class="note">${text((m) => m.none)}</p>` : ""}
     ${
       p.patterns.length > 0
         ? html`<h3>${text((m) => m.patterns)}</h3>
