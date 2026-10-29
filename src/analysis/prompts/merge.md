@@ -14,6 +14,11 @@ Merge duplicates and near-duplicates into fewer, stronger observations:
   evidence you keep **exactly** as given — never invent, edit or shorten quotes, never
   change prompt ids.
 - Keep observations that are supported by a single batch too, unless they are trivial.
+- The last line of these instructions gives the most observations to return. Reach it by
+  combining observations about the same habit or topic into one claim that covers them; keep
+  at least one quote of **every** input observation in the observation that absorbs it, so
+  no input is lost. Combine closely related claims first; keep distinct, contrary or
+  context-dependent behaviour as separate observations when the number allows.
 - Do not infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
 - Write `claim` in English.

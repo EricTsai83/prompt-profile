@@ -92,7 +92,7 @@ These version numbers are independent. Bump them whenever the corresponding thin
 | Version | Location | Now | When to bump |
 |---|---|---|---|
 | `Profile.schemaVersion` | `domain/Profile.ts` | 13 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 15 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 16 | `map.md` / `merge.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 11, others 17 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |

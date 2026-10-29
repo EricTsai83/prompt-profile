@@ -34,6 +34,7 @@ import {
   capEvidence,
   retainOmittedEvidence,
   groupForMerge,
+  mergeBudget,
   MIN_MERGE_SHRINK,
   observationsText,
   REDUCE_INPUT_LIMIT,
@@ -257,17 +258,17 @@ export const analyze = (input: {
           ? cause
           : new AnalysisFailed({ reason, chunksFailed: failed.length, chunksTotal: total, cause })
     const limit = options.reduceInputLimit ?? REDUCE_INPUT_LIMIT
-    const merge = (group: ReadonlyArray<Observation>) =>
+    const merge = (group: ReadonlyArray<Observation>, budget: number) =>
       Effect.gen(function* () {
         const text = observationsText(group)
-        const parts = keyParts("merge", sha256(text), runner.id, options)
+        const parts = keyParts("merge", sha256(text, String(budget)), runner.id, options)
         const cached = options.noCache ? Option.none() : yield* cache.get(parts)
         // The cache stores raw LLM output: verify on every path, cached or not.
         const value = Option.isSome(cached)
           ? cached.value.value
           : yield* runner
               .generate({
-                system: loadPrompt("merge"),
+                system: `${loadPrompt("merge")}\n\nReturn at most ${budget} observations.`,
                 prompt: text,
                 schema: OBSERVATIONS_SCHEMA,
               })
@@ -287,9 +288,13 @@ export const analyze = (input: {
       if (before <= limit) break
       const groups = groupForMerge(observations, limit)
       yield* progress.onMergeStart(groups.length)
-      const merged = yield* Effect.forEach(groups, merge, {
-        concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
-      }).pipe(Effect.mapError(stageError("merge-failed")))
+      const merged = yield* Effect.forEach(
+        groups,
+        (group) => merge(group, mergeBudget(group.length, before, limit)),
+        {
+          concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
+        },
+      ).pipe(Effect.mapError(stageError("merge-failed")))
       observations = merged.flat()
       // another round would not get much smaller either
       if (observationsText(observations).length > before * (1 - MIN_MERGE_SHRINK)) break

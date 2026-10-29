@@ -13,6 +13,22 @@ export const MAX_EVIDENCE_PER_OBSERVATION = 4
 /** A round that shrinks the observations by less than this is the last one. */
 export const MIN_MERGE_SHRINK = 0.2
 
+/** Merges aim at this share of the reduce input limit, leaving room for restored observations. */
+export const MERGE_TARGET = 0.8
+
+/**
+ * How many observations a merge of `n` (out of `total` characters in the round) may return so
+ * that the round lands at MERGE_TARGET of `limit`. Without a number the model merged only a
+ * few near-duplicates and large histories did not fit. It is never below one observation per
+ * MAX_EVIDENCE_PER_OBSERVATION inputs: every input keeps a quote, and a merged observation
+ * holds at most that many, so nothing has to be dropped whole.
+ */
+export const mergeBudget = (n: number, total: number, limit: number): number =>
+  Math.max(
+    Math.ceil(n / MAX_EVIDENCE_PER_OBSERVATION),
+    Math.min(n, Math.floor((n * limit * MERGE_TARGET) / total)),
+  )
+
 /** How observations are sent to the merge / reduce steps (also what the limit measures). */
 export const observationsText = (obs: ReadonlyArray<Observation>): string =>
   JSON.stringify(

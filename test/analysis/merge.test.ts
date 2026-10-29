@@ -1,6 +1,11 @@
 import { describe, expect, it } from "@effect/vitest"
 import type { Observation } from "../../src/domain/ChunkObservations.ts"
-import { capEvidence, groupForMerge, observationsText } from "../../src/analysis/merge.ts"
+import {
+  capEvidence,
+  groupForMerge,
+  mergeBudget,
+  observationsText,
+} from "../../src/analysis/merge.ts"
 
 const obs = (claim: string): Observation => ({
   dimension: "growth",
@@ -68,5 +73,22 @@ describe("capEvidence across sessions", () => {
     }
     const [capped] = capEvidence([o], 4, (id) => id.split(":")[0]!)
     expect(capped!.evidence.map((e) => e.promptId)).toEqual(["s1:1", "s1:2", "s2:1", "s3:7"])
+  })
+})
+
+describe("mergeBudget", () => {
+  it("asks a group for its share of the target size", () => {
+    // 150k of observations against a 100k limit: aim at 80k, so keep about 53%
+    expect(mergeBudget(40, 150_000, 100_000)).toBe(21)
+  })
+
+  it("never asks for fewer than one observation per four input quotes' worth", () => {
+    // every input observation must keep a quote, and a merged observation holds at most 4
+    expect(mergeBudget(40, 1_000_000, 100_000)).toBe(10)
+    expect(mergeBudget(3, 1_000_000, 100_000)).toBe(1)
+  })
+
+  it("never asks for more than the group already has", () => {
+    expect(mergeBudget(12, 50_000, 100_000)).toBe(12)
   })
 })

@@ -223,7 +223,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "15",
+        analysisVersion: "16",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -555,6 +555,50 @@ describe("analyze", () => {
         const fake = makeFakeLlmRunner({ respond: trimmingMerge })
         const profile = yield* run(fake, makeMemoryCache(), { ...options, reduceInputLimit: 2_500 })
         expect(fake.log.some((c) => c.prompt.startsWith("["))).toBe(true)
+        expect(fake.log.some((c) => c.schema === "LlmProfileDraft")).toBe(true)
+        expect(profile.dimensions.length).toBe(5)
+      }),
+    )
+
+    /** Map: three similar observations per chunk. Merge: only as far as it is asked to, by
+     * "at most N observations" in its instructions; otherwise it changes nothing. Every input
+     * observation keeps its first quote, at most 4 quotes per merged observation. */
+    const budgetedMerge: FakeOptions["respond"] = (input) => {
+      if (input.schemaName === "LlmChunkAnalysis") {
+        const found = [...input.prompt.matchAll(/<prompt id="([^"]+)"[^>]*>\n(.{0,30})/g)]
+        return {
+          observations: [0, 1, 2].map((i) => ({
+            dimension: "work_style",
+            claim: `works in small steps, variant ${i} ${"padding ".repeat(20)}`,
+            evidence: [found[i % found.length]!].map((m) => ({ promptId: m[1], quote: m[2] })),
+          })),
+          episodes: [],
+          interventions: [],
+        }
+      }
+      if (input.schemaName === "LlmChunkObservations") {
+        const group = JSON.parse(input.prompt) as Array<{ evidence: Array<unknown> }>
+        const max = Number(
+          /Return at most (\d+) observations/.exec(input.system)?.[1] ?? group.length,
+        )
+        const size = Math.ceil(group.length / max)
+        return {
+          observations: Array.from({ length: Math.ceil(group.length / size) }, (_, i) => ({
+            dimension: "work_style",
+            claim: "works in small steps",
+            evidence: group.slice(i * size, i * size + size).map((o) => o.evidence[0]),
+          })),
+        }
+      }
+      return respond(input)
+    }
+    it.effect("tells each merge how many observations to return, so a large history fits", () =>
+      Effect.gen(function* () {
+        const fake = makeFakeLlmRunner({ respond: budgetedMerge })
+        const profile = yield* run(fake, makeMemoryCache(), { ...options, reduceInputLimit: 8_000 })
+        const merges = fake.log.filter((c) => c.prompt.startsWith("["))
+        expect(merges.length).toBeGreaterThan(0)
+        expect(merges.every((c) => /Return at most \d+ observations/.test(c.system))).toBe(true)
         expect(fake.log.some((c) => c.schema === "LlmProfileDraft")).toBe(true)
         expect(profile.dimensions.length).toBe(5)
       }),
