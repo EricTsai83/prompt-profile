@@ -62,11 +62,11 @@ describe("siteFiles", () => {
         "sample-profile.json",
       ]),
     )
-    for (const link of links) {
-      const path = link.endsWith("/") ? `${link}index.html` : link
-      // generated here, or copied from the hand-written docs/
-      expect(files.has(path) || existsSync(`docs/${path}`), path).toBe(true)
-    }
+    // generated here, or copied from the hand-written docs/
+    const missing = links
+      .map((link) => (link.endsWith("/") ? `${link}index.html` : link))
+      .filter((path) => !files.has(path) && !existsSync(`docs/${path}`))
+    expect(missing).toEqual([])
     for (const look of LOOK_IDS)
       expect(home).toContain(`href="demo/${look === "classic" ? "full" : look}/report.html"`)
   })
