@@ -102,6 +102,22 @@ export interface ShapeTokens {
   }
   /** Rule under the top bar (a CSS border value). */
   readonly topbar: string
+  /**
+   * Corner radii of surfaces, largest first: cards (`xl`), grouped lists and the view switch
+   * (`lg`), list items (`md`), controls (`sm`) and tooltips (`xs`). Pills, circles and chart
+   * marks keep fixed shapes.
+   */
+  readonly radius: Readonly<Record<"xs" | "sm" | "md" | "lg" | "xl", string>>
+}
+
+/** Hover, focus and view transitions; `prefers-reduced-motion` turns them all off. */
+export interface MotionTokens {
+  /** Color, border and opacity changes on hover and focus. */
+  readonly fast: string
+  /** Content appearing: tooltips and a newly selected view. */
+  readonly base: string
+  /** Ease-out curve: quick start, gentle stop. */
+  readonly easing: string
 }
 
 export interface SpaceTokens {
@@ -184,6 +200,7 @@ export interface Theme {
   readonly identity: Identity
   readonly type: TypeTokens
   readonly shape: ShapeTokens
+  readonly motion: MotionTokens
   readonly space: SpaceTokens
   readonly layout: LayoutChoices
   readonly card: CardTokens
@@ -258,13 +275,17 @@ const SHOWCASE_TYPE: TypeTokens = {
 const DOCUMENT_TYPE: TypeTokens = { ...SHOWCASE_TYPE, title: DOCUMENT_TITLE }
 
 const BORDER = "1px solid var(--border)"
+const RADII: ShapeTokens["radius"] = { xs: "8px", sm: "10px", md: "12px", lg: "14px", xl: "18px" }
+const MOTION: MotionTokens = { fast: "150ms", base: "200ms", easing: "cubic-bezier(.2,0,0,1)" }
 const IDENTITY_SHAPE: ShapeTokens = {
   hero: { border: "0", top: "0", bottom: "0", radius: "24px" },
   topbar: "none",
+  radius: RADII,
 }
 const PANEL_SHAPE: ShapeTokens = {
   hero: { border: BORDER, top: BORDER, bottom: BORDER, radius: "12px" },
   topbar: "none",
+  radius: RADII,
 }
 
 const SHOWCASE_LAYOUT: LayoutChoices = {
@@ -426,7 +447,9 @@ const CLASSIC: Theme = {
   shape: {
     hero: { border: BORDER, top: BORDER, bottom: BORDER, radius: "24px" },
     topbar: "none",
+    radius: RADII,
   },
+  motion: MOTION,
   space: SPACE,
   layout: { ...SHOWCASE_LAYOUT, hero: "clock" },
   card: {
@@ -489,6 +512,7 @@ export const THEMES: ReadonlyArray<Theme> = [
     },
     type: SHOWCASE_TYPE,
     shape: IDENTITY_SHAPE,
+    motion: MOTION,
     space: SPACE,
     layout: SHOWCASE_LAYOUT,
     card: IDENTITY_CARD,
@@ -537,6 +561,7 @@ export const THEMES: ReadonlyArray<Theme> = [
     },
     type: SHOWCASE_TYPE,
     shape: IDENTITY_SHAPE,
+    motion: MOTION,
     space: SPACE,
     layout: SHOWCASE_LAYOUT,
     card: { ...IDENTITY_CARD, graphic: { right: 56, top: 110, width: 370 } },
@@ -585,6 +610,7 @@ export const THEMES: ReadonlyArray<Theme> = [
     },
     type: SHOWCASE_TYPE,
     shape: IDENTITY_SHAPE,
+    motion: MOTION,
     space: SPACE,
     layout: SHOWCASE_LAYOUT,
     card: { ...IDENTITY_CARD, graphic: { right: 70, top: 190, width: 290 } },
@@ -603,6 +629,7 @@ export const THEMES: ReadonlyArray<Theme> = [
       ...PANEL_SHAPE,
       hero: { ...PANEL_SHAPE.hero, top: "3px solid var(--accent)" },
     },
+    motion: MOTION,
     space: { ...SPACE, page: "1160px" },
     layout: { composition: "document", hero: "panel", signatures: "columns", detailWidth: "full" },
     card: PRODUCT_CARD,
@@ -618,6 +645,7 @@ export const THEMES: ReadonlyArray<Theme> = [
     identity: productIdentity(SLATE_LIGHT),
     type: DOCUMENT_TYPE,
     shape: { ...PANEL_SHAPE, topbar: BORDER },
+    motion: MOTION,
     space: { ...SPACE, page: "1240px", panelTop: "16px" },
     layout: { composition: "document", hero: "split", signatures: "stacked", detailWidth: "full" },
     card: { ...PRODUCT_CARD, support: { align: "center", padding: 20, surface: "card" } },
@@ -645,7 +673,9 @@ export const THEMES: ReadonlyArray<Theme> = [
     shape: {
       hero: { border: "0", top: "0", bottom: BORDER, radius: "0" },
       topbar: "none",
+      radius: RADII,
     },
+    motion: MOTION,
     space: { ...SPACE, page: "960px", overview: "minmax(0,1fr) minmax(0,1.3fr)" },
     layout: {
       composition: "document",

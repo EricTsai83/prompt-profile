@@ -303,7 +303,7 @@ export const techniqueStyle = `
 .tech-time{display:grid;grid-template-columns:minmax(9em,13em) repeat(var(--months),minmax(0,1fr));gap:3px;align-items:center}
 .tt-m{font-size:11px;color:var(--muted);text-align:center}
 .tt-name{position:relative;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;outline:none}
-.tt-c{position:relative;height:20px;border-radius:4px;background:var(--empty);outline:none}
+.tt-c{position:relative;height:20px;border-radius:4px;background:var(--empty);outline:none;transition:box-shadow var(--motion-fast) var(--ease-out)}
 .tt-c:hover,.tt-c:focus{box-shadow:0 0 0 2px var(--fg)}
 .tt-c.nodata{background:repeating-linear-gradient(135deg,var(--empty) 0 4px,transparent 4px 8px)}
 :is(.tt-c).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
@@ -311,7 +311,7 @@ export const techniqueStyle = `
 :is(.tt-c).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}
 :is(.tt-c).l4{background:var(--accent)}
 .caps{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.cap{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.cap{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:18px 20px;display:flex;flex-direction:column;gap:12px}
 .cap-extend{grid-row:span 2}
 .cap header h3{font-size:17px}.cap header p{font-size:12.5px;color:var(--muted);margin-top:2px}
 .cap-ms{list-style:none;margin:0;padding:0}
@@ -320,7 +320,7 @@ export const techniqueStyle = `
 .cap-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cap-named h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
 .cap-named ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.cap-item{padding:10px 12px;border:1px solid var(--border);border-radius:12px}
+.cap-item{padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-md)}
 .ci-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ci-head b{font-size:13.5px;overflow-wrap:anywhere}
 .ci-tag{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
 .cap-item p{font-size:12.5px;color:var(--muted);margin-top:4px}

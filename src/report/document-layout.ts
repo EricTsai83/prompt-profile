@@ -31,7 +31,7 @@ html:root .portrait-chapter h3{margin-bottom:var(--space-3);line-height:1.4}
 html:root .portrait-chapter>p{font-size:16px;line-height:1.8}
 html:root .portrait-evidence blockquote{margin:var(--space-3) 0;padding:var(--space-2) var(--space-4)}
 html:root .traits,html:root .improves,html:root .caps{gap:var(--space-6)}
-html:root .trait,html:root .improve{padding:var(--space-6);border-radius:8px}
+html:root .trait,html:root .improve{padding:var(--space-6);border-radius:var(--radius-xs)}
 html:root .dim-body{padding:0 var(--space-6) var(--space-6)}
 html:root .dimension>summary{padding:var(--space-4) var(--space-6)}
 html:root .about{margin-top:var(--space-12);padding:var(--space-6);line-height:1.75}

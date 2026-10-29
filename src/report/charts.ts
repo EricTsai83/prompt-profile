@@ -386,7 +386,7 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
 .hours{--n:24}.weekdays{--n:7;gap:10px}
 .col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding-bottom:20px;outline:none}
-.col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity .15s}
+.col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity var(--motion-fast) var(--ease-out)}
 .col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
 .col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);white-space:nowrap}
 .heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
@@ -410,7 +410,7 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .ch-when{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .heat-h{font-size:10px;color:var(--muted);text-align:left}
 .heat-d{font-size:11px;color:var(--muted);align-self:center}
-.heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none}
+.heat-c,.cal-d{position:relative;border-radius:3px;background:var(--empty);outline:none;transition:box-shadow var(--motion-fast) var(--ease-out)}
 .heat-c{height:22px}
 .cal-d{aspect-ratio:1}
 :is(.heat-c,.cal-d,.scale i).l1{background:color-mix(in srgb,var(--accent) 28%,var(--empty))}
@@ -431,10 +431,10 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 .ranks b{text-align:right;font-size:12px}
 .stack{display:flex;align-items:flex-end;gap:3px;height:170px;margin-top:8px}
 .stack-w{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;outline:none}
-.stack-bar{display:flex;flex-direction:column-reverse;width:100%;border-radius:3px;overflow:hidden;opacity:.9}
+.stack-bar{display:flex;flex-direction:column-reverse;width:100%;border-radius:3px;overflow:hidden;opacity:.9;transition:opacity var(--motion-fast) var(--ease-out),box-shadow var(--motion-fast) var(--ease-out)}
 .stack-w:hover .stack-bar,.stack-w:focus .stack-bar{opacity:1;box-shadow:0 0 0 2px var(--fg)}
 .tip{cursor:default}
-.tip:hover::after,.tip:focus::after{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:min(240px,80vw);padding:6px 9px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:12px;line-height:1.4;font-weight:500;white-space:normal;text-align:left;pointer-events:none;box-shadow:0 4px 14px var(--shadow)}
+.tip:hover::after,.tip:focus::after{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);z-index:20;width:max-content;max-width:min(240px,80vw);padding:6px 9px;border-radius:var(--radius-xs);background:var(--fg);color:var(--bg);font-size:12px;line-height:1.4;font-weight:500;white-space:normal;text-align:left;pointer-events:none;box-shadow:0 4px 14px var(--shadow);animation:fade-in var(--motion-base) var(--ease-out)}
 .tip-l:hover::after,.tip-l:focus::after{left:0;transform:none}
 .tip-r:hover::after,.tip-r:focus::after{left:auto;right:0;transform:none}
 ${

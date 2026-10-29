@@ -14,6 +14,9 @@ const sample = () =>
     JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
   )
 
+/** Pills, circles, flat corners and chart marks up to 5px keep fixed radii. */
+const FIXED_RADIUS = /^(0|50%|999px|[1-5]px|var\(--[a-z-]+\))$/
+
 const styleOf = (page: string): string => /<style>([\s\S]*?)<\/style>/.exec(page)![1]!
 
 const pngSize = (png: Uint8Array) => {
@@ -68,11 +71,40 @@ describe("generated stylesheet", () => {
           themeFirst: style.startsWith(block),
           lookSelectors: components.match(/data-look[^{]*/g) ?? [],
           colors: components.match(/#[0-9a-f]{3,8}(?![\w-])|rgba?\([^)]*\)/gi) ?? [],
+          // Surfaces read the radius scale; only pills, circles and small chart marks are fixed.
+          radii: [...components.matchAll(/border-radius:([^;}!]+)/g)]
+            .map((m) => m[1]!.trim())
+            .filter((v) => !v.split(/\s+/).every((part) => FIXED_RADIUS.test(part))),
+          // Every transition and animation takes its timing from the motion tokens.
+          durations: components.match(/(?<![\w.-])\d*\.?\d+m?s(?![\w-])/g) ?? [],
         }
       })
       expect(scans).toEqual(
-        LOOK_IDS.map((id) => ({ id, themeFirst: true, lookSelectors: [], colors: [] })),
+        LOOK_IDS.map((id) => ({
+          id,
+          themeFirst: true,
+          lookSelectors: [],
+          colors: [],
+          radii: [],
+          durations: [],
+        })),
       )
+    }),
+  )
+
+  it.effect("animates hover, tooltips and views, and stops for reduced motion", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      for (const id of LOOK_IDS) {
+        const style = styleOf(renderHtml(p, { look: id, cardHide: [] }))
+        expect(style).toContain("--motion-fast:150ms")
+        expect(style).toMatch(/\.sig\{[^}]*transition:[^}]*var\(--motion-fast\)/)
+        expect(style).toMatch(/\.tip:hover::after[^{]*\{[^}]*animation:[^}]*var\(--motion-base\)/)
+        expect(style).toMatch(/\.report-view\{[^}]*animation:[^}]*var\(--motion-base\)/)
+        const reduced = /@media \(prefers-reduced-motion:reduce\)\{([^{]*\{[^}]*\})\}/.exec(style)
+        expect(reduced?.[1]).toMatch(/animation:none!important/)
+        expect(reduced?.[1]).toMatch(/transition:none!important/)
+      }
     }),
   )
 })

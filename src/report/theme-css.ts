@@ -7,8 +7,8 @@ const colors = (t: ColorTokens) =>
 const printColors = (t: PrintTokens) =>
   `--bg:${t.bg};--fg:${t.fg};--muted:${t.muted};--card:${t.card};--border:${t.border};--accent:${t.accent};--accent-soft:${t.accentSoft}`
 
-/** Type, shape and space tokens; the same in every color scheme. */
-const metrics = ({ type, shape, space }: Theme) =>
+/** Type, shape, motion and space tokens; the same in every color scheme. */
+const metrics = ({ type, shape, motion, space }: Theme) =>
   [
     `--font-body:${type.body}`,
     `--title-font:${type.title.family}`,
@@ -26,6 +26,10 @@ const metrics = ({ type, shape, space }: Theme) =>
     `--hero-bottom:${shape.hero.bottom}`,
     `--hero-radius:${shape.hero.radius}`,
     `--topbar-rule:${shape.topbar}`,
+    ...Object.entries(shape.radius).map(([step, value]) => `--radius-${step}:${value}`),
+    `--motion-fast:${motion.fast}`,
+    `--motion-base:${motion.base}`,
+    `--ease-out:${motion.easing}`,
     `--page:${space.page}`,
     ...Object.entries(space.scale).map(([step, value]) => `--space-${step}:${value}`),
     `--reading:${space.reading}`,
