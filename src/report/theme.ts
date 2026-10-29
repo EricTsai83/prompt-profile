@@ -8,8 +8,10 @@
  * the `data-*` attributes, never on a look id.
  *
  * To add a look: add its id to `LOOK_IDS` (looks.ts), add a theme entry to `THEMES` reusing
- * existing variants, then run `scripts/template-gallery.ts`, `scripts/template-qa.mjs` and
- * `scripts/card-qa.ts`. Adding a variant is a code change in the CSS and card trees.
+ * existing variants, then run `scripts/template-gallery.ts`, `scripts/template-qa.mjs` (layout,
+ * computed styles, axe-core and motion checks) and `scripts/card-qa.ts`. Adding a variant is a
+ * code change in the CSS and card trees. Colors must pass WCAG AA contrast
+ * (`test/report/contrast.test.ts`).
  */
 import type { LookId } from "./looks.ts"
 

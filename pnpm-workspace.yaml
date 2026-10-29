@@ -11,6 +11,7 @@ catalog:
   "@effect/vitest": 4.0.6
   "@resvg/resvg-wasm": 2.6.2
   "@types/node": ^24.19.2
+  axe-core: ^4.14.0
   effect: 4.0.6
   oxfmt: ^0.74.0
   oxlint: ^1.89.0

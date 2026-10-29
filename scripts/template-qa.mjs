@@ -6,6 +6,10 @@
  * them with `test/report/computed-styles.json`, which catches cascade-order regressions that HTML
  * snapshots miss. `UPDATE_STYLES=1` rewrites the table after an intended visual change.
  * `QA_OUT` picks the capture folder, so two runs can be compared file by file.
+ *
+ * Runs axe-core (WCAG 2.2 A and AA rules) on both views of every look, width and color scheme,
+ * and checks that motion plays by default and stops for `prefers-reduced-motion`. Screenshots are
+ * taken with reduced motion so no capture lands mid-animation.
  */
 import { createRequire } from "node:module"
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
@@ -16,6 +20,23 @@ const { chromium } = require(
   process.env.PLAYWRIGHT_CORE ||
     "/Users/eric/.npm/_npx/705bc6b22212b352/node_modules/playwright-core",
 )
+const AXE = require.resolve("axe-core/axe.min.js")
+const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
+/** axe violations as short strings: rule id and the first offending selectors. */
+const axeViolations = async (page) => {
+  await page.addScriptTag({ path: AXE })
+  const { violations } = await page.evaluate(
+    (values) => globalThis.axe.run(document, { runOnly: { type: "tag", values } }),
+    AXE_TAGS,
+  )
+  return violations.map(
+    (v) =>
+      `axe ${v.id}: ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(" "))
+        .join(", ")}${v.nodes.length > 3 ? ` (+${v.nodes.length - 3})` : ""}`,
+  )
+}
 const LOOKS = ["classic", "signal", "afterhours", "studio", "prism", "slate", "folio"]
 const STYLE_TABLE = resolve("test/report/computed-styles.json")
 /** Elements whose look-specific styles matter most; the first match of each is measured. */
@@ -67,7 +88,14 @@ const styles = {}
 for (const look of LOOKS)
   for (const width of [360, 390, 1440])
     for (const colorScheme of ["light", "dark"]) {
-      const page = await browser.newPage({ viewport: { width, height: 900 }, colorScheme })
+      const page = await browser.newPage({
+        viewport: { width, height: 900 },
+        colorScheme,
+        reducedMotion: "reduce",
+        // The report's CSP blocks inline scripts; axe is injected only in this test browser.
+        // Outside requests are still caught by the request listener below.
+        bypassCSP: true,
+      })
       const errors = []
       page.on("request", (r) => {
         if (!/^(file:|data:)/.test(r.url())) errors.push(r.url())
@@ -89,6 +117,8 @@ for (const look of LOOKS)
           )
           if (check.overflow || !check.view || !check.lang || check.collapsed)
             errors.push(JSON.stringify(check))
+          if (width !== 390 && lang === "en")
+            errors.push(...(await axeViolations(page)).map((e) => `${view}: ${e}`))
           if (width !== 390)
             await page.screenshot({
               path: `${root}/${look}-${width}-${colorScheme}-${view}-${lang}.png`,
@@ -123,8 +153,28 @@ for (const look of LOOKS)
       await page.close()
     }
 for (const look of LOOKS)
+  for (const reducedMotion of ["no-preference", "reduce"]) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion })
+    await page.goto(pathToFileURL(resolve(`tmp/template-edges/${look}.html`)).href)
+    await page.locator(`label[for="report-detail"]`).first().click()
+    const motion = await page.evaluate(() => ({
+      view: getComputedStyle(document.querySelector(".report-view-detail")).animationName,
+      sig: getComputedStyle(document.querySelector(".sig, .panel")).transitionProperty,
+    }))
+    const expected =
+      reducedMotion === "reduce" ? { view: "none", sig: "none" } : { view: "view-in" }
+    const errors = Object.entries(expected)
+      .filter(([key, value]) => motion[key] !== value)
+      .map(([key]) => `${key}: ${motion[key]}`)
+    results.push({ look, reducedMotion, errors })
+    await page.close()
+  }
+for (const look of LOOKS)
   for (const variant of ["legacy", "unclear", "long-private"]) {
-    const page = await browser.newPage({ viewport: { width: 360, height: 900 } })
+    const page = await browser.newPage({
+      viewport: { width: 360, height: 900 },
+      reducedMotion: "reduce",
+    })
     await page.goto(pathToFileURL(resolve(`tmp/template-edges/${look}-${variant}.html`)).href)
     const errors = []
     for (const view of ["overview", "detail"]) {
