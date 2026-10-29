@@ -4,15 +4,15 @@ This contract describes the existing renderer, rather than the earlier prototype
 content.md. Purpose and output format are independent: HTML offers both purposes; PNG is an
 introduction. The source Profile is immutable. All examples and checks use fictional data.
 
-| Reader question                   | Source                                      | Identity presentation                                                                               | Factual presentation and limits                                                                        |
-| --------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| How does this person collaborate? | archetype, headline, portrait.introduction  | Supported introduction and connected story                                                          | Original interpretation remains inspectable; a request does not prove an outcome                       |
-| Which behaviors stand out?        | traits, confidence, evidence                | Up to three non-low-confidence observations with evidence, in profile order; document cards use two | All traits, support, confidence and excerpts, including weaker observations                            |
-| Where do preferences differ?      | portrait.axes                               | Categorical labels, including mixed and unclear                                                     | Explanation plus supporting and contrary evidence; no strength score                                   |
-| What is the context?              | stats, projects, techniques                 | Optional aggregate activity signals and fun facts                                                   | Definitions, denominators, coverage, projects, activity and metadata; missing metadata is not zero use |
-| What does usage mean?             | usage, plan, list-price estimates           | No usage, subscription or price content                                                             | Factual view only; estimates retain their qualifications                                               |
-| What remains unknown?             | coverage, evidence limits, missing portrait | Limited-evidence introduction; fewer observations or none                                           | Sampling and missing evidence remain visible; no inferred expertise or successful outcome              |
-| What could change?                | improvements, previous                      | No coaching as identity                                                                             | Optional suggestions and available comparison, subject to exclusions                                   |
+| Reader question                   | Source                                      | Identity presentation                                                                                      | Factual presentation and limits                                                                        |
+| --------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| How does this person collaborate? | archetype, headline, portrait.introduction  | Supported introduction and connected story                                                                 | Original interpretation remains inspectable; a request does not prove an outcome                       |
+| Which behaviors stand out?        | traits, confidence, evidence                | Up to three non-low-confidence observations with evidence, in profile order; all PNG cards use at most two | All traits, support, confidence and excerpts, including weaker observations                            |
+| Where do preferences differ?      | portrait.axes                               | Categorical labels, including mixed and unclear                                                            | Explanation plus supporting and contrary evidence; no strength score                                   |
+| What is the context?              | stats, projects, techniques                 | Optional aggregate activity signals and fun facts                                                          | Definitions, denominators, coverage, projects, activity and metadata; missing metadata is not zero use |
+| What does usage mean?             | usage, plan, list-price estimates           | HTML omits usage; PNG may show tokens and API estimates                                                    | Factual view only; estimates retain their qualifications                                               |
+| What remains unknown?             | coverage, evidence limits, missing portrait | Limited-evidence introduction; fewer observations or none                                                  | Sampling and missing evidence remain visible; no inferred expertise or successful outcome              |
+| What could change?                | improvements, previous                      | No coaching as identity                                                                                    | Optional suggestions and available comparison, subject to exclusions                                   |
 
 Repeated names connect the two views; they do not indicate independent corroboration. Document
 heroes already describe featured observations, so their identity observation blocks add the
@@ -33,15 +33,19 @@ Episodes and contextual signature moves require plan 20 B/C. No renderer synthes
 chronology, outcomes or new roles. Richer evidence and better generated wording require future
 analysis; composition and card selection apply by rerendering compatible stored profiles.
 Profile, analysis and pipeline versions do not change for this integration. Look versions advance
-to Classic 6 and other looks 12 because shared card selection changes.
+to Classic 9 and other looks 15 after the navigation and PNG integration.
 
 ## Offline reading and exports
 
 View and language selectors remain independent offline controls with keyboard access. Print
 includes both intended purposes rather than only the active screen view. PNG remains a fixed
 1200 × 630 introduction: title, headline, supported behavior names and optional aggregate
-activity context. Existing stats and graphic hiding controls remain available. It does not add
-usage pricing, evidence panels or quotes.
+activity context. The measured summary includes prompt/conversation counts, tokens and an API
+list-price estimate in USD. Prompt and response periods are labeled separately. `--exclude usage`
+replaces token/cost cells with active days and longest streak; `--card-hide stats` removes all
+summary cells and periods. Missing usage is “Not measured”; unpriced responses are “Unknown”;
+partial prices carry a plus sign and a label. Unreadable logs retain a visible qualification.
+There are no evidence panels or quotes.
 
 ## Verification record — 2026-10-29
 
@@ -58,9 +62,22 @@ and PNG inspection and unfamiliar-reader sessions remain outstanding acceptance 
 ## Owner review amendment — PNG direction
 
 The owner requested a more engaging share card with selected usage, tokens and API list-price
-equivalent. This is the next design direction, not an implemented PNG feature. Detailed usage
+equivalent. This direction is now implemented. Detailed usage
 stays in factual HTML; PNG may carry a compact measured summary. Estimates must be labeled as
 API list-price equivalent, with partial/missing states preserved. Actual spend and human hours
 are not established by current fields. Replace the unexplained command footer with clear product
 attribution. Plan 20 D owns original character art and can integrate later without blocking this
 card iteration. This amendment supersedes the earlier PNG pricing exclusion in this document.
+
+## PNG implementation evidence
+
+Before: the footer showed an unexplained shell command and summary cells showed active hours,
+night share and streaks. After: the footer identifies the generator; prompt/conversation counts
+provide scale, while tokens and labeled API estimates provide usage context. No generic rank,
+subscription savings or human-hours claim is added. Character art remains in plan 20 D.
+
+Behavioral tests failed before summary implementation, then passed for two-source totals,
+reasoning counted once, partial/unknown/unmeasured states, distinct periods and date exclusions.
+All-look card tests cover usage exclusions, hidden stats, attribution and unchanged stored prose.
+The existing CLI render variant test verifies zero fake runners and preserves the original
+artifacts; the report module does not import analysis or an LLM implementation.

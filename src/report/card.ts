@@ -9,10 +9,10 @@ import { clockSvg, graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
 import { lookOf, type CardTokens, type Theme } from "./theme.ts"
 import { contentIn } from "./content.ts"
-import { chronotype, nightShare } from "./derive.ts"
+import { cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
-import { MESSAGES } from "./messages.ts"
+import { CARD_MESSAGES, MESSAGES } from "./messages.ts"
 import type { Language } from "../domain/Profile.ts"
 
 export const CARD_WIDTH = 1200
@@ -54,24 +54,6 @@ export const clip = (s: string, max: number): string => {
   return `${chars.slice(0, end).join("").trimEnd()}…`
 }
 
-/**
- * The card's numbers, as on the report's signature: the busiest four hours, the night share
- * and the longest streak (the first `n`). Never prompt text.
- */
-const cardMetrics = (profile: Profile, lang: Language, n: number): Array<[string, string]> => {
-  const t = MESSAGES[lang]
-  const s = profile.stats
-  const window = chronotype(s)
-  const hh = (hour: number) => `${String(hour).padStart(2, "0")}:00`
-  return (
-    [
-      [t.cardActive, window === null ? t.none : `${hh(window.start)}–${hh(window.end)}`],
-      [t.nightShare, `${Math.round(nightShare(s) * 100)}%`],
-      [t.cardStreak, t.days(s.longestStreakDays)],
-    ] as Array<[string, string]>
-  ).slice(0, n)
-}
-
 /** Archetype size steps: long names get smaller type instead of overflowing. */
 const titleSize = (card: CardTokens, name: string) =>
   card.size.title[name.length > 44 ? 2 : name.length > 26 ? 1 : 0]
@@ -108,6 +90,11 @@ const identityCopy = (
           fontFamily: font.title,
           fontWeight: 800,
           fontSize: titleSize(card, name),
+          maxHeight: titleSize(card, name) * card.title.lineHeight * 2,
+          overflow: "hidden",
+          lineClamp: 2,
+          wordBreak: "normal",
+          flexShrink: 0,
           lineHeight: card.title.lineHeight,
           letterSpacing: card.title.tracking,
         },
@@ -117,6 +104,9 @@ const identityCopy = (
         "div",
         {
           fontSize: card.size.headline,
+          maxHeight: card.size.headline * card.headline.lineHeight * 2,
+          overflow: "hidden",
+          lineClamp: 2,
           lineHeight: card.headline.lineHeight,
           marginTop: card.headline.gap,
           color: colors.muted,
@@ -127,11 +117,11 @@ const identityCopy = (
         ? null
         : h(
             "div",
-            { display: "flex", gap: card.chips.gap, flexWrap: "wrap", marginTop: card.chips.top },
+            { display: "flex", gap: card.chips.gap, flexWrap: "nowrap", marginTop: card.chips.top },
             profile.traits
               .map((t, i) => ({ t, i }))
               .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
-              .slice(0, 3)
+              .slice(0, 2)
               .map(({ i }) =>
                 h(
                   "div",
@@ -139,6 +129,10 @@ const identityCopy = (
                     display: "flex",
                     fontSize: card.size.chip,
                     padding: card.chips.padding,
+                    maxWidth: 320,
+                    maxHeight: 40,
+                    overflow: "hidden",
+                    lineClamp: 1,
                     borderRadius: 999,
                     ...colors.chip,
                   },
@@ -157,25 +151,55 @@ const metricRow = (
   hide: RenderOptions["cardHide"],
   lang: Language,
   muted: string,
+  showUsage: boolean,
 ): Node =>
   h(
     "div",
-    { display: "flex", gap: theme.card.metrics.gap },
-    (hide.includes("stats") ? [] : cardMetrics(profile, lang, theme.card.metrics.count)).map(
+    { display: "flex", gap: 24, width: CARD_WIDTH - 2 * theme.card.padding.x },
+    (hide.includes("stats") ? [] : cardSummary(profile, lang, showUsage).metrics).map(
       ([label, value]) =>
-        h("div", { display: "flex", flexDirection: "column" }, [
+        h("div", { display: "flex", flexDirection: "column", flex: 1 }, [
           h(
             "div",
             {
               fontFamily: fontsOf(theme).display,
               fontWeight: 800,
-              fontSize: theme.card.size.metric,
+              fontSize:
+                value.length > 10 ? Math.min(26, theme.card.size.metric) : theme.card.size.metric,
             },
             value,
           ),
           h("div", { fontSize: theme.card.size.label, color: muted }, label),
         ]),
     ),
+  )
+
+const cardFooter = (
+  p: Profile,
+  theme: Theme,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+  muted: string,
+  showUsage: boolean,
+  exactDates: boolean,
+): Node =>
+  h(
+    "div",
+    {
+      display: "flex",
+      justifyContent: "space-between",
+      width: CARD_WIDTH - 2 * theme.card.padding.x,
+      fontSize: theme.card.size.footer,
+      color: muted,
+    },
+    [
+      h(
+        "div",
+        { maxWidth: 740, flex: 1, marginRight: 20 },
+        hide.includes("stats") ? "" : cardSummary(p, lang, showUsage, exactDates).note,
+      ),
+      h("div", { flexShrink: 0 }, CARD_MESSAGES[lang].attribution),
+    ],
   )
 
 /** The full-card text layer, painted over the background layers. */
@@ -208,6 +232,8 @@ const classicTree = (
   theme: Theme,
   hide: RenderOptions["cardHide"],
   lang: Language,
+  showUsage: boolean,
+  exactDates: boolean,
 ): Node => {
   const t = MESSAGES[lang]
   const k = schemeOf(theme)
@@ -263,14 +289,23 @@ const classicTree = (
           ]
         : []),
       copyLayer(theme, [
-        h("div", { fontSize: card.size.brand, fontWeight: 700 }, t.project),
+        h("div", { display: "flex", justifyContent: "space-between", alignItems: "center" }, [
+          h("div", { fontSize: card.size.brand, fontWeight: 700 }, t.project),
+          hide.includes("stats")
+            ? null
+            : h(
+                "div",
+                { fontSize: card.size.header, color: k.muted },
+                cardPeriod(profile, lang, exactDates),
+              ),
+        ]),
         identityCopy(profile, theme, hide, lang, showGraphic, {
           muted: k.muted,
           chip: { color: k.accent, backgroundColor: k.accentSoft },
         }),
-        h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
-          metricRow(profile, theme, hide, lang, k.muted),
-          h("div", { fontSize: card.size.footer, color: k.muted }, "npx prompt-profile"),
+        h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
+          metricRow(profile, theme, hide, lang, k.muted, showUsage),
+          cardFooter(profile, theme, hide, lang, k.muted, showUsage, exactDates),
         ]),
       ]),
     ],
@@ -283,6 +318,8 @@ const identityTree = (
   theme: Theme,
   hide: RenderOptions["cardHide"],
   lang: Language,
+  showUsage: boolean,
+  exactDates: boolean,
 ): Node => {
   const t = MESSAGES[lang]
   const id = theme.identity
@@ -331,7 +368,9 @@ const identityTree = (
             { fontFamily: fontsOf(theme).display, fontWeight: 800, fontSize: card.size.brand },
             t.project,
           ),
-          h("div", { color: id.muted }, t.madeFrom),
+          hide.includes("stats")
+            ? null
+            : h("div", { color: id.muted }, cardPeriod(profile, lang, exactDates)),
         ]),
         identityCopy(profile, theme, hide, lang, showGraphic, {
           muted: id.muted,
@@ -340,13 +379,9 @@ const identityTree = (
             backgroundColor: id.chipBackground,
           },
         }),
-        h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
-          metricRow(profile, theme, hide, lang, id.muted),
-          h(
-            "div",
-            { fontSize: card.size.footer, color: id.split ? id.text : id.muted },
-            "npx prompt-profile",
-          ),
+        h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
+          metricRow(profile, theme, hide, lang, id.muted, showUsage),
+          cardFooter(profile, theme, hide, lang, id.muted, showUsage, exactDates),
         ]),
       ]),
     ].filter((x) => x !== null),
@@ -359,6 +394,8 @@ const productTree = (
   theme: Theme,
   hide: RenderOptions["cardHide"],
   lang: Language,
+  showUsage: boolean,
+  exactDates: boolean,
 ): Node => {
   const c = contentIn(p, lang)
   const k = schemeOf(theme)
@@ -396,7 +433,14 @@ const productTree = (
           fontSize: card.size.header,
           color: k.muted,
         },
-        [h("div", {}, MESSAGES[lang].project), h("div", {}, theme.id.toUpperCase())],
+        [
+          h("div", {}, MESSAGES[lang].project),
+          h(
+            "div",
+            {},
+            hide.includes("stats") ? theme.id.toUpperCase() : cardPeriod(p, lang, exactDates),
+          ),
+        ],
       ),
       h(
         "div",
@@ -434,7 +478,7 @@ const productTree = (
                   flexShrink: 0,
                   lineClamp: 2,
                   overflow: "hidden",
-                  wordBreak: "break-all",
+                  wordBreak: "normal",
                 },
                 clip(c.archetype.name.replace(/\s+/g, " "), 52),
               ),
@@ -450,7 +494,7 @@ const productTree = (
                   flexShrink: 0,
                   lineClamp: 2,
                   overflow: "hidden",
-                  wordBreak: "break-all",
+                  wordBreak: "normal",
                 },
                 clip(c.headline.replace(/\s+/g, " "), 105),
               ),
@@ -478,7 +522,7 @@ const productTree = (
                           lineHeight: 1.3,
                           lineClamp: 1,
                           overflow: "hidden",
-                          wordBreak: "break-all",
+                          wordBreak: "normal",
                         },
                         clip(c.trait(i).name.replace(/\s+/g, " "), 48),
                       ),
@@ -504,7 +548,7 @@ const productTree = (
                     props: {
                       src: svgDataUrl(graphic.svg),
                       width: card.graphic.width,
-                      height: 180,
+                      height: 100,
                     },
                   },
               hide.includes("stats")
@@ -515,9 +559,9 @@ const productTree = (
                       display: "flex",
                       flexDirection: "column",
                       gap: card.metrics.gap,
-                      marginTop: 26,
+                      marginTop: 18,
                     },
-                    cardMetrics(p, lang, card.metrics.count).map(([label, value]) =>
+                    cardSummary(p, lang, showUsage, exactDates).metrics.map(([label, value]) =>
                       h(
                         "div",
                         {
@@ -547,7 +591,7 @@ const productTree = (
           fontSize: card.size.footer,
           color: k.muted,
         },
-        "npx prompt-profile",
+        cardFooter(p, theme, hide, lang, k.muted, showUsage, exactDates),
       ),
     ],
   )
@@ -574,7 +618,7 @@ export const cardTree = (
   const hide: RenderOptions["cardHide"] = isLimitedEvidence(profile)
     ? [...new Set([...options.cardHide, "traits" as const])]
     : options.cardHide
-  return TREES[theme.card.composition](p, theme, hide, lang)
+  return TREES[theme.card.composition](p, theme, hide, lang, v.usage, v.dates)
 }
 
 let wasmReady: Promise<void> | null = null

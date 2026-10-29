@@ -793,3 +793,41 @@ export const USAGE_MESSAGES = {
     monthNote: (zone: string) => `月份以 ${zone} 時區計算。`,
   },
 } as const
+
+/** Compact share-card copy; the detailed methodology remains in the HTML report. */
+export const CARD_MESSAGES = {
+  en: {
+    activity: "Prompt activity",
+    prompts: "Prompts",
+    sessions: "Conversations",
+    tokens: "Tokens",
+    cost: "API estimate · USD",
+    active: "Active days",
+    streak: "Longest streak",
+    missing: "Not measured",
+    unknown: "Unknown",
+    empty: "No responses",
+    usage: "Usage",
+    periodUnknown: "period unavailable",
+    partial: "Partial pricing",
+    incomplete: "Incomplete logs",
+    attribution: "Made with prompt-profile",
+  },
+  "zh-TW": {
+    activity: "Prompt 活動期間",
+    prompts: "Prompt 數",
+    sessions: "對話數",
+    tokens: "Token 用量",
+    cost: "API 估算 · 美元",
+    active: "活躍天數",
+    streak: "最長連續天數",
+    missing: "未統計",
+    unknown: "未知",
+    empty: "無回覆紀錄",
+    usage: "用量期間",
+    periodUnknown: "期間不明",
+    partial: "部分用量未計價",
+    incomplete: "紀錄不完整",
+    attribution: "由 prompt-profile 產生",
+  },
+} as const

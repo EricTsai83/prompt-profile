@@ -153,14 +153,18 @@ Written to `./prompt-profile-report/` (change it with `--out`):
     follow-ups, and what changed since your last report
   - **usage during this period** (facts page only): Claude Code and Codex side by side with
     the plan each runs on, tokens by kind, the share of each tool, months and models, and the
-    **API list-price equivalent** in USD; never on the card or the "Who they are" page
+    **API list-price equivalent** in USD. Detailed breakdowns stay here; the card can show a
+    compact token total and API estimate. The "Who they are" page does not show usage
   - a language switch when there is more than one language
 
   It shows everything by default, quotes and project folder names included. To share it, leave
   parts out with `--exclude` (below).
 
 - `card.png`: a 1200 × 630 share card in the default language, plus `card.<lang>.png` for each
-  other language (**omits evidence quotes**)
+  other language (**omits evidence quotes**). Includes the introduction, up to two supported
+  behaviors, prompt/conversation counts, token usage and an API estimate in USD. Missing and
+  partial pricing are labeled; `--exclude usage` removes usage from HTML and PNG.
+  `--card-hide stats` hides the card’s measured summary
 - `profile.json`: the raw profile data (re-create the report with `prompt-profile render`)
 
 ### Leaving parts out

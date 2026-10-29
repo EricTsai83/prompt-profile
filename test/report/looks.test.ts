@@ -176,6 +176,26 @@ describe("looks: card", () => {
     }),
   )
 
+  it.effect("usage is optional and rerendering leaves stored prose unchanged", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const before = JSON.stringify(p)
+      for (const look of LOOK_IDS) {
+        const shown = texts(cardTree(p, { look, cardHide: [] }, "en")).join("\n")
+        expect(shown).toContain("API estimate · USD")
+        expect(shown).toContain("Made with prompt-profile")
+        expect(shown).not.toContain("npx prompt-profile")
+        const excluded = texts(cardTree(p, { look, cardHide: [], exclude: ["usage"] }, "en")).join(
+          "\n",
+        )
+        expect(excluded).not.toMatch(/API|Tokens|Usage:/)
+        const hidden = texts(cardTree(p, { look, cardHide: ["stats"] }, "en")).join("\n")
+        expect(hidden).not.toMatch(/API|Tokens|Usage:|Prompt activity/)
+      }
+      expect(JSON.stringify(p)).toBe(before)
+    }),
+  )
+
   it.effect("every look renders a 1200×630 PNG", () =>
     Effect.gen(function* () {
       const p = yield* sample()
@@ -211,7 +231,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 2,
         look: "afterhours",
-        lookVersion: 14,
+        lookVersion: 15,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

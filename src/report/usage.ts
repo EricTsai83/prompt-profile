@@ -8,7 +8,8 @@ import type { Visibility } from "./visibility.ts"
 /**
  * "Usage during this period" (plan 23), in the factual view only: per tool its plan, tokens by
  * kind and API list-price equivalent, then the share between the tools, months and models.
- * Never on the overview or the card, never a ranking. Four states are told apart: not measured
+ * The identity HTML view omits usage; cards use a separate compact measured summary.
+ * Never a ranking. Four states are told apart: not measured
  * (an older profile), unknown plan, unknown price and unreadable logs.
  */
 

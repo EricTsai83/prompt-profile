@@ -146,7 +146,6 @@ describe("an unregistered eighth look", () => {
       const p = yield* sample()
       const tree = JSON.stringify(cardTree(p, { look: EIGHTH.id, cardHide: [] }, "en", EIGHTH))
       expect(tree).toContain("#0a7f3f")
-      expect(tree).toContain("EIGHTH")
       expect(tree).toContain('"fontSize":17')
       // Tokens reach every part they size, also when a look makes them differ.
       const uneven: Theme = {
