@@ -1,6 +1,9 @@
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect } from "effect"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
 import { parseSince } from "../../src/cli/options.ts"
+import { makeHarness } from "./harness.ts"
 
 const now = DateTime.makeUnsafe("2026-10-24T00:00:00Z")
 const iso = (value: string) =>
@@ -34,6 +37,20 @@ describe("parseSince", () => {
     Effect.gen(function* () {
       const error = yield* Effect.flip(parseSince(value, now))
       expect(error._tag).toBe("InvalidArgument")
+    }),
+  )
+})
+
+describe("default range", () => {
+  it.effect("is the last 3 months when --since is not given", () =>
+    Effect.gen(function* () {
+      const h = makeHarness({ statuses: [] })
+      const r = yield* h.run(["stats", "--out", join(h.root, "s")])
+      expect(r.code).toBe(0)
+      const { window } = JSON.parse(readFileSync(join(h.root, "s", "stats.json"), "utf8"))
+      const until = new Date(window.until)
+      until.setUTCMonth(until.getUTCMonth() - 3)
+      expect(window.since).toBe(until.toISOString())
     }),
   )
 })

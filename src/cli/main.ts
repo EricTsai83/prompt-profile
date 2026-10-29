@@ -25,7 +25,7 @@ import { makeOutput, Output } from "./services.ts"
 
 const since = Flag.String("since").pipe(
   Flag.withDescription("Time range: 1m, 3m, 6m, 1y or all"),
-  Flag.withDefault("6m"),
+  Flag.withDefault("3m"),
 )
 const out = Flag.String("out").pipe(
   Flag.withDescription("Output folder"),

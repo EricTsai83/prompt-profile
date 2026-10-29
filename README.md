@@ -64,7 +64,7 @@ in every look (`--look`; render only, no new analysis):
 3. Before anything is sent it shows a summary and asks `Continue?`:
 
    ```
-   ● Range: last 6m · 2026-05-02 → 2026-10-28
+   ● Range: last 3m · 2026-07-28 → 2026-10-28
      In range: Claude Code 1,204 · Codex 311 prompts
      1,515 prompts in 182 sessions after cleaning → 1,515 selected in 24 chunks
      No sampling: every chunk is analysed
@@ -211,7 +211,7 @@ cards agree.
 ## Usage
 
 ```bash
-prompt-profile                 # analyse the last 6 months and write the report
+prompt-profile                 # analyse the last 3 months and write the report
 prompt-profile --since 3m      # 1m / 3m / 6m / 1y / all (also <n>d, <n>w)
 prompt-profile --engine codex  # which CLI analyses your prompts (default: auto, Claude Code first)
 prompt-profile --model <name>  # model passed to claude / codex
