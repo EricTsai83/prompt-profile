@@ -39,3 +39,15 @@ it("excludes missing, fabricated and duplicate quotes from selected support", ()
   expect(result.quoteValidity).toEqual({ kept: 1, dropped: 3 })
   expect(result.selectedEvidence).toEqual({ prompts: 1, sessions: 1 })
 })
+
+it("keeps authored semantic failures separate from successful quote checks", async () => {
+  const { default: cases } = await import("../eval/claim-support/cases.json")
+  expect(cases).toHaveLength(6)
+  for (const item of cases) {
+    const result = inspectClaimSupport(item.evidence, item.prompts)
+    expect(result.quoteValidity.dropped).toBe(0)
+    expect(result.selectedEvidence.sessions).toBe(item.expectedSelectedSessions)
+    expect(result.manualReview.semanticSupport).toBe("unreviewed")
+    expect(item.before).not.toBe(item.after)
+  }
+})

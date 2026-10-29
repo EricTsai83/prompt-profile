@@ -496,7 +496,15 @@ export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =
           })
         }
         const profile = result.success
-        const score = scoreProfile(profile, persona.rubric)
+        const score = scoreProfile(
+          profile,
+          persona.rubric,
+          persona.prompts.map((prompt) => ({
+            id: prompt.id,
+            session: `${prompt.source}:${prompt.sessionId}`,
+            text: prompt.text,
+          })),
+        )
         // A requested language that could not be generated is missing content, not a pass.
         const missing = c.variant.options.languages.filter((l) => !profile.languages.includes(l))
         const failures = [

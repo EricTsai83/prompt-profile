@@ -104,3 +104,100 @@ it.effect("requires a minimum number of improvements when the rubric asks for it
     expect(none.failures).toContain("Too few improvements")
   }),
 )
+
+it.effect("checks unsupported claims in portrait prose as well as headline and coaching", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const portrait = {
+      introduction: "They mastered async runtimes.",
+      chapters: [],
+      axes: [],
+    }
+    const result = scoreProfile(
+      { ...sample, portrait },
+      {
+        ...rubric,
+        requiredConcepts: [],
+        forbiddenPatterns: ["mastered async runtimes"],
+      },
+    )
+    expect(result.failures).toContain("Forbidden inference: mastered async runtimes")
+  }),
+)
+
+it.effect("exports source-bounded support and leaves semantic review explicitly pending", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const profile = {
+      ...sample,
+      traits: [
+        {
+          ...sample.traits[0]!,
+          evidence: [{ promptId: "a", quote: "Plan this migration." }],
+        },
+      ],
+    }
+    const result = scoreProfile(profile, rubric, [
+      { id: "a", session: "one", text: "Plan this migration." },
+      { id: "b", session: "two", text: "Implement directly." },
+    ])
+    expect(result.claimSupport).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: "traits[0]",
+          quoteValidity: { kept: 1, dropped: 0 },
+          selectedEvidence: { prompts: 1, sessions: 1 },
+          availableSource: { prompts: 2, sessions: 2 },
+          manualReview: {
+            semanticSupport: "unreviewed",
+            specificity: "unreviewed",
+            contradictions: "unreviewed",
+            uncertainty: "unreviewed",
+          },
+        }),
+        expect.objectContaining({
+          path: "headline",
+          selectedEvidence: { prompts: 0, sessions: 0 },
+        }),
+      ]),
+    )
+    expect(scoreProfile(profile, rubric).claimSupport).toBeNull()
+  }),
+)
+
+it.effect("preserves authored bilingual claim strength through the translation boundary", () =>
+  Effect.gen(function* () {
+    const { addTranslations, translationInput } = yield* Effect.promise(
+      () => import("../../src/analysis/translate.ts"),
+    )
+    const { makeFakeLlmRunner } = yield* Effect.promise(() => import("../../src/llm/fake.ts"))
+    const { LlmRunner } = yield* Effect.promise(() => import("../../src/llm/LlmRunner.ts"))
+    const { Progress, silentProgress } = yield* Effect.promise(
+      () => import("../../src/analysis/progress.ts"),
+    )
+    const { default: cases } = yield* Effect.promise(
+      () => import("../eval/claim-support/cases.json"),
+    )
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    for (const item of cases) {
+      const profile = { ...sample, headline: item.after }
+      const fake = makeFakeLlmRunner({
+        respond: () => ({ ...translationInput(profile), headline: item.afterZhTW }),
+      })
+      const result = yield* addTranslations(profile, ["en", "zh-TW"]).pipe(
+        Effect.provideService(LlmRunner, fake),
+        Effect.provideService(Progress, silentProgress),
+      )
+      expect(result.translations["zh-TW"]?.headline).toBe(item.afterZhTW)
+      expect(result.headline).toBe(item.after)
+      expect(result.traits).toEqual(profile.traits)
+      expect(fake.log[0]?.prompt).toContain(item.after)
+    }
+  }),
+)

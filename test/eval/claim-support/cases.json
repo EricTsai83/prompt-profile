@@ -1,0 +1,177 @@
+[
+  {
+    "id": "irrelevant-quote",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "Explain why the alert threshold is 40."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "Explain why the alert threshold is 40."
+      }
+    ],
+    "before": "They require approval before code changes.",
+    "after": "In this prompt they ask for the threshold rationale.",
+    "review": {
+      "dimension": "semantic-support",
+      "reason": "The quote requests an explanation, not an approval gate.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "在這則提示中，他們請 AI 說明門檻值的理由。"
+  },
+  {
+    "id": "same-session-repetition",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "Run the rollback test again."
+      },
+      {
+        "id": "a2",
+        "session": "one",
+        "text": "Run the rollback test once more."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "Run the rollback test again."
+      },
+      {
+        "promptId": "a2",
+        "quote": "Run the rollback test once more."
+      }
+    ],
+    "before": "They routinely require rollback tests across projects.",
+    "after": "They requested a rollback test repeatedly in one session.",
+    "review": {
+      "dimension": "session-spread",
+      "reason": "Repetition in one conversation does not establish cross-session recurrence.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "他們在同一段對話中，多次要求進行回滾測試。"
+  },
+  {
+    "id": "single-event-habit",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "The static export failed; fix this build."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "The static export failed; fix this build."
+      }
+    ],
+    "before": "Their static exports keep breaking builds.",
+    "after": "They requested a fix for one failed static export.",
+    "review": {
+      "dimension": "uncertainty",
+      "reason": "One event cannot establish a recurring failure.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "他們請 AI 修正一次失敗的靜態匯出。"
+  },
+  {
+    "id": "request-as-achievement",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "Compare async runtimes and quiz me on dispatch."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "Compare async runtimes and quiz me on dispatch."
+      }
+    ],
+    "before": "They mastered async runtimes and passed a dispatch quiz.",
+    "after": "They requested a runtime comparison and a dispatch quiz.",
+    "review": {
+      "dimension": "semantic-support",
+      "reason": "A request contains no evidence of completion or understanding.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "他們請 AI 比較執行環境，並提供一份測驗。"
+  },
+  {
+    "id": "missing-counterexample",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "Plan the migration before editing."
+      },
+      {
+        "id": "a2",
+        "session": "two",
+        "text": "Implement this small fix directly; no plan needed."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "Plan the migration before editing."
+      }
+    ],
+    "before": "They always plan before implementation.",
+    "after": "They requested a plan for a migration but direct implementation for a small fix.",
+    "review": {
+      "dimension": "contradictions",
+      "reason": "The second session contradicts the universal claim.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "他們要求遷移作業先規劃，但要求直接實作小修正。"
+  },
+  {
+    "id": "context-dependent",
+    "prompts": [
+      {
+        "id": "a1",
+        "session": "one",
+        "text": "For the payment migration, wait for approval at each step."
+      },
+      {
+        "id": "a2",
+        "session": "two",
+        "text": "For this disposable prototype, choose the approach and finish it."
+      }
+    ],
+    "evidence": [
+      {
+        "promptId": "a1",
+        "quote": "For the payment migration, wait for approval at each step."
+      }
+    ],
+    "before": "They prefer personal control in all work.",
+    "after": "They requested stepwise approval for payments and delegated the disposable prototype.",
+    "review": {
+      "dimension": "specificity",
+      "reason": "Control differs by task stakes; preserve both contexts.",
+      "baseline": "unsupported",
+      "revision": "bounded-to-source"
+    },
+    "expectedSelectedSessions": 1,
+    "afterZhTW": "他們要求付款遷移逐步確認，並將可拋棄的原型交由 AI 自行處理。"
+  }
+]

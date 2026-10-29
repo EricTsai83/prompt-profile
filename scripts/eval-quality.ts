@@ -21,7 +21,11 @@ export interface QualityRubric {
 /** Universal quantifiers that a handful of prompts rarely supports ("every change", "never"). */
 const UNIVERSAL = /\b(?:every|always|never|all of your|none of your|each of your)\b/gi
 
-export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
+export const scoreProfile = (
+  profile: Profile,
+  rubric: QualityRubric,
+  sources?: ReadonlyArray<{ readonly id: string; readonly session: string; readonly text: string }>,
+) => {
   // Inspect generated claims, not copied quotes or statistics.
   const claims = [
     profile.headline,
@@ -30,6 +34,13 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     ...profile.traits.flatMap((t) => [t.name, t.description]),
     ...profile.dimensions.flatMap((d) => [d.title, d.summary]),
     ...profile.funFacts,
+    ...(profile.portrait
+      ? [
+          profile.portrait.introduction,
+          ...profile.portrait.chapters.flatMap((chapter) => [chapter.title, chapter.body]),
+          ...profile.portrait.axes.map((axis) => axis.explanation),
+        ]
+      : []),
     ...profile.improvements.flatMap((i) => [i.title, i.pattern, i.impact, i.suggestion]),
   ].join("\n")
   const failures: Array<string> = []
@@ -61,6 +72,36 @@ export const scoreProfile = (profile: Profile, rubric: QualityRubric) => {
     evidenceRetention,
     emptyDimensions,
     overgeneralisations,
+    // No source slice means no inferred spread, rather than treating each quote as a session.
+    claimSupport:
+      sources === undefined
+        ? null
+        : [
+            { path: "headline", evidence: [] },
+            { path: "archetype", evidence: [] },
+            ...profile.traits.map((item, i) => ({ path: `traits[${i}]`, evidence: item.evidence })),
+            ...profile.dimensions.map((item, i) => ({
+              path: `dimensions[${i}]`,
+              evidence: item.evidence,
+            })),
+            ...profile.improvements.map((item, i) => ({
+              path: `improvements[${i}]`,
+              evidence: item.evidence,
+            })),
+            ...(profile.portrait
+              ? [
+                  { path: "portrait.introduction", evidence: [] },
+                  ...profile.portrait.chapters.map((item, i) => ({
+                    path: `portrait.chapters[${i}]`,
+                    evidence: item.evidence,
+                  })),
+                  ...profile.portrait.axes.flatMap((item, i) => [
+                    { path: `portrait.axes[${i}]`, evidence: item.evidence },
+                    { path: `portrait.axes[${i}].counterEvidence`, evidence: item.counterEvidence },
+                  ]),
+                ]
+              : []),
+          ].map(({ path, evidence }) => ({ path, ...inspectClaimSupport(evidence, sources) })),
   }
 }
 
