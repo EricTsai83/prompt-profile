@@ -1,6 +1,6 @@
 # Factual and identity report experience
 
-Status: HTML composition and supported PNG observation selection implemented; visual and reader validation pending
+Status: Implementation complete; final PNG owner review pending (reader research remains in plan 32)
 
 ## Outcome
 
@@ -26,13 +26,13 @@ Reader research belongs to plan 32; no completed human study is claimed.
 ## Acceptance
 
 - [x] Write a content contract in docs/ux/: identity leads with a supported introduction and two or three distinctive behaviors when available; factual content exposes evidence, coverage, exceptions and unknowns.
-- [ ] Keep detailed usage/plan/list-price information in the factual HTML view; allow selected usage and clearly labeled API list-price estimates on PNG per the owner review below. Activity graphics earn prominence through a useful supported question rather than occupying the hero by default.
-- [ ] Remove redundant repetition across portrait, traits and dimensions without discarding accessible supporting or contrary evidence.
+- [x] Keep detailed usage/plan/list-price information in the factual HTML view; allow selected usage and clearly labeled API list-price estimates on PNG per the owner review below. Activity graphics earn prominence through a useful supported question rather than occupying the hero by default.
+- [x] Remove redundant repetition across portrait, traits and dimensions without discarding accessible supporting or contrary evidence.
 - [x] Use current verified fields immediately; label missing episode/signature inputs as dependencies on plan 20 B/C, never synthesize them in render.
-- [ ] Provide intentional sparse/mixed/legacy and heavily excluded compositions; no forced complete role, measured personality strength or inferred outcome.
-- [ ] Keep report-language and purpose/view selection independent, keyboard accessible and offline; printing includes the intended factual and identity content.
-- [ ] Keep the PNG a legible introduction rather than a miniature dashboard; preserve quote-free cards, project exclusions and long bilingual text handling.
-- [ ] Prove rerendering compatible profiles adds zero analysis calls and does not rewrite stored prose; record which changes require future analysis.
+- [x] Provide intentional sparse/mixed/legacy and heavily excluded compositions; no forced complete role, measured personality strength or inferred outcome.
+- [x] Keep report-language and purpose/view selection independent, keyboard accessible and offline; printing includes the intended factual and identity content.
+- [x] Keep the PNG a legible introduction rather than a miniature dashboard; preserve quote-free cards, project exclusions and long bilingual text handling.
+- [x] Prove rerendering compatible profiles adds zero analysis calls and does not rewrite stored prose; record which changes require future analysis.
 - [ ] Inspect full desktop/mobile, light/dark, English/Traditional Chinese, print and PNG artifacts; attach findings to the durable design records rather than infer visual approval from tests.
 
 ## Implementation and verification
@@ -81,3 +81,22 @@ preferable to an unexplained shell command. Review the hierarchy, copy and small
 of the entire card rather than merely adding more numbers. The next PNG review should show a
 clear introduction, a small selection of interesting measured facts, a labeled price estimate
 and understandable attribution. Character integration can follow plan 20 D; it is not a blocker.
+
+### Final implementation checkpoint
+
+The owner accepted the content and purpose-switching round, then requested centered navigation.
+Navigation is centered at desktop and mobile widths. Story headings now share the section edge;
+only the prose retains the reading measure. The broader content repetition review is complete:
+document looks omit duplicate featured descriptions; source evidence remains available in facts,
+and stored generated prose is not rewritten. No new analysis call is needed.
+
+PNG now includes up to two supported behavior names, prompt/conversation counts, tokens and API
+estimates. It distinguishes unmeasured, unpriced, partially priced and incomplete logs. Usage and
+prompt periods are separate; exclusions and hidden stats affect both labels and periods. The
+unexplained command footer is replaced with localized product attribution. Character art remains
+in plan 20 D. Production Profile, analysis and pipeline contracts are unchanged.
+
+Technical validation and agent visual inspection are recorded in the
+[durable purpose contract](../docs/ux/report-redesign/purpose-contract.md). The remaining open
+review is the owner's revised PNG review; do not interpret automated checks as that approval.
+Real participant sessions remain entirely owned by plan 32 and do not block this feature closeout.

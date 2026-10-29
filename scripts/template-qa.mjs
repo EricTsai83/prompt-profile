@@ -107,6 +107,22 @@ for (const look of LOOKS)
           await page.locator(`label[for="lang-${lang}"]`).first().click()
           const check = await page.evaluate(
             ({ view: selectedView, lang: selectedLang }) => ({
+              hero: document.querySelector(".hero").getClientRects().length > 0,
+              centered: (() => {
+                const nav = document.querySelector(".view-nav").getBoundingClientRect()
+                const pageRect = document.querySelector(".page").getBoundingClientRect()
+                return Math.abs(nav.x + nav.width / 2 - pageRect.x - pageRect.width / 2) < 1
+              })(),
+              storyAligned: (() => {
+                if (selectedView !== "overview") return true
+                const story = document.querySelector(".portrait h2")
+                const heading = document.querySelector(".identity-moves h2")
+                return (
+                  !story ||
+                  !heading ||
+                  Math.abs(story.getBoundingClientRect().x - heading.getBoundingClientRect().x) < 1
+                )
+              })(),
               overflow: document.documentElement.scrollWidth > innerWidth,
               view: document.querySelector(`#report-${selectedView}`).checked,
               lang: document.querySelector(`#lang-${selectedLang}`).checked,
@@ -115,7 +131,15 @@ for (const look of LOOKS)
             }),
             { view, lang },
           )
-          if (check.overflow || !check.view || !check.lang || check.collapsed)
+          if (
+            check.overflow ||
+            !check.view ||
+            !check.lang ||
+            check.collapsed ||
+            !check.centered ||
+            !check.storyAligned ||
+            check.hero !== (view === "overview")
+          )
             errors.push(JSON.stringify(check))
           if (width !== 390 && lang === "en")
             errors.push(...(await axeViolations(page)).map((e) => `${view}: ${e}`))

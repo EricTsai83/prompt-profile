@@ -23,7 +23,9 @@ html:root .overview-bars{margin-top:var(--space-4);gap:var(--space-3)}
 html:root .overview-charts .note,html:root .preference-map>.note{margin-top:var(--space-3)}
 html:root .preference-map{margin:var(--space-8) 0}
 html:root .preference-rows{gap:var(--space-6) var(--space-8);margin-top:var(--space-6)}
-html:root .portrait{max-width:var(--reading);margin:var(--space-8) auto var(--space-12)}
+html:root .portrait{max-width:none;margin:var(--space-8) 0 var(--space-12)}
+html:root .portrait-intro,html:root .portrait-chapter{max-width:var(--reading)}
+html:root[data-story-width=reading] .portrait-intro,html:root[data-story-width=reading] .portrait-chapter{max-width:var(--column)}
 html:root .portrait h2{margin-top:0}
 html:root .portrait-intro{margin-top:var(--space-4);line-height:1.65}
 html:root .portrait-chapter{margin-top:var(--space-8)}

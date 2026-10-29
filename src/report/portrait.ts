@@ -74,7 +74,8 @@ export const preferenceEvidence = (
 }
 
 export const portraitStyle = `
-.portrait{max-width:740px;margin:48px auto 64px}
+.portrait{margin:48px 0 64px}
+.portrait-intro,.portrait-chapter{max-width:740px}
 .portrait h2{font-size:clamp(var(--text-xl),4vw,var(--text-2xl));letter-spacing:-.03em}
 .portrait-intro{font-size:var(--text-xl);line-height:1.85;margin-top:24px}
 .portrait-chapter{margin-top:36px}

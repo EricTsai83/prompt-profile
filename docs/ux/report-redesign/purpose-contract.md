@@ -33,7 +33,7 @@ Episodes and contextual signature moves require plan 20 B/C. No renderer synthes
 chronology, outcomes or new roles. Richer evidence and better generated wording require future
 analysis; composition and card selection apply by rerendering compatible stored profiles.
 Profile, analysis and pipeline versions do not change for this integration. Look versions advance
-to Classic 9 and other looks 15 after the navigation and PNG integration.
+to Classic 10 and other looks 16 after the navigation and PNG integration.
 
 ## Offline reading and exports
 
@@ -56,8 +56,8 @@ suites cover language/view independence, exclusions, legacy/sparse content and r
 No LLM call or stored prose change is introduced by card selection.
 
 This change does not claim a completed reader study or exhaustive visual approval. Earlier HTML
-capture findings remain in output-roles.md. Fresh full-page, mobile, bilingual, light/dark, print
-and PNG inspection and unfamiliar-reader sessions remain outstanding acceptance work for plan 25.
+capture findings remain in output-roles.md. The final inspection record below supersedes the earlier outstanding visual work. Unfamiliar-reader
+sessions remain in plan 32; revised PNG owner approval is not yet recorded.
 
 ## Owner review amendment — PNG direction
 
@@ -81,3 +81,38 @@ reasoning counted once, partial/unknown/unmeasured states, distinct periods and 
 All-look card tests cover usage exclusions, hidden stats, attribution and unchanged stored prose.
 The existing CLI render variant test verifies zero fake runners and preserves the original
 artifacts; the report module does not import analysis or an LLM implementation.
+
+## Final layout and inspection record
+
+Story sections now share the report section edge. Body text retains a reading measure; Folio
+keeps its narrower narrative measure. This resolves the owner's observation that the whole story
+block appeared inset. A browser check failed before the cascade fix (185px inset at desktop),
+then passed for all seven looks. The shared document-layout rules needed the change as well as
+the story stylesheet. Purpose navigation is centered, superseding the earlier right-aligned design.
+
+Local fictional artifacts were rendered for seven looks, two languages and five cases: standard,
+legacy without usage/portrait, unclear preferences, long text with personal/usage exclusions,
+and limited evidence. All 70 PNGs were inspected in seven contact sheets; representative cards
+were also opened at native resolution. Long titles/headlines stay within their bounds; unsupported
+traits disappear for limited evidence; legacy cards show unmeasured usage rather than zero. The
+inspection found an English title splitting a word; normal word wrapping replaced break-all.
+The footnotes are supporting detail and are small at phone-sized thumbnails; the title and metric
+values remain primary. Character art and a full export selection workflow remain in plans 20 D/29.
+
+Full-page HTML captures cover both purposes, English/Traditional Chinese, desktop/mobile and
+light/dark. Manual inspection included the complete Classic desktop identity view, Classic mobile
+identity/facts and the story section, plus print-media output at the transition into facts. The
+fictional portrait narrative was kept in English in the bilingual layout fixture; Chinese fixed
+copy and the existing translated profile/card fields were exercised, including long Chinese text.
+This is layout inspection, not a new translation-quality study or owner aesthetic approval.
+Local artifacts are under `tmp/purpose-review/`; personal histories and real LLMs were not used.
+
+The existing offline browser QA suite exercises all looks and edge variants, with additional
+checks for centered controls, purpose-specific hero visibility and aligned story headings. Its
+style reference is updated for intentionally hidden heroes and the story layout. Print keeps both
+views, language/view controls remain independent, and no outside requests are allowed. The CLI
+render test records zero LLM runner creation; card tests prove source Profile immutability.
+
+Repository gates passed with 59 test files and 644 tests. Final owner review is limited to the
+revised PNG and any newly noticed presentation issue. Content and purpose interaction approval
+are already recorded in output-roles.md; no unfamiliar-reader study is claimed.

@@ -94,7 +94,7 @@ These version numbers are independent. Bump them whenever the corresponding thin
 | `Profile.schemaVersion` | `domain/Profile.ts` | 10 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | 11 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 9, others 15 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 10, others 16 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
@@ -112,7 +112,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 |---|---|---|---|---|
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 25 | [Factual and identity report experience](25-factual-and-identity-reports.md) | Purpose-based identity/factual reading and matching exports | Existing report; builds on closed plan 21 | HTML split and supported PNG observations implemented; visual/reader validation pending |
+| 25 | [Factual and identity report experience](25-factual-and-identity-reports.md) | Purpose-based identity/factual reading and matching exports | Existing report; builds on closed plan 21 | Implementation complete; final PNG owner review pending |
 | 26 | [Claim fidelity and analysis calibration](26-claim-fidelity-and-calibration.md) | Claim-support cases, calibration and evaluation | Plan 22 evaluation tools; episode cases extend after plan 20 B | Ready for fixtures and baseline; production rules follow findings |
 | 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements; plan 20 B enriches evidence later | Ready for contract and fixtures; implement after initial plan 26 findings |
 | 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Plan 26; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |

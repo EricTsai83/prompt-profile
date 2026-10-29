@@ -91,3 +91,10 @@ question, exhaustive visual validation or unfamiliar-reader research.
 The owner's subsequent screenshot request supersedes right alignment: view controls are now
 centered above the selected purpose. Mobile retains full-width touch targets. A browser position
 check failed before the CSS change (367px off center at 1280px).
+
+### Story alignment and export integration
+
+Story headings now align with the other report sections; only their prose retains a narrower
+measure. The PNG includes a compact measured usage summary and localized generator attribution,
+as requested in owner review. See purpose-contract.md for fields, fallbacks and inspection scope.
+The earlier statement that cards were unchanged is historical; revised PNG owner review is pending.
