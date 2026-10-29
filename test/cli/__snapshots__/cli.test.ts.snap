@@ -6,18 +6,26 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 ● Reading data
   Claude Code        9 prompts · 3 sessions
   Codex              7 prompts · 5 sessions
-● Cleaning and redacting
+● Cleaning and redacting (on this computer)
   Skipped 0 noisy prompts (-)
   Redacted 1 sensitive items (PATH 1)
-● Range: all time · 16 prompts → 2 chunks
-  Using Claude Code (logged in): base estimate 3 calls, billed to your subscription
-  Base estimate excludes intermediate merges and retries (up to 2 retries per call).
+● Range: all time · 2026-05-29 → 2026-09-05
+  In range: Claude Code 9 · Codex 7 prompts
+  16 prompts in 8 sessions after cleaning → 16 selected in 2 chunks
+  No sampling: every chunk is analysed
+  Read, cleaned and redacted on this computer; the report and analysis cache are written only here.
+● Sent off this computer: the selected, redacted prompts go through your logged-in Claude Code CLI (claude -p) to its model service
+  No API key: uses your subscription quota, base estimate 3 calls (2 chunks + 1 final profile)
+  Intermediate merges and retries (up to 2 per call) can add calls.
+  No hard limit: add --max-calls <n> to stop after n CLI calls.
+  Free first: --dry-run writes what would be sent without calling any LLM; \`prompt-profile stats\` shows statistics.
 
 ● Analysing ░░░░░░░░░░░░ 0/2 chunks
 ● Analysing ██████░░░░░░ 1/2 chunks
 ● Analysing ████████████ 2/2 chunks
 ● Writing the profile…
 ● Verifying evidence: kept 8 / 8
+● Writing report files…
 
 ✔ Done!
   Report <tmp>/out/report.html
@@ -36,14 +44,15 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --sin
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > login expired during analysis > stderr 1`] = `
 "
-✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again."
+✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again.
+To inspect for free without an LLM: \`prompt-profile --dry-run\` (what would be sent) or \`prompt-profile stats\`."
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > no LLM installed > stderr 1`] = `
 "
 ✖ prompt-profile needs Claude Code or Codex installed and logged in.
 Claude Code: https://claude.com/claude-code · Codex: https://github.com/openai/codex
-To see statistics without an LLM, run \`prompt-profile stats\`."
+To inspect for free without an LLM: \`prompt-profile --dry-run\` (what would be sent) or \`prompt-profile stats\`."
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > no data > stderr 1`] = `
@@ -58,7 +67,8 @@ If your data lives elsewhere, set CLAUDE_CONFIG_DIR or CODEX_HOME."
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > not logged in > stderr 1`] = `
 "
-✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again."
+✖ Claude Code (claude) is installed but not logged in. Run \`claude\` and use /login, then try again.
+To inspect for free without an LLM: \`prompt-profile --dry-run\` (what would be sent) or \`prompt-profile stats\`."
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > out of range > stderr 1`] = `
@@ -68,5 +78,9 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > out of ra
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > rate limited > stderr 1`] = `
 "
-✖ Hit your plan's rate limit. Finished chunks are cached; run again later to continue where it stopped."
+✖ Hit your plan's rate limit. Wait until it resets, then re-run.
+Chunk results finished before the stop are saved in the analysis cache. No report was written.
+A re-run with the cache reuses finished chunks and merges; the final profile step and translations always run again.
+Re-run:
+  prompt-profile --since all --yes"
 `;

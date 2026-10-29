@@ -90,3 +90,83 @@ export const parseAllow = (
     ? Effect.succeed([...new Set(parts)])
     : Effect.fail(new InvalidArgument({ flag: "--allow", value }))
 }
+
+/** The flags of a main-command run that a re-run must repeat (`--no-cache` never is). */
+export interface RunFlags {
+  /** How prompt-profile was started (`launcherOf`); default `prompt-profile`. */
+  readonly launcher?: string | undefined
+  readonly since: string
+  /** As typed: `claude` / `codex`. */
+  readonly engine?: string | undefined
+  readonly model?: string | undefined
+  readonly out: string
+  readonly full: boolean
+  readonly yes: boolean
+  readonly maxCalls?: string | undefined
+  readonly lang?: string | undefined
+  readonly look?: LookId | undefined
+  readonly cardHide?: string | undefined
+  readonly exclude?: string | undefined
+  readonly check?: string | undefined
+  readonly allow?: string | undefined
+}
+
+/**
+ * The command that starts this prompt-profile again: through npx (`npm exec` sets
+ * `npm_command=exec`) at the same version, so the cache stays compatible; otherwise the
+ * installed command.
+ */
+export const launcherOf = (
+  env: Readonly<Record<string, string | undefined>>,
+  version: string,
+): string => (env["npm_command"] === "exec" ? `npx prompt-profile@${version}` : "prompt-profile")
+
+/** A shell word: quoted only when it needs to be. */
+const shellWord = (value: string): string =>
+  /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", `'\\''`)}'`
+
+const flag = (name: string, value: string | undefined, skip?: string): Array<string> =>
+  value === undefined || value === skip ? [] : [name, shellWord(value)]
+
+/**
+ * The command that repeats a run with the cache read (plan 24): every choice that changes what
+ * is analysed or written, without `--no-cache`, `--dry-run` or `--verbose`.
+ */
+export const rerunCommand = (f: RunFlags): string =>
+  [
+    f.launcher ?? "prompt-profile",
+    ...flag("--since", f.since),
+    ...flag("--engine", f.engine),
+    ...flag("--model", f.model),
+    ...flag("--out", f.out, DEFAULT_OUT),
+    ...(f.full ? ["--full"] : []),
+    ...flag("--lang", f.lang),
+    ...flag("--look", f.look, "classic"),
+    ...flag("--card-hide", f.cardHide),
+    ...flag("--exclude", f.exclude),
+    ...flag("--check", f.check, "mask"),
+    ...flag("--allow", f.allow),
+    ...flag("--max-calls", f.maxCalls),
+    ...(f.yes ? ["--yes"] : []),
+  ].join(" ")
+
+/**
+ * `render` for a written profile with the same render choices and folder: re-creates the report
+ * and cards without analysis (e.g. a card whose font was unavailable).
+ */
+export const renderRetryCommand = (profileJson: string, outDir: string, f: RunFlags): string => {
+  const options = [
+    ...flag("--look", f.look, "classic"),
+    ...flag("--card-hide", f.cardHide),
+    ...flag("--exclude", f.exclude),
+    ...flag("--check", f.check, "mask"),
+    ...flag("--allow", f.allow),
+  ]
+  // Non-default render options would otherwise go to variants/<name>/.
+  return [
+    `${f.launcher ?? "prompt-profile"} render`,
+    shellWord(profileJson),
+    ...(options.length > 0 ? ["--out", shellWord(outDir)] : []),
+    ...options,
+  ].join(" ")
+}

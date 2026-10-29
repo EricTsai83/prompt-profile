@@ -13,13 +13,13 @@ import {
   verboseDetail,
   type AppError,
 } from "./render-error.ts"
-import { runMain } from "./commands/analyze.ts"
+import { runFlags, runMain, type MainOptions } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
 import { CHECK_MODES } from "../pipeline/audit.ts"
 import { LOOK_IDS } from "../report/looks.ts"
-import { DEFAULT_OUT } from "./options.ts"
+import { DEFAULT_OUT, launcherOf, rerunCommand } from "./options.ts"
 import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
 
@@ -73,9 +73,15 @@ const optional = <A>(o: Option.Option<A>): A | undefined => Option.getOrUndefine
 
 /**
  * Run a command body: render any AppError — or, for a bug (defect), a short message with
- * the stack only under --verbose — then fail with the right exit code.
+ * the stack only under --verbose — then fail with the right exit code. `rerun` builds the
+ * command that repeats an analysis with the cache (from how prompt-profile was started), for
+ * errors that can be recovered that way.
  */
-const handle = <R>(body: Effect.Effect<void, AppError, R>, flags: { readonly verbose: boolean }) =>
+const handle = <R>(
+  body: Effect.Effect<void, AppError, R>,
+  flags: { readonly verbose: boolean },
+  rerun?: (launcher: string) => string,
+) =>
   Effect.gen(function* () {
     const env = yield* Environment
     const output = makeOutput({ isTTY: env.isTTY, verbose: flags.verbose })
@@ -83,7 +89,7 @@ const handle = <R>(body: Effect.Effect<void, AppError, R>, flags: { readonly ver
       Effect.provideService(Output, output),
       Effect.catch((error: AppError) =>
         Effect.gen(function* () {
-          const { message, code } = renderError(error)
+          const { message, code } = renderError(error, rerun?.(launcherOf(env.env, VERSION)))
           yield* output.error(`\n✖ ${message}`)
           yield* output.debug(verboseDetail(error))
           return yield* new Exit({ code })
@@ -108,7 +114,11 @@ const withCache = <A, E, R>(eff: Effect.Effect<A, E, R>) =>
 
 const statsCommand = Command.make("stats", { since, out, verbose }, (f) =>
   handle(runStats({ since: f.since, out: f.out }), f),
-).pipe(Command.withDescription("Show statistics only (no LLM, free and fast); writes stats.json"))
+).pipe(
+  Command.withDescription(
+    "Show statistics only: no LLM call and nothing leaves this computer (free); writes stats.json",
+  ),
+)
 
 const renderCommand = Command.make(
   "render",
@@ -166,7 +176,9 @@ export const command = Command.make(
       Flag.optional,
     ),
     maxCalls: Flag.String("max-calls").pipe(
-      Flag.withDescription("Maximum LLM CLI calls, including retries (default: no explicit cap)"),
+      Flag.withDescription(
+        "Hard limit on LLM CLI calls, including merges and retries (default: none)",
+      ),
       Flag.optional,
     ),
     out,
@@ -186,43 +198,44 @@ export const command = Command.make(
     ),
     yes: Flag.Boolean("yes").pipe(
       Flag.withAlias("y"),
-      Flag.withDescription("Skip the confirmation step"),
+      Flag.withDescription("Skip the confirmation before calls that use your subscription quota"),
       Flag.withDefault(false),
     ),
     dryRun: Flag.Boolean("dry-run").pipe(
-      Flag.withDescription("Write what would be sent to the LLM into --out, without calling it"),
+      Flag.withDescription(
+        "Free preview: write what would be sent (redacted prompt text) into --out, call no LLM",
+      ),
       Flag.withDefault(false),
     ),
     verbose,
   },
-  (f) =>
-    handle(
-      withCache(
-        runMain({
-          since: f.since,
-          engine: ((e) => (e === undefined ? undefined : e === "claude" ? "claude-code" : "codex"))(
-            optional(f.engine),
-          ) as RunnerId | undefined,
-          model: optional(f.model),
-          maxCalls: optional(f.maxCalls),
-          out: f.out,
-          full: f.full,
-          cache: f.cache,
-          yes: f.yes,
-          dryRun: f.dryRun,
-          lang: optional(f.lang),
-          look: f.look,
-          cardHide: optional(f.cardHide),
-          exclude: optional(f.exclude),
-          check: f.check,
-          allow: optional(f.allow),
-        }),
-      ),
-      f,
-    ),
+  (f) => {
+    const options: MainOptions = {
+      since: f.since,
+      engine: ((e) => (e === undefined ? undefined : e === "claude" ? "claude-code" : "codex"))(
+        optional(f.engine),
+      ) as RunnerId | undefined,
+      model: optional(f.model),
+      maxCalls: optional(f.maxCalls),
+      out: f.out,
+      full: f.full,
+      cache: f.cache,
+      yes: f.yes,
+      dryRun: f.dryRun,
+      lang: optional(f.lang),
+      look: f.look,
+      cardHide: optional(f.cardHide),
+      exclude: optional(f.exclude),
+      check: f.check,
+      allow: optional(f.allow),
+    }
+    return handle(withCache(runMain(options)), f, (launcher) =>
+      rerunCommand({ ...runFlags(options), launcher }),
+    )
+  },
 ).pipe(
   Command.withDescription(
-    "Analyse your Claude Code / Codex prompts locally and generate a personal profile.",
+    "Read your Claude Code / Codex prompt history on this computer, redact it, and analyse it with your logged-in claude or codex CLI (uses your subscription quota, no API key; selected redacted prompts leave this computer). Writes a local report. Free first: --dry-run or `prompt-profile stats`.",
   ),
   Command.withSubcommands([statsCommand, renderCommand, cacheCommand]),
 )

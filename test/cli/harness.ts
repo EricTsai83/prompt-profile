@@ -1,12 +1,12 @@
 import { NodeServices } from "@effect/platform-node"
-import { Effect, Exit as EffectExit, Layer } from "effect"
+import { Effect, Exit as EffectExit, Layer, Option, Queue, Terminal, type Cause } from "effect"
 import { TestClock, TestConsole } from "effect/testing"
 import { mkdtempSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { runCli } from "../../src/cli/main.ts"
 import { FontSource, LlmProvider, Opener } from "../../src/cli/services.ts"
-import { embeddedFonts } from "../../src/report/fonts.ts"
+import { embeddedFonts, FontUnavailable } from "../../src/report/fonts.ts"
 import type { RunnerStatus } from "../../src/llm/detect.ts"
 import { makeFakeLlmRunner, type FakeLlmRunner, type FakeOptions } from "../../src/llm/fake.ts"
 import { Environment, type EnvironmentShape } from "../../src/platform/Environment.ts"
@@ -78,7 +78,32 @@ export interface HarnessOptions {
   readonly env?: Partial<EnvironmentShape>
   readonly statuses?: ReadonlyArray<RunnerStatus>
   readonly fake?: FakeOptions
+  /** The CJK card font cannot be loaded (e.g. its download failed). */
+  readonly cjkFontsFail?: boolean
+  /** Keys typed at a prompt (with `env.isTTY`); input ends after them. */
+  readonly keys?: ReadonlyArray<string>
 }
+
+/** A terminal that "types" `keys`, then ends its input. */
+const scriptedTerminal = (keys: ReadonlyArray<string>) =>
+  Terminal.make({
+    columns: Effect.succeed(80),
+    rows: Effect.succeed(24),
+    readInput: Effect.gen(function* () {
+      const queue = yield* Queue.unbounded<Terminal.UserInput, Cause.Done>()
+      yield* Queue.offerAll(
+        queue,
+        keys.map((k) => ({
+          input: Option.some(k),
+          key: { name: k, ctrl: false, meta: false, shift: false },
+        })),
+      )
+      yield* Queue.end(queue)
+      return queue
+    }),
+    readLine: Effect.succeed(""),
+    display: () => Effect.void,
+  })
 
 export const ok = (id: "claude-code" | "codex"): RunnerStatus => ({
   id,
@@ -110,7 +135,10 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     Layer.succeed(Environment, environment),
     // No download in tests: Inter stands in for the CJK font (missing glyphs render empty).
     Layer.succeed(FontSource, {
-      cjk: () => Effect.succeed(embeddedFonts().map((f) => ({ ...f, name: "Noto Sans TC" }))),
+      cjk: () =>
+        options.cjkFontsFail
+          ? Effect.fail(new FontUnavailable({ reason: "font download failed" }))
+          : Effect.succeed(embeddedFonts().map((f) => ({ ...f, name: "Noto Sans TC" }))),
     }),
     Layer.succeed(LlmProvider, {
       detect: Effect.succeed(options.statuses ?? [ok("claude-code"), ok("codex")]),
@@ -123,7 +151,11 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     }),
     Layer.succeed(Opener, { open: (f) => Effect.sync(() => (opened.push(f), true)) }),
     TestConsole.layer,
-  ).pipe(Layer.provideMerge(NodeServices.layer))
+  ).pipe(Layer.provideMerge(NodeServices.layer), (services) =>
+    options.keys
+      ? Layer.merge(services, Layer.succeed(Terminal.Terminal, scriptedTerminal(options.keys)))
+      : services,
+  )
 
   /** Run the CLI; returns exit code and captured output. */
   const run = (args: ReadonlyArray<string>) =>

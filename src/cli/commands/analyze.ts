@@ -1,21 +1,31 @@
-import { Effect, Path } from "effect"
+import { DateTime, Effect, Path } from "effect"
 import { Prompt } from "effect/cli"
 import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../analysis/index.ts"
 import { Progress, type ProgressShape } from "../../analysis/progress.ts"
 import { chooseRunner } from "../../llm/detect.ts"
-import { LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
+import { DISPLAY_NAMES, LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
 import { withCallBudget } from "../../llm/budget.ts"
 import { withRetry } from "../../llm/retry.ts"
 import { Environment } from "../../platform/Environment.ts"
 import type { CheckMode } from "../../pipeline/audit.ts"
 import type { LookId } from "../../report/looks.ts"
+import type { SafePrompt } from "../../domain/SafePrompt.ts"
+import type { Stats } from "../../domain/Stats.ts"
 import { VERSION } from "../../version.ts"
 import { summarizeUsage, type SourceUsageInput } from "../../pipeline/usage.ts"
 import type { RunnerStatus } from "../../llm/detect.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, summaryLines, type Messages } from "../messages.ts"
-import { reportContents } from "../../report/index.ts"
-import { parseAllow, parseLanguages, parseRenderOptions } from "../options.ts"
+import { isLimitedEvidence, reportContents } from "../../report/index.ts"
+import {
+  parseAllow,
+  parseLanguages,
+  launcherOf,
+  parseRenderOptions,
+  renderRetryCommand,
+  rerunCommand,
+  type RunFlags,
+} from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
 import {
   previousSnapshot,
@@ -28,7 +38,7 @@ import {
 
 /** The main command: read → pipeline → (confirm) → analyse → report. */
 
-export interface MainOptions {
+export interface MainOptions extends Omit<RunFlags, "engine"> {
   readonly maxCalls?: string | undefined
   readonly since: string
   readonly engine: RunnerId | undefined
@@ -64,7 +74,8 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
       sampled: p.sampled,
       cacheHits: p.cacheHits,
       llmCalls: p.llmCalls,
-      llmCallsEstimate: "Map + final reduce only; merges and retries are additional.",
+      llmCallsEstimate:
+        "Uncached chunks + final profile + translations; intermediate merges and retries are additional.",
       charsToSend: p.charsToSend,
       promptsAnalyzed: p.promptsAnalyzed,
       sessionsAnalyzed: p.sessionsAnalyzed,
@@ -110,10 +121,86 @@ const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressSha
     onReduceStart: out.line(t.reducing),
     onReduceDone: (ms) => out.debug(t.chunkTiming(total, ms)),
     onVerified: (kept, dropped) => out.line(t.verified(kept, kept + dropped)),
+    onTranslateStart: (language) => out.line(t.translating(language)),
     onTranslated: (language, ok) =>
       out.line(ok ? t.translated(language) : t.translationFailed(language)),
   }
 }
+
+/** `--engine` as typed (`claude` / `codex`), for commands shown to the user. */
+const engineFlag = (id: RunnerId | undefined) =>
+  id === undefined ? undefined : id === "claude-code" ? "claude" : "codex"
+
+/** The flags a re-run must repeat, as the user typed them. */
+export const runFlags = (options: MainOptions): RunFlags => ({
+  ...options,
+  engine: engineFlag(options.engine),
+})
+
+const RUNNER_COMMANDS: Record<RunnerId, string> = {
+  "claude-code": "claude -p",
+  codex: "codex exec",
+}
+
+/** YYYY-MM-DD in the user's time zone. */
+const localDate = (d: DateTime.Utc, timeZone: string) =>
+  DateTime.formatIsoDate(DateTime.makeZonedUnsafe(d, { timeZone }))
+
+/**
+ * What a run will read, select, send and cost — before confirmation, and for --dry-run. Uses
+ * the collected stats and the analysis plan; nothing here calls an LLM.
+ */
+const preflight = (input: {
+  readonly since: string
+  readonly prompts: ReadonlyArray<SafePrompt>
+  readonly stats: Stats
+  readonly plan: AnalysisPlan
+  /** The engine a real run would use; null when no logged-in CLI was found. */
+  readonly runner: RunnerId | null
+  readonly maxCalls: number | null
+  readonly dryRun: boolean
+}) =>
+  Effect.gen(function* () {
+    const t = messages
+    const out = yield* Output
+    const env = yield* Environment
+    const { plan: p, stats } = input
+    const range = stats.dateRange
+    yield* out.line(
+      t.range(
+        t.sinceLabel(input.since),
+        range === null ? null : localDate(range.from, env.timezone),
+        range === null ? null : localDate(range.to, env.timezone),
+      ),
+    )
+    yield* out.line(
+      t.inRange(
+        Object.entries(stats.bySource)
+          .filter(([, k]) => k > 0)
+          .map(([id, k]) => [DISPLAY_NAMES[id as RunnerId] ?? id, k] as const),
+      ),
+    )
+    yield* out.line(
+      t.selection(
+        input.prompts.length,
+        new Set(input.prompts.map((x) => `${x.source}:${x.sessionId}`)).size,
+        p.promptsAnalyzed,
+        p.chunks.length,
+      ),
+    )
+    yield* out.line(p.sampled ? t.sampledNote(p.chunks.length, p.chunksTotal) : t.notSampled)
+    yield* out.line(t.localLine)
+    yield* out.line(
+      input.runner === null
+        ? t.noRunnerLine
+        : t.remoteLine(DISPLAY_NAMES[input.runner], RUNNER_COMMANDS[input.runner], input.dryRun),
+    )
+    yield* out.line(t.quotaLine(p.llmCalls, p.mapCalls, p.cacheHits, p.translationCalls))
+    yield* out.line(t.callEstimateNote)
+    yield* out.line(input.maxCalls === null ? t.noCallBudget : t.callBudget(input.maxCalls))
+    if (!input.dryRun) yield* out.line(t.freeRoute)
+    yield* out.line("")
+  })
 
 export const runMain = (options: MainOptions) =>
   Effect.gen(function* () {
@@ -133,6 +220,8 @@ export const runMain = (options: MainOptions) =>
     const allow = yield* parseAllow(options.allow)
     const env = yield* Environment
     const languages = yield* parseLanguages(options.lang, env.locale)
+    // The flags a re-run repeats, started the way this run was.
+    const flags: RunFlags = { ...runFlags(options), launcher: launcherOf(env.env, VERSION) }
     const out = yield* Output
     const outDir = yield* resolveOut(options.out)
     yield* out.line(t.header(VERSION))
@@ -154,10 +243,23 @@ export const runMain = (options: MainOptions) =>
       // Estimate with the engine a real run would pick (detection sends no prompt): cache
       // keys depend on it. Without a usable CLI, fall back so a dry run still works.
       const runnerId = yield* chooseRunner(yield* provider.detect, options.engine ?? null).pipe(
-        Effect.map((s) => s.id),
-        Effect.orElseSucceed(() => options.engine ?? "claude-code"),
+        Effect.map((s): RunnerId | null => s.id),
+        Effect.orElseSucceed(() => null),
       )
-      const p = yield* plan({ prompts, options: analyzeOptions, runner: runnerId })
+      const p = yield* plan({
+        prompts,
+        options: analyzeOptions,
+        runner: runnerId ?? options.engine ?? "claude-code",
+      })
+      yield* preflight({
+        since: options.since,
+        prompts,
+        stats,
+        plan: p,
+        runner: runnerId,
+        maxCalls,
+        dryRun: true,
+      })
       yield* writeDryRun(p, outDir)
       yield* out.line(t.dryRun(outDir, p.chunks.length, p.charsToSend))
       return
@@ -170,12 +272,15 @@ export const runMain = (options: MainOptions) =>
     const runner = withRetry(maxCalls === null ? base : withCallBudget(base, maxCalls))
 
     const p = yield* plan({ prompts, options: analyzeOptions, runner: runner.id })
-    yield* out.line(t.range(t.sinceLabel(options.since), p.promptsAnalyzed, p.chunks.length))
-    if (p.sampled) yield* out.line(t.sampledNote(p.chunks.length, p.chunksTotal))
-    yield* out.line(t.engineLine(runner.displayName, p.llmCalls, p.cacheHits))
-    yield* out.line(t.callEstimateNote)
-    if (maxCalls !== null) yield* out.line(t.callBudget(maxCalls))
-    yield* out.line("")
+    yield* preflight({
+      since: options.since,
+      prompts,
+      stats,
+      plan: p,
+      runner: runner.id,
+      maxCalls,
+      dryRun: false,
+    })
 
     if (!options.yes) {
       if (!env.isTTY) return yield* new NeedsConfirmation()
@@ -192,13 +297,14 @@ export const runMain = (options: MainOptions) =>
     const profile = yield* analyze({ prompts, stats, options: analyzeOptions }).pipe(
       Effect.provideService(LlmRunner, runner),
       Effect.provideService(Progress, makeProgress(out, t, p.chunks.length)),
-      Effect.onInterrupt(() => out.error(`\n${t.interrupted}`)),
+      Effect.onInterrupt(() => out.error(`\n${t.interrupted(rerunCommand(flags))}`)),
     )
 
     // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
     const usage = summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
     // The report in this folder before this run, if any: "since your last report".
     const previous = yield* previousSnapshot(outDir)
+    yield* out.line(t.writing)
     const files = yield* writeReportFiles(
       { ...profile, previous, usage },
       outDir,
@@ -217,6 +323,8 @@ export const runMain = (options: MainOptions) =>
       yield* out.line(
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
+    if (files.cards.some((c) => c.file === null))
+      yield* out.line(t.cardRetry(renderRetryCommand(files.profileJson, outDir, flags)))
     yield* out.line(t.dataLine(files.profileJson))
     for (const line of summaryLines(
       reportContents(files.profile, renderOptions),
@@ -226,4 +334,8 @@ export const runMain = (options: MainOptions) =>
       yield* out.line(line)
     if (profile.coverage.chunksFailed > 0)
       yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))
+    if (isLimitedEvidence(profile)) yield* out.line(t.limitedEvidence)
+    const missing = languages.filter((l) => !profile.languages.includes(l))
+    if (missing.length > 0)
+      yield* out.line(t.missingLanguages(missing.join(", "), rerunCommand(flags)))
   })

@@ -30,23 +30,42 @@ export const messages = {
   reading: "● Reading data",
   sourceLine: (name: string, prompts: number, sessions: number) =>
     `  ${name.padEnd(12)} ${n(prompts).padStart(7)} prompts · ${n(sessions)} sessions`,
-  cleaning: "● Cleaning and redacting",
+  cleaning: "● Cleaning and redacting (on this computer)",
   excludedLine: (count: number, rules: string) => `  Skipped ${n(count)} noisy prompts (${rules})`,
   redactedLine: (count: number, detail: string) =>
     count === 0
       ? "  No supported redaction pattern matched"
       : `  Redacted ${n(count)} sensitive items (${detail})`,
-  range: (since: string, prompts: number, chunks: number) =>
-    `● Range: ${since} · ${n(prompts)} prompts → ${chunks} chunks`,
+  // ---- preflight: shown before confirmation and by --dry-run (plan 24) ----
+  range: (since: string, from: string | null, to: string | null) =>
+    `● Range: ${since}${from !== null && to !== null ? ` · ${from} → ${to}` : ""}`,
+  inRange: (sources: ReadonlyArray<readonly [string, number]>) =>
+    `  In range: ${sources.map(([name, k]) => `${name} ${n(k)}`).join(" · ")} prompts`,
+  selection: (cleaned: number, sessions: number, selected: number, chunks: number) =>
+    `  ${count(cleaned, "prompt", "prompts")} in ${count(sessions, "session", "sessions")} after cleaning → ${n(selected)} selected in ${count(chunks, "chunk", "chunks")}`,
   sampledNote: (selected: number, total: number) =>
     `  Large history: sampling ${selected} / ${total} chunks (--full analyses everything)`,
-  engineLine: (name: string, calls: number, hits: number) =>
-    `  Using ${name} (logged in): base estimate ${calls} call${calls === 1 ? "" : "s"}${hits > 0 ? ` (${hits} chunks cached)` : ""}, billed to your subscription`,
-  callEstimateNote:
-    "  Base estimate excludes intermediate merges and retries (up to 2 retries per call).",
-  callBudget: (limit: number) => `  Call budget: at most ${limit} CLI calls, including retries`,
+  notSampled: "  No sampling: every chunk is analysed",
+  localLine:
+    "  Read, cleaned and redacted on this computer; the report and analysis cache are written only here.",
+  remoteLine: (name: string, command: string, dryRun: boolean) =>
+    `● ${dryRun ? "A real run sends off this computer" : "Sent off this computer"}: the selected, redacted prompts go through your logged-in ${name} CLI (${command}) to its model service`,
+  noRunnerLine:
+    "● No logged-in Claude Code or Codex found: a real run needs one (the dry run does not)",
+  quotaLine: (calls: number, map: number, cached: number, translations: number) =>
+    `  No API key: uses your subscription quota, base estimate ${count(calls, "call", "calls")} (${[
+      `${count(map, "chunk", "chunks")}${cached > 0 ? `, ${n(cached)} more cached` : ""}`,
+      "1 final profile",
+      ...(translations > 0 ? [count(translations, "translation", "translations")] : []),
+    ].join(" + ")})`,
+  callEstimateNote: "  Intermediate merges and retries (up to 2 per call) can add calls.",
+  callBudget: (limit: number) => `  Hard limit: at most ${limit} CLI calls, including retries`,
+  noCallBudget: "  No hard limit: add --max-calls <n> to stop after n CLI calls.",
+  freeRoute:
+    "  Free first: --dry-run writes what would be sent without calling any LLM; `prompt-profile stats` shows statistics.",
   confirm: "Continue?",
-  cancelled: "Cancelled. No LLM was called.",
+  cancelled: "Cancelled. No LLM was called and nothing was sent.",
+  // ---- progress: phases only, never a time estimate ----
   analysing: (done: number, total: number, cached: number) =>
     `● Analysing ${bar(done, total)} ${done}/${total} chunks${cached > 0 ? ` (${cached} from cache)` : ""}`,
   chunkTiming: (index: number, ms: number) =>
@@ -54,15 +73,18 @@ export const messages = {
   merging: (groups: number) => `● Many observations: merging in ${groups} groups first…`,
   reducing: "● Writing the profile…",
   verified: (kept: number, total: number) => `● Verifying evidence: kept ${kept} / ${total}`,
-  translated: (language: string) => `● Translated into ${language}`,
+  translating: (language: string) => `● Translating into ${language}…`,
+  translated: (language: string) => `  Translated into ${language}`,
   translationFailed: (language: string) =>
     `⚠ Translation into ${language} failed; the report is written without it`,
+  writing: "● Writing report files…",
   done: "✔ Done!",
   reportLine: (p: string, opened: boolean) =>
     `  Report ${p}${opened ? " (opened in your browser)" : ""}`,
   cardLine: (p: string) => `  Card   ${p}`,
   cardSkipped: (language: string, reason: string) =>
     `  Card   (${language}) not created: ${reason}`,
+  cardRetry: (command: string) => `  Retry missing cards without new analysis: ${command}`,
   dataLine: (p: string) => `  Data   ${p}`,
   checkClean: "  Check  no secrets or personal data found",
   skimHint: "  Before sharing, skim the quotes yourself: the check is rule-based.",
@@ -71,9 +93,20 @@ export const messages = {
   checkMasked: (count: number, groups: string) => `  Check  ${count} masked: ${groups}`,
   checkKept: (count: number, groups: string) => `  Check  ${count} kept (--check warn): ${groups}`,
   skippedChunks: (k: number) => `  ${k} chunk(s) failed and were skipped (noted in the report)`,
-  interrupted: "Interrupted. Run again to resume from the cache.",
+  limitedEvidence:
+    "  Limited evidence: nothing has verified quotes from 2+ sessions yet, so the report shows observations without a role or coaching. A longer --since or more history adds evidence.",
+  missingLanguages: (languages: string, command: string) =>
+    `  ⚠ ${languages} is missing: its translation failed. To add it, re-run (cached chunks are reused; the final profile and translation calls run again):\n    ${command}`,
+  // ---- recovery (plan 24): what is saved, what a re-run reuses, the exact command ----
+  saved:
+    "Chunk results finished before the stop are saved in the analysis cache. No report was written.",
+  reuse:
+    "A re-run with the cache reuses finished chunks and merges; the final profile step and translations always run again.",
+  rerun: (command: string) => `Re-run:\n  ${command}`,
+  interrupted: (command: string) =>
+    `Interrupted. ${messages.saved}\n${messages.reuse}\n${messages.rerun(command)}`,
   dryRun: (dir: string, chunks: number, chars: number) =>
-    `✔ Dry run: ${chunks} chunks, ~${n(chars)} characters would be sent. Written to ${dir} (chunks/*.txt, plan.json). No LLM was called.`,
+    `✔ Dry run complete. No LLM was called and nothing was sent. ${count(chunks, "chunk", "chunks")}, ~${n(chars)} characters would be sent.\n  Written to ${dir}/chunks/ and ${dir}/plan.json: the chunks are your redacted prompt text, so keep them private and delete them when done.`,
   statsSummary: (s: StatsSummary) =>
     [
       `  prompts ${s.prompts} · sessions ${s.sessions} · active days ${s.activeDays}`,

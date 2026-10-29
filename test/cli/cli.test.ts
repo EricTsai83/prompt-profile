@@ -55,7 +55,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--engine", "codex", "--out", out, "--since", "all"])
       expect(r.code).toBe(0)
-      expect(r.stdout).toContain("Using Codex")
+      expect(r.stdout).toContain("your logged-in Codex CLI")
       const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
       expect(profile.engine.runner).toBe("codex")
       expect(existsSync(join(out, "card.png"))).toBe(true)
