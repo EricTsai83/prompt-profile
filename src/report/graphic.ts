@@ -1,5 +1,5 @@
 import { chronotype } from "./derive.ts"
-import type { GraphicKind, Identity } from "./looks.ts"
+import type { GraphicKind, Identity } from "./theme.ts"
 
 /** Busiest-hours window, as from `chronotype`. */
 type HourWindow = { readonly start: number; readonly end: number } | null
@@ -50,7 +50,7 @@ export const clockSvg = (
 export const graphicSvg = (
   kind: GraphicKind,
   hours: ReadonlyArray<number>,
-  identity: Pick<Identity, "graphicColor" | "graphicDetail">,
+  identity: Pick<Identity, "graphicColor" | "graphicDetail" | "graphicRing">,
 ): { readonly svg: string; readonly width: number; readonly height: number } => {
   const max = Math.max(1, ...hours)
   const color = identity.graphicColor
@@ -77,8 +77,9 @@ export const graphicSvg = (
       })
       .join("")
     const detail = identity.graphicDetail
+    const ring = identity.graphicRing
     return {
-      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><circle cx="150" cy="150" r="126" stroke="#8ca8bc" stroke-opacity="0.16" fill="none"/><circle cx="150" cy="150" r="65" stroke="#8ca8bc" stroke-opacity="0.3" fill="none"/>${dots}<path d="M150 131v21l16 10" fill="none" stroke="${detail}" stroke-width="5" stroke-linecap="round"/></svg>`,
+      svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><circle cx="150" cy="150" r="126" stroke="${ring}" stroke-opacity="0.16" fill="none"/><circle cx="150" cy="150" r="65" stroke="${ring}" stroke-opacity="0.3" fill="none"/>${dots}<path d="M150 131v21l16 10" fill="none" stroke="${detail}" stroke-width="5" stroke-linecap="round"/></svg>`,
       width: 300,
       height: 300,
     }

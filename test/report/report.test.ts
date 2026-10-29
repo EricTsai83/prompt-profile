@@ -7,7 +7,7 @@ import { join } from "node:path"
 import { decodeProfile } from "../../src/domain/Profile.ts"
 import { cardTree, clip, renderCard } from "../../src/report/card.ts"
 import { clockSvg, svgDataUrl } from "../../src/report/graphic.ts"
-import { CLASSIC_TOKENS } from "../../src/report/looks.ts"
+import { lookOf } from "../../src/report/theme.ts"
 import { embeddedFonts } from "../../src/report/fonts.ts"
 import { escapeHtml, html, raw } from "../../src/report/html-template.ts"
 import { renderHtml, writeReport } from "../../src/report/index.ts"
@@ -97,7 +97,7 @@ describe("card", () => {
     Effect.gen(function* () {
       const profile = yield* sample()
       const tree = JSON.stringify(cardTree(profile))
-      const { bg, card, fg, accent } = CLASSIC_TOKENS.dark
+      const { bg, card, fg, accent } = lookOf("classic").color.dark
       // Full bleed like the looks: the hero's color edge to edge, no page around it
       expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
       expect(tree).not.toContain(bg)

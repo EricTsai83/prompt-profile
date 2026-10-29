@@ -5,7 +5,7 @@ import { decodeProfile } from "../src/domain/Profile.ts"
 import { renderHtml } from "../src/report/html.ts"
 import { renderCard } from "../src/report/card.ts"
 import { embeddedFonts } from "../src/report/fonts.ts"
-import { PRODUCT_LOOK_IDS } from "../src/report/looks.ts"
+import { LOOK_IDS, PRODUCT_LOOK_IDS } from "../src/report/looks.ts"
 
 const p = await Effect.runPromise(
   decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
@@ -33,8 +33,9 @@ writeFileSync(
 
 // Local edge-case captures use only fictional data and are never public examples.
 mkdirSync("tmp/template-edges", { recursive: true })
-writeFileSync("tmp/template-edges/classic.html", renderHtml(profile))
-for (const look of PRODUCT_LOOK_IDS) {
+// Every look, so theme refactors can be checked for equivalence (template-qa.mjs).
+for (const look of LOOK_IDS) {
+  writeFileSync(`tmp/template-edges/${look}.html`, renderHtml(profile, { look, cardHide: [] }))
   for (const [name, input, exclude] of [
     ["legacy", { ...profile, portrait: null, stats: { ...profile.stats, techniques: null } }, []],
     [

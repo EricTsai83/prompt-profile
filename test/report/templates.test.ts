@@ -6,7 +6,8 @@ import { Effect } from "effect"
 import { readFileSync } from "node:fs"
 import { decodeProfile } from "../../src/domain/Profile.ts"
 import { renderHtml } from "../../src/report/html.ts"
-import { LOOK_IDS, lookOf, type LookId } from "../../src/report/looks.ts"
+import { LOOK_IDS, type LookId } from "../../src/report/looks.ts"
+import { lookOf, THEMES } from "../../src/report/theme.ts"
 
 const sample = () =>
   decodeProfile(
@@ -20,7 +21,7 @@ describe("production templates", () => {
         const p = yield* sample()
         for (const id of ["prism", "slate", "folio"]) {
           expect(LOOK_IDS).toContain(id)
-          expect(lookOf(id as LookId)).not.toBeNull()
+          expect(lookOf(id as LookId).id).toBe(id)
           const output = renderHtml(p, { look: id as LookId, cardHide: [] })
           expect(output).toContain('class="identity-signatures"')
           expect(output).toContain(`data-look="${id}"`)
@@ -77,7 +78,7 @@ it("respects project visibility in both report and card languages", async () => 
   }
 })
 
-it("keeps long card identity text above the footer in every product template", async () => {
+it("keeps long card identity text above the footer in every product card", async () => {
   const p = await Effect.runPromise(sample())
   const profile = {
     ...p,
@@ -85,7 +86,7 @@ it("keeps long card identity text above the footer in every product template", a
     headline: "W\n".repeat(52),
     traits: p.traits.map((t) => ({ ...t, name: "W\n".repeat(24) })),
   }
-  for (const look of ["prism", "slate", "folio"] as const) {
+  for (const look of THEMES.filter((t) => t.card.composition === "product").map((t) => t.id)) {
     const textBoxes: Array<{ top: number; height: number }> = []
     await satori(cardTree(profile, { look, cardHide: [] }, "en") as never, {
       width: 1200,

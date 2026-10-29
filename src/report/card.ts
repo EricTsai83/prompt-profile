@@ -4,16 +4,10 @@ import satori from "satori"
 import { createRequire } from "node:module"
 import { readAsset } from "../platform/assets.ts"
 import type { Profile } from "../domain/Profile.ts"
-import { DISPLAY_FONT, type FontData } from "./fonts.ts"
+import type { FontData } from "./fonts.ts"
 import { clockSvg, graphicSvg, svgDataUrl } from "./graphic.ts"
-import {
-  CLASSIC_TOKENS,
-  DEFAULT_RENDER_OPTIONS,
-  lookOf,
-  isProductLook,
-  type Look,
-  type RenderOptions,
-} from "./looks.ts"
+import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
+import { lookOf, type CardTokens, type Theme } from "./theme.ts"
 import { contentIn } from "./content.ts"
 import { chronotype, nightShare } from "./derive.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
@@ -77,23 +71,148 @@ const cardMetrics = (profile: Profile, lang: Language, n: number): Array<[string
   ).slice(0, n)
 }
 
-/** Clock size on the classic card; the report's 260 × 260 drawing is scaled to it. */
-const CARD_CLOCK = 300
+/** Archetype size steps: long names get smaller type instead of overflowing. */
+const titleSize = (card: CardTokens, name: string) =>
+  card.size.title[name.length > 44 ? 2 : name.length > 26 ? 1 : 0]
+
+/** The card's font families, from the theme. */
+const fontsOf = (theme: Theme) => {
+  const { body, display } = theme.type.card
+  return { body, display, title: theme.card.titleFont === "display" ? display : body }
+}
+
+/** Color tokens of a classic or product card. */
+const schemeOf = (theme: Theme) => theme.color[theme.card.scheme]
+
+/** The archetype name, headline and trait chips of a classic or identity card. */
+const identityCopy = (
+  profile: Profile,
+  theme: Theme,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+  showGraphic: boolean,
+  colors: { readonly muted: string; readonly chip: Record<string, unknown> },
+): Node => {
+  const c = contentIn(profile, lang)
+  const card = theme.card
+  const font = fontsOf(theme)
+  const name = clip(c.archetype.name, 56)
+  return h(
+    "div",
+    { display: "flex", flexDirection: "column", maxWidth: showGraphic ? 700 : 1000 },
+    [
+      h(
+        "div",
+        {
+          fontFamily: font.title,
+          fontWeight: 800,
+          fontSize: titleSize(card, name),
+          lineHeight: card.title.lineHeight,
+          letterSpacing: card.title.tracking,
+        },
+        name,
+      ),
+      h(
+        "div",
+        {
+          fontSize: card.size.headline,
+          lineHeight: card.headline.lineHeight,
+          marginTop: card.headline.gap,
+          color: colors.muted,
+        },
+        clip(c.headline, 120),
+      ),
+      hide.includes("traits")
+        ? null
+        : h(
+            "div",
+            { display: "flex", gap: card.chips.gap, flexWrap: "wrap", marginTop: card.chips.top },
+            profile.traits.slice(0, 3).map((_tr, i) =>
+              h(
+                "div",
+                {
+                  display: "flex",
+                  fontSize: card.size.chip,
+                  padding: card.chips.padding,
+                  borderRadius: 999,
+                  ...colors.chip,
+                },
+                clip(c.trait(i).name, 32),
+              ),
+            ),
+          ),
+    ],
+  )
+}
+
+/** The card's numbers in a row (classic and identity cards). */
+const metricRow = (
+  profile: Profile,
+  theme: Theme,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+  muted: string,
+): Node =>
+  h(
+    "div",
+    { display: "flex", gap: theme.card.metrics.gap },
+    (hide.includes("stats") ? [] : cardMetrics(profile, lang, theme.card.metrics.count)).map(
+      ([label, value]) =>
+        h("div", { display: "flex", flexDirection: "column" }, [
+          h(
+            "div",
+            {
+              fontFamily: fontsOf(theme).display,
+              fontWeight: 800,
+              fontSize: theme.card.size.metric,
+            },
+            value,
+          ),
+          h("div", { fontSize: theme.card.size.label, color: muted }, label),
+        ]),
+    ),
+  )
+
+/** The full-card text layer, painted over the background layers. */
+const copyLayer = (theme: Theme, children: Array<Node | null>): Node =>
+  h(
+    "div",
+    {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      // Absolute like the layers below it, so it is painted on top of them.
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+      padding: `${theme.card.padding.y}px ${theme.card.padding.x}px`,
+      boxSizing: "border-box",
+    },
+    children,
+  )
 
 /**
  * The classic card: the classic report's hero edge to edge, like the looks, in its dark colors,
- * with the same hour clock. The hour labels are text nodes over the drawing (SVG images get no fonts).
+ * with the same hour clock (`card.graphic`: its size and distance from the right edge). The hour
+ * labels are text nodes over the drawing (SVG images get no fonts).
  */
-const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: Language): Node => {
+const classicTree = (
+  profile: Profile,
+  theme: Theme,
+  hide: RenderOptions["cardHide"],
+  lang: Language,
+): Node => {
   const t = MESSAGES[lang]
-  const c = contentIn(profile, lang)
-  const k = CLASSIC_TOKENS.dark
-  const name = clip(c.archetype.name, 56)
+  const k = schemeOf(theme)
+  const card = theme.card
+  const size = card.graphic.width
   const showGraphic = !hide.includes("graphic")
   const clock = clockSvg(profile.stats.hourHistogram, k.accent)
-  const left = CARD_WIDTH - 60 - CARD_CLOCK
-  const top = (CARD_HEIGHT - CARD_CLOCK) / 2
-  const scale = CARD_CLOCK / clock.width
+  const left = CARD_WIDTH - card.graphic.right - size
+  const top = (CARD_HEIGHT - size) / 2
+  const scale = size / clock.width
   const ticks = [0, 6, 12, 18].map((hour) => {
     const a = (hour / 24) * Math.PI * 2 - Math.PI / 2
     return h(
@@ -121,7 +240,7 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: La
       position: "relative",
       backgroundColor: k.card,
       color: k.fg,
-      fontFamily: "Inter",
+      fontFamily: fontsOf(theme).body,
     },
     [
       ...(showGraphic
@@ -130,112 +249,42 @@ const classicTree = (profile: Profile, hide: RenderOptions["cardHide"], lang: La
               type: "img",
               props: {
                 src: svgDataUrl(clock.svg),
-                width: CARD_CLOCK,
-                height: CARD_CLOCK,
+                width: size,
+                height: size,
                 style: { position: "absolute", left, top },
               },
             },
             ...ticks,
           ]
         : []),
-      h(
-        "div",
-        {
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          // Absolute like the layers below it, so it is painted on top of them.
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: CARD_WIDTH,
-          height: CARD_HEIGHT,
-          padding: "52px 60px",
-          boxSizing: "border-box",
-        },
-        [
-          h("div", { fontSize: 20, fontWeight: 700 }, t.project),
-          h(
-            "div",
-            { display: "flex", flexDirection: "column", maxWidth: showGraphic ? 700 : 1000 },
-            [
-              h(
-                "div",
-                {
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 800,
-                  fontSize: titleSize(name),
-                  lineHeight: 0.98,
-                  letterSpacing: -2,
-                },
-                name,
-              ),
-              h(
-                "div",
-                { fontSize: 24, lineHeight: 1.4, marginTop: 18, color: k.muted },
-                clip(c.headline, 120),
-              ),
-              hide.includes("traits")
-                ? null
-                : h(
-                    "div",
-                    { display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 },
-                    profile.traits.slice(0, 3).map((_tr, i) =>
-                      h(
-                        "div",
-                        {
-                          display: "flex",
-                          fontSize: 18,
-                          padding: "6px 16px",
-                          borderRadius: 999,
-                          color: k.accent,
-                          backgroundColor: k.accentSoft,
-                        },
-                        clip(c.trait(i).name, 32),
-                      ),
-                    ),
-                  ),
-            ],
-          ),
-          h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
-            h(
-              "div",
-              { display: "flex", gap: 44 },
-              (hide.includes("stats") ? [] : cardMetrics(profile, lang, 3)).map(([label, value]) =>
-                h("div", { display: "flex", flexDirection: "column" }, [
-                  h("div", { fontFamily: DISPLAY_FONT, fontWeight: 800, fontSize: 36 }, value),
-                  h("div", { fontSize: 16, color: k.muted }, label),
-                ]),
-              ),
-            ),
-            h("div", { fontSize: 18, color: k.muted }, "npx prompt-profile"),
-          ]),
-        ],
-      ),
+      copyLayer(theme, [
+        h("div", { fontSize: card.size.brand, fontWeight: 700 }, t.project),
+        identityCopy(profile, theme, hide, lang, showGraphic, {
+          muted: k.muted,
+          chip: { color: k.accent, backgroundColor: k.accentSoft },
+        }),
+        h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
+          metricRow(profile, theme, hide, lang, k.muted),
+          h("div", { fontSize: card.size.footer, color: k.muted }, "npx prompt-profile"),
+        ]),
+      ]),
     ],
   )
 }
 
-/** Archetype size steps: long names get smaller type instead of overflowing. */
-const titleSize = (name: string) => (name.length > 44 ? 58 : name.length > 26 ? 72 : 96)
-
 /** A share-first look: identity colors, display type and the activity graphic. */
-const lookTree = (
+const identityTree = (
   profile: Profile,
-  look: Look,
+  theme: Theme,
   hide: RenderOptions["cardHide"],
   lang: Language,
 ): Node => {
   const t = MESSAGES[lang]
-  const c = contentIn(profile, lang)
-  const s = profile.stats
-  const id = look.identity
-  const name = clip(c.archetype.name, 56)
+  const id = theme.identity
+  const card = theme.card
   const showGraphic = !hide.includes("graphic")
-  const graphic = graphicSvg(id.graphic, s.hourHistogram, id)
-  const box = { bars: [56, 168, 340], orbit: [56, 110, 370], fold: [70, 190, 290] }[id.graphic]
-  const [right, top, width] = box as [number, number, number]
-  const metrics = cardMetrics(profile, lang, 2)
+  const graphic = graphicSvg(id.graphic, profile.stats.hourHistogram, id)
+  const { right, top, width } = card.graphic
   return h(
     "div",
     {
@@ -246,7 +295,7 @@ const lookTree = (
       position: "relative",
       backgroundColor: id.background,
       color: id.text,
-      fontFamily: "Inter",
+      fontFamily: fontsOf(theme).body,
     },
     [
       id.split
@@ -270,83 +319,31 @@ const lookTree = (
             },
           }
         : null,
-      h(
-        "div",
-        {
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          // Absolute like the layers below it, so it is painted on top of them.
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: CARD_WIDTH,
-          height: CARD_HEIGHT,
-          padding: "52px 60px",
-          boxSizing: "border-box",
-        },
-        [
-          h("div", { display: "flex", justifyContent: "space-between", fontSize: 18 }, [
-            h("div", { fontFamily: DISPLAY_FONT, fontWeight: 800, fontSize: 24 }, t.project),
-            h("div", { color: id.muted }, t.madeFrom),
-          ]),
+      copyLayer(theme, [
+        h("div", { display: "flex", justifyContent: "space-between", fontSize: card.size.header }, [
           h(
             "div",
-            { display: "flex", flexDirection: "column", maxWidth: showGraphic ? 700 : 1000 },
-            [
-              h(
-                "div",
-                {
-                  fontFamily: DISPLAY_FONT,
-                  fontWeight: 800,
-                  fontSize: titleSize(name),
-                  lineHeight: 0.98,
-                  letterSpacing: -2,
-                },
-                name,
-              ),
-              h(
-                "div",
-                { fontSize: 24, lineHeight: 1.4, marginTop: 20, color: id.muted },
-                clip(c.headline, 120),
-              ),
-              hide.includes("traits")
-                ? null
-                : h(
-                    "div",
-                    { display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 },
-                    profile.traits.slice(0, 3).map((_tr, i) =>
-                      h(
-                        "div",
-                        {
-                          display: "flex",
-                          fontSize: 18,
-                          padding: "6px 16px",
-                          borderRadius: 999,
-                          border: `1.5px solid ${id.chipBorder}`,
-                          backgroundColor: id.chipBackground,
-                        },
-                        clip(c.trait(i).name, 32),
-                      ),
-                    ),
-                  ),
-            ],
+            { fontFamily: fontsOf(theme).display, fontWeight: 800, fontSize: card.size.brand },
+            t.project,
           ),
-          h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
-            h(
-              "div",
-              { display: "flex", gap: 44 },
-              (hide.includes("stats") ? [] : metrics).map(([label, value]) =>
-                h("div", { display: "flex", flexDirection: "column" }, [
-                  h("div", { fontFamily: DISPLAY_FONT, fontWeight: 800, fontSize: 40 }, value),
-                  h("div", { fontSize: 16, color: id.muted }, label),
-                ]),
-              ),
-            ),
-            h("div", { fontSize: 18, color: id.split ? id.text : id.muted }, "npx prompt-profile"),
-          ]),
-        ],
-      ),
+          h("div", { color: id.muted }, t.madeFrom),
+        ]),
+        identityCopy(profile, theme, hide, lang, showGraphic, {
+          muted: id.muted,
+          chip: {
+            border: `${card.chips.border}px solid ${id.chipBorder}`,
+            backgroundColor: id.chipBackground,
+          },
+        }),
+        h("div", { display: "flex", justifyContent: "space-between", alignItems: "flex-end" }, [
+          metricRow(profile, theme, hide, lang, id.muted),
+          h(
+            "div",
+            { fontSize: card.size.footer, color: id.split ? id.text : id.muted },
+            "npx prompt-profile",
+          ),
+        ]),
+      ]),
     ].filter((x) => x !== null),
   )
 }
@@ -354,15 +351,17 @@ const lookTree = (
 /** Product cards use a quiet identity column and a separate activity/support surface. */
 const productTree = (
   p: Profile,
-  look: Look,
+  theme: Theme,
   hide: RenderOptions["cardHide"],
   lang: Language,
 ): Node => {
   const c = contentIn(p, lang)
-  const k = look.light
-  const folio = look.id === "folio"
-  const slate = look.id === "slate"
-  const graphic = graphicSvg("bars", p.stats.hourHistogram, look.identity)
+  const k = schemeOf(theme)
+  const card = theme.card
+  const pad = card.padding.x
+  const inner = CARD_WIDTH - 2 * pad
+  const support = card.support
+  const graphic = graphicSvg("bars", p.stats.hourHistogram, theme.identity)
   const traits = p.traits
     .map((t, i) => ({ t, i }))
     .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
@@ -374,34 +373,34 @@ const productTree = (
       height: CARD_HEIGHT,
       display: "flex",
       flexDirection: "column",
-      padding: 48,
+      padding: `${card.padding.y}px ${pad}px`,
       position: "relative",
       boxSizing: "border-box",
       backgroundColor: k.bg,
       color: k.fg,
-      fontFamily: "Inter",
-      borderTop: `8px solid ${k.accent}`,
+      fontFamily: fontsOf(theme).body,
+      borderTop: `${card.accentRule}px solid ${k.accent}`,
     },
     [
       h(
         "div",
         {
           display: "flex",
-          width: 1104,
+          width: inner,
           justifyContent: "space-between",
-          fontSize: 18,
+          fontSize: card.size.header,
           color: k.muted,
         },
-        [h("div", {}, MESSAGES[lang].project), h("div", {}, look.id.toUpperCase())],
+        [h("div", {}, MESSAGES[lang].project), h("div", {}, theme.id.toUpperCase())],
       ),
       h(
         "div",
         {
           display: "flex",
           position: "absolute",
-          left: 48,
+          left: pad,
           top: 120,
-          width: 1104,
+          width: inner,
           height: 390,
           gap: 40,
         },
@@ -420,11 +419,11 @@ const productTree = (
               h(
                 "div",
                 {
-                  fontFamily: folio ? DISPLAY_FONT : "Inter",
-                  fontSize: 48,
+                  fontFamily: fontsOf(theme).title,
+                  fontSize: card.size.title[0],
                   fontWeight: 700,
-                  lineHeight: 1.12,
-                  letterSpacing: -1.5,
+                  lineHeight: card.title.lineHeight,
+                  letterSpacing: card.title.tracking,
                   width: 700,
                   maxHeight: 108,
                   flexShrink: 0,
@@ -437,10 +436,10 @@ const productTree = (
               h(
                 "div",
                 {
-                  fontSize: 23,
-                  lineHeight: 1.5,
+                  fontSize: card.size.headline,
+                  lineHeight: card.headline.lineHeight,
                   color: k.muted,
-                  marginTop: 18,
+                  marginTop: card.headline.gap,
                   width: 700,
                   maxHeight: 70,
                   flexShrink: 0,
@@ -457,17 +456,17 @@ const productTree = (
                     {
                       display: "flex",
                       flexDirection: "column",
-                      gap: 12,
-                      marginTop: 28,
-                      fontSize: 18,
+                      gap: card.chips.gap,
+                      marginTop: card.chips.top,
+                      fontSize: card.size.chip,
                     },
                     traits.map(({ i }) =>
                       h(
                         "div",
                         {
                           display: "block",
-                          paddingTop: 10,
-                          borderTop: `1px solid ${k.border}`,
+                          padding: card.chips.padding,
+                          borderTop: `${card.chips.border}px solid ${k.border}`,
                           width: 700,
                           maxHeight: 36,
                           flexShrink: 0,
@@ -487,30 +486,42 @@ const productTree = (
             {
               display: "flex",
               flexDirection: "column",
-              justifyContent: folio ? "flex-end" : "center",
+              justifyContent: support.align === "end" ? "flex-end" : "center",
               width: 340,
-              padding: slate ? 20 : 0,
-              backgroundColor: slate ? k.card : k.bg,
+              padding: support.padding,
+              backgroundColor: k[support.surface],
             },
             [
               hide.includes("graphic")
                 ? null
-                : { type: "img", props: { src: svgDataUrl(graphic.svg), width: 260, height: 180 } },
+                : {
+                    type: "img",
+                    props: {
+                      src: svgDataUrl(graphic.svg),
+                      width: card.graphic.width,
+                      height: 180,
+                    },
+                  },
               hide.includes("stats")
                 ? null
                 : h(
                     "div",
-                    { display: "flex", flexDirection: "column", gap: 14, marginTop: 26 },
-                    cardMetrics(p, lang, 2).map(([label, value]) =>
+                    {
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: card.metrics.gap,
+                      marginTop: 26,
+                    },
+                    cardMetrics(p, lang, card.metrics.count).map(([label, value]) =>
                       h(
                         "div",
                         {
                           display: "flex",
                           justifyContent: "space-between",
-                          fontSize: 16,
+                          fontSize: card.size.label,
                           color: k.muted,
                         },
-                        [label, h("b", { color: k.fg }, value)],
+                        [label, h("b", { color: k.fg, fontSize: card.size.metric }, value)],
                       ),
                     ),
                   ),
@@ -523,12 +534,12 @@ const productTree = (
         {
           display: "flex",
           position: "absolute",
-          left: 48,
+          left: pad,
           bottom: 30,
-          width: 1104,
+          width: inner,
           borderTop: `1px solid ${k.border}`,
           paddingTop: 18,
-          fontSize: 15,
+          fontSize: card.size.footer,
           color: k.muted,
         },
         "npx prompt-profile",
@@ -536,6 +547,8 @@ const productTree = (
     ],
   )
 }
+
+const TREES = { classic: classicTree, identity: identityTree, product: productTree } as const
 
 /**
  * Card content: archetype, headline, up to 3 trait names and a few numbers.
@@ -545,16 +558,13 @@ export const cardTree = (
   profile: Profile,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
   lang: Language = profile.languages[0],
+  // Every look-specific choice comes from the theme; tests pass one that is not registered.
+  theme: Theme = lookOf(options.look),
 ): Node => {
-  const look = lookOf(options.look)
   // Project visibility is the same user choice for the report and its card.
   const v = visibilityOf(options)
   const p = v.projects ? profile : scrubIdentity(profile, makeScrub(profile, v), lang)
-  return look === null
-    ? classicTree(p, options.cardHide, lang)
-    : isProductLook(look.id)
-      ? productTree(p, look, options.cardHide, lang)
-      : lookTree(p, look, options.cardHide, lang)
+  return TREES[theme.card.composition](p, theme, options.cardHide, lang)
 }
 
 let wasmReady: Promise<void> | null = null
@@ -574,10 +584,11 @@ export const renderCard = (
   fonts: ReadonlyArray<FontData>,
   options: RenderOptions = DEFAULT_RENDER_OPTIONS,
   lang: Language = profile.languages[0],
+  theme: Theme = lookOf(options.look),
 ): Effect.Effect<Uint8Array, Error> =>
   Effect.tryPromise({
     try: async () => {
-      const svg = await satori(cardTree(profile, options, lang) as never, {
+      const svg = await satori(cardTree(profile, options, lang, theme) as never, {
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         fonts: fonts.map((f) => ({

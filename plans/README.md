@@ -61,7 +61,7 @@ src/
   pipeline/       # filter.ts, clean.ts, redact.ts, stats.ts, techniques.ts, audit.ts (final output check)
   llm/            # LlmRunner interface + claude / codex / fake implementations + detect.ts
   analysis/       # chunk.ts, map.ts, reduce.ts, verify.ts, translate.ts, cache.ts, prompts/
-  report/         # html.ts, charts.ts, techniques.ts, card.ts, looks.ts, visibility.ts, messages.ts, fonts/
+  report/         # html.ts, charts.ts, techniques.ts, card.ts, looks.ts, theme.ts, theme-css.ts, visibility.ts, messages.ts, fonts/
   platform/       # Environment service, private file writes, cache folder
 test/
   fixtures/       # fake data for each adapter (must not contain real personal data)
@@ -94,7 +94,7 @@ There are three independent version numbers. Bump them whenever the correspondin
 | `Profile.schemaVersion` | `domain/Profile.ts` | 9 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | 11 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 7 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 1, others 7 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 
 ## Open plans
 

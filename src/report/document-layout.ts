@@ -1,16 +1,18 @@
-/** Shared reading rhythm. Component styles own color and illustration; this final layer owns layout. */
+/**
+ * Shared reading rhythm, the last style layer: generated theme variables → base components →
+ * variants → this. Component styles own color and illustration; this layer owns layout.
+ */
 export const documentLayoutStyle = `
-:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--reading:65ch;--gutter:clamp(20px,4vw,48px)}
 html:root .page{padding:var(--space-8) var(--gutter) var(--space-12)}
 html:root .report-view{line-height:1.75}
 html:root .view-heading{margin:var(--space-8) 0 var(--space-6)}
 html:root .view-heading p{max-width:var(--reading);margin-top:var(--space-2)}
 html:root .hero{padding:var(--space-8)}
-html[data-look=folio] .hero{padding:var(--space-8) 0}
+html[data-hero=editorial] .hero{padding:var(--space-8) 0}
 html:root .hero .desc{max-width:var(--reading)}
 html:root .hero h1{line-height:1.12}
 html:root .identity-signatures{margin-top:var(--space-6);margin-bottom:0}
-html[data-look=slate] .identity-signatures{margin:0}
+html[data-signatures=stacked] .identity-signatures{margin:0}
 html:root .grid,html:root .overview-charts{gap:var(--space-6);margin:0 0 var(--space-8)}
 html:root .panel{padding:var(--space-6);margin-bottom:0}
 html:root .wide{margin-bottom:var(--space-6)}
@@ -34,13 +36,13 @@ html:root .dim-body{padding:0 var(--space-6) var(--space-6)}
 html:root .dimension>summary{padding:var(--space-4) var(--space-6)}
 html:root .about{margin-top:var(--space-12);padding:var(--space-6);line-height:1.75}
 html:root .foot{margin-top:var(--space-6)}
-@media(max-width:640px){html:root .page{padding:var(--space-4) 20px var(--space-8)}html:root .hero,html:root .panel,html:root .trait,html:root .improve{padding:var(--space-4)}html[data-look=folio] .hero{padding:var(--space-6) 0}html:root .grid{grid-template-columns:1fr}html:root .portrait-chapter>p{font-size:15px}}
+@media(max-width:640px){html:root .page{padding:var(--space-4) 20px var(--space-8)}html:root .hero,html:root .panel,html:root .trait,html:root .improve{padding:var(--space-4)}html[data-hero=editorial] .hero{padding:var(--space-6) 0}html:root .grid{grid-template-columns:1fr}html:root .portrait-chapter>p{font-size:15px}}
 /* Open composition: statistics are a strip, comparisons share a field, prose follows rules. */
 html:root :is(.sig,.panel,.trait,.dimension,.fact,.about,.minor,.improve,.cap,.cap-item,.signals li,.chg){background:transparent;border:0;border-radius:0;box-shadow:none}
 html:root .sigs{background:transparent;border:0;border-radius:0;overflow:visible;gap:24px;border-block:1px solid var(--border);padding:18px 0}
 html:root .sig{padding:0;min-width:0}
 html:root .panel{padding:24px 0;border-top:1px solid var(--border)}
-html:root .overview-charts{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:40px}
+html:root .overview-charts{grid-template-columns:var(--overview-columns);gap:40px}
 html:root .traits{grid-template-columns:1fr;gap:0}
 html:root .trait{display:grid;grid-template-columns:minmax(160px,1fr) minmax(0,2fr);column-gap:32px;padding:24px 0;border-top:1px solid var(--border)}
 html:root .trait>header{grid-column:1;grid-row:span 3;display:block}
@@ -59,20 +61,18 @@ html:root .signals li{padding:12px 0;border-top:1px solid var(--border)}
 html:root .chg{padding:10px 0;border-bottom:1px solid var(--border)}
 html:root .improve-impact{margin-top:8px}
 html:root .about{padding:24px 0;border-top:1px solid var(--border);max-width:var(--reading)}
-html[data-look=slate] .panel{padding-top:16px}
-html[data-look=folio] .overview-charts{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}
+html:root .panel{padding-top:var(--panel-top)}
 @media(min-width:900px){html:root .report-view-detail .portrait{max-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:48px}html:root .portrait>h2,html:root .portrait>.portrait-intro{grid-column:1/-1;max-width:var(--reading)}html:root .portrait-chapter{grid-column:1;max-width:var(--reading)}html:root .portrait-preferences{grid-column:2;grid-row:3 / span 12;align-self:start;margin-top:32px;font-size:13px}}
-@media(max-width:760px){html:root .caps,html:root .overview-charts,html[data-look=folio] .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
+@media(max-width:760px){html:root .caps,html:root .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
 @page{size:A4;margin:16mm 17mm 18mm}
 @media print{
-html:root{--bg:#fff;--card:#fff;--fg:#17212b;--muted:#46515b;--border:#bdc5cc;--accent:#304d6a;--accent-soft:#e6ebef;color-scheme:light}
-html:root body{font-size:10pt;line-height:1.5;background:white;color:var(--fg)}
+html:root body{font-size:10pt;line-height:1.5;background:var(--bg);color:var(--fg)}
 html:root .page{max-width:none;padding:0;margin:0}
 html:root .topbar,html:root .view-nav,html:root .page-turn,html:root .switch{display:none!important}
 html:root .report-view{display:block!important;line-height:1.5}
 html:root .report-view-detail{break-before:auto;max-width:none;margin:0}
 html:root .hero{padding:5mm;border-radius:0;display:block;break-inside:auto;min-height:0}
-html[data-look=folio] .hero{padding:0 0 5mm}
+html[data-hero=editorial] .hero{padding:0 0 5mm}
 html:root .hero h1{font-size:25pt;line-height:1.15}
 html:root .hero .tagline{font-size:13pt;line-height:1.45}
 html:root .hero .desc{font-size:10pt;line-height:1.5}

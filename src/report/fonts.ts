@@ -3,6 +3,7 @@ import { createHash } from "node:crypto"
 import type { Language } from "../domain/Profile.ts"
 import { readAsset } from "../platform/assets.ts"
 import { writePrivateFile } from "../platform/files.ts"
+import { THEMES } from "./theme.ts"
 
 export interface FontData {
   readonly name: string
@@ -12,20 +13,32 @@ export interface FontData {
 
 const read = (file: string) => readAsset(file, () => new URL(`./fonts/${file}`, import.meta.url))
 
-/** The display face of the share-first looks (static ExtraBold, SIL OFL). */
-export const DISPLAY_FONT = "Bricolage"
-const DISPLAY_FILE = "BricolageGrotesque-ExtraBold.woff"
+/** Fonts shipped with the package (dev → src/report/fonts, build → dist/fonts), by family. */
+export const EMBEDDED_FONTS: Readonly<
+  Record<string, ReadonlyArray<{ readonly weight: FontData["weight"]; readonly file: string }>>
+> = {
+  Inter: [
+    { weight: 400, file: "Inter-Regular.woff" },
+    { weight: 700, file: "Inter-Bold.woff" },
+  ],
+  // The display face of the share-first looks (static ExtraBold, SIL OFL).
+  Bricolage: [{ weight: 800, file: "BricolageGrotesque-ExtraBold.woff" }],
+}
 
-/** Fonts ship with the package (dev → src/report/fonts, build → dist/fonts). */
-export const embeddedFonts = (): ReadonlyArray<FontData> => [
-  { name: "Inter", weight: 400, data: read("Inter-Regular.woff") },
-  { name: "Inter", weight: 700, data: read("Inter-Bold.woff") },
-  { name: DISPLAY_FONT, weight: 800, data: read(DISPLAY_FILE) },
-]
+/** The embedded fonts some theme's card declares. */
+export const embeddedFonts = (): ReadonlyArray<FontData> => {
+  const families = new Set(THEMES.flatMap((t) => [t.type.card.body, t.type.card.display]))
+  return Object.entries(EMBEDDED_FONTS)
+    .filter(([name]) => families.has(name))
+    .flatMap(([name, faces]) => faces.map((f) => ({ name, weight: f.weight, data: read(f.file) })))
+}
 
-/** The display font as a data URL, so the HTML report stays offline. */
-export const displayFontDataUrl = (): string =>
-  `data:font/woff;base64,${Buffer.from(read(DISPLAY_FILE)).toString("base64")}`
+/** An embedded face as a data URL, so the HTML report stays offline. */
+export const fontDataUrl = (family: string, weight: number): string => {
+  const face = EMBEDDED_FONTS[family]?.find((f) => f.weight === weight)
+  if (face === undefined) throw new Error(`no embedded font ${family} ${weight}`)
+  return `data:font/woff;base64,${Buffer.from(read(face.file)).toString("base64")}`
+}
 
 /**
  * Noto Sans TC is too large to ship in the npm package (≈ 5.7 MB per weight), so it is

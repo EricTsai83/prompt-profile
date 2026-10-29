@@ -1,4 +1,9 @@
-/** Offline card geometry and PNG QA; CJK_FONT_DIR must contain the verified cached fonts. */
+/**
+ * Offline card geometry and PNG QA; CJK_FONT_DIR must contain the verified cached fonts.
+ * Also writes every look's card in both languages and all hide combinations to
+ * `<CARD_QA_OUT>/all`, so two runs can be compared byte for byte. `CARD_QA_LOOKS=a,b` limits
+ * both passes to some looks (satori's wasm memory does not survive every look in one process).
+ */
 import { createHash } from "node:crypto"
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
@@ -7,7 +12,7 @@ import satori from "satori"
 import { decodeProfile } from "../src/domain/Profile.ts"
 import { cardTree, renderCard } from "../src/report/card.ts"
 import { CJK_FONTS, embeddedFonts } from "../src/report/fonts.ts"
-import { PRODUCT_LOOK_IDS, CARD_PARTS } from "../src/report/looks.ts"
+import { LOOK_IDS, PRODUCT_LOOK_IDS, CARD_PARTS } from "../src/report/looks.ts"
 
 const dir = process.env.CJK_FONT_DIR
 if (!dir) throw new Error("Set CJK_FONT_DIR to the cached Noto Sans TC font folder")
@@ -24,10 +29,13 @@ const p = await Effect.runPromise(
   decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
 )
 const seed = p.translations["zh-TW"]!.archetype.name.repeat(30)
-const out = "tmp/card-qa"
+const out = process.env.CARD_QA_OUT || "tmp/card-qa"
 mkdirSync(out, { recursive: true })
+const only = process.env.CARD_QA_LOOKS?.split(",")
+const selected = <A extends string>(looks: ReadonlyArray<A>) =>
+  looks.filter((l) => only === undefined || only.includes(l))
 const results = []
-for (const look of PRODUCT_LOOK_IDS) {
+for (const look of selected(PRODUCT_LOOK_IDS)) {
   for (const kind of ["cjk", "mixed"] as const) {
     const text = kind === "cjk" ? seed : `AI Collaboration ${seed}`
     const profile = {
@@ -73,5 +81,22 @@ for (const look of PRODUCT_LOOK_IDS) {
     }
   }
 }
+mkdirSync(join(out, "all"), { recursive: true })
+const long = {
+  ...p,
+  archetype: { ...p.archetype, name: "A very long fictional collaborator name ".repeat(3) },
+  headline: "Fictional headline that keeps going ".repeat(6),
+}
+for (const [kind, profile] of [
+  ["sample", p],
+  ["long", long],
+] as const)
+  for (const look of selected(LOOK_IDS))
+    for (const lang of p.languages)
+      for (let mask = 0; mask < 8; mask++) {
+        const cardHide = CARD_PARTS.filter((_, i) => mask & (1 << i))
+        const png = await Effect.runPromise(renderCard(profile, fonts, { look, cardHide }, lang))
+        writeFileSync(join(out, "all", `${kind}-${look}-${lang}-${mask}.png`), png)
+      }
 writeFileSync(join(out, "checks.json"), JSON.stringify(results, null, 2) + "\n")
 console.log(`${results.length} card geometry and PNG cases passed`)

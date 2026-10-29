@@ -1,6 +1,5 @@
 import { documentLayoutStyle } from "./document-layout.ts"
-import { identitySignatures, productStyle } from "./templates.ts"
-import { isProductLook } from "./looks.ts"
+import { identitySignatures, variantStyle } from "./templates.ts"
 import { portraitSection, portraitStyle } from "./portrait.ts"
 import { VIEW_MESSAGES } from "./messages.ts"
 import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
@@ -18,19 +17,11 @@ import {
 } from "./charts.ts"
 import { chapters, chronotype, correctionEvery, nightShare, promptsPerSession } from "./derive.ts"
 import { LANG_TAGS, makeLoc, type Loc } from "./loc.ts"
-import { displayFontDataUrl } from "./fonts.ts"
 import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
-import {
-  CLASSIC_TOKENS,
-  DEFAULT_RENDER_OPTIONS,
-  excludedParts,
-  lookOf,
-  type Identity,
-  type Look,
-  type RenderOptions,
-  type ReportTokens,
-} from "./looks.ts"
+import { DEFAULT_RENDER_OPTIONS, excludedParts, type RenderOptions } from "./looks.ts"
+import { lookOf, type Theme } from "./theme.ts"
+import { displayStyle, themeAttributes, themeCss } from "./theme-css.ts"
 import { MESSAGES, type Messages } from "./messages.ts"
 import { triggeredSignals } from "./signals.ts"
 import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
@@ -398,42 +389,21 @@ const signatureTile = (value: Raw, label: Raw, tip: Raw, i: number): Raw =>
 
 // ---- styles -------------------------------------------------------------------------------
 
-/** The classic hero: today's colors on a card, with the hour graphic. */
-const CLASSIC_IDENTITY: Identity = {
-  background: "var(--card)",
-  split: null,
-  text: "var(--fg)",
-  muted: "var(--muted)",
-  chipBorder: "var(--border)",
-  chipBackground: "transparent",
-  graphic: "bars",
-  graphicColor: "#5b5bd6",
-  graphicDetail: "#5b5bd6",
-}
-
-/** Categorical colors for up to six projects, then "other"; readable in light and dark. */
-const PROJECT_PALETTE = `--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#d3d6dc`
-
-const tokens = (t: ReportTokens) =>
-  `--bg:${t.bg};--fg:${t.fg};--muted:${t.muted};--card:${t.card};--border:${t.border};--accent:${t.accent};--accent-soft:${t.accentSoft};--warn:${t.warn};--empty:${t.empty}`
-
 const BASE_STYLE = `
-:root{${PROJECT_PALETTE}}
-@media (prefers-color-scheme:dark){:root{--po:#454952}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
-.page{max-width:1080px;margin:0 auto;padding:20px 20px 56px}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--font-body)}
+.page{max-width:var(--page);margin:0 auto;padding:20px 20px 56px}
 h1,h2,h3{line-height:1.2;margin:0}
 p{margin:0}
-.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0 18px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0 18px;border-bottom:var(--topbar-rule)}
 .brand{font-weight:700;letter-spacing:-.01em}
 .switch{display:flex;gap:2px;padding:3px;border:1px solid var(--border);border-radius:999px;background:var(--card)}
 .switch label{padding:4px 12px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--muted)}
 .lang-input{position:absolute;opacity:0;pointer-events:none}
-.hero{position:relative;overflow:hidden;border-radius:24px;padding:36px 40px;border:1px solid var(--border);background:var(--id-bg);color:var(--id-fg)}
+.hero{position:relative;overflow:hidden;border-radius:var(--hero-radius);padding:36px 40px;border:var(--hero-border);border-top:var(--hero-top);border-bottom:var(--hero-bottom);background:var(--id-bg);color:var(--id-fg)}
 .hero .split{position:absolute;right:0;top:0;bottom:0;width:34%;background:var(--id-split)}
 .hero .copy{position:relative;max-width:60%}
-.hero h1{font-size:clamp(32px,5.6vw,58px);letter-spacing:-.02em;margin-bottom:12px}
+.hero h1{font-family:var(--title-font);font-weight:var(--title-weight);font-size:var(--title-size);letter-spacing:var(--title-tracking);max-width:var(--title-measure);margin-bottom:12px}
 .hero .tagline{font-size:19px;line-height:1.45;color:var(--id-muted);display:block}
 .hero .desc{margin-top:8px;color:var(--id-muted);font-size:14px}
 .hero .report-facts{margin:18px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:13px}.hero .report-facts dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--id-muted)}.hero .report-facts dd{margin:2px 0 0;font-weight:600;font-variant-numeric:tabular-nums}
@@ -539,7 +509,7 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .changes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px}
 .chg{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--card);font-size:13px}
 .chg b{font-variant-numeric:tabular-nums}.chg i{font-style:normal;font-size:12px;color:var(--muted);min-width:3em;text-align:right}
-.chg.good i{color:#1f9d55}.chg.bad i{color:var(--warn)}
+.chg.good i{color:var(--positive)}.chg.bad i{color:var(--warn)}
 .last-tips{margin-top:10px;font-size:13px;color:var(--muted)}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .fact{padding:16px 18px;font-size:14px}
@@ -573,34 +543,22 @@ const languageStyle = (langs: ReadonlyArray<Language>): string =>
         ...langs.map(
           (l) =>
             `#lang-${l}:checked~.page [data-l="${l}"]{display:revert}` +
-            `#lang-${l}:checked~.page label[for="lang-${l}"]{background:var(--accent);color:#fff}` +
+            `#lang-${l}:checked~.page label[for="lang-${l}"]{background:var(--accent);color:var(--on-accent)}` +
             `#lang-${l}:focus-visible~.page label[for="lang-${l}"]{outline:3px solid var(--accent);outline-offset:2px}`,
         ),
       ].join("\n")
 
-const identityVars = (id: Identity) =>
-  `.hero{--id-bg:${id.background};--id-fg:${id.text};--id-muted:${id.muted};--id-split:${id.split ?? "transparent"}}`
-
-const lookStyle = (look: Look | null): string => {
-  if (look === null) {
-    return `:root{color-scheme:light dark;${tokens(CLASSIC_TOKENS.light)}}
-@media (prefers-color-scheme:dark){:root{${tokens(CLASSIC_TOKENS.dark)}}}
-${identityVars(CLASSIC_IDENTITY)}`
-  }
-  return `@font-face{font-family:Bricolage;src:url(${displayFontDataUrl()}) format("woff");font-weight:800}
-:root{color-scheme:light dark;${tokens(look.light)}}
-@media (prefers-color-scheme:dark){:root{${tokens(look.dark)}}}
-${identityVars(look.identity)}
-.hero{border:0}
-h1,section>h2,.sig b{font-family:Bricolage,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC",sans-serif;font-weight:800}`
-}
-
 // ---- page ---------------------------------------------------------------------------------
 
 /** Render a self-contained, offline HTML report (no external requests, no JavaScript). */
-export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RENDER_OPTIONS) => {
-  const look = lookOf(options.look)
-  const identity = look?.identity ?? CLASSIC_IDENTITY
+export const renderHtml = (
+  profile: Profile,
+  options: RenderOptions = DEFAULT_RENDER_OPTIONS,
+  // Every look-specific choice comes from the theme; tests pass one that is not registered.
+  theme: Theme = lookOf(options.look),
+) => {
+  const identity = theme.identity
+  const clock = theme.layout.hero === "clock"
   const loc = makeLoc(profile)
   const v = visibilityOf(options)
   const scrub = makeScrub(profile, v)
@@ -631,29 +589,22 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
   const portrait = portraitSection(profile, loc, v, scrub)
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
-  const graphic = look
-    ? graphicSvg(identity.graphic, s.hourHistogram, {
-        graphicColor: identity.graphicColor,
-        graphicDetail: identity.graphicDetail,
-      })
-    : null
+  const graphic = !clock ? graphicSvg(identity.graphic, s.hourHistogram, identity) : null
 
   const page = html`<!doctype html>
-    <html lang="${LANG_TAGS[loc.langs[0]!]}"${look ? raw(` data-look="${look.id}"`) : ""}>
+    <html lang="${LANG_TAGS[loc.langs[0]!]}" ${raw(themeAttributes(theme))}>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="referrer" content="no-referrer" />
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${look ? "; font-src data:" : ""}"
+          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${theme.type.display ? "; font-src data:" : ""}"
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(lookStyle(look))}${raw(
-            languageStyle(loc.langs),
-          )}
-        ${isProductLook(options.look) ? raw(productStyle) : ""}${raw(documentLayoutStyle)}</style>
+          ${raw(themeCss(theme))}${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+        ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
         <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
@@ -698,7 +649,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
               <h1>${loc.text((_m, ct, l) => scrub(ct.archetype.name, l))}</h1>
               <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
               <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
-              ${look ? html`<p class="chrono">${windowText}</p>` : ""}
+              ${clock ? "" : html`<p class="chrono">${windowText}</p>`}
               <dl class="report-facts">
                 <div>
                   <dt>${loc.text((m) => m.dataPeriod)}</dt>
@@ -738,7 +689,7 @@ export const renderHtml = (profile: Profile, options: RenderOptions = DEFAULT_RE
                 </div>
               </dl>
             </div>
-            ${isProductLook(options.look) ? identitySignatures(profile, loc, scrub) : ""}${
+            ${theme.layout.signatures === "none" ? "" : identitySignatures(profile, loc, scrub)}${
               graphic
                 ? html`<img
                     class="graphic"

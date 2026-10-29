@@ -20,7 +20,8 @@ src/
   pipeline/       filter → clean → redact → truncate, plus stats
   llm/            LlmRunner interface + claude / codex / fake runners + detect.ts (NOTES.md: CLI behaviour)
   analysis/       chunk → map → verify → merge → reduce, the cache and prompts/*.md
-  report/         Profile → HTML report + PNG card (messages.ts: every text)
+  report/         Profile → HTML report + PNG card (messages.ts: every text; theme.ts: every look's
+                  colors, type, spacing, layout choices and card layout)
   platform/       environment (Environment service), private file writes, cache folder
 test/
   <module>/       unit tests per src/ module

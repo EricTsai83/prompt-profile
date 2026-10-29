@@ -10,10 +10,10 @@ import {
   excludedParts,
   hiddenParts,
   isDefaultRender,
-  lookOf,
   RENDER_MANIFEST_VERSION,
   type RenderOptions,
 } from "./looks.ts"
+import { lookOf } from "./theme.ts"
 
 export { renderHtml } from "./html.ts"
 export { renderCard } from "./card.ts"
@@ -89,7 +89,7 @@ export const writeReport = (
       const manifest = {
         renderVersion: RENDER_MANIFEST_VERSION,
         look: options.look,
-        lookVersion: lookOf(options.look)?.version ?? 1,
+        lookVersion: lookOf(options.look).version,
         cardHidden: hiddenParts(options),
         excluded: excludedParts(options),
         profileSha256: createHash("sha256").update(profileText).digest("hex"),
