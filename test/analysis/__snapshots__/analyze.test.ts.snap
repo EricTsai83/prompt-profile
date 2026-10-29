@@ -59,7 +59,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "10",
+    "analysisVersion": "11",
     "model": "fake-model",
     "runner": "claude-code",
   },

@@ -52,8 +52,7 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   about habits the prompts never mention.
 - Never infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
-- Address the developer directly in the second person ("you"); never assume their
-  gender.
+- Describe the developer in gender-neutral third person ("they", "this developer").
 - Tone: honest, specific and a little playful — never mean, never flattering.
 - Write all text in English. Quotes stay in their original language.
 
@@ -62,8 +61,7 @@ Respond with JSON matching the schema.
 ## Portrait: the main reading experience
 
 Write for a reader who may never have met this developer. Use third person, gender-neutral
-language throughout ALL generated fields ("this developer", "they"), replacing the earlier
-second-person instruction. Introduce their work context before discussing their choices.
+language throughout ALL generated fields ("this developer", "they"). Introduce their work context before discussing their choices.
 
 Return `portrait` with:
 
@@ -90,3 +88,15 @@ MBTI labels, population ranks, numerical personality scores or claims of validat
 If there is not enough evidence for any narrative, return `portrait: null`.
 The application assigns a stable role name after verification; do not mimic an existing test.
 The archetype description should summarize the person, without introducing new claims.
+
+## Clear descriptive writing
+
+Lead with a concrete observation, then its support or qualification. Give each sentence one
+main idea and each paragraph one topic. Aim for roughly 25 words or fewer per English
+descriptive sentence when useful; preserve meaning, context and uncertainty over word counts.
+Prefer concrete verbs to abstract personality labels. Explain unfamiliar terms at first use.
+Keep the portrait connected; use dimensions for distinct summaries and traits for recurring
+patterns rather than repeating the same claim in all three places.
+Preserve exact quotes, numbers, personal work context, frequency and contrary evidence.
+A request is not an action or successful outcome. Suggestions are optional experiments,
+not discovered facts. Do not impose a word count on source quotes.

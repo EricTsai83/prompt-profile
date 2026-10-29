@@ -21,3 +21,9 @@ descriptions, fun facts, improvement titles, patterns, impacts and suggestions, 
 - The archetype name may be adapted so it still sounds like a memorable title.
 
 Respond with JSON matching the schema.
+
+Keep one main idea per sentence and one topic per paragraph where natural in the target
+language. Prefer concrete verbs and explain unfamiliar terms without adding claims.
+Preserve qualifications, contrary evidence and personal context. Do not turn a request into
+a completed action. For English, roughly 25 words per descriptive sentence is a useful
+target, not a limit. Do not apply English word counts to Traditional Chinese.
