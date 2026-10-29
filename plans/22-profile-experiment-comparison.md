@@ -2,7 +2,7 @@
 
 Status: config, fixed-input execution, provenance, rendering, offline comparison, `--from` and
 docs implemented with fake-runner tests ([usage](../docs/experiments.md)); local-history
-snapshots and the bounded real-LLM comparison remain
+snapshots remain
 
 ## Objective
 
@@ -166,7 +166,7 @@ Example configuration (model IDs below are placeholders that the owner replaces)
 - [x] Test offline artifact generation with fictional profiles, including bilingual/sparse content,
       hostile text, missing cases and saved-version incompatibility. Rebuilding from saved output
       must make zero LLM calls. Avoid tests that merely mirror markup or arbitrary CSS values.
-- [ ] Run a bounded opt-in real comparison with at least two engine/model variants on one identical
+- [x] Run a bounded opt-in real comparison with at least two engine/model variants on one identical
       persona; use two repetitions to inspect variability. Record unavailable CLIs/models honestly.
       Inspect full HTML reports and PNG cards, selectors/links, narrow layout and offline loading.
       No real-history content or screenshots enter committed fixtures or documentation.
@@ -178,3 +178,22 @@ Example configuration (model IDs below are placeholders that the owner replaces)
       pipeline rule or CLI invocation changes. Bump production versions only if their contracts change.
 - [ ] When all acceptance boxes are complete, remove this plan and its index row in the same change
       and repair incoming links. Keep durable tool documentation outside `plans/`.
+
+## Real comparison — 2026-10-29
+
+`experiments/starter.json` on the fictional `curious-learner` persona: Claude Code 2.1.312 and
+codex-cli 0.165.0, each with its default model, two repetitions, English and Traditional Chinese.
+Outcome `passed` (exit 0), 20 of 40 attempts, no retries or failures. Claude reported
+`claude-opus-5-5`. Codex reported no model, and the page shows "not reported". Claude cases
+took 83–86 s; Codex cases took 127–138 s with about three times the input tokens. Every report
+and every en/zh-TW card rendered.
+
+Structured decisions differed between the engines: 5 traits and 54 verified quotes for Claude,
+3 traits and 43 quotes for Codex. They also differed within each engine: the closure and control
+axes were unresolved in one of the two repetitions, and the improvement counts varied. No
+complete role was assigned in any case. These are observations on one persona, not a ranking.
+
+The comparison page was inspected in headless Chromium at desktop and 390 px widths:
+selectors, links, embedded reports, cards and stacked layout all worked, with no horizontal
+overflow, external request or console error. Output stays in ignored `eval-output/`.
+
