@@ -100,7 +100,7 @@ These version numbers are independent. Bump them whenever the corresponding thin
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–19, 21 and 23 are done
+in the change that finishes it; it stays in git history. Plans 01–19, 21, 23 and 24 are done
 and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
@@ -112,7 +112,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 |---|---|---|---|---|
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 24 | [First-run clarity and recovery](24-first-run-and-recovery.md) | Clear data flow, preflight, sparse reports and recovery | None | Ready; first delivery batch |
 | 25 | [Factual and identity report experience](25-factual-and-identity-reports.md) | Purpose-based identity/factual reading and matching exports | Existing report; builds on closed plan 21 | HTML split implemented; export integration and validation pending |
 | 26 | [Claim fidelity and analysis calibration](26-claim-fidelity-and-calibration.md) | Claim-support cases, calibration and evaluation | Plan 22 evaluation tools; episode cases extend after plan 20 B | Ready for fixtures and baseline; production rules follow findings |
 | 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements; plan 20 B enriches evidence later | Ready for contract and fixtures; implement after initial plan 26 findings |
@@ -142,7 +141,8 @@ plan 21 is closed by owner decision (see the [closeout](../docs/ux/report-redesi
 
 ### Recommended execution batches
 
-1. **Clarify present value:** plan 24 (first run), plan 25 (identity/factual purposes), and
+1. **Clarify present value:** plan 24 (first run; done, usage in the
+   [README](../README.md#small-histories-and-stopped-runs)), plan 25 (identity/factual purposes), and
    plan 32's research protocol. Begin plan 26's fictional quality cases alongside these.
 2. **Make the portrait specific and trustworthy:** plan 20 B (episodes), plan 26's production
    calibration, and plan 20 C (contextual roles/signature moves). Ship a bounded episode-to-report

@@ -1,7 +1,9 @@
 # prompt-profile
 
-Analyze your past prompts from AI coding agents (Claude Code, Codex) locally and generate a
-personal profile.
+Read your past prompts from AI coding agents (Claude Code, Codex) on your computer, analyse them
+with the `claude` or `codex` CLI you are already logged in to, and get a personal profile report.
+Reading, cleaning, redaction and the report happen locally; the selected, redacted prompts are sent
+through that CLI to its model service and use your subscription quota (no API key).
 
 ![Synthetic sample share card](docs/sample-card.png)
 
@@ -59,14 +61,34 @@ in every look (`--look`; render only, no new analysis):
 
    `@latest` makes npx fetch the newest version instead of reusing one it cached earlier.
 
-3. It reads your local history, shows how many prompts it found and how many CLI calls the
-   analysis will take, and asks `Continue?`. The calls use your Claude / ChatGPT subscription
-   quota. To see what would be sent first, run `npx prompt-profile@latest --dry-run` (calls nothing).
+3. Before anything is sent it shows a summary and asks `Continue?`:
+
+   ```
+   ● Range: last 6m · 2026-05-02 → 2026-10-28
+     In range: Claude Code 1,204 · Codex 311 prompts
+     1,515 prompts in 182 sessions after cleaning → 1,515 selected in 24 chunks
+     No sampling: every chunk is analysed
+     Read, cleaned and redacted on this computer; the report and analysis cache are written only here.
+   ● Sent off this computer: the selected, redacted prompts go through your logged-in Claude Code CLI (claude -p) to its model service
+     No API key: uses your subscription quota, base estimate 25 calls (24 chunks + 1 final profile)
+     Intermediate merges and retries (up to 2 per call) can add calls.
+     No hard limit: add --max-calls <n> to stop after n CLI calls.
+     Free first: --dry-run writes what would be sent without calling any LLM; `prompt-profile stats` shows statistics.
+   ```
+
+   (Illustrative numbers.) The calls use your Claude / ChatGPT subscription quota.
+
 4. When it is done, the report opens in your browser. Everything is written to
    `./prompt-profile-report/`.
 
-Want to look around for free first? `npx prompt-profile@latest stats` shows statistics without any LLM
-call.
+### Look first, for free
+
+- `npx prompt-profile@latest --dry-run` prints the same summary, then writes the exact chunks that
+  would be sent to `--out` (`chunks/*.txt`, `plan.json`) and calls no LLM. The chunks are your
+  redacted prompt text: keep them private and delete them when done.
+- `npx prompt-profile@latest stats` shows statistics; nothing leaves your computer.
+
+Both work without a logged-in CLI.
 
 ## Install
 
@@ -194,7 +216,7 @@ prompt-profile --max-calls 40  # cap CLI invocations, including merges and retri
 prompt-profile --full          # no sampling, analyse everything (slower, uses more quota)
 prompt-profile --no-cache      # do not read the analysis cache
 prompt-profile --yes           # skip the confirmation (required in non-interactive sessions)
-prompt-profile --dry-run       # write what would be sent to the LLM into --out, call nothing
+prompt-profile --dry-run       # free: the summary, plus what would be sent written into --out
 prompt-profile --verbose       # full errors and LLM call timings
 prompt-profile --lang zh-TW,en # report languages, the first is the default (en, zh-TW)
 prompt-profile --look signal   # classic (default) / signal / afterhours / studio / prism / slate / folio
@@ -220,6 +242,33 @@ and then translated, one extra CLI call per extra language; quotes stay as you w
 
 Exit codes: `0` success · `1` error · `2` usage / needs `--yes` · `3` no data · `4` no usable LLM
 CLI · `5` rate limited · `130` interrupted (a re-run resumes from the cache).
+
+## Small histories and stopped runs
+
+**Small histories.** A role, featured observations and prompt coaching each need verified quotes
+from at least two sessions (the same rule that sets trait confidence and preference axes). When
+nothing in a profile reaches that, the report is titled "Early observations": it states how many
+prompts and sessions it is based on, keeps the observations, five dimensions and measurements,
+and leaves out the generated role and the "Improve your prompts" section. The card does the same.
+The terminal says so after the run; a longer `--since` range or more history adds evidence.
+
+**If a run stops.** Progress is shown by phase (chunks, merges, the final profile, verification,
+translations, writing files); there is no time estimate. When a run stops early, the error says
+what was saved and prints the exact command to run again:
+
+| What happened                                                         | What is saved                                           | What a re-run does                                                            |
+| --------------------------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Ctrl-C, rate limit, timeout, malformed output, too many failed chunks | Finished chunk results in the analysis cache; no report | Reuses cached chunks and merges; the final profile and translations run again |
+| `--max-calls` reached                                                 | Same; cached results do not use the budget again        | Same; raise `--max-calls` if it stops again                                   |
+| The final profile step failed                                         | Chunk results                                           | Repeats only the final profile and translation calls                          |
+| An intermediate merge failed (large histories)                        | Chunk results and finished merges                       | Repeats the unfinished merges, then the final profile and translations        |
+| A translation failed                                                  | The report, without that language                       | The printed command adds it (final profile + translation)                     |
+| A card was not created (e.g. the Chinese font download failed)        | The report and `profile.json`                           | `prompt-profile render <profile.json>` retries the cards, no analysis         |
+
+The re-run command keeps your flags and leaves out `--no-cache`, so it reads the cache. When
+prompt-profile was started with npx, the printed commands start with `npx prompt-profile@<version>`
+(the same version, so the cache matches); otherwise with the installed `prompt-profile`.
+A CLI's own error message can quote what it was sent, so it is shown only with `--verbose`.
 
 ## Privacy
 
