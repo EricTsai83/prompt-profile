@@ -24,6 +24,17 @@ const views = (page: string) => ({
 })
 
 describe("report views", () => {
+  it("changes the opening content with the selected purpose instead of retaining a shared identity hero", async () => {
+    const p = await sample()
+    const page = renderHtml(p)
+    const { identity, facts } = views(page)
+    expect(identity).toContain('class="hero"')
+    expect(identity).toContain(p.archetype.name)
+    expect(page.split('<section id="overview"')[0]).not.toContain('class="hero"')
+    expect(facts).not.toContain('class="hero"')
+    expect(facts).toContain('class="view-heading"')
+    expect(facts).toContain("Facts &amp; evidence")
+  })
   it("opens on an identity introduction: signature behaviours in their own words, preferences and the portrait story", async () => {
     const html = renderHtml(await sample())
     const { identity } = views(html)

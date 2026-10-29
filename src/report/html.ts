@@ -668,6 +668,8 @@ export const renderHtml = (
             <label for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overview)}</label>
             <label for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detail)}</label>
           </nav>
+          <main>
+          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
           <section class="hero">
             ${identity.split ? html`<div class="split"></div>` : ""}
             <div class="copy">
@@ -719,8 +721,7 @@ export const renderHtml = (
             }
           </section>
 
-          <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
+
           <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewNote)}</p></header>
           ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
           ${preferenceMap(profile, loc)}

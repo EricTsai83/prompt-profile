@@ -128,19 +128,23 @@ const identityCopy = (
         : h(
             "div",
             { display: "flex", gap: card.chips.gap, flexWrap: "wrap", marginTop: card.chips.top },
-            profile.traits.slice(0, 3).map((_tr, i) =>
-              h(
-                "div",
-                {
-                  display: "flex",
-                  fontSize: card.size.chip,
-                  padding: card.chips.padding,
-                  borderRadius: 999,
-                  ...colors.chip,
-                },
-                clip(c.trait(i).name, 32),
+            profile.traits
+              .map((t, i) => ({ t, i }))
+              .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
+              .slice(0, 3)
+              .map(({ i }) =>
+                h(
+                  "div",
+                  {
+                    display: "flex",
+                    fontSize: card.size.chip,
+                    padding: card.chips.padding,
+                    borderRadius: 999,
+                    ...colors.chip,
+                  },
+                  clip(c.trait(i).name, 32),
+                ),
               ),
-            ),
           ),
     ],
   )

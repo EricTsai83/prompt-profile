@@ -19,7 +19,7 @@ exports[`renderHtml > matches snapshot 1`] = `
 .hero{--id-bg:var(--card);--id-fg:var(--fg);--id-muted:var(--muted);--id-split:transparent}
 
 .view-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
-.view-nav{display:flex;gap:2px;margin:var(--space-1) 0 var(--space-6);padding:3px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);width:fit-content}
+.view-nav{display:flex;gap:2px;margin:var(--space-1) 0 var(--space-6) auto;padding:3px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);width:fit-content}
 .view-nav label,.page-turn{cursor:pointer;border-radius:var(--radius-sm);padding:var(--space-1) var(--space-3);font-size:var(--text-sm);font-weight:600;color:var(--muted);display:inline-block;transition:background-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out)}
 .view-nav label:hover,.page-turn:hover{color:var(--fg);background:var(--accent-soft)}
 #report-overview:checked~.page label[for="report-overview"],#report-detail:checked~.page label[for="report-detail"]{background:var(--accent-soft);color:var(--fg)}
@@ -505,6 +505,8 @@ html:root .tech-time{overflow:visible;font-size:8pt}
             <label for="report-overview"><span data-l="en" lang="en">Who they are</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這個人</span></label>
             <label for="report-detail"><span data-l="en" lang="en">Facts &amp; evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">事實與證據</span></label>
           </nav>
+          <main>
+          <section id="overview" class="report-view report-view-overview" aria-label="Who they are">
           <section class="hero">
 
             <div class="copy">
@@ -566,8 +568,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </figure></div>
           </section>
 
-          <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="Who they are">
+
           <header class="view-heading"><h2><span data-l="en" lang="en">Meet the collaborator</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這位協作者</span></h2><p><span data-l="en" lang="en">An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。</span></p></header>
           <section class="identity-moves">
     <h2><span data-l="en" lang="en">Featured observations, in their own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與本人原話</span></h2>

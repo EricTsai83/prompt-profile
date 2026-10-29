@@ -56,6 +56,29 @@ const ALL_OPTIONS: Array<RenderOptions> = LOOK_IDS.flatMap((look) =>
 )
 
 describe("render options", () => {
+  it.effect("cards feature only supported observations across every look", () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const base = p.traits[0]!
+      const profile = {
+        ...p,
+        traits: [
+          { ...base, name: "Weak observation", confidence: "low" as const },
+          { ...base, name: "Unsupported observation", evidence: [] },
+          { ...base, name: "Supported observation", confidence: "high" as const },
+        ],
+        translations: {},
+      }
+      for (const look of LOOK_IDS) {
+        const text = texts(cardTree(profile, { look, cardHide: [] }, "en"))
+        expect(text).toContain("Supported observation")
+        expect(text).not.toContain("Weak observation")
+        expect(text).not.toContain("Unsupported observation")
+      }
+      expect(profile.traits).toHaveLength(3)
+    }),
+  )
+
   it("names a variant by look and hidden parts, in a fixed order", () => {
     expect(variantName({ look: "signal", cardHide: [] })).toBe("signal")
     expect(variantName({ look: "studio", cardHide: ["graphic", "stats"] })).toBe(
@@ -188,7 +211,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 2,
         look: "afterhours",
-        lookVersion: 11,
+        lookVersion: 13,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

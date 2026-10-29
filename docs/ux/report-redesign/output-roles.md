@@ -64,3 +64,24 @@ The owner accepted the current result and explicitly closed plan 21. This record
 scope decision, not a completed unfamiliar-reader study or exhaustive visual acceptance.
 Reader research continues in plan 32; remaining purpose/export integration belongs to plan 25.
 Plan 21's critique, content matrix, direction studies and iteration records remain in this folder.
+
+## Purpose-specific opening — owner review, 2026-10-29
+
+The owner requested right-aligned view controls and an opening that changes with the purpose.
+The identity hero now belongs inside the identity view, so selecting facts starts with the
+factual heading and measurements instead of retaining the same identity card. Both purposes
+remain visible in print. Mobile retains full-width controls with equal touch targets; desktop
+controls align to the right. Language selection remains independent.
+
+A behavioral regression failed before moving the hero into its view and passed afterward.
+Headless browser checks at 1280px and 390px verified hero visibility on each selection, visible
+facts, no horizontal overflow and both purposes in print. These are functional checks, not
+owner visual approval. Classic advances to 7 and other looks to 13; no stored prose or analysis
+contract changes. The PNG redesign remains pending.
+
+### Owner acceptance — purpose-specific opening
+
+The owner accepted this review round after opening the updated report: right-aligned view
+controls and the identity hero appearing only on the identity view. This acceptance is scoped
+to that interaction and layout change; it does not close PNG redesign, the earlier story-width
+question, exhaustive visual validation or unfamiliar-reader research.
