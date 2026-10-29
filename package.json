@@ -1,6 +1,6 @@
 {
   "name": "prompt-profile",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Read your Claude Code / Codex prompt history locally, analyse it with your logged-in claude or codex CLI, and generate a personal profile report.",
   "keywords": [
     "ai",
