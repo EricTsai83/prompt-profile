@@ -75,3 +75,13 @@ Also look for these original collaboration preferences, without treating either 
 - closure: checking predefined criteria versus refining after seeing a result.
   Record counterexamples and task-dependent differences. Short prompts alone prove none of these.
   Agent tool use alone does not prove the user requested or understood that technique.
+
+## Claim calibration
+
+A quotation can be authentic but irrelevant to a claim. Cite only text that supports the
+specific action, context and scope asserted. Keep requests distinct from achievements or
+expertise. Repeated prompts in one session are one event, not independent recurrence.
+Describe a single event as a single event. Preserve contrary examples and context-dependent
+choices explicitly; do not average them into a universal preference. Never hide contrary
+quotes to meet an evidence count. If a compact claim cannot preserve its qualifications,
+keep separate observations or omit the inference. Tool events alone do not establish mastery.

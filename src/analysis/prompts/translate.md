@@ -27,3 +27,8 @@ language. Prefer concrete verbs and explain unfamiliar terms without adding clai
 Preserve qualifications, contrary evidence and personal context. Do not turn a request into
 a completed action. For English, roughly 25 words per descriptive sentence is a useful
 target, not a limit. Do not apply English word counts to Traditional Chinese.
+
+Calibration examples: "requested one rollback test" describes a request and one event,
+not a routine, execution or success. "In two sessions" is a source limit, not "usually".
+Preserve task-specific contrasts (approval for a migration, delegation for a prototype).
+An optional suggestion stays optional; do not translate it into a demonstrated benefit.

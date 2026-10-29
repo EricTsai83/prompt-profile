@@ -83,6 +83,27 @@ export const verifyEvidence = (
   })
 }
 
+/** Prose can combine several assertions; after losing a citation we cannot safely keep it.
+ * Duplicate citations are deduplicated but do not invalidate otherwise authentic support.
+ */
+export const verifyCompleteEvidence = (
+  evidence: ReadonlyArray<Evidence>,
+  texts: ReadonlyMap<string, string>,
+  counts: EvidenceCounts,
+): ReadonlyArray<Evidence> => {
+  const invalid = evidence.some((e) => {
+    const text = texts.get(e.promptId)
+    return text === undefined || !quoteMatches(e.quote, text)
+  })
+  const verified = verifyEvidence(evidence, texts, counts)
+  if (invalid) {
+    counts.kept -= verified.length
+    counts.dropped += verified.length
+    return []
+  }
+  return verified
+}
+
 /** After map: drop invalid evidence, then observations with no evidence left. */
 export const verifyObservations = (
   obs: ChunkObservations,
@@ -91,7 +112,7 @@ export const verifyObservations = (
 ): ChunkObservations => ({
   chunkId: obs.chunkId,
   observations: obs.observations
-    .map((o) => ({ ...o, evidence: verifyEvidence(o.evidence, texts, counts) }))
+    .map((o) => ({ ...o, evidence: verifyCompleteEvidence(o.evidence, texts, counts) }))
     .filter((o) => o.evidence.length > 0),
 })
 
@@ -109,8 +130,8 @@ export interface PromptOrigin {
 /**
  * After reduce: a trait supported by < 2 distinct prompts drops one confidence level; with 0 it is
  * removed. Then the spread of its quotes caps the confidence (never raises it): `high` needs 3
- * sessions across at least 2 weeks, `medium` 2 sessions, otherwise `low`. Without origin data
- * every prompt counts as its own session and week. Fewer than 3 traits is reported as-is.
+ * sessions across at least 2 weeks, `medium` 2 sessions, otherwise `low`. Without complete origin data
+ * spread is unknown and confidence is capped at low. Fewer than 3 traits is reported as-is.
  */
 export const verifyTraits = (
   traits: ReadonlyArray<Omit<Trait, "support">>,
@@ -119,17 +140,20 @@ export const verifyTraits = (
   origins?: ReadonlyMap<string, PromptOrigin>,
 ): ReadonlyArray<Trait> =>
   traits.flatMap((t) => {
-    const evidence = verifyEvidence(t.evidence, texts, counts)
+    const evidence = verifyCompleteEvidence(t.evidence, texts, counts)
     if (evidence.length === 0) return []
     const prompts = new Set(evidence.map((e) => e.promptId))
-    const support = {
-      sessions: new Set(evidence.map((e) => origins?.get(e.promptId)?.session ?? e.promptId)).size,
-      weeks: new Set(evidence.map((e) => origins?.get(e.promptId)?.week ?? e.promptId)).size,
-    }
+    const known = origins !== undefined && evidence.every((e) => origins.has(e.promptId))
+    const support = known
+      ? {
+          sessions: new Set(evidence.map((e) => origins!.get(e.promptId)!.session)).size,
+          weeks: new Set(evidence.map((e) => origins!.get(e.promptId)!.week)).size,
+        }
+      : null
     const allowed: Confidence =
-      support.sessions >= 3 && support.weeks >= 2
+      support && support.sessions >= 3 && support.weeks >= 2
         ? "high"
-        : support.sessions >= 2
+        : support && support.sessions >= 2
           ? "medium"
           : "low"
     const stated = prompts.size < 2 ? DOWNGRADE[t.confidence] : t.confidence
@@ -146,7 +170,7 @@ export const verifyImprovements = (
   counts: EvidenceCounts,
 ): ReadonlyArray<Improvement> =>
   improvements.flatMap((i) => {
-    const evidence = verifyEvidence(i.evidence, texts, counts)
+    const evidence = verifyCompleteEvidence(i.evidence, texts, counts)
     if (evidence.length === 0) return []
     const rewrite =
       i.rewrite !== null && evidence.some((e) => e.promptId === i.rewrite!.promptId)
@@ -155,10 +179,18 @@ export const verifyImprovements = (
     return [{ ...i, evidence, rewrite }]
   })
 
-/** Dimensions keep their summary even with 0 evidence (the report flags "insufficient evidence"). */
+/** Empty or partially rejected support cannot leave a generated dimension assertion. */
 export const verifyDimensions = (
   dimensions: ReadonlyArray<Dimension>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
 ): ReadonlyArray<Dimension> =>
-  dimensions.map((d) => ({ ...d, evidence: verifyEvidence(d.evidence, texts, counts) }))
+  dimensions.map((d) => {
+    const evidence = verifyCompleteEvidence(d.evidence, texts, counts)
+    return {
+      ...d,
+      title: evidence.length ? d.title : d.key,
+      summary: evidence.length ? d.summary : "",
+      evidence,
+    }
+  })

@@ -22,3 +22,13 @@ Respond with JSON matching the schema.
 
 Preserve collaboration episodes: keep their chronological quote order, session boundaries,
 turning points and counterexamples. Do not merge separate events into a fictional conversation.
+
+## Claim calibration
+
+A quotation can be authentic but irrelevant to a claim. Cite only text that supports the
+specific action, context and scope asserted. Keep requests distinct from achievements or
+expertise. Repeated prompts in one session are one event, not independent recurrence.
+Describe a single event as a single event. Preserve contrary examples and context-dependent
+choices explicitly; do not average them into a universal preference. Never hide contrary
+quotes to meet an evidence count. If a compact claim cannot preserve its qualifications,
+keep separate observations or omit the inference. Tool events alone do not establish mastery.

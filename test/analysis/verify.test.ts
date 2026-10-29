@@ -95,9 +95,8 @@ describe("verify", () => {
       texts,
       counts,
     )
-    expect(result.observations).toHaveLength(1)
-    expect(result.observations[0]!.evidence).toHaveLength(1)
-    expect(counts).toEqual({ kept: 1, dropped: 2 })
+    expect(result.observations).toHaveLength(0)
+    expect(counts).toEqual({ kept: 0, dropped: 3 })
   })
 
   it("downgrades traits with < 2 evidence and removes traits with none", () => {
@@ -132,21 +131,18 @@ describe("verify", () => {
       texts,
       counts,
     )
-    // without session metadata each prompt counts as its own session and week
-    expect(traits.map((t) => [t.name, t.confidence])).toEqual([
-      ["a", "medium"],
-      ["b", "low"],
-    ])
-    expect(counts).toEqual({ kept: 3, dropped: 2 })
+    // Missing session metadata cannot establish independent support.
+    expect(traits.map((t) => [t.name, t.confidence])).toEqual([["a", "low"]])
+    expect(counts).toEqual({ kept: 2, dropped: 3 })
   })
 
-  it("keeps dimension summaries even without evidence", () => {
+  it("clears dimension assertions without complete evidence", () => {
     const dims = verifyDimensions(
       [{ key: "growth", title: "t", summary: "s", evidence: [{ promptId: "p1", quote: "nope" }] }],
       texts,
       { kept: 0, dropped: 0 },
     )
-    expect(dims).toEqual([{ key: "growth", title: "t", summary: "s", evidence: [] }])
+    expect(dims).toEqual([{ key: "growth", title: "growth", summary: "", evidence: [] }])
   })
 })
 
@@ -283,9 +279,8 @@ describe("improvements", () => {
       counts,
     )
     expect(result.map((r) => [r.title, r.evidence.length, r.rewrite?.promptId ?? null])).toEqual([
-      ["kept", 1, "p3"],
       ["rewrite of an unverified prompt", 1, null],
     ])
-    expect(counts).toEqual({ kept: 2, dropped: 2 })
+    expect(counts).toEqual({ kept: 1, dropped: 3 })
   })
 })

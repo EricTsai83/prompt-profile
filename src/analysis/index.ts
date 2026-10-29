@@ -21,6 +21,7 @@ import { Progress } from "./progress.ts"
 import { addTranslations } from "./translate.ts"
 import {
   capEvidence,
+  retainOmittedEvidence,
   groupForMerge,
   MIN_MERGE_SHRINK,
   observationsText,
@@ -197,10 +198,20 @@ export const analyze = (input: {
     // ---- verify (map) ---------------------------------------------------------------
     const mapCounts: EvidenceCounts = { kept: 0, dropped: 0 }
     const verified = outcomes.flatMap((o) =>
-      o.observations === null ? [] : [verifyObservations(o.observations, texts, mapCounts)],
+      o.observations === null
+        ? []
+        : [
+            verifyObservations(
+              o.observations,
+              new Map(o.chunk.prompts.map((p) => [p.id, p.text])),
+              mapCounts,
+            ),
+          ],
     )
-    let observations: ReadonlyArray<Observation> = capEvidence(
-      verified.flatMap((v) => v.observations),
+    const originalObservations = verified.flatMap((v) => v.observations)
+    let observations: ReadonlyArray<Observation> = retainOmittedEvidence(
+      originalObservations,
+      capEvidence(originalObservations),
     )
 
     // ---- intermediate merges when the reduce input is too large -----------------------
@@ -234,7 +245,8 @@ export const analyze = (input: {
                     .pipe(Effect.as(fresh))
                 }),
               )
-        return capEvidence(verifyObservations(value, texts).observations)
+        const merged = verifyObservations(value, texts).observations
+        return retainOmittedEvidence(group, retainOmittedEvidence(merged, capEvidence(merged)))
       })
     for (let round = 0; round < 3; round++) {
       const before = observationsText(observations).length
@@ -317,11 +329,12 @@ export const analyze = (input: {
           ),
         ),
     )
-    const portrait = verifyPortrait(profile.portrait, texts, origins, counts)
+    const finalTexts = new Map(analyzedPrompts.map((p) => [p.id, p.text]))
+    const portrait = verifyPortrait(profile.portrait, finalTexts, origins, counts)
     const code = portrait ? roleCode(portrait.axes) : null
     const traits = verifyTraits(
       profile.traits,
-      texts,
+      finalTexts,
       counts,
       new Map(
         outcomes.flatMap((o) =>
@@ -332,15 +345,27 @@ export const analyze = (input: {
         ),
       ),
     )
-    const dimensions = verifyDimensions(profile.dimensions, texts, counts)
-    const improvements = verifyImprovements(profile.improvements, texts, counts)
+    const dimensions = verifyDimensions(profile.dimensions, finalTexts, counts)
+    const improvements = verifyImprovements(profile.improvements, finalTexts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)
+    const summariesUnsafe =
+      counts.dropped > 0 ||
+      !(
+        portrait ||
+        traits.length ||
+        improvements.length ||
+        dimensions.some((d) => d.evidence.length)
+      )
     const verifiedProfile: Profile = {
       ...profile,
-      portrait,
-      archetype: portrait
-        ? { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" }
-        : profile.archetype,
+      // Global summaries have no direct citations: conservatively reset them after rejection.
+      headline: summariesUnsafe ? "Collaboration observations" : profile.headline,
+      portrait: summariesUnsafe ? null : portrait,
+      archetype: summariesUnsafe
+        ? { name: "Collaboration observations", description: "" }
+        : portrait
+          ? { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" }
+          : profile.archetype,
       traits,
       dimensions,
       improvements,
