@@ -42,41 +42,50 @@ const textNodes = (value: unknown): string[] => {
   return []
 }
 
-it("respects project visibility in both report and card languages", async () => {
-  const p = await Effect.runPromise(sample())
-  for (const project of ["PrivateOrchard", "XY"]) {
-    const profile = {
-      ...p,
-      headline: `Builds ${project} at midnight`,
-      archetype: { name: `${project} architect`, description: project },
-      traits: p.traits.map((t) => ({ ...t, name: `${project} specialist` })),
-      stats: { ...p.stats, topProjects: p.stats.topProjects.map((x) => ({ ...x, name: project })) },
-      translations: {
-        ...p.translations,
-        "zh-TW": {
-          ...p.translations["zh-TW"]!,
-          headline: `Builds ${project}`,
-          archetype: { name: `${project} architect`, description: project },
-          traits: p.traits.map(() => ({ name: `${project} specialist`, description: project })),
+// Renders every look twice per project name: allow for slow CI runners (5 s default).
+it(
+  "respects project visibility in both report and card languages",
+  { timeout: 20_000 },
+  async () => {
+    const p = await Effect.runPromise(sample())
+    for (const project of ["PrivateOrchard", "XY"]) {
+      const profile = {
+        ...p,
+        headline: `Builds ${project} at midnight`,
+        archetype: { name: `${project} architect`, description: project },
+        traits: p.traits.map((t) => ({ ...t, name: `${project} specialist` })),
+        stats: {
+          ...p.stats,
+          topProjects: p.stats.topProjects.map((x) => ({ ...x, name: project })),
         },
-      },
-    }
-    for (const look of LOOK_IDS)
-      for (const lang of ["en", "zh-TW"] as const) {
+        translations: {
+          ...p.translations,
+          "zh-TW": {
+            ...p.translations["zh-TW"]!,
+            headline: `Builds ${project}`,
+            archetype: { name: `${project} architect`, description: project },
+            traits: p.traits.map(() => ({ name: `${project} specialist`, description: project })),
+          },
+        },
+      }
+      for (const look of LOOK_IDS)
         for (const hidden of [false, true]) {
           const options = { look, cardHide: [], exclude: hidden ? ["projects" as const] : [] }
-          const card = textNodes(cardTree(profile, options, lang)).join("\n")
+          // One HTML report holds both languages: render it once, not once per card language.
           // Embedded font/image bytes can coincidentally contain a short project name.
           const report = renderHtml(profile, options)
             .replace(/<style[\s\S]*?<\/style>/g, "")
             .replace(/data:[^"']*/g, "")
-          expect(card.includes(project)).toBe(!hidden)
           expect(report.includes(project)).toBe(!hidden)
+          for (const lang of ["en", "zh-TW"] as const) {
+            const card = textNodes(cardTree(profile, options, lang)).join("\n")
+            expect(card.includes(project)).toBe(!hidden)
+          }
         }
-      }
-    expect(renderHtml(profile, { look: "prism", cardHide: [] })).toContain(project)
-  }
-})
+      expect(renderHtml(profile, { look: "prism", cardHide: [] })).toContain(project)
+    }
+  },
+)
 
 it("keeps long card identity text above the footer in every product card", async () => {
   const p = await Effect.runPromise(sample())
