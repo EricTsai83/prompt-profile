@@ -230,3 +230,17 @@ walkthrough or validation of every report/language edge case. Plan 21 remains op
 remaining acceptance items. Generated PDF review exports remain local; reproducible fictional
 HTML examples, research captures and QA tooling are versioned. The report explanation skill
 is versioned at `.agents/skills/prompt-profile-explain-reports/SKILL.md`.
+
+## Owner direction - output roles (2026-10-29)
+
+The owner finds the current split between the HTML report and the PNG card unhelpful. Two
+outputs matter, defined by purpose rather than file format:
+
+- **Factual report:** a truthful, complete presentation of the information, with sources,
+  denominators and unknowns.
+- **Identity report:** a fun, recognizable introduction of the person.
+
+Today the "Profile & evidence" view comes closest to the factual role, and the visual overview
+plus the card come closest to the identity role. Remaining composition work should restructure
+the outputs around these two roles. [Plan 23](23-usage-plan-and-api-equivalent-cost.md) already
+places usage, plan and cost in the factual report only.
