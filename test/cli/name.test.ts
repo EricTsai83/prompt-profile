@@ -1,6 +1,11 @@
 import { Effect } from "effect"
 import { describe, expect, it } from "vitest"
-import { parseRenderOptions, renderRetryCommand, rerunCommand } from "../../src/cli/options.ts"
+import {
+  parseEffort,
+  parseRenderOptions,
+  renderRetryCommand,
+  rerunCommand,
+} from "../../src/cli/options.ts"
 
 const parse = (name: string | undefined) =>
   Effect.runPromise(Effect.result(parseRenderOptions("classic", undefined, undefined, name)))
@@ -28,5 +33,30 @@ describe("--name", () => {
     }
     expect(rerunCommand(flags)).toContain("--name 'Eric Tsai'")
     expect(renderRetryCommand("p/profile.json", "p", flags)).toContain("--name 'Eric Tsai'")
+  })
+})
+
+describe("--effort", () => {
+  it.each(["low", "medium", "high", "xhigh", "max"])("accepts %s", async (value) => {
+    expect(await Effect.runPromise(Effect.result(parseEffort(value)))).toMatchObject({
+      success: value,
+    })
+  })
+
+  it.each(["minimal", "none", "MEDIUM2", ""])(
+    "rejects %s, which one of the CLIs lacks",
+    async (value) => {
+      expect(await Effect.runPromise(Effect.result(parseEffort(value)))).toMatchObject({
+        failure: { _tag: "InvalidArgument", flag: "--effort" },
+      })
+    },
+  )
+
+  it("is not set by default and is repeated by the re-run command", async () => {
+    expect(await Effect.runPromise(Effect.result(parseEffort(undefined)))).toMatchObject({
+      success: null,
+    })
+    const flags = { since: "3m", out: "prompt-profile-report", full: false, yes: false }
+    expect(rerunCommand({ ...flags, effort: "medium" })).toContain("--effort medium")
   })
 })

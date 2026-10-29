@@ -10,6 +10,7 @@ import {
   type ReportPart,
 } from "../report/looks.ts"
 import { PERSONAL_RULES, type PersonalRule } from "../pipeline/audit.ts"
+import { EFFORTS, type Effort } from "../domain/Effort.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */
@@ -34,6 +35,16 @@ export const parseSince = (
   const since = DateTime.toEpochMillis(DateTime.subtract(now, parts))
   return Effect.succeed(Number.isFinite(since) && since >= 0 ? DateTime.makeUnsafe(since) : null)
 }
+
+/** `--effort`: a level both claude and codex accept; unset means each CLI's default. */
+export const parseEffort = (
+  value: string | undefined,
+): Effect.Effect<Effort | null, InvalidArgument> =>
+  value === undefined
+    ? Effect.succeed(null)
+    : (EFFORTS as ReadonlyArray<string>).includes(value)
+      ? Effect.succeed(value as Effort)
+      : Effect.fail(new InvalidArgument({ flag: "--effort", value }))
 
 /** Longest `--name`: it titles the report. */
 export const MAX_NAME_LENGTH = 60
@@ -111,6 +122,7 @@ export interface RunFlags {
   /** As typed: `claude` / `codex`. */
   readonly engine?: string | undefined
   readonly model?: string | undefined
+  readonly effort?: string | undefined
   readonly out: string
   readonly full: boolean
   readonly yes: boolean
@@ -151,6 +163,7 @@ export const rerunCommand = (f: RunFlags): string =>
     ...flag("--since", f.since),
     ...flag("--engine", f.engine),
     ...flag("--model", f.model),
+    ...flag("--effort", f.effort),
     ...flag("--out", f.out, DEFAULT_OUT),
     ...(f.full ? ["--full"] : []),
     ...flag("--lang", f.lang),

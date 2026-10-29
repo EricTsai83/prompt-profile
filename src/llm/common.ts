@@ -10,8 +10,11 @@ import {
 
 export const DEFAULT_TIMEOUT: Duration.Input = "5 minutes"
 
+import type { Effort } from "../domain/Effort.ts"
+
 export interface RunnerOptions {
   readonly model?: string | undefined
+  readonly effort?: Effort | null | undefined
   readonly timeout?: Duration.Input | undefined
 }
 

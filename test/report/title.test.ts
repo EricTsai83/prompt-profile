@@ -35,3 +35,13 @@ describe("report title", () => {
     expect(out).toContain("&lt;b&gt;Eve&lt;/b&gt;’s prompt profile")
   })
 })
+
+describe("engine line", () => {
+  it("names the reasoning effort when one was requested", async () => {
+    const p = await sample()
+    const out = renderHtml({ ...p, engine: { ...p.engine, effort: "medium" } })
+    expect(out).toContain("Engine: Claude Code (claude-opus-5-5, medium reasoning effort)")
+    expect(out).toContain("分析引擎：Claude Code（claude-opus-5-5，推理強度 medium）")
+    expect(renderHtml(p)).toContain("Engine: Claude Code (claude-opus-5-5)")
+  })
+})

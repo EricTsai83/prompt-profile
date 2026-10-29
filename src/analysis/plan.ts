@@ -1,4 +1,5 @@
 import { Effect, Option } from "effect"
+import type { Effort } from "../domain/Effort.ts"
 import type { Language } from "../domain/Profile.ts"
 import type { SafePrompt } from "../domain/SafePrompt.ts"
 import { PIPELINE_VERSION } from "../pipeline/version.ts"
@@ -20,6 +21,8 @@ export interface AnalyzeOptions {
   readonly noCache: boolean
   /** `--model` passed to the runner; part of the cache key. */
   readonly model: string | null
+  /** `--effort` passed to the runner; part of the cache key when set. */
+  readonly effort?: Effort | null
   /** Report languages, default first (default `["en"]`); each non-English one costs a call. */
   readonly languages?: ReadonlyArray<Language>
   /** Observations above this many characters are merged first (default REDUCE_INPUT_LIMIT). */
@@ -59,6 +62,7 @@ export const keyParts = (
   pipelineVersion: PIPELINE_VERSION,
   runner,
   model: options.model,
+  effort: options.effort ?? null,
 })
 
 export const selectChunks = (prompts: ReadonlyArray<SafePrompt>, options: AnalyzeOptions) => {

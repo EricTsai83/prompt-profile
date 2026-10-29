@@ -48,7 +48,7 @@ export interface Messages {
   readonly insufficientEvidence: string
   readonly funFacts: string
   readonly about: string
-  readonly engine: (runner: string, model: string | null) => string
+  readonly engine: (runner: string, model: string | null, effort: string | null) => string
   readonly generatedAt: (at: string) => string
   readonly evidenceVerified: (kept: number, dropped: number) => string
   readonly chunksSkipped: (n: number) => string
@@ -200,7 +200,8 @@ const en: Messages = {
   insufficientEvidence: "Insufficient evidence: no quote in this summary passed verification.",
   funFacts: "Fun facts",
   about: "About this report",
-  engine: (r, m) => `Engine: ${r}${m ? ` (${m})` : ""}`,
+  engine: (r, m, e) =>
+    `Engine: ${r}${m || e ? ` (${[m, e ? `${e} reasoning effort` : null].filter(Boolean).join(", ")})` : ""}`,
   generatedAt: (at) => `Generated: ${at}`,
   evidenceVerified: (k, d) =>
     `${k} pieces of evidence verified${d > 0 ? ` (${d} invalid or duplicate quotes removed)` : ""}`,
@@ -404,7 +405,8 @@ const zhTW: Messages = {
   insufficientEvidence: "證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。",
   funFacts: "有趣的事實",
   about: "關於這份報告",
-  engine: (r, m) => `分析引擎：${r}${m ? `（${m}）` : ""}`,
+  engine: (r, m, e) =>
+    `分析引擎：${r}${m || e ? `（${[m, e ? `推理強度 ${e}` : null].filter(Boolean).join("，")}）` : ""}`,
   generatedAt: (at) => `產生時間：${at}`,
   evidenceVerified: (k, d) =>
     `已驗證 ${k} 段證據${d > 0 ? `（移除 ${d} 段無效或重複的引文）` : ""}`,

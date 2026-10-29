@@ -183,6 +183,12 @@ export const command = Command.make(
       Flag.withDescription("Model passed to claude / codex"),
       Flag.optional,
     ),
+    effort: Flag.String("effort").pipe(
+      Flag.withDescription(
+        "Reasoning effort passed to claude / codex: low, medium, high, xhigh or max (default: the CLI's)",
+      ),
+      Flag.optional,
+    ),
     maxCalls: Flag.String("max-calls").pipe(
       Flag.withDescription(
         "Hard limit on LLM CLI calls, including merges and retries (default: none)",
@@ -225,6 +231,7 @@ export const command = Command.make(
         optional(f.engine),
       ) as RunnerId | undefined,
       model: optional(f.model),
+      effort: optional(f.effort),
       maxCalls: optional(f.maxCalls),
       out: f.out,
       full: f.full,

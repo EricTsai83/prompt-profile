@@ -3,6 +3,7 @@ import { Effect, Schema } from "effect"
 import { Episode, EpisodeCoverage, Pattern } from "./Episode.ts"
 import { MAX_QUOTE_LENGTH } from "./quote.ts"
 import { Steering } from "./Steering.ts"
+import { Effort } from "./Effort.ts"
 import { SourceId } from "./Source.ts"
 import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
@@ -16,10 +17,10 @@ import { Usage } from "./Usage.ts"
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
  * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
  * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
- * where the person redirected the AI or asked for repairs). Versions 2–12 are migrated on
- * decode.
+ * where the person redirected the AI or asked for repairs). 14: `engine.effort`. Versions 2–13
+ * are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 13 as const
+export const PROFILE_SCHEMA_VERSION = 14 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -160,6 +161,8 @@ export type Coverage = typeof Coverage.Type
 export const Engine = Schema.Struct({
   runner: SourceId,
   model: Schema.NullOr(Schema.String),
+  /** `--effort` as requested; null = the CLI's default (and before schema version 14). */
+  effort: Schema.NullOr(Effort).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   analysisVersion: Schema.String,
 })
 export type Engine = typeof Engine.Type
@@ -310,7 +313,7 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }

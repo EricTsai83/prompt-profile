@@ -14,10 +14,21 @@ export interface CacheKeyParts {
   readonly pipelineVersion: string
   readonly runner: string
   readonly model: string | null
+  /** `--effort`; null = the CLI's default. */
+  readonly effort: string | null
 }
 
 export const cacheKey = (p: CacheKeyParts): string =>
-  sha256(p.kind, p.inputId, p.analysisVersion, p.pipelineVersion, p.runner, p.model ?? "")
+  // a run without --effort keeps the keys it had before effort existed
+  sha256(
+    p.kind,
+    p.inputId,
+    p.analysisVersion,
+    p.pipelineVersion,
+    p.runner,
+    p.model ?? "",
+    ...(p.effort ? [p.effort] : []),
+  )
 
 /** The cache file stores the key parts so a mismatch (hash collision, tampering) is a miss. */
 export const CacheEntry = Schema.Struct({
@@ -27,6 +38,7 @@ export const CacheEntry = Schema.Struct({
   pipelineVersion: Schema.String,
   runner: Schema.String,
   model: Schema.NullOr(Schema.String),
+  effort: Schema.NullOr(Schema.String).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   /** Model reported by the CLI when the entry was produced. */
   producedBy: Schema.NullOr(Schema.String),
   value: ChunkObservations,
@@ -55,7 +67,8 @@ const sameParts = (e: CacheEntry, p: CacheKeyParts) =>
   e.analysisVersion === p.analysisVersion &&
   e.pipelineVersion === p.pipelineVersion &&
   e.runner === p.runner &&
-  e.model === p.model
+  e.model === p.model &&
+  e.effort === p.effort
 
 const decodeEntry = Schema.decodeUnknownOption(Schema.fromJsonString(CacheEntry))
 const encodeEntry = Schema.encodeSync(Schema.fromJsonString(CacheEntry))

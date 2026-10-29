@@ -21,6 +21,7 @@ import {
   parseAllow,
   parseLanguages,
   launcherOf,
+  parseEffort,
   parseRenderOptions,
   renderRetryCommand,
   rerunCommand,
@@ -213,6 +214,7 @@ export const runMain = (options: MainOptions) =>
     ) {
       return yield* new InvalidArgument({ flag: "--max-calls", value: options.maxCalls! })
     }
+    const effort = yield* parseEffort(options.effort)
     const renderOptions = yield* parseRenderOptions(
       options.look ?? "classic",
       options.cardHide,
@@ -237,6 +239,7 @@ export const runMain = (options: MainOptions) =>
       full: options.full,
       noCache: !options.cache,
       model: options.model ?? null,
+      effort,
       languages,
     }
     const provider = yield* LlmProvider
@@ -270,7 +273,7 @@ export const runMain = (options: MainOptions) =>
     // Pick the engine (no prompt is sent to check login).
     const statuses = yield* provider.detect
     const status = yield* chooseRunner(statuses, options.engine ?? null)
-    const base = yield* provider.make(status.id, { model: options.model })
+    const base = yield* provider.make(status.id, { model: options.model, effort })
     const runner = withRetry(maxCalls === null ? base : withCallBudget(base, maxCalls))
 
     const p = yield* plan({ prompts, options: analyzeOptions, runner: runner.id })

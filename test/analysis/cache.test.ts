@@ -10,6 +10,7 @@ import {
   fileCacheLayer,
   type CacheKeyParts,
 } from "../../src/analysis/cache.ts"
+import { sha256 } from "../../src/analysis/hash.ts"
 
 const parts: CacheKeyParts = {
   kind: "map",
@@ -18,6 +19,7 @@ const parts: CacheKeyParts = {
   pipelineVersion: "1",
   runner: "claude-code",
   model: null,
+  effort: null,
 }
 const entry = {
   ...parts,
@@ -95,4 +97,23 @@ describe("cache deletion failures", () => {
       yield* cache.clear
     }).pipe(Effect.provide(fileCacheLayer("/missing-cache")), Effect.provide(NodeServices.layer)),
   )
+})
+
+describe("cache key and reasoning effort", () => {
+  it("separates results made with a different effort, and keeps keys without one unchanged", () => {
+    const base = { ...parts, effort: null }
+    expect(cacheKey({ ...parts, effort: "high" })).not.toBe(cacheKey(base))
+    expect(cacheKey({ ...parts, effort: "high" })).not.toBe(cacheKey({ ...parts, effort: "low" }))
+    // the key of a run without --effort is what it was before effort existed
+    expect(cacheKey(base)).toBe(
+      sha256(
+        parts.kind,
+        parts.inputId,
+        parts.analysisVersion,
+        parts.pipelineVersion,
+        parts.runner,
+        "",
+      ),
+    )
+  })
 })

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 13,
+  "schemaVersion": 14,
   "languages": [
     "en",
     "zh-TW"
@@ -8,6 +8,7 @@
   "engine": {
     "runner": "claude-code",
     "model": "claude-opus-5-5",
+    "effort": null,
     "analysisVersion": "1"
   },
   "coverage": {

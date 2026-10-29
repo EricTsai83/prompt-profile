@@ -46,6 +46,8 @@ export const codexArgs = (
   "--skip-git-repo-check",
   "--json",
   ...(options.model ? ["-m", options.model] : []),
+  // a -c override applies even with --ignore-user-config
+  ...(options.effort ? ["-c", `model_reasoning_effort="${options.effort}"`] : []),
   "-",
 ]
 

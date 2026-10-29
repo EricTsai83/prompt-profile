@@ -347,6 +347,7 @@ export const analyze = (input: {
       engine: {
         runner: runner.id,
         model: draft.model ?? outcomes.find((o) => o.model !== null)?.model ?? options.model,
+        effort: options.effort ?? null,
         analysisVersion: ANALYSIS_VERSION,
       },
       stats: input.stats,

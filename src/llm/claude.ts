@@ -45,6 +45,7 @@ export const claudeArgs = (
   "--system-prompt",
   `${SYSTEM_PREAMBLE}\n\n${input.system}`,
   ...(options.model ? ["--model", options.model] : []),
+  ...(options.effort ? ["--effort", options.effort] : []),
 ]
 
 /** Lenient view of `claude -p --output-format json` (only the fields we use). */

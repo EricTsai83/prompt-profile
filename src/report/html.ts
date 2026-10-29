@@ -1074,7 +1074,7 @@ export const renderHtml = (
                   <p>
                     ${loc.text(
                       (m) =>
-                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model)} · ${m.generatedAt((v.dates ? formatDateTime : formatMonth)(profile.generatedAt, tz, m.locale))}`,
+                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model, profile.engine.effort)} · ${m.generatedAt((v.dates ? formatDateTime : formatMonth)(profile.generatedAt, tz, m.locale))}`,
                     )}
                   </p>
                   <p>

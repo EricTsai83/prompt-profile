@@ -219,6 +219,7 @@ prompt-profile                 # analyse the last 3 months and write the report
 prompt-profile --since 3m      # 1m / 3m / 6m / 1y / all (also <n>d, <n>w)
 prompt-profile --engine codex  # which CLI analyses your prompts (default: auto, Claude Code first)
 prompt-profile --model <name>  # model passed to claude / codex
+prompt-profile --effort medium # reasoning effort: low / medium / high / xhigh / max (default: the CLI's)
 prompt-profile --out <dir>     # output folder
 prompt-profile --max-calls 40  # cap CLI invocations, including merges and retries
 prompt-profile --full          # no sampling, analyse everything (slower, uses more quota)

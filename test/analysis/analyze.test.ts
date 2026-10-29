@@ -223,6 +223,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
+        effort: null,
         analysisVersion: "16",
       })
       // the profile is written in English
@@ -232,6 +233,17 @@ describe("analyze", () => {
       expect(
         Schema.encodeSync(Profile)({ ...profile, generatedAt: DateTime.makeUnsafe(0) }),
       ).toMatchSnapshot()
+    }),
+  )
+
+  it.effect("records the requested reasoning effort with the engine", () =>
+    Effect.gen(function* () {
+      const profile = yield* run(makeFakeLlmRunner({ respond }), makeMemoryCache(), {
+        ...options,
+        effort: "medium",
+      })
+      expect(profile.engine.effort).toBe("medium")
+      expect((yield* run(makeFakeLlmRunner({ respond }))).engine.effort).toBeNull()
     }),
   )
 
