@@ -11,7 +11,7 @@ exports[`renderHtml > matches snapshot 1`] = `
           http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"
         />
-        <title>The Midnight Architect · prompt-profile</title>
+        <title>The Midnight Architect · prompt profile</title>
         <style>
           :root{color-scheme:light dark;--bg:#f6f6f3;--fg:#1d1d1f;--muted:#6b6b70;--card:#ffffff;--border:#e6e6e1;--accent:#5b5bd6;--accent-soft:#ececfb;--warn:#9a5800;--empty:#ececea;--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#d3d6dc;--on-accent:#fff;--positive:#187c43;--shadow:rgba(0,0,0,.18);--font-body:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;--title-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;--title-weight:700;--title-size:clamp(32px,5.6vw,58px);--title-tracking:-.02em;--title-measure:none;--prose-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;--prose-intro:20px;--text-2xs:11px;--text-xs:12px;--text-sm:13px;--text-md:14px;--text-base:15px;--text-lg:17px;--text-xl:20px;--text-2xl:26px;--hero-border:1px solid var(--border);--hero-top:1px solid var(--border);--hero-bottom:1px solid var(--border);--hero-radius:24px;--topbar-rule:none;--radius-xs:8px;--radius-sm:10px;--radius-md:12px;--radius-lg:14px;--radius-xl:18px;--motion-fast:150ms;--motion-base:200ms;--ease-out:cubic-bezier(.2,0,0,1);--page:1080px;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--reading:65ch;--gutter:clamp(20px,4vw,48px);--column:740px;--panel-top:24px;--overview-columns:minmax(0,1.35fr) minmax(0,1fr)}
 @media (prefers-color-scheme:dark){:root{--bg:#121214;--fg:#ececee;--muted:#9a9aa2;--card:#1c1c20;--border:#2c2c33;--accent:#9d9dff;--accent-soft:#25254a;--warn:#f0b35a;--empty:#26262c;--p0:#4f7cff;--p1:#f2994a;--p2:#27ae60;--p3:#eb5757;--p4:#9b51e0;--p5:#2bb3c0;--po:#454952;--on-accent:#0b0d12;--positive:#35a766;--shadow:rgba(0,0,0,.18)}}
@@ -510,7 +510,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   />
         <div class="page">
           <header class="topbar">
-            <span class="brand">prompt-profile</span>
+            <span class="brand"><span data-l="en" lang="en">prompt profile</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt profile</span></span>
             <nav class="switch" aria-label="Language">
                     <label for="lang-en" lang="en"
                           >English</label

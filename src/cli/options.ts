@@ -35,14 +35,18 @@ export const parseSince = (
   return Effect.succeed(Number.isFinite(since) && since >= 0 ? DateTime.makeUnsafe(since) : null)
 }
 
+/** Longest `--name`: it titles the report. */
+export const MAX_NAME_LENGTH = 60
+
 /**
- * `--look`, `--card-hide` (a comma list of CARD_PARTS) and `--exclude` (a comma list of
- * REPORT_PARTS or EXCLUDE_GROUPS) as render options.
+ * `--look`, `--card-hide` (a comma list of CARD_PARTS), `--exclude` (a comma list of
+ * REPORT_PARTS or EXCLUDE_GROUPS) and `--name` as render options.
  */
 export const parseRenderOptions = (
   look: LookId,
   cardHide: string | undefined,
   exclude?: string | undefined,
+  name?: string | undefined,
 ): Effect.Effect<RenderOptions, InvalidArgument> =>
   Effect.gen(function* () {
     const list = (value: string | undefined) =>
@@ -58,7 +62,15 @@ export const parseRenderOptions = (
       else if ((REPORT_PARTS as ReadonlyArray<string>).includes(p)) parts.push(p as ReportPart)
       else return yield* new InvalidArgument({ flag: "--exclude", value: exclude! })
     }
-    return { look, cardHide: hide, exclude: REPORT_PARTS.filter((p) => parts.includes(p)) }
+    const trimmed = name?.trim() ?? ""
+    if (Array.from(trimmed).length > MAX_NAME_LENGTH)
+      return yield* new InvalidArgument({ flag: "--name", value: name! })
+    return {
+      look,
+      cardHide: hide,
+      exclude: REPORT_PARTS.filter((p) => parts.includes(p)),
+      name: trimmed === "" ? null : trimmed,
+    }
   })
 
 /** A Chinese locale gets a Traditional Chinese report with English; anything else English. */
@@ -107,6 +119,7 @@ export interface RunFlags {
   readonly look?: LookId | undefined
   readonly cardHide?: string | undefined
   readonly exclude?: string | undefined
+  readonly name?: string | undefined
   readonly check?: string | undefined
   readonly allow?: string | undefined
 }
@@ -144,6 +157,7 @@ export const rerunCommand = (f: RunFlags): string =>
     ...flag("--look", f.look, "classic"),
     ...flag("--card-hide", f.cardHide),
     ...flag("--exclude", f.exclude),
+    ...flag("--name", f.name),
     ...flag("--check", f.check, "mask"),
     ...flag("--allow", f.allow),
     ...flag("--max-calls", f.maxCalls),
@@ -159,6 +173,7 @@ export const renderRetryCommand = (profileJson: string, outDir: string, f: RunFl
     ...flag("--look", f.look, "classic"),
     ...flag("--card-hide", f.cardHide),
     ...flag("--exclude", f.exclude),
+    ...flag("--name", f.name),
     ...flag("--check", f.check, "mask"),
     ...flag("--allow", f.allow),
   ]

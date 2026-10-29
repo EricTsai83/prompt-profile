@@ -54,6 +54,7 @@ export interface MainOptions extends Omit<RunFlags, "engine"> {
   readonly look?: LookId
   readonly cardHide?: string | undefined
   readonly exclude?: string | undefined
+  readonly name?: string | undefined
   readonly check?: CheckMode
   readonly allow?: string | undefined
 }
@@ -216,6 +217,7 @@ export const runMain = (options: MainOptions) =>
       options.look ?? "classic",
       options.cardHide,
       options.exclude,
+      options.name,
     )
     const allow = yield* parseAllow(options.allow)
     const env = yield* Environment

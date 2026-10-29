@@ -642,7 +642,7 @@ export const renderHtml = (
           http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${theme.type.display ? "; font-src data:" : ""}"
         />
-        <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
+        <title>${scrub(profile.archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
@@ -666,7 +666,7 @@ export const renderHtml = (
         }
         <div class="page">
           <header class="topbar">
-            <span class="brand">prompt-profile</span>
+            <span class="brand">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].brand(options.name ?? null))}</span>
             ${
               multi
                 ? html`<nav class="switch" aria-label="${loc.attr((m) => m.switchLabel)}">

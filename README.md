@@ -225,6 +225,7 @@ prompt-profile --verbose       # full errors and LLM call timings
 prompt-profile --lang zh-TW,en # report languages, the first is the default (en, zh-TW)
 prompt-profile --look signal   # classic (default) / signal / afterhours / studio / prism / slate / folio
 prompt-profile --card-hide stats,graphic  # leave traits / stats / graphic out of card.png
+prompt-profile --name Eric     # title the report "Eric’s prompt profile" (not stored in profile.json)
 
 prompt-profile stats                  # statistics only, no LLM (free and fast)
 prompt-profile render profile.json    # re-create the report from an existing profile.json

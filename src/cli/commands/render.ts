@@ -20,11 +20,17 @@ export const runRender = (options: {
   readonly look: LookId
   readonly cardHide: string | undefined
   readonly exclude?: string | undefined
+  readonly name?: string | undefined
   readonly check?: CheckMode
   readonly allow?: string | undefined
 }) =>
   Effect.gen(function* () {
-    const renderOptions = yield* parseRenderOptions(options.look, options.cardHide, options.exclude)
+    const renderOptions = yield* parseRenderOptions(
+      options.look,
+      options.cardHide,
+      options.exclude,
+      options.name,
+    )
     const allow = yield* parseAllow(options.allow)
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path

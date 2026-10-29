@@ -44,6 +44,8 @@ export interface RenderOptions {
   readonly cardHide: ReadonlyArray<CardPart>
   /** Report parts left out; none when absent. */
   readonly exclude?: ReadonlyArray<ReportPart>
+  /** `--name`: titles the report "<name>’s prompt profile". Render-only, never stored. */
+  readonly name?: string | null
 }
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = { look: "classic", cardHide: [], exclude: [] }

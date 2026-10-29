@@ -52,6 +52,12 @@ const cardHide = Flag.String("card-hide").pipe(
   Flag.withDescription("Leave parts out of the card: comma list of traits, stats, graphic"),
   Flag.optional,
 )
+const name = Flag.String("name").pipe(
+  Flag.withDescription(
+    'Your name in the report title, e.g. --name Eric → "Eric’s prompt profile" (render only, not stored in profile.json)',
+  ),
+  Flag.optional,
+)
 const check = Flag.Literals("check", CHECK_MODES).pipe(
   Flag.withDescription(
     "Final check for personal data (email, home path, username, phone…): mask (default), warn keeps it, strict writes nothing. Secrets are always masked",
@@ -135,6 +141,7 @@ const renderCommand = Command.make(
     look,
     cardHide,
     exclude,
+    name,
     check,
     allow,
     verbose,
@@ -147,6 +154,7 @@ const renderCommand = Command.make(
         look: f.look,
         cardHide: optional(f.cardHide),
         exclude: optional(f.exclude),
+        name: optional(f.name),
         check: f.check,
         allow: optional(f.allow),
       }),
@@ -186,6 +194,7 @@ export const command = Command.make(
     look,
     cardHide,
     exclude,
+    name,
     check,
     allow,
     full: Flag.Boolean("full").pipe(
@@ -226,6 +235,7 @@ export const command = Command.make(
       look: f.look,
       cardHide: optional(f.cardHide),
       exclude: optional(f.exclude),
+      name: optional(f.name),
       check: f.check,
       allow: optional(f.allow),
     }

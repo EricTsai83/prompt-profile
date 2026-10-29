@@ -605,6 +605,7 @@ export const PORTRAIT_MESSAGES = {
 export const VIEW_MESSAGES = {
   en: {
     navigation: "Report views",
+    brand: (name: string | null) => (name ? `${name}’s prompt profile` : "prompt profile"),
     overview: "Who they are",
     detail: "Facts & evidence",
     overviewTitle: "Meet the collaborator",
@@ -641,6 +642,7 @@ export const VIEW_MESSAGES = {
   },
   "zh-TW": {
     navigation: "報告頁面",
+    brand: (name: string | null) => (name ? `${name} 的 prompt profile` : "prompt profile"),
     overview: "認識這個人",
     detail: "事實與證據",
     overviewTitle: "認識這位協作者",
