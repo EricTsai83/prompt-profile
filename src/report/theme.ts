@@ -205,12 +205,17 @@ const PROJECTS = ["#4f7cff", "#f2994a", "#27ae60", "#eb5757", "#9b51e0", "#2bb3c
 /** Details shared by every look's light and dark colors. */
 const LIGHT_DETAILS = {
   onAccent: "#fff",
-  positive: "#1f9d55",
+  positive: "#187c43",
   shadow: "rgba(0,0,0,.18)",
   projects: PROJECTS,
   projectOther: "#d3d6dc",
 }
-const DARK_DETAILS = { ...LIGHT_DETAILS, projectOther: "#454952" }
+const DARK_DETAILS = {
+  ...LIGHT_DETAILS,
+  onAccent: "#0b0d12",
+  positive: "#35a766",
+  projectOther: "#454952",
+}
 
 const PRINT: PrintTokens = {
   bg: "#fff",
@@ -348,9 +353,9 @@ const productLight = (
   warn: "#8a5300",
   empty: "#edf0f2",
 })
-const PRISM_LIGHT = productLight("#f8fafc", "#172338", "#5265d8", "#edf0ff")
-const SLATE_LIGHT = productLight("#f4f5f6", "#20272c", "#367d77", "#e6f1ef")
-const FOLIO_LIGHT = productLight("#faf9f5", "#302e2a", "#98613d", "#f1e8dd")
+const PRISM_LIGHT = productLight("#f8fafc", "#172338", "#5062d2", "#edf0ff")
+const SLATE_LIGHT = productLight("#f4f5f6", "#20272c", "#32746f", "#e6f1ef")
+const FOLIO_LIGHT = productLight("#faf9f5", "#302e2a", "#8f5b39", "#f1e8dd")
 
 /** The dark colors the three product looks share (only the background differs). */
 const productDark = (bg: string): ColorTokens => ({
@@ -370,7 +375,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 1,
+  version: 2,
   color: {
     light: {
       bg: "#f6f6f3",
@@ -442,7 +447,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   CLASSIC,
   {
     id: "signal",
-    version: 7,
+    version: 8,
     color: {
       light: {
         bg: "#f5f7ff",
@@ -474,7 +479,7 @@ export const THEMES: ReadonlyArray<Theme> = [
       background: "#3155f5",
       split: null,
       text: "#ffffff",
-      muted: "#dfe5ff",
+      muted: "#e3e8ff",
       chipBorder: "rgba(255,255,255,0.4)",
       chipBackground: "rgba(255,255,255,0)",
       graphic: "bars",
@@ -490,7 +495,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "afterhours",
-    version: 7,
+    version: 8,
     color: {
       light: {
         bg: "#eef3f8",
@@ -498,7 +503,7 @@ export const THEMES: ReadonlyArray<Theme> = [
         muted: "#55697b",
         card: "#ffffff",
         border: "#d3dfe8",
-        accent: "#496c97",
+        accent: "#476992",
         accentSoft: "#e1eaf3",
         warn: "#8a5300",
         empty: "#e3ebf2",
@@ -538,7 +543,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "studio",
-    version: 7,
+    version: 8,
     color: {
       light: {
         bg: "#fff7f4",
@@ -546,7 +551,7 @@ export const THEMES: ReadonlyArray<Theme> = [
         muted: "#6f5d58",
         card: "#ffffff",
         border: "#ecded9",
-        accent: "#c73d27",
+        accent: "#bf3b25",
         accentSoft: "#ffe9e4",
         warn: "#8a5300",
         empty: "#f6e9e5",
@@ -586,7 +591,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "prism",
-    version: 7,
+    version: 8,
     color: {
       light: { ...PRISM_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#101827"),
@@ -604,7 +609,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "slate",
-    version: 7,
+    version: 8,
     color: {
       light: { ...SLATE_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#141b20"),
@@ -619,7 +624,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "folio",
-    version: 7,
+    version: 8,
     color: {
       light: { ...FOLIO_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#201f1c"),
