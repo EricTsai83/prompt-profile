@@ -2,6 +2,7 @@ import { AXIS_KEYS } from "./Interaction.ts"
 import { Effect, Schema } from "effect"
 import { Episode, EpisodeCoverage, Pattern } from "./Episode.ts"
 import { MAX_QUOTE_LENGTH } from "./quote.ts"
+import { Steering } from "./Steering.ts"
 import { SourceId } from "./Source.ts"
 import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
@@ -14,10 +15,11 @@ import { Usage } from "./Usage.ts"
  * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
  * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
- * working (`sides`) instead of one pole with counter-evidence. Versions 2–11 are migrated on
+ * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
+ * where the person redirected the AI or asked for repairs). Versions 2–12 are migrated on
  * decode.
  */
-export const PROFILE_SCHEMA_VERSION = 12 as const
+export const PROFILE_SCHEMA_VERSION = 13 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -239,6 +241,9 @@ const ProfileFields = Schema.Struct({
   episodes: Schema.Array(Episode).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   /** Habits recurring across `episodes`; empty before version 11. */
   patterns: Schema.Array(Pattern).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
+  /** Steering and repairs per conversation; null before version 13 (the report then shows
+   * the rule-based `stats.correctionRate`). */
+  steering: Schema.NullOr(Steering).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   /** Tokens, plan and API list-price equivalent; null = not measured (before version 10). */
   usage: Schema.NullOr(Usage).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   stats: Stats,
@@ -305,7 +310,7 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }

@@ -266,7 +266,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       const r = yield* h.run(["render", profile])
       expect(r.stdout).toContain(
-        "Contains  19 quotes · 3 project names · exact dates · 2 improvements · 2 fun facts",
+        "Contains  22 quotes · 3 project names · exact dates · 2 improvements · 2 fun facts",
       )
       expect(r.stdout).toContain("skim the quotes yourself")
       expect(r.stdout).toContain(`prompt-profile render ${profile} --exclude personal`)

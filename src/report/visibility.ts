@@ -112,7 +112,8 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
               0,
             )
           : 0) +
-        p.episodes.reduce((n, e) => n + e.turns.length, 0)
+        p.episodes.reduce((n, e) => n + e.turns.length, 0) +
+        (p.steering ? p.steering.steer.examples.length + p.steering.repair.examples.length : 0)
       : 0,
     projects: v.projects ? names.size : 0,
     exactDates: v.dates,

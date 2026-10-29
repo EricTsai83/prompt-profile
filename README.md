@@ -148,8 +148,11 @@ Written to `./prompt-profile-report/` (change it with `--out`):
     pull requests, parallel sessions and prompt-writing habits; counted from tool metadata and
     the skill descriptions recorded in your transcripts, never tool inputs, outputs or skill
     arguments
+  - **how you steer the AI** (facts page): in how many of the analysed conversations with
+    follow-ups you redirected the AI's approach, and separately how often you asked it to fix a
+    broken result, with examples; one-shot requests are not counted against you
   - **how to improve your prompts** (facts page): 2–4 suggestions, each with a real prompt of
-    yours and a suggested rewrite, plus signals such as frequent corrections or very short
+    yours and a suggested rewrite, plus signals such as very short
     follow-ups, and what changed since your last report
   - **usage during this period** (facts page only): Claude Code and Codex side by side with
     the plan each runs on, tokens by kind, the share of each tool, months and models, and the

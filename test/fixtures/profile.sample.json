@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 12,
+  "schemaVersion": 13,
   "languages": [
     "en",
     "zh-TW"
@@ -3879,5 +3879,35 @@
         "explore"
       ]
     }
-  ]
+  ],
+  "steering": {
+    "conversations": 280,
+    "withFollowUps": 196,
+    "followUpPrompts": 1010,
+    "steer": {
+      "conversations": 41,
+      "prompts": 58,
+      "examples": [
+        {
+          "promptId": "claude-code:s1:u5",
+          "quote": "no, keep the old API"
+        },
+        {
+          "promptId": "claude-code:s4:u6",
+          "quote": "forget jotai, let's stay with zustand"
+        }
+      ]
+    },
+    "repair": {
+      "conversations": 27,
+      "prompts": 39,
+      "examples": [
+        {
+          "promptId": "codex:s2:3",
+          "quote": "<script>alert('x')</script> 這段為什麼會被執行？"
+        }
+      ]
+    },
+    "rejected": 3
+  }
 }

@@ -185,7 +185,7 @@ describe("--exclude", () => {
     Effect.gen(function* () {
       const p = yield* sample()
       expect(reportContents(p, { look: "classic", cardHide: [] })).toEqual({
-        quotes: 19,
+        quotes: 22,
         projects: 3,
         exactDates: true,
         improvements: 2,
@@ -193,7 +193,7 @@ describe("--exclude", () => {
         usage: true,
       })
       expect(reportContents(p, { look: "classic", cardHide: [], exclude: ["coaching"] })).toEqual({
-        quotes: 17,
+        quotes: 20,
         projects: 3,
         exactDates: true,
         improvements: 0,

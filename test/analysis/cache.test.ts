@@ -22,7 +22,7 @@ const parts: CacheKeyParts = {
 const entry = {
   ...parts,
   producedBy: "m",
-  value: { chunkId: "chunk-1", observations: [], episodes: [] },
+  value: { chunkId: "chunk-1", observations: [], episodes: [], interventions: [] },
 }
 
 describe("file cache", () => {

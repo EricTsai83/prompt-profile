@@ -30,8 +30,16 @@ export const SIGNALS: ReadonlyArray<Signal> = [
   },
 ]
 
-export const triggeredSignals = (s: Stats): Array<Signal & { readonly amount: number }> =>
+/**
+ * `perConversation`: steering is measured per conversation (profile schema 13), so the
+ * keyword-based correction rate, which depends on how many prompts a person writes, is left out.
+ */
+export const triggeredSignals = (
+  s: Stats,
+  perConversation = false,
+): Array<Signal & { readonly amount: number }> =>
   SIGNALS.flatMap((signal) => {
+    if (perConversation && signal.id === "corrections") return []
     const amount = signal.value(s)
     return signal.triggered(amount) ? [{ ...signal, amount }] : []
   })

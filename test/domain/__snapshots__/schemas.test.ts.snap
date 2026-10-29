@@ -91,6 +91,33 @@ exports[`LLM schemas > LlmChunkAnalysis produces a subset-compliant JSON Schema 
       },
       "type": "array",
     },
+    "interventions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "steer",
+              "repair",
+            ],
+            "type": "string",
+          },
+          "promptId": {
+            "type": "string",
+          },
+          "quote": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "promptId",
+          "kind",
+          "quote",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "observations": {
       "items": {
         "additionalProperties": false,
@@ -142,6 +169,7 @@ exports[`LLM schemas > LlmChunkAnalysis produces a subset-compliant JSON Schema 
   "required": [
     "observations",
     "episodes",
+    "interventions",
   ],
   "type": "object",
 }

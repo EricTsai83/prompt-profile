@@ -932,3 +932,46 @@ export const EPISODE_MESSAGES = {
     },
   },
 } as const
+
+/** Steering and repairs per conversation (replaces the rule-based "1 in N prompts"). */
+export const STEERING_MESSAGES = {
+  en: {
+    tile: (steered: number, withFollowUps: number) =>
+      withFollowUps === 0 ? "—" : `${steered} of ${withFollowUps}`,
+    tileLabel: "conversations where they redirected the AI",
+    tileDef:
+      "Analysed conversations with follow-up prompts in which at least one prompt overrides or changes the AI’s approach. Repairs of broken results are counted separately.",
+    title: "How they steer the AI",
+    denominator: (withFollowUps: number, conversations: number) =>
+      `${withFollowUps} of the ${conversations} analysed conversations have follow-up prompts. The other ${conversations - withFollowUps} were a single request, with nothing to steer.`,
+    steer: "Redirected the AI’s approach",
+    steerNote: "Overrode or changed the AI’s plan or decision and pointed it elsewhere.",
+    repair: "Asked the AI to fix a broken result",
+    repairNote: "Said a result was wrong or still failing and asked for a fix.",
+    counts: (conversations: number, prompts: number) =>
+      `${conversations} ${conversations === 1 ? "conversation" : "conversations"} · ${prompts} ${prompts === 1 ? "prompt" : "prompts"}`,
+    method:
+      "The analysing model labels follow-up prompts by meaning, and every label is checked against the prompt text: a judgement, not an exact count.",
+    rejected: (n: number) => `${n} ${n === 1 ? "label was" : "labels were"} rejected.`,
+    sentenceGap: " ",
+  },
+  "zh-TW": {
+    tile: (steered: number, withFollowUps: number) =>
+      withFollowUps === 0 ? "—" : `${withFollowUps} 段中 ${steered} 段`,
+    tileLabel: "有後續互動的對話中，曾改變 AI 的做法",
+    tileDef:
+      "在分析過、且有後續提示的對話中，至少有一則提示推翻或改變了 AI 的做法。要求修正壞掉的結果另外計算。",
+    title: "如何引導 AI",
+    denominator: (withFollowUps: number, conversations: number) =>
+      `分析過的 ${conversations} 段對話中，有 ${withFollowUps} 段有後續提示；其餘 ${conversations - withFollowUps} 段只有一個請求，無從引導。`,
+    steer: "改變 AI 的做法",
+    steerNote: "推翻或改變 AI 的計畫或決定，帶它走另一個方向。",
+    repair: "要求 AI 修正壞掉的結果",
+    repairNote: "指出結果有錯或仍然失敗，要求修正。",
+    counts: (conversations: number, prompts: number) =>
+      `${conversations} 段對話 · ${prompts} 則提示`,
+    method: "由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。",
+    rejected: (n: number) => `有 ${n} 個標記未通過比對。`,
+    sentenceGap: "",
+  },
+} as const

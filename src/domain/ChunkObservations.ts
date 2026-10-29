@@ -1,5 +1,6 @@
 import { Effect, Schema } from "effect"
 import { EndingKind, TaskType, TurnRole } from "./Episode.ts"
+import { InterventionKind } from "./Steering.ts"
 import { Evidence, ObservationKey } from "./Profile.ts"
 
 export const Observation = Schema.Struct({
@@ -27,5 +28,9 @@ export const ChunkObservations = Schema.Struct({
   chunkId: Schema.String,
   observations: Schema.Array(Observation),
   episodes: Schema.Array(ChunkEpisode).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
+  /** Follow-up prompts the map step labelled as steering or repairs (not verified yet). */
+  interventions: Schema.Array(
+    Schema.Struct({ promptId: Schema.String, kind: InterventionKind, quote: Schema.String }),
+  ).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
 })
 export type ChunkObservations = typeof ChunkObservations.Type

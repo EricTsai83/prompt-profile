@@ -322,6 +322,13 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .episode-turns blockquote{margin:4px 0 0;line-height:1.7;overflow-wrap:anywhere}
 .turn-gap{font-style:italic}
 .episode-ending{margin-top:8px}
+
+.steering>h2{font-size:var(--text-xl);margin:36px 0 0}
+.steering .note{margin:8px 0 0;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
+.steering-kind{padding:14px 0;border-top:1px solid var(--border);margin-top:14px;break-inside:avoid}
+.steering-kind h3{font-size:var(--text-base)}
+.steering-kind h3 small{font-size:var(--text-sm);color:var(--muted);font-weight:600;margin-left:8px}
+.steering-kind blockquote{margin:10px 0 0;padding:2px 16px;border-left:2px solid var(--accent);line-height:1.7;overflow-wrap:anywhere}
 .page [data-l]{display:none}
 #lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:var(--on-accent)}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
 #lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:var(--on-accent)}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
@@ -617,8 +624,8 @@ html:root .tech-time{overflow:visible;font-size:8pt}
             <div class="sig tip " data-tip-en="Median prompt length in characters, after cleaning" data-tip-zh-TW="清理後 prompt 長度的中位數（字元）" tabindex="-1">
     <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b><span><span data-l="en" lang="en">typical prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">典型 prompt 長度</span></span>
   </div>
-            <div class="sig tip " data-tip-en="Prompts that push back on the AI&#39;s answer (e.g. &quot;no, that&#39;s wrong&quot;)" data-tip-zh-TW="反駁 AI 回答的 prompt，例如「不對」「錯了」" tabindex="-1">
-    <b><span data-l="en" lang="en">1 in 8</span><span data-l="zh-TW" lang="zh-Hant-TW">每 8 則</span></b><span><span data-l="en" lang="en">prompts corrects the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">prompt 就有一次糾正 AI</span></span>
+            <div class="sig tip " data-tip-en="Analysed conversations with follow-up prompts in which at least one prompt overrides or changes the AI’s approach. Repairs of broken results are counted separately." data-tip-zh-TW="在分析過、且有後續提示的對話中，至少有一則提示推翻或改變了 AI 的做法。要求修正壞掉的結果另外計算。" tabindex="-1">
+    <b><span data-l="en" lang="en">41 of 196</span><span data-l="zh-TW" lang="zh-Hant-TW">196 段中 41 段</span></b><span><span data-l="en" lang="en">conversations where they redirected the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">有後續互動的對話中，曾改變 AI 的做法</span></span>
   </div>
             <div class="sig tip tip-r" data-tip-en="Average number of prompts in one conversation" data-tip-zh-TW="一次對話平均有幾則 prompt" tabindex="-1">
     <b>6.3</b><span><span data-l="en" lang="en">prompts per session</span><span data-l="zh-TW" lang="zh-Hant-TW">每個 session 的 prompt 數</span></span>
@@ -2887,6 +2894,22 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 
 
 
+          <section class="steering">
+    <h2><span data-l="en" lang="en">How they steer the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">如何引導 AI</span></h2>
+    <p class="note"><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p>
+    <div class="steering-kind">
+      <h3><span data-l="en" lang="en">Redirected the AI’s approach</span><span data-l="zh-TW" lang="zh-Hant-TW">改變 AI 的做法</span> <small><span data-l="en" lang="en">41 conversations · 58 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">41 段對話 · 58 則提示</span></small></h3>
+      <p class="note"><span data-l="en" lang="en">Overrode or changed the AI’s plan or decision and pointed it elsewhere.</span><span data-l="zh-TW" lang="zh-Hant-TW">推翻或改變 AI 的計畫或決定，帶它走另一個方向。</span></p>
+      <blockquote><span data-l="en" lang="en">no, keep the old API</span><span data-l="zh-TW" lang="zh-Hant-TW">no, keep the old API</span></blockquote><blockquote><span data-l="en" lang="en">forget jotai, let&#39;s stay with zustand</span><span data-l="zh-TW" lang="zh-Hant-TW">forget jotai, let&#39;s stay with zustand</span></blockquote>
+    </div>
+    <div class="steering-kind">
+      <h3><span data-l="en" lang="en">Asked the AI to fix a broken result</span><span data-l="zh-TW" lang="zh-Hant-TW">要求 AI 修正壞掉的結果</span> <small><span data-l="en" lang="en">27 conversations · 39 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">27 段對話 · 39 則提示</span></small></h3>
+      <p class="note"><span data-l="en" lang="en">Said a result was wrong or still failing and asked for a fix.</span><span data-l="zh-TW" lang="zh-Hant-TW">指出結果有錯或仍然失敗，要求修正。</span></p>
+      <blockquote><span data-l="en" lang="en">&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</span><span data-l="zh-TW" lang="zh-Hant-TW">&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</span></blockquote>
+    </div>
+    <p class="note"><span data-l="en" lang="en">The analysing model labels follow-up prompts by meaning, and every label is checked against the prompt text: a judgement, not an exact count. 3 labels were rejected.</span><span data-l="zh-TW" lang="zh-Hant-TW">由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。有 3 個標記未通過比對。</span></p>
+  </section>
+
           <section class="episodes">
     <h2><span data-l="en" lang="en">How conversations unfolded</span><span data-l="zh-TW" lang="zh-Hant-TW">對話如何展開</span></h2>
     <p class="note"><span data-l="en" lang="en">Showing 3 of 11 verified episodes, chosen to spread over time, conversations and kinds of task. They come from the 280 analysed conversations, not all 312 in the history.</span><span data-l="zh-TW" lang="zh-Hant-TW">從 11 個通過驗證的片段中選出 3 個，盡量分散在不同時間、對話與任務類型。它們來自分析過的 280 段對話，而非紀錄中全部的 312 段。</span></p><p class="note"><span data-l="en" lang="en">Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。</span></p><p class="note"><span data-l="en" lang="en">3 proposed episodes were rejected: a turn was invented, misquoted, out of order or from another conversation.</span><span data-l="zh-TW" lang="zh-Hant-TW">有 3 個提出的片段未採用：其中有捏造、引述不符、順序錯亂或混入其他對話的提示。</span></p><p class="note"><span data-l="en" lang="en">2 stated results were withdrawn because no prompt in the episode showed them.</span><span data-l="zh-TW" lang="zh-Hant-TW">有 2 個聲稱的結果已撤回，因為片段中沒有任何提示呈現該結果。</span></p>
@@ -3537,9 +3560,6 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   <h3 class="sub-h"><span data-l="en" lang="en">Signals worth a look</span><span data-l="zh-TW" lang="zh-Hant-TW">值得注意的訊號</span></h3>
                           <ul class="signals">
     <li>
-          <b><span data-l="en" lang="en">1 in 8 prompts corrects the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">每 8 則 prompt 就有一次糾正 AI</span></b>
-          <span><span data-l="en" lang="en">Most corrections add something you already knew: put the expected result and the constraints in the first prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">多數糾正補上的是你早就知道的事：把預期結果和限制寫在第一個 prompt。</span></span>
-        </li><li>
           <b><span data-l="en" lang="en">31% of prompts are under ~4 words</span><span data-l="zh-TW" lang="zh-Hant-TW">31% 的 prompt 不到四個字詞</span></b>
           <span><span data-l="en" lang="en">Follow-ups like “fix it” make the AI guess. Name the file, the error and what “done” looks like.</span><span data-l="zh-TW" lang="zh-Hant-TW">像「改一下」這樣的追問會讓 AI 用猜的。寫出檔案、錯誤訊息，以及怎樣才算完成。</span></span>
         </li><li>

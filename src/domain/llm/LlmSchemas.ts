@@ -2,6 +2,7 @@ import { AXIS_KEYS } from "../Interaction.ts"
 import { Schema } from "effect"
 import type { ChunkObservations } from "../ChunkObservations.ts"
 import { ENDINGS, TASK_TYPES, TURN_ROLES } from "../Episode.ts"
+import { INTERVENTION_KINDS } from "../Steering.ts"
 import {
   CONFIDENCES,
   DIMENSION_KEYS,
@@ -56,6 +57,14 @@ export const LlmChunkAnalysis = Schema.Struct({
       ),
       /** `promptId` of the turn that shows the ending; an empty string when unknown. */
       ending: Schema.Struct({ kind: Schema.Literals(ENDINGS), promptId: Schema.String }),
+    }),
+  ),
+  /** Every follow-up prompt of the batch that steers the AI or asks it for a repair. */
+  interventions: Schema.Array(
+    Schema.Struct({
+      promptId: Schema.String,
+      kind: Schema.Literals(INTERVENTION_KINDS),
+      quote: Schema.String,
     }),
   ),
 })
@@ -164,6 +173,10 @@ export const fromLlmChunkObservations = (
           },
         }))
       : [],
+  interventions:
+    "interventions" in llm
+      ? llm.interventions.map((i) => ({ ...i, quote: truncateQuote(i.quote) }))
+      : [],
 })
 
 export interface ProfileExtras {
@@ -231,6 +244,8 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
   // the analysis fills both after verifying them against the map step's episodes
   episodes: [],
   patterns: [],
+  // measured by the analysis from the map step's verified labels
+  steering: null,
   previous: null,
   // the CLI fills it from local logs; the analysis never sees usage
   usage: null,

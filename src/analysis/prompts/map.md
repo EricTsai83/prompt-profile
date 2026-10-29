@@ -88,7 +88,24 @@ Return an empty list when no conversation shows more than a single request.
   when unknown.
 
 Only the user's side is available: do not invent assistant responses, completion, success,
-motives or saved time. A request is not a result. Keep the same conversations' quotes in the
+motives or saved time. A request is not a result.
+
+## Steering and repairs
+
+Also return `interventions`: every follow-up prompt in this batch (`turn` greater than 1) that
+does one of these, with its `promptId`, a verbatim `quote` showing it (same rules as evidence)
+and its `kind`:
+
+- `steer`: overrides or changes the AI's approach, plan or decision and points it elsewhere
+  ("keep the existing API, don't add an endpoint", "use zustand instead", "stop, do the tests
+  first"). Rejecting a suggestion or choosing between options the AI offered counts too.
+- `repair`: asks the AI to fix a result that is wrong or broken ("still failing", "that
+  deleted the wrong file").
+
+Leave out follow-ups that only add information, ask a new question, approve ("looks good,
+continue") or ask for a check. Judge the meaning, not keywords: a polite redirection is a
+steer; "what's wrong with this test?" is a question. Label each prompt at most once; never
+label the first prompt of a conversation. Return an empty list when there are none. Keep the same conversations' quotes in the
 observations too when they support a claim.
 
 Also look for these original collaboration preferences, without treating either pole as better:

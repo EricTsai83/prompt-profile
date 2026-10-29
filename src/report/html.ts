@@ -30,6 +30,8 @@ import { techniquesSection, techniqueStyle } from "./techniques.ts"
 import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibility.ts"
 import { usageSection, usageStyle } from "./usage.ts"
 import { episodesSection, episodesStyle } from "./episodes.ts"
+import { steeringSection, steeringStyle } from "./steering.ts"
+import { STEERING_MESSAGES } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
 
@@ -305,7 +307,7 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
 }
 
 const signalRow = (p: Profile, loc: Loc): Raw | null => {
-  const list = triggeredSignals(p.stats)
+  const list = triggeredSignals(p.stats, p.steering !== null)
   if (list.length === 0) return null
   const r = p.stats.promptHabits.reusedOpenings
   const texts = (m: Messages, id: (typeof list)[number]["id"], amount: number) =>
@@ -616,6 +618,8 @@ export const renderHtml = (
   const signature = order.slice(0, 3)
   const minor = order.slice(3)
   const every = correctionEvery(s)
+  const steer = profile.steering
+  const steering = steeringSection(profile, loc, v, scrub)
   // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
   const coaching = v.coaching && !limited
   const signals = coaching ? signalRow(profile, loc) : null
@@ -644,7 +648,7 @@ export const renderHtml = (
         />
         <title>${scrub(profile.archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
@@ -773,12 +777,24 @@ export const renderHtml = (
               loc.tip((m) => m.medianPromptDef),
               1,
             )}
-            ${signatureTile(
-              loc.text((m) => m.corrections(every)),
-              loc.text((m) => m.correctionsLabel),
-              loc.tip((m) => m.correctionsDef),
-              2,
-            )}
+            ${
+              // per conversation when measured; the rule-based rate for older profiles
+              steer
+                ? signatureTile(
+                    loc.text((_m, _c, l) =>
+                      STEERING_MESSAGES[l].tile(steer.steer.conversations, steer.withFollowUps),
+                    ),
+                    loc.text((_m, _c, l) => STEERING_MESSAGES[l].tileLabel),
+                    loc.tip((_m, _c, l) => STEERING_MESSAGES[l].tileDef),
+                    2,
+                  )
+                : signatureTile(
+                    loc.text((m) => m.corrections(every)),
+                    loc.text((m) => m.correctionsLabel),
+                    loc.tip((m) => m.correctionsDef),
+                    2,
+                  )
+            }
             ${signatureTile(
               html`${perSession === null ? "—" : perSession}`,
               loc.text((m) => m.perSession),
@@ -915,6 +931,8 @@ export const renderHtml = (
           </section>
 
           ${preferences ?? ""}
+
+          ${steering ?? ""}
 
           ${episodes ?? ""}
 

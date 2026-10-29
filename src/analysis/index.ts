@@ -26,6 +26,7 @@ import {
   verifyPatterns,
 } from "./episodes.ts"
 import { AnalysisFailed, type AnalyzeError } from "./errors.ts"
+import { measureSteering } from "./steering.ts"
 import { sha256 } from "./hash.ts"
 import { Progress } from "./progress.ts"
 import { addTranslations } from "./translate.ts"
@@ -230,6 +231,13 @@ export const analyze = (input: {
       cap(originalObservations),
     )
 
+    // ---- steering and repairs, per conversation -----------------------------------------
+    const steering = measureSteering(
+      outcomes.flatMap((o) =>
+        o.observations === null ? [] : [{ chunk: o.chunk, observations: o.observations }],
+      ),
+    )
+
     // ---- episodes: verified per chunk, then a deterministic selection -------------------
     const episodeCounts = emptyEpisodeCounts()
     const episodes = selectEpisodes(
@@ -402,6 +410,7 @@ export const analyze = (input: {
       improvements,
       episodes: episodes.map(toProfileEpisode),
       patterns,
+      steering,
       coverage: {
         ...profile.coverage,
         evidenceKept: counts.kept,

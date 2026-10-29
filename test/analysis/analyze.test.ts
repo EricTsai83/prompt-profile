@@ -38,6 +38,7 @@ const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
         },
       ],
       episodes: [],
+      interventions: [],
     }
   }
   const obs = JSON.parse(/observations:\n(.*)\n\nstats:/s.exec(prompt)![1]!) as Array<{
@@ -222,7 +223,7 @@ describe("analyze", () => {
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
-        analysisVersion: "14",
+        analysisVersion: "15",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -502,6 +503,7 @@ describe("analyze", () => {
       return {
         observations: [{ dimension: "work_style", claim: "c", evidence: all }],
         episodes: [],
+        interventions: [],
       }
     }
     it.effect("fails explicitly when the observations cannot fit the input cap", () =>
@@ -531,6 +533,7 @@ describe("analyze", () => {
             },
           ],
           episodes: [],
+          interventions: [],
         }
       }
       if (input.schemaName === "LlmChunkObservations") {
@@ -667,6 +670,7 @@ describe("interaction episodes", () => {
       const roles = ["ask", "context", "correct"] as const
       return {
         observations: [],
+        interventions: [],
         episodes: [
           ...[...bySession].map(([session, turns]) => ({
             session,
@@ -709,6 +713,47 @@ describe("interaction episodes", () => {
       ],
     }
   }
+
+  it.effect("measures steering per conversation from verified follow-up labels", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({
+        respond: (input) => {
+          if (input.schemaName !== "LlmChunkAnalysis") return respond!(input)
+          const found = [
+            ...input.prompt.matchAll(
+              /<prompt id="([^"]+)" session="[^"]+" turn="(\d+)\/\d+"[^>]*>\n(.{0,25})/g,
+            ),
+          ]
+          return {
+            observations: [],
+            episodes: [],
+            // every third turn steers; the first turn is labelled too, and must be rejected
+            interventions: found
+              .filter((m) => m[2] === "3" || m[2] === "1")
+              .map((m) => ({ promptId: m[1], kind: "steer", quote: m[3] })),
+          }
+        },
+      })
+      const profile = yield* analyze({ prompts: sessions, stats, options }).pipe(
+        Effect.provide(
+          Layer.mergeAll(
+            Layer.succeed(LlmRunner, fake),
+            Layer.succeed(AnalysisCache, makeMemoryCache()),
+            Layer.succeed(Progress, silentProgress),
+          ),
+        ),
+      )
+      expect(profile.steering).toMatchObject({
+        conversations: 4,
+        withFollowUps: 4,
+        followUpPrompts: 8,
+        steer: { conversations: 4, prompts: 4 },
+        repair: { conversations: 0, prompts: 0, examples: [] },
+        rejected: 4,
+      })
+      expect(profile.steering!.steer.examples).toHaveLength(2)
+    }),
+  )
 
   it.effect("verifies, selects and keeps episodes with their order and spread", () =>
     Effect.gen(function* () {

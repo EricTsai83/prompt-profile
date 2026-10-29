@@ -77,6 +77,7 @@ describe("verify", () => {
       {
         chunkId: "c",
         episodes: [],
+        interventions: [],
         observations: [
           {
             dimension: "work_style",

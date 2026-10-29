@@ -14,7 +14,8 @@ const sample = () => decodeProfile(JSON.parse(readFileSync(SAMPLE, "utf8")))
 const englishOnly = (p: Profile): Profile => ({ ...p, languages: ["en"], translations: {} })
 const evidenceTotal = (p: Profile) =>
   [...p.traits, ...p.dimensions, ...p.improvements].reduce((n, x) => n + x.evidence.length, 0) +
-  p.episodes.reduce((n, e) => n + e.turns.length, 0)
+  p.episodes.reduce((n, e) => n + e.turns.length, 0) +
+  (p.steering ? p.steering.steer.examples.length + p.steering.repair.examples.length : 0)
 
 const texts = (node: unknown): Array<string> => {
   if (typeof node === "string") return [node]
