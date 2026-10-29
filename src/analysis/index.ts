@@ -204,16 +204,13 @@ export const analyze = (input: {
     )
 
     // ---- intermediate merges when the reduce input is too large -----------------------
-    /** Fatal errors stop everything as-is; anything else means the reduce stage failed. */
-    const reduceError = (cause: LlmError): AnalyzeError =>
-      FATAL.has(cause._tag)
-        ? cause
-        : new AnalysisFailed({
-            reason: "reduce-failed",
-            chunksFailed: failed.length,
-            chunksTotal: total,
-            cause,
-          })
+    /** Fatal errors stop everything as-is; anything else means that stage failed. */
+    const stageError =
+      (reason: "merge-failed" | "reduce-failed") =>
+      (cause: LlmError): AnalyzeError =>
+        FATAL.has(cause._tag)
+          ? cause
+          : new AnalysisFailed({ reason, chunksFailed: failed.length, chunksTotal: total, cause })
     const limit = options.reduceInputLimit ?? REDUCE_INPUT_LIMIT
     const merge = (group: ReadonlyArray<Observation>) =>
       Effect.gen(function* () {
@@ -246,7 +243,7 @@ export const analyze = (input: {
       yield* progress.onMergeStart(groups.length)
       const merged = yield* Effect.forEach(groups, merge, {
         concurrency: options.concurrency ?? DEFAULT_CONCURRENCY,
-      }).pipe(Effect.mapError(reduceError))
+      }).pipe(Effect.mapError(stageError("merge-failed")))
       observations = merged.flat()
       // another round would not get much smaller either
       if (observationsText(observations).length > before * (1 - MIN_MERGE_SHRINK)) break
@@ -281,7 +278,7 @@ export const analyze = (input: {
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
       })
-      .pipe(Effect.mapError(reduceError))
+      .pipe(Effect.mapError(stageError("reduce-failed")))
     yield* progress.onReduceDone(draft.durationMs)
 
     // ---- verify (reduce) ------------------------------------------------------------

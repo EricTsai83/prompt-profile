@@ -31,8 +31,12 @@ export interface AnalysisPlan {
   readonly chunks: ReadonlyArray<Chunk>
   readonly sampled: boolean
   readonly cacheHits: number
-  /** Base estimate: uncached map calls + final reduce; merges and retries are additional. */
+  /** Base estimate: uncached map calls + final reduce + translations; merges and retries are additional. */
   readonly llmCalls: number
+  /** Of `llmCalls`: one per uncached chunk. */
+  readonly mapCalls: number
+  /** Of `llmCalls`: one per non-English report language. */
+  readonly translationCalls: number
   /** Characters that will be sent (uncached chunks only). */
   readonly charsToSend: number
   readonly promptsAnalyzed: number
@@ -84,13 +88,15 @@ export const plan = (input: {
       else charsToSend += c.text.length
     }
     const prompts = chunks.flatMap((c) => c.prompts)
+    const translations = chunks.length > 0 ? translationCalls(input.options) : 0
     return {
       chunksTotal: all.length,
       chunks,
       sampled,
       cacheHits,
-      llmCalls:
-        chunks.length - cacheHits + (chunks.length > 0 ? 1 + translationCalls(input.options) : 0),
+      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 1 + translations : 0),
+      mapCalls: chunks.length - cacheHits,
+      translationCalls: translations,
       charsToSend,
       promptsAnalyzed: prompts.length,
       sessionsAnalyzed: new Set(prompts.map((p) => `${p.source}:${p.sessionId}`)).size,

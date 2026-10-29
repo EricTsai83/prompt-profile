@@ -13,6 +13,8 @@ export interface ProgressShape {
   readonly onReduceStart: Effect.Effect<void>
   readonly onReduceDone: (durationMs: number) => Effect.Effect<void>
   readonly onVerified: (kept: number, dropped: number) => Effect.Effect<void>
+  /** Before each translation call. */
+  readonly onTranslateStart: (language: string) => Effect.Effect<void>
   /** After each translation call; `ok` false means the language was dropped. */
   readonly onTranslated: (language: string, ok: boolean) => Effect.Effect<void>
 }
@@ -29,6 +31,7 @@ export const silentProgress: ProgressShape = {
   onReduceStart: Effect.void,
   onReduceDone: () => Effect.void,
   onVerified: () => Effect.void,
+  onTranslateStart: () => Effect.void,
   onTranslated: () => Effect.void,
 }
 

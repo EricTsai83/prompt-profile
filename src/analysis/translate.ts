@@ -61,6 +61,7 @@ export const addTranslations = (
     const translations: Record<string, TranslationType> = {}
     for (const language of requested) {
       if (language === "en" || translations[language] !== undefined) continue
+      yield* progress.onTranslateStart(language)
       const result = yield* runner
         .generate({
           system: loadPrompt("translate"),

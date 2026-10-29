@@ -447,6 +447,27 @@ describe("analyze", () => {
           }
         : respond(input)
 
+    it.effect("a failed merge is reported as a merge failure, not a final-step failure", () =>
+      Effect.gen(function* () {
+        const failed = new ProcessFailed({
+          runner: "claude-code",
+          exitCode: 1,
+          detail: "x",
+          stderrTail: "",
+        })
+        const fake = makeFakeLlmRunner({
+          respond,
+          failures: new Map(Array.from({ length: 40 }, (_, i) => [i + 1, failed] as const)),
+        })
+        // every chunk call succeeds from the cache of a first run; then merges fail
+        const cache = makeMemoryCache()
+        yield* Effect.flip(run(makeFakeLlmRunner({ respond }), cache, small)).pipe(Effect.ignore)
+        const error = yield* Effect.flip(run(fake, cache, { ...options, reduceInputLimit: 1_000 }))
+        expect(error).toMatchObject({ _tag: "AnalysisFailed", reason: "merge-failed" })
+        expect(fake.log.every((c) => c.prompt.startsWith("["))).toBe(true)
+      }),
+    )
+
     it.effect("merge output is verified, also when it comes from the cache", () =>
       Effect.gen(function* () {
         const cache = makeMemoryCache()
