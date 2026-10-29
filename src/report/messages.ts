@@ -598,16 +598,22 @@ export const PORTRAIT_MESSAGES = {
 export const VIEW_MESSAGES = {
   en: {
     navigation: "Report views",
-    overview: "Visual overview",
-    detail: "Profile & evidence",
-    overviewTitle: "The collaboration at a glance",
-    detailTitle: "The person behind the prompts",
+    overview: "Who they are",
+    detail: "Facts & evidence",
+    overviewTitle: "Meet the collaborator",
+    detailTitle: "What the records show",
     overviewNote:
-      "Patterns, rhythm and workflow. Continue to the second page for the story and its evidence.",
+      "An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts & evidence page.",
     detailNote:
-      "Read the interactions, supporting quotes and tools behind the overview. Evidence is expanded by default.",
-    next: "Read the profile and evidence →",
-    back: "← Back to the visual overview",
+      "Every measurement with its source and denominator, all observations with their evidence, and what remains unknown. Evidence is expanded by default.",
+    next: "See the facts and evidence →",
+    back: "← Back to the introduction",
+    moves: "Featured observations, in their own words",
+    movesNote:
+      "Up to three observations with medium or high confidence and a verified quote, each shown with one of the person’s own prompts. They are not ranked by strength. Confidence and the remaining evidence are on the Facts & evidence page.",
+    noMoves:
+      "No observation has medium or high confidence with a verified quote, so none is featured here. The Facts & evidence page lists every observation with its confidence.",
+    preferenceEvidence: "Evidence for each preference",
     tools: "Which tools appear in conversations?",
     promptTechniques: "What do the prompts ask for?",
     toolsNote:
@@ -625,18 +631,26 @@ export const VIEW_MESSAGES = {
     mixed: "Mixed / insufficient evidence",
     first: "Observed preference",
     noPortrait:
-      "A collaboration portrait is not available in this profile. The detail page contains the available observations.",
+      "A collaboration portrait is not available in this profile. The Facts & evidence page contains the available observations.",
   },
   "zh-TW": {
     navigation: "報告頁面",
-    overview: "圖表總覽",
-    detail: "人物側寫與證據",
-    overviewTitle: "一眼看見協作方式",
-    detailTitle: "從對話認識這個人",
-    overviewNote: "先看協作偏好、使用節奏與工作流程，再到第二頁閱讀互動故事與證據。",
-    detailNote: "閱讀總覽背後的互動、原文引述與使用工具。證據預設展開，不必逐一點開。",
-    next: "閱讀人物側寫與證據 →",
-    back: "← 回到圖表總覽",
+    overview: "認識這個人",
+    detail: "事實與證據",
+    overviewTitle: "認識這位協作者",
+    detailTitle: "紀錄呈現了什麼",
+    overviewNote:
+      "以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。",
+    detailNote:
+      "每項量測都附來源與分母，每項觀察都附證據，也列出仍然未知的部分。證據預設展開，不必逐一點開。",
+    next: "查看事實與證據 →",
+    back: "← 回到人物介紹",
+    moves: "精選觀察與本人原話",
+    movesNote:
+      "最多三項信心為中或高、且附有已驗證引述的觀察，各附一則本人寫下的提示，並未依強弱排序。信心程度與其餘證據列在「事實與證據」頁。",
+    noMoves:
+      "目前沒有信心為中或高、且附有已驗證引述的觀察，因此這裡不列出。「事實與證據」頁列出每項觀察與其信心程度。",
+    preferenceEvidence: "每項偏好的證據",
     tools: "對話中出現哪些工具？",
     promptTechniques: "提示中提出哪些要求？",
     toolsNote:
@@ -652,7 +666,7 @@ export const VIEW_MESSAGES = {
       `來源：以文字規則檢查 ${n} 則清理後提示，以此為分母。每項數值是符合該規則的比例。報告未儲存各項符合的確切則數，百分比經過四捨五入。`,
     mixed: "混合偏好／證據不足",
     first: "觀察到的偏好",
-    noPortrait: "這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。",
+    noPortrait: "這份 profile 尚未包含協作側寫；「事實與證據」頁仍可閱讀既有的觀察與證據。",
   },
 } as const
 

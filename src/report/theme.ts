@@ -139,7 +139,7 @@ export interface SpaceTokens {
   /** Reading measure of prose and notes. */
   readonly reading: string
   readonly gutter: string
-  /** Column width of the reading layout's detail view and ledger signatures. */
+  /** Column width of the reading layout's portrait story and ledger signatures. */
   readonly column: string
   /** Top padding of an open panel. */
   readonly panelTop: string
@@ -153,7 +153,8 @@ export interface LayoutChoices {
   readonly composition: "showcase" | "document"
   readonly hero: "clock" | "identity" | "panel" | "split" | "editorial"
   readonly signatures: "none" | "columns" | "stacked" | "ledger"
-  readonly detailWidth: "full" | "reading"
+  /** `reading`: the identity view's portrait story uses the column width and the prose font. */
+  readonly storyWidth: "full" | "reading"
 }
 
 export type CardComposition = "classic" | "identity" | "product"
@@ -315,7 +316,7 @@ const SHOWCASE_LAYOUT: LayoutChoices = {
   composition: "showcase",
   hero: "identity",
   signatures: "none",
-  detailWidth: "full",
+  storyWidth: "full",
 }
 
 const TITLE_STEPS = [96, 72, 58] as const
@@ -419,7 +420,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 4,
+  version: 5,
   color: {
     light: {
       bg: "#f6f6f3",
@@ -494,7 +495,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   CLASSIC,
   {
     id: "signal",
-    version: 10,
+    version: 11,
     color: {
       light: {
         bg: "#f5f7ff",
@@ -543,7 +544,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "afterhours",
-    version: 10,
+    version: 11,
     color: {
       light: {
         bg: "#eef3f8",
@@ -592,7 +593,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "studio",
-    version: 10,
+    version: 11,
     color: {
       light: {
         bg: "#fff7f4",
@@ -641,7 +642,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "prism",
-    version: 10,
+    version: 11,
     color: {
       light: { ...PRISM_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#101827"),
@@ -655,12 +656,12 @@ export const THEMES: ReadonlyArray<Theme> = [
     },
     motion: MOTION,
     space: { ...SPACE, page: "1160px" },
-    layout: { composition: "document", hero: "panel", signatures: "columns", detailWidth: "full" },
+    layout: { composition: "document", hero: "panel", signatures: "columns", storyWidth: "full" },
     card: PRODUCT_CARD,
   },
   {
     id: "slate",
-    version: 10,
+    version: 11,
     color: {
       light: { ...SLATE_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#141b20"),
@@ -671,12 +672,12 @@ export const THEMES: ReadonlyArray<Theme> = [
     shape: { ...PANEL_SHAPE, topbar: BORDER },
     motion: MOTION,
     space: { ...SPACE, page: "1240px", panelTop: "16px" },
-    layout: { composition: "document", hero: "split", signatures: "stacked", detailWidth: "full" },
+    layout: { composition: "document", hero: "split", signatures: "stacked", storyWidth: "full" },
     card: { ...PRODUCT_CARD, support: { align: "center", padding: 20, surface: "card" } },
   },
   {
     id: "folio",
-    version: 10,
+    version: 11,
     color: {
       light: { ...FOLIO_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#201f1c"),
@@ -705,7 +706,7 @@ export const THEMES: ReadonlyArray<Theme> = [
       composition: "document",
       hero: "editorial",
       signatures: "ledger",
-      detailWidth: "reading",
+      storyWidth: "reading",
     },
     card: {
       ...PRODUCT_CARD,

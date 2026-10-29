@@ -66,4 +66,4 @@ export const displayStyle = (theme: Theme): string =>
 
 /** `<html>` attributes: the look (compatibility and debugging only) and its layout choices. */
 export const themeAttributes = ({ id, layout }: Theme): string =>
-  `data-look="${id}" data-composition="${layout.composition}" data-hero="${layout.hero}" data-signatures="${layout.signatures}" data-detail-width="${layout.detailWidth}"`
+  `data-look="${id}" data-composition="${layout.composition}" data-hero="${layout.hero}" data-signatures="${layout.signatures}" data-story-width="${layout.storyWidth}"`

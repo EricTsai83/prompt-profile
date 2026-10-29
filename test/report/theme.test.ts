@@ -34,7 +34,7 @@ const EIGHTH: Theme = {
     light: { ...lookOf("folio").color.light, accent: "#0a7f3f", bg: "#f2fbf5" },
   },
   space: { ...lookOf("folio").space, page: "1010px" },
-  layout: { composition: "document", hero: "panel", signatures: "ledger", detailWidth: "full" },
+  layout: { composition: "document", hero: "panel", signatures: "ledger", storyWidth: "full" },
   card: { ...lookOf("slate").card, size: { ...lookOf("slate").card.size, footer: 17 } },
 }
 

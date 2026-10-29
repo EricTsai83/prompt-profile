@@ -112,21 +112,26 @@ fictional development review exports, not automatic CLI outputs.
 
 Written to `./prompt-profile-report/` (change it with `--out`):
 
-- `report.html`: your private, single-file report that works offline:
-  - who you are: archetype, a 24-hour clock of your busiest hours, four measured habits with
-    their definitions, your top traits with a quote each and how widely they are supported
-  - **how to improve your prompts**: 2–4 suggestions, each with a real prompt of yours and a
-    suggested rewrite, plus signals such as frequent corrections or very short follow-ups
-  - **how you work with AI**: a capability map (plan, delegate, extend, verify, ship) with the
-    skills you used and what each does, subagent types, MCP servers, models, pull requests,
-    parallel sessions and prompt-writing habits; counted from tool metadata and the skill
-    descriptions recorded in your transcripts, never tool inputs, outputs or skill arguments
-  - what changed since your last report, a daily calendar and a weekday × hour heatmap (hover
-    or tap for the count and main projects), project chapters, the five dimensions, and how it
-    was measured
-  - **usage during this period** (on the "Profile & evidence" page only): Claude Code and Codex
-    side by side with the plan each runs on, tokens by kind, the share of each tool, months and
-    models, and the **API list-price equivalent** in USD; never on the card or the overview
+- `report.html`: your private, single-file report that works offline, with two pages:
+  - **Who they are** (opens first): archetype, up to three observations with medium or high
+    confidence each with one of your own prompts, observed collaboration preferences, the portrait story with its quotes,
+    and fun facts
+  - **Facts & evidence**: every measurement with its source and denominator: four measured
+    habits with their definitions, tool and prompt-wording shares, a daily calendar and a
+    weekday × hour heatmap (hover or tap for the count and main projects), project chapters,
+    all traits with their quotes and how widely they are supported, the evidence for and
+    against each preference, the five dimensions and how it was measured
+  - **how you work with AI** (facts page): a capability map (plan, delegate, extend, verify,
+    ship) with the skills you used and what each does, subagent types, MCP servers, models,
+    pull requests, parallel sessions and prompt-writing habits; counted from tool metadata and
+    the skill descriptions recorded in your transcripts, never tool inputs, outputs or skill
+    arguments
+  - **how to improve your prompts** (facts page): 2–4 suggestions, each with a real prompt of
+    yours and a suggested rewrite, plus signals such as frequent corrections or very short
+    follow-ups, and what changed since your last report
+  - **usage during this period** (facts page only): Claude Code and Codex side by side with
+    the plan each runs on, tokens by kind, the share of each tool, months and models, and the
+    **API list-price equivalent** in USD; never on the card or the "Who they are" page
   - a language switch when there is more than one language
 
   It shows everything by default, quotes and project folder names included. To share it, leave

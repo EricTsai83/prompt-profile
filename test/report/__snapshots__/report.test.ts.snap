@@ -2,7 +2,7 @@
 
 exports[`renderHtml > matches snapshot 1`] = `
 "<!doctype html>
-    <html lang="en" data-look="classic" data-composition="showcase" data-hero="clock" data-signatures="none" data-detail-width="full">
+    <html lang="en" data-look="classic" data-composition="showcase" data-hero="clock" data-signatures="none" data-story-width="full">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -39,7 +39,7 @@ exports[`renderHtml > matches snapshot 1`] = `
 .preference-rail.unclear{background:var(--border)}.preference-rail.unclear i{display:none}.preference-rail.first i{left:0;border:2px solid var(--accent);background:var(--accent)}.preference-rail.second i{left:100%;border:2px solid var(--accent);background:var(--accent)}
 .preference-ends{display:flex;justify-content:space-between;font-size:var(--text-sm);color:var(--muted)}.preference-status{font-size:var(--text-xs);margin-top:10px;color:var(--muted)}
 .page-turn{margin:var(--space-6) 0;padding:var(--space-2) var(--space-4);border:1px solid var(--border)}
-.report-view-detail .portrait{margin-top:32px}.report-view-detail details[open]>summary{margin-bottom:14px}.report-view-detail blockquote{line-height:1.85}
+.report-view details[open]>summary{margin-bottom:14px}.report-view blockquote{line-height:1.85}
 @media(max-width:640px){.overview-charts,.preference-rows{grid-template-columns:1fr}.view-nav{width:100%}.view-nav label{flex:1;text-align:center;padding:var(--space-2)}.overview-bars li{gap:8px}}
 @media print{.view-nav,.page-turn,.switch{display:none!important}.report-view{display:block!important;animation:none}.report-view-detail{break-before:page}.panel,.portrait-chapter,.preference-row{break-inside:avoid}.page{max-width:none;padding:0}}
 
@@ -310,6 +310,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 #lang-en:checked~.page [data-l="en"]{display:revert}#lang-en:checked~.page label[for="lang-en"]{background:var(--accent);color:var(--on-accent)}#lang-en:focus-visible~.page label[for="lang-en"]{outline:3px solid var(--accent);outline-offset:2px}
 #lang-zh-TW:checked~.page [data-l="zh-TW"]{display:revert}#lang-zh-TW:checked~.page label[for="lang-zh-TW"]{background:var(--accent);color:var(--on-accent)}#lang-zh-TW:focus-visible~.page label[for="lang-zh-TW"]{outline:3px solid var(--accent);outline-offset:2px}
 
+.identity-moves{margin:var(--space-8) 0}.identity-moves>.note{margin-top:var(--space-2);max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
+.identity-moves ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
+.identity-moves li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
+.identity-moves li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
 html[data-composition=document] .identity-signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0 8px}
 .identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:var(--text-base);line-height:1.5}.identity-signatures p{font-size:var(--text-sm);line-height:1.8;color:var(--muted);margin-top:8px}
 [data-composition=document] .hero{background:var(--card);color:var(--fg);overflow:visible}
@@ -323,7 +327,7 @@ html[data-composition=document] .identity-signatures{display:grid;grid-template-
 [data-composition=document] .view-heading p{font-size:var(--text-sm)}
 :where([data-composition=document]) .preference-row:has(.unclear) .preference-rail,:where([data-composition=document]) .preference-row:has(.unclear) .preference-ends{display:none}
 [data-hero=split] .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px}html[data-signatures=stacked] .identity-signatures{display:grid!important;grid-template-columns:1fr;gap:0;margin:0}html[data-signatures=stacked] .identity-signatures article{padding:12px 0;border-top:1px solid var(--border)}html[data-signatures=stacked] .identity-signatures article:first-child{border-top:0}html[data-signatures=stacked] .identity-signatures p{margin-top:4px}
-[data-hero=editorial] .hero{background:transparent}html[data-signatures=ledger] .identity-signatures{grid-template-columns:1fr;gap:0;max-width:var(--column)}html[data-signatures=ledger] .identity-signatures article{display:grid;grid-template-columns:200px 1fr;gap:24px;border-top:1px solid var(--border);padding:16px 0}html[data-signatures=ledger] .identity-signatures p{margin:0}[data-detail-width=reading] .report-view-detail{max-width:var(--column);margin:auto}[data-detail-width=reading] .portrait-intro{font-family:var(--prose-font);font-size:var(--prose-intro)}[data-detail-width=reading] .portrait-chapter{border-top:1px solid var(--border);padding-top:28px}
+[data-hero=editorial] .hero{background:transparent}html[data-signatures=ledger] .identity-signatures{grid-template-columns:1fr;gap:0;max-width:var(--column)}html[data-signatures=ledger] .identity-signatures article{display:grid;grid-template-columns:200px 1fr;gap:24px;border-top:1px solid var(--border);padding:16px 0}html[data-signatures=ledger] .identity-signatures p{margin:0}[data-story-width=reading] .portrait{max-width:var(--column)}[data-story-width=reading] .portrait-intro{font-family:var(--prose-font);font-size:var(--prose-intro)}[data-story-width=reading] .portrait-chapter{border-top:1px solid var(--border);padding-top:28px}
 :where([data-composition=document]) .counter-evidence{border-left:2px dashed var(--warn);padding-left:16px}
 @media(max-width:700px){html[data-composition=document] .identity-signatures{grid-template-columns:1fr;gap:0}[data-hero=split] .hero{display:block}html[data-signatures=ledger] .identity-signatures article{grid-template-columns:1fr;gap:6px}html[data-composition=document] .hero h1{overflow-wrap:anywhere}html[data-composition=document] .report-facts{display:grid;gap:12px}}
 @media print{html[data-composition=document] .hero{break-inside:avoid}html[data-composition=document] .identity-signatures{break-inside:avoid}}
@@ -387,7 +391,7 @@ html:root .chg{padding:10px 0;border-bottom:1px solid var(--border)}
 html:root .improve-impact{margin-top:8px}
 html:root .about{padding:24px 0;border-top:1px solid var(--border);max-width:var(--reading)}
 html:root .panel{padding-top:var(--panel-top)}
-@media(min-width:900px){html:root .report-view-detail .portrait{max-width:none;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:48px}html:root .portrait>h2,html:root .portrait>.portrait-intro{grid-column:1/-1;max-width:var(--reading)}html:root .portrait-chapter{grid-column:1;max-width:var(--reading)}html:root .portrait-preferences{grid-column:2;grid-row:3 / span 12;align-self:start;margin-top:32px;font-size:var(--text-sm)}}
+@media(min-width:900px){html:root .preference-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}html:root .preference-evidence>h2,html:root .preference-evidence>.note{grid-column:1/-1}}
 @media(max-width:760px){html:root .caps,html:root .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
 @page{size:A4;margin:16mm 17mm 18mm}
 @media print{
@@ -471,8 +475,8 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 </style>
       </head>
       <body>
-        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="Visual overview" checked />
-        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="Profile &amp; evidence" />
+        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="Who they are" checked />
+        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="Facts &amp; evidence" />
         <input
                     type="radio"
                     name="lang"
@@ -498,8 +502,8 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   </nav>
           </header>
           <nav class="view-nav" aria-label="Report views">
-            <label for="report-overview"><span data-l="en" lang="en">Visual overview</span><span data-l="zh-TW" lang="zh-Hant-TW">圖表總覽</span></label>
-            <label for="report-detail"><span data-l="en" lang="en">Profile &amp; evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">人物側寫與證據</span></label>
+            <label for="report-overview"><span data-l="en" lang="en">Who they are</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這個人</span></label>
+            <label for="report-detail"><span data-l="en" lang="en">Facts &amp; evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">事實與證據</span></label>
           </nav>
           <section class="hero">
 
@@ -563,8 +567,30 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           </section>
 
           <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="Visual overview">
-          <header class="view-heading"><h2><span data-l="en" lang="en">The collaboration at a glance</span><span data-l="zh-TW" lang="zh-Hant-TW">一眼看見協作方式</span></h2><p><span data-l="en" lang="en">Patterns, rhythm and workflow. Continue to the second page for the story and its evidence.</span><span data-l="zh-TW" lang="zh-Hant-TW">先看協作偏好、使用節奏與工作流程，再到第二頁閱讀互動故事與證據。</span></p></header>
+          <section id="overview" class="report-view report-view-overview" aria-label="Who they are">
+          <header class="view-heading"><h2><span data-l="en" lang="en">Meet the collaborator</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這位協作者</span></h2><p><span data-l="en" lang="en">An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。</span></p></header>
+          <section class="identity-moves">
+    <h2><span data-l="en" lang="en">Featured observations, in their own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與本人原話</span></h2>
+    <p class="note"><span data-l="en" lang="en">Up to three observations with medium or high confidence and a verified quote, each shown with one of the person’s own prompts. They are not ranked by strength. Confidence and the remaining evidence are on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">最多三項信心為中或高、且附有已驗證引述的觀察，各附一則本人寫下的提示，並未依強弱排序。信心程度與其餘證據列在「事實與證據」頁。</span></p>
+    <ol><li>
+        <h3><span data-l="en" lang="en">Plan first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></h3>
+        <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
+        <blockquote>don&#39;t write code yet, break the plan into small steps</blockquote>
+      </li></ol>
+  </section>
+          <p class="note"><span data-l="en" lang="en">A collaboration portrait is not available in this profile. The Facts &amp; evidence page contains the available observations.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份 profile 尚未包含協作側寫；「事實與證據」頁仍可閱讀既有的觀察與證據。</span></p>
+
+          <section>
+                  <h2><span data-l="en" lang="en">Fun facts</span><span data-l="zh-TW" lang="zh-Hant-TW">有趣的事實</span></h2>
+                  <ul class="facts">
+                    <li class="fact"><span data-l="en" lang="en">Latest prompt: 03:12 AM.</span><span data-l="zh-TW" lang="zh-Hant-TW">最晚的 prompt：凌晨 03:12。</span></li><li class="fact"><span data-l="en" lang="en">Longest streak: 23 days in a row.</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續天數：23 天。</span></li>
+                  </ul>
+                </section>
+
+          <label class="page-turn" for="report-detail"><span data-l="en" lang="en">See the facts and evidence →</span><span data-l="zh-TW" lang="zh-Hant-TW">查看事實與證據 →</span></label>
+          </section>
+          <section id="detail" class="report-view report-view-detail" aria-label="Facts &amp; evidence">
+          <header class="view-heading"><h2><span data-l="en" lang="en">What the records show</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄呈現了什麼</span></h2><p><span data-l="en" lang="en">Every measurement with its source and denominator, all observations with their evidence, and what remains unknown. Evidence is expanded by default.</span><span data-l="zh-TW" lang="zh-Hant-TW">每項量測都附來源與分母，每項觀察都附證據，也列出仍然未知的部分。證據預設展開，不必逐一點開。</span></p></header>
           <section class="sigs" aria-label="Measured signature">
             <div class="sig tip tip-l" data-tip-en="Share of prompts sent between 22:00 and 04:59" data-tip-zh-TW="22:00 到 04:59 之間送出的 prompt 比例" tabindex="-1">
     <b>19%</b><span><span data-l="en" lang="en">at night</span><span data-l="zh-TW" lang="zh-Hant-TW">在深夜</span></span>
@@ -580,8 +606,6 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </div>
           </section>
 
-
-          <p class="note"><span data-l="en" lang="en">A collaboration portrait is not available in this profile. The detail page contains the available observations.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份 profile 尚未包含協作側寫；第二頁仍可閱讀既有的觀察與證據。</span></p>
           <div class="overview-charts">
     <article class="panel"><h2><span data-l="en" lang="en">Which tools appear in conversations?</span><span data-l="zh-TW" lang="zh-Hant-TW">對話中出現哪些工具？</span></h2>
       <p class="note"><span data-l="en" lang="en">A session is one recorded conversation. Tool records describe agent activity, not the person’s ability. Categories overlap; percentages need not add to 100%.</span><span data-l="zh-TW" lang="zh-Hant-TW">一個 session 是一段對話紀錄。工具紀錄呈現 AI 助手的活動，不代表使用者的能力。類別可重疊，百分比不必合計為 100%。</span></p>
@@ -2787,17 +2811,6 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                       </div>
                     </article>
                   </div>
-          <section>
-                  <h2><span data-l="en" lang="en">Fun facts</span><span data-l="zh-TW" lang="zh-Hant-TW">有趣的事實</span></h2>
-                  <ul class="facts">
-                    <li class="fact"><span data-l="en" lang="en">Latest prompt: 03:12 AM.</span><span data-l="zh-TW" lang="zh-Hant-TW">最晚的 prompt：凌晨 03:12。</span></li><li class="fact"><span data-l="en" lang="en">Longest streak: 23 days in a row.</span><span data-l="zh-TW" lang="zh-Hant-TW">最長連續天數：23 天。</span></li>
-                  </ul>
-                </section>
-
-          <label class="page-turn" for="report-detail"><span data-l="en" lang="en">Read the profile and evidence →</span><span data-l="zh-TW" lang="zh-Hant-TW">閱讀人物側寫與證據 →</span></label>
-          </section>
-          <section id="detail" class="report-view report-view-detail" aria-label="Profile &amp; evidence">
-          <header class="view-heading"><h2><span data-l="en" lang="en">The person behind the prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">從對話認識這個人</span></h2><p><span data-l="en" lang="en">Read the interactions, supporting quotes and tools behind the overview. Evidence is expanded by default.</span><span data-l="zh-TW" lang="zh-Hant-TW">閱讀總覽背後的互動、原文引述與使用工具。證據預設展開，不必逐一點開。</span></p></header>
 
           <section>
             <h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2>
@@ -2863,6 +2876,73 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </article>
             </div>
 
+          </section>
+
+
+
+          <section>
+            <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>
+            <div class="dims">
+              <details open class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details open class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details open class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details open class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
+    <div class="dim-body">
+      <ul class="evidence">
+    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
+  </ul>
+    </div>
+  </details><details open class="dimension">
+    <summary><span class="dim-name"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+    <span class="dim-main">
+      <span class="dim-title"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
+      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
+    </span>
+    <span class="badge warn"><span data-l="en" lang="en">No verified evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">沒有通過驗證的證據</span></span></summary>
+    <div class="dim-body">
+      <p class="warning"><span data-l="en" lang="en">Insufficient evidence: no quote in this summary passed verification.</span><span data-l="zh-TW" lang="zh-Hant-TW">證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。</span></p>
+    </div>
+  </details>
+            </div>
           </section>
 
           <section class="techniques">
@@ -3438,71 +3518,6 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </div>
                 </section>
 
-          <section>
-            <h2><span data-l="en" lang="en">Five dimensions</span><span data-l="zh-TW" lang="zh-Hant-TW">五個面向</span></h2>
-            <div class="dims">
-              <details open class="dimension">
-    <summary><span class="dim-name"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
-    <span class="dim-main">
-      <span class="dim-title"><span data-l="en" lang="en">Work style</span><span data-l="zh-TW" lang="zh-Hant-TW">工作風格</span></span>
-      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
-    </span>
-    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
-    <div class="dim-body">
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details open class="dimension">
-    <summary><span class="dim-name"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
-    <span class="dim-main">
-      <span class="dim-title"><span data-l="en" lang="en">Communication</span><span data-l="zh-TW" lang="zh-Hant-TW">溝通</span></span>
-      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
-    </span>
-    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
-    <div class="dim-body">
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details open class="dimension">
-    <summary><span class="dim-name"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
-    <span class="dim-main">
-      <span class="dim-title"><span data-l="en" lang="en">Tech profile</span><span data-l="zh-TW" lang="zh-Hant-TW">技術輪廓</span></span>
-      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
-    </span>
-    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
-    <div class="dim-body">
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details open class="dimension">
-    <summary><span class="dim-name"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
-    <span class="dim-main">
-      <span class="dim-title"><span data-l="en" lang="en">Interests</span><span data-l="zh-TW" lang="zh-Hant-TW">興趣</span></span>
-      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
-    </span>
-    <span class="badge"><span data-l="en" lang="en">1 quote</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文</span></span></summary>
-    <div class="dim-body">
-      <ul class="evidence">
-    <li><blockquote>don&#39;t write code yet, break the plan into small steps</blockquote></li>
-  </ul>
-    </div>
-  </details><details open class="dimension">
-    <summary><span class="dim-name"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
-    <span class="dim-main">
-      <span class="dim-title"><span data-l="en" lang="en">Growth</span><span data-l="zh-TW" lang="zh-Hant-TW">成長</span></span>
-      <span class="dim-summary"><span data-l="en" lang="en">Plans first, then breaks big tasks into small steps.</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃，再把大任務拆成小步驟。</span></span>
-    </span>
-    <span class="badge warn"><span data-l="en" lang="en">No verified evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">沒有通過驗證的證據</span></span></summary>
-    <div class="dim-body">
-      <p class="warning"><span data-l="en" lang="en">Insufficient evidence: no quote in this summary passed verification.</span><span data-l="zh-TW" lang="zh-Hant-TW">證據不足：這段摘要沒有通過驗證的原文引用，僅供參考。</span></p>
-    </div>
-  </details>
-            </div>
-          </section>
-
           <section class="usage">
     <div class="section-head">
       <h2><span data-l="en" lang="en">Usage during this period</span><span data-l="zh-TW" lang="zh-Hant-TW">這段期間的用量</span></h2>
@@ -3782,7 +3797,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 
                   <p><span data-l="en" lang="en">Privacy: prompts are read only on your machine; after redaction they are analysed with your own Claude Code / Codex account. This report is never uploaded.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 只在你的電腦上讀取；遮蔽敏感資訊後，才用你自己的 Claude Code / Codex 帳號分析。這份報告不會被上傳。</span></p>
                 </section>
-          <label class="page-turn" for="report-overview"><span data-l="en" lang="en">← Back to the visual overview</span><span data-l="zh-TW" lang="zh-Hant-TW">← 回到圖表總覽</span></label>
+          <label class="page-turn" for="report-overview"><span data-l="en" lang="en">← Back to the introduction</span><span data-l="zh-TW" lang="zh-Hant-TW">← 回到人物介紹</span></label>
           </section>
           </main>
           <footer class="foot">prompt-profile · npx prompt-profile</footer>

@@ -1,6 +1,6 @@
 import { documentLayoutStyle } from "./document-layout.ts"
-import { identitySignatures, variantStyle } from "./templates.ts"
-import { portraitSection, portraitStyle } from "./portrait.ts"
+import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
+import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
 import { VIEW_MESSAGES } from "./messages.ts"
 import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
 import { DateTime } from "effect"
@@ -601,7 +601,8 @@ export const renderHtml = (
   const every = correctionEvery(s)
   const signals = v.coaching ? signalRow(profile, loc) : null
   const progress = v.coaching ? progressBlock(profile, loc, v, scrub) : null
-  const portrait = portraitSection(profile, loc, v, scrub)
+  const story = portraitStory(profile, loc, v, scrub)
+  const preferences = preferenceEvidence(profile, loc, v, scrub)
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   const perSession = promptsPerSession(s)
   // the usage's own period: it is summed over the whole window, not only the prompts' days
@@ -621,7 +622,7 @@ export const renderHtml = (
         />
         <title>${scrub(profile.archetype.name, "en")} · prompt-profile</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${portrait ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
       </head>
       <body>
@@ -715,6 +716,27 @@ export const renderHtml = (
           <main>
           <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
           <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewNote)}</p></header>
+          ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
+          ${preferenceMap(profile, loc)}
+          ${story ?? ""}
+          ${
+            v.funFacts && profile.funFacts.length > 0
+              ? html`<section>
+                  <h2>${loc.text((m) => m.funFacts)}</h2>
+                  <ul class="facts">
+                    ${profile.funFacts.map(
+                      (_f, i) =>
+                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
+                    )}
+                  </ul>
+                </section>`
+              : ""
+          }
+
+          <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].next)}</label>
+          </section>
+          <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}">
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailNote)}</p></header>
           <section class="sigs" aria-label="${loc.attr((m) => m.signature)}">
             ${signatureTile(
               html`${percent(nightShare(s))}%`,
@@ -742,8 +764,6 @@ export const renderHtml = (
             )}
           </section>
 
-
-          ${preferenceMap(profile, loc)}
           ${workflowCharts(profile, loc)}
           <section>
             <h2>${loc.text((m) => m.rhythm)}</h2>
@@ -855,25 +875,7 @@ export const renderHtml = (
                       </div>
                     </article>
                   </div>
-          ${
-            v.funFacts && profile.funFacts.length > 0
-              ? html`<section>
-                  <h2>${loc.text((m) => m.funFacts)}</h2>
-                  <ul class="facts">
-                    ${profile.funFacts.map(
-                      (_f, i) =>
-                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
-                    )}
-                  </ul>
-                </section>`
-              : ""
-          }
 
-          <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].next)}</label>
-          </section>
-          <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}">
-          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailNote)}</p></header>
-          ${portrait ?? ""}
           <section>
             <h2>${loc.text((m) => m.traits)}</h2>
             <div class="traits">
@@ -887,6 +889,15 @@ export const renderHtml = (
                     </ul>`
                 : ""
             }
+          </section>
+
+          ${preferences ?? ""}
+
+          <section>
+            <h2>${loc.text((m) => m.dimensions)}</h2>
+            <div class="dims">
+              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
+            </div>
           </section>
 
           ${
@@ -921,13 +932,6 @@ export const renderHtml = (
                 </section>`
               : ""
           }
-
-          <section>
-            <h2>${loc.text((m) => m.dimensions)}</h2>
-            <div class="dims">
-              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
-            </div>
-          </section>
 
           ${usage ?? ""}
 

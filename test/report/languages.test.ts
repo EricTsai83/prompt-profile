@@ -35,7 +35,13 @@ describe("report languages", () => {
       expect(out).toContain('<span data-l="en" lang="en">The Midnight Architect</span>')
       expect(out).toContain("證據不足")
       expect(out).toContain("Insufficient evidence")
-      expect(out.match(/<blockquote[ >]/g)?.length).toBe(evidenceTotal(p))
+      // the facts view holds every quote once; the identity view repeats one per featured habit
+      const [identity, facts] = out.split('<section id="detail"') as [string, string]
+      const featured = identity.split('class="identity-moves"')[1]!.split("</section>")[0]!
+      expect(facts.match(/<blockquote[ >]/g)?.length).toBe(evidenceTotal(p))
+      expect(identity.match(/<blockquote[ >]/g)?.length).toBe(
+        featured.match(/<blockquote[ >]/g)?.length,
+      )
       expect(out).not.toContain("<script")
     }),
   )

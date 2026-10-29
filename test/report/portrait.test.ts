@@ -13,7 +13,7 @@ const sample = () =>
   )
 
 describe("portrait report", () => {
-  it("includes a continuous evidence-backed portrait on the detail page and honors quote exclusions", async () => {
+  it("introduces the person with the portrait story on the identity view and honors quote exclusions", async () => {
     const p = {
       ...(await sample()),
       portrait: {
@@ -38,7 +38,9 @@ describe("portrait report", () => {
     }
     const out = renderHtml(p)
     expect(out).toContain('class="portrait"')
-    expect(out.indexOf("Setting a course")).toBeGreaterThan(out.indexOf('class="sigs"'))
+    // the story introduces the person, before the measurements of the facts view
+    expect(out.indexOf("Setting a course")).toBeLessThan(out.indexOf('<section id="detail"'))
+    expect(out.indexOf("Setting a course")).toBeGreaterThan(out.indexOf('<section id="overview"'))
     expect(out).toContain("UNIQUE_PRIVATE_QUOTE")
     expect(out).toContain("Observed collaboration preferences")
     expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })).not.toContain(
