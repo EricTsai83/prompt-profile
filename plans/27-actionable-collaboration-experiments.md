@@ -1,6 +1,6 @@
 # Actionable collaboration experiments
 
-Status: Ready for contract and fixtures; implement after initial plan 26 findings
+Status: Ready for contract and fixtures; claim calibration baseline delivered
 
 ## Outcome
 
@@ -52,3 +52,5 @@ No automatic reminders, agent execution or productivity scores.
 
 When all acceptance items are complete, move durable usage/decision notes outside `plans/`,
 delete this file and its index row in the same change, and repair incoming links.
+
+Calibration foundation: [authored cases, production safeguards and limitations](../docs/ux/model-comparison/claim-support.md).

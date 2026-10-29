@@ -9,7 +9,7 @@ collaborate with an agent. Observation is input to a choice, not proof of a desi
 
 ## Dependencies and ownership
 
-Depends on: Plan 26; plan 27 can provide candidate actions.
+Depends on: the completed [claim calibration](../docs/ux/model-comparison/claim-support.md); plan 27 can provide candidate actions.
 
 Reuse verified profile evidence and private file utilities. Preferences are a separate user-owned
 artifact; exporting them must not mutate the source profile or any existing agent configuration.
