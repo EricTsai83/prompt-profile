@@ -157,9 +157,15 @@ identifiers while evaluating whether the axes describe distinct, observable pref
       task-context effects, and what must not be inferred from prompt length or tool events.
 - [ ] Evaluate overlap between pacing and decision ownership. Revise axes or catalog size if
       synthetic examples cannot distinguish them; do not preserve sixteen types merely for symmetry.
-- [ ] Replace the single `unclear` presentation with explicit reasons for insufficient evidence,
+- [x] Replace the single `unclear` presentation with explicit reasons for insufficient evidence,
       conflicting evidence, or task-dependent preferences. A counterexample should trigger analysis
       of context, not automatically erase all useful information about the person's behavior.
+      Owner decision (2026-10-30): there are no counterexamples. A person may work one way in one
+      project or kind of task and the other way elsewhere; both are characteristic. Each axis lists
+      every observed way of working (`sides`, profile schema 12) with its context, quotes and
+      conversation count; a way needs two or more conversations to count as characteristic, and
+      fewer is shown as seen once or "not seen in two or more conversations yet". A complete role
+      is assigned only when every axis has exactly one characteristic way.
 - [ ] Aggregate support at the session level, report spread and eligible evidence coverage, and
       prevent one very long conversation or repeated boilerplate from dominating classification.
 - [ ] Define evidence-strength reporting without numerical personality scores. No complete role
