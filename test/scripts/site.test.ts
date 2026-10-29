@@ -1,4 +1,5 @@
 import { Effect } from "effect"
+import { existsSync } from "node:fs"
 import { beforeAll, describe, expect, it } from "vitest"
 import { siteFiles } from "../../scripts/site.ts"
 import { decodeProfile } from "../../src/domain/Profile.ts"
@@ -46,5 +47,27 @@ describe("siteFiles", () => {
   it("links every product template from the gallery", () => {
     const gallery = text("demo/templates/index.html")
     for (const look of PRODUCT_LOOK_IDS) expect(gallery).toContain(`href="../${look}/report.html"`)
+  })
+
+  it("has a home page at the site root, whose every link points to a published file", () => {
+    const home = text("index.html")
+    expect(home).toMatch(/^<!doctype html>/i)
+    expect(home).toContain('<img src="sample-card.png"')
+    const links = [...home.matchAll(/(?:href|src)="([^"#:]+)"/g)].map((m) => m[1]!)
+    expect(links).toEqual(
+      expect.arrayContaining([
+        "sample-report.html",
+        "demo/without-personal/report.html",
+        "demo/templates/index.html",
+        "sample-profile.json",
+      ]),
+    )
+    for (const link of links) {
+      const path = link.endsWith("/") ? `${link}index.html` : link
+      // generated here, or copied from the hand-written docs/
+      expect(files.has(path) || existsSync(`docs/${path}`), path).toBe(true)
+    }
+    for (const look of LOOK_IDS)
+      expect(home).toContain(`href="demo/${look === "classic" ? "full" : look}/report.html"`)
   })
 })
