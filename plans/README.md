@@ -92,9 +92,9 @@ There are three independent version numbers. Bump them whenever the correspondin
 | Version | Location | Now | When to bump |
 |---|---|---|---|
 | `Profile.schemaVersion` | `domain/Profile.ts` | 9 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 10 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 11 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 3 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
+| `Look.version` / `RENDER_MANIFEST_VERSION` | `report/looks.ts` | 7 / 2 | A look's design or the `render.json` format changes (render only; not part of any cache key) |
 
 ## Open plans
 
@@ -110,7 +110,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
-| 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Planned |
+| 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Production templates reviewed; current design approved; reader walkthrough pending |
 
 ## Shared rules for every plan
 

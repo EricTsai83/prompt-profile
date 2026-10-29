@@ -18,7 +18,9 @@ The author's own report, from about 1,700 real prompts over six months, publishe
   `--exclude personal`: no quotes, rewrites or fun facts, projects shown as "Project A, B…",
   dates by month. This is what you would post publicly.
 
-The share card is the same for both: it never contains quotes or project names. The full report
+The card never contains prompt quotes. Project names may appear in normal mode;
+`--exclude projects` (also included in `--exclude personal`) anonymizes known project names
+in both the report and card, including generated identity text. The full report
 in every look (`--look`; render only, no new analysis):
 
 <table>
@@ -102,6 +104,12 @@ folder. Move the executable to a folder on your `PATH` to run it as `prompt-prof
 
 ## What you get
 
+The CLI writes HTML, `profile.json`, and `card*.png`; it does not automatically export PDF.
+For a static PDF, open `report.html`, select a language, then use your browser’s Print → Save
+as PDF. Printing includes both report views in that language. The offline HTML stays interactive;
+both formats use the same profile without another analysis call. Files in `output/pdf/` are
+fictional development review exports, not automatic CLI outputs.
+
 Written to `./prompt-profile-report/` (change it with `--out`):
 
 - `report.html`: your private, single-file report that works offline:
@@ -180,7 +188,7 @@ prompt-profile --yes           # skip the confirmation (required in non-interact
 prompt-profile --dry-run       # write what would be sent to the LLM into --out, call nothing
 prompt-profile --verbose       # full errors and LLM call timings
 prompt-profile --lang zh-TW,en # report languages, the first is the default (en, zh-TW)
-prompt-profile --look signal   # classic (default) / signal / afterhours / studio
+prompt-profile --look signal   # classic (default) / signal / afterhours / studio / prism / slate / folio
 prompt-profile --card-hide stats,graphic  # leave traits / stats / graphic out of card.png
 
 prompt-profile stats                  # statistics only, no LLM (free and fast)
@@ -194,7 +202,8 @@ prompt-profile render profile.json --look studio --card-hide stats
 Looks and `--card-hide` only change how the report and card are drawn: no new analysis and no
 LLM calls, and the original report is kept. `--card-hide` changes the share card only; the
 private report and `profile.json` still contain everything, including quotes. The card never
-contains quotes or project names in any look.
+contains prompt quotes in any look. Project names follow the same `--exclude projects` choice
+as the report.
 
 Languages: without `--lang`, a Chinese system locale gives a Traditional Chinese report with an
 English switch (`zh-TW,en`); any other locale gives English. The profile is written in English
@@ -307,3 +316,20 @@ ability scores or a validated personality instrument. The system is independent 
 
 Re-analyse to generate the new portrait; rendering an older profile does not create new
 analysis. `pnpm dev:report` renders an entirely fictional portrait for local inspection.
+
+### Choose a report template
+
+- **Prism** puts supported signature behaviors above a clear visual overview.
+- **Slate** combines a compact identity workspace with precise activity charts.
+- **Folio** gives the portrait and evidence a quieter, connected reading rhythm.
+
+Each includes a matching 1200 × 630 card. [Browse fictional examples](docs/demo/templates/index.html).
+Existing looks and the classic default remain available. Change presentation without reanalysis:
+
+```bash
+prompt-profile render profile.json --look prism
+prompt-profile render profile.json --look slate
+prompt-profile render profile.json --look folio --card-hide stats
+```
+
+The card hiding options affect only the card; report exclusions remain available through `--exclude`.

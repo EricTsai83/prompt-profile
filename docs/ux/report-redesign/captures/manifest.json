@@ -1,0 +1,145 @@
+{
+  "data": "Fictional only; current screenshots annotated in DOM before capture; prototypes English only",
+  "results": [
+    {
+      "file": "current-en-1440-overview.png",
+      "width": 1440,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "current-zh-TW-1440-overview.png",
+      "width": 1440,
+      "view": "overview",
+      "lang": "zh-TW",
+      "errors": []
+    },
+    {
+      "file": "current-en-1440-detail.png",
+      "width": 1440,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "current-zh-TW-1440-detail.png",
+      "width": 1440,
+      "view": "detail",
+      "lang": "zh-TW",
+      "errors": []
+    },
+    {
+      "file": "current-en-390-overview.png",
+      "width": 390,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "current-zh-TW-390-overview.png",
+      "width": 390,
+      "view": "overview",
+      "lang": "zh-TW",
+      "errors": []
+    },
+    {
+      "file": "current-en-390-detail.png",
+      "width": 390,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "current-zh-TW-390-detail.png",
+      "width": 390,
+      "view": "detail",
+      "lang": "zh-TW",
+      "errors": []
+    },
+    {
+      "file": "poster-en-1440-overview.png",
+      "width": 1440,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "poster-en-1440-detail.png",
+      "width": 1440,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "poster-en-390-overview.png",
+      "width": 390,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "poster-en-390-detail.png",
+      "width": 390,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "route-en-1440-overview.png",
+      "width": 1440,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "route-en-1440-detail.png",
+      "width": 1440,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "route-en-390-overview.png",
+      "width": 390,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "route-en-390-detail.png",
+      "width": 390,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "index-en-1440-overview.png",
+      "width": 1440,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "index-en-1440-detail.png",
+      "width": 1440,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "index-en-390-overview.png",
+      "width": 390,
+      "view": "overview",
+      "lang": "en",
+      "errors": []
+    },
+    {
+      "file": "index-en-390-detail.png",
+      "width": 390,
+      "view": "detail",
+      "lang": "en",
+      "errors": []
+    }
+  ]
+}

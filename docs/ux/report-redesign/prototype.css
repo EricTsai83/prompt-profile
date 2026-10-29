@@ -1,0 +1,376 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f5f4ee;
+  color: #172c32;
+  font:
+    17px/1.65 Arial,
+    sans-serif;
+}
+a {
+  color: inherit;
+}
+button,
+select {
+  font: inherit;
+  padding: 8px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  cursor: pointer;
+}
+button[aria-pressed="true"] {
+  background: #172c32;
+  color: white;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #bc451d;
+  outline-offset: 4px;
+}
+nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+header,
+main,
+footer {
+  max-width: 1200px;
+  margin: auto;
+  padding: 28px 40px;
+}
+header {
+  border-bottom: 1px solid #a4afab;
+}
+small,
+.eyebrow {
+  font: 12px/1.5 monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+h1 {
+  font-size: clamp(40px, 6vw, 82px);
+  line-height: 1.03;
+  letter-spacing: -0.055em;
+  margin: 18px 0 28px;
+  max-width: 850px;
+}
+h2 {
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+h3 {
+  font-size: 21px;
+  margin-bottom: 8px;
+}
+p {
+  max-width: 65ch;
+}
+.lede {
+  font-size: 23px;
+  line-height: 1.45;
+  max-width: 48ch;
+}
+.hero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: center;
+  padding: 35px 0 48px;
+}
+.character {
+  border: 2px dashed currentColor;
+  min-height: 230px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 24px;
+  transform: rotate(3deg);
+}
+.character b {
+  font-size: 65px;
+  line-height: 1;
+}
+.character small {
+  max-width: 22ch;
+}
+.signatures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  border-top: 2px solid;
+  padding: 25px 0;
+}
+.signatures article {
+  border-right: 1px solid #9da9a4;
+  padding-right: 22px;
+}
+.num {
+  font: 13px monospace;
+}
+.pattern {
+  padding: 28px 0;
+  border-block: 1px solid #a4afab;
+}
+.steps {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 23px;
+}
+.steps span {
+  padding: 10px 0;
+}
+.uncertainty {
+  background: #e2e9df;
+  padding: 24px 28px;
+  margin: 36px 0;
+}
+.detail {
+  max-width: 760px;
+  margin: auto;
+}
+.detail section {
+  margin: 45px 0;
+}
+.detail blockquote {
+  margin: 20px 0;
+  padding: 16px 24px;
+  border-left: 4px solid #267b67;
+  background: #edf3ee;
+  font-size: 21px;
+}
+.detail cite {
+  font: 12px monospace;
+  display: block;
+  margin-top: 10px;
+}
+.contrary {
+  border-top: 2px solid #b65b34;
+  padding-top: 16px;
+}
+.contrary blockquote {
+  border-color: #b65b34;
+  background: #fff0e7;
+}
+details summary {
+  font-weight: bold;
+  cursor: pointer;
+}
+footer {
+  font-size: 13px;
+  border-top: 1px solid #9da9a4;
+}
+body.poster {
+  background: #e3edb4;
+}
+.poster .hero {
+  grid-template-columns: 3fr 2fr;
+}
+.poster .character {
+  background: #193d38;
+  color: #e3edb4;
+  border: 0;
+  min-height: 340px;
+}
+.poster .signatures {
+  border-top: 5px solid;
+}
+.poster .uncertainty {
+  background: #f4f5df;
+}
+.route {
+  background: #112b39;
+  color: #e7f2f4;
+}
+.route main {
+  border-left: 1px solid #4b6975;
+}
+.route .hero {
+  grid-template-columns: 1fr;
+}
+.route .hero h1 {
+  max-width: 800px;
+}
+.route .character {
+  min-height: 100px;
+  transform: none;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  border-color: #8cb4bb;
+  max-width: 650px;
+}
+.route .character b {
+  font-size: 38px;
+}
+.route .pattern {
+  order: -1;
+  background: #234959;
+  padding: 28px;
+}
+.route .overview {
+  display: flex;
+  flex-direction: column;
+}
+.route .signatures {
+  border-top: 0;
+  grid-template-columns: 1fr;
+  margin-left: 80px;
+  border-left: 3px solid #77c6c3;
+  padding-left: 30px;
+}
+.route .signatures article {
+  border: 0;
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 18px;
+}
+.route .signatures h3 {
+  margin-top: 0;
+}
+.route .uncertainty {
+  background: #234959;
+}
+.route .detail blockquote {
+  color: #172c32;
+}
+.index .hero {
+  grid-template-columns: 1fr 3fr;
+  align-items: start;
+}
+.index .identity {
+  grid-column: 2;
+}
+.index .character {
+  grid-column: 1;
+  grid-row: 1;
+  transform: none;
+  min-height: 170px;
+}
+.index .character b {
+  font-size: 42px;
+}
+.index h1 {
+  font-size: clamp(38px, 5vw, 65px);
+}
+.index .signatures {
+  display: block;
+  border-top: 1px solid;
+}
+.index .signatures article {
+  display: grid;
+  grid-template-columns: 80px 1fr 2fr;
+  gap: 28px;
+  border-right: 0;
+  border-bottom: 1px solid #9da9a4;
+  padding: 20px 0;
+}
+.index .signatures h3,
+.index .signatures p {
+  margin: 0;
+}
+.index .pattern {
+  margin-left: 25%;
+}
+.index .detail {
+  max-width: 900px;
+}
+.index .detail section {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 24px;
+}
+.index .detail section > h2 {
+  margin-top: 0;
+}
+.index .detail section > .body {
+  min-width: 0;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 650px) {
+  header,
+  main,
+  footer {
+    padding: 22px;
+  }
+  .hero,
+  .poster .hero,
+  .index .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding-top: 16px;
+  }
+  .character,
+  .poster .character {
+    min-height: 145px;
+    transform: none;
+  }
+  .character b {
+    font-size: 45px;
+  }
+  .signatures {
+    display: block;
+  }
+  .signatures article {
+    border-right: 0;
+    border-bottom: 1px solid #9da9a4;
+    padding: 20px 0;
+  }
+  .index .signatures article {
+    grid-template-columns: 30px 1fr;
+    gap: 12px;
+  }
+  .index .signatures p {
+    grid-column: 2;
+  }
+  .index .pattern {
+    margin-left: 0;
+  }
+  .route .signatures {
+    margin-left: 8px;
+  }
+  .index .detail section {
+    display: block;
+  }
+  .lede {
+    font-size: 20px;
+  }
+  .steps {
+    font-size: 19px;
+  }
+  h2 {
+    font-size: 27px;
+  }
+}
+@media print {
+  nav {
+    display: none;
+  }
+  [hidden] {
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .detail {
+    break-before: page;
+  }
+}
+
+.route .signatures article p {
+  grid-column: 2;
+  margin-top: 0;
+}

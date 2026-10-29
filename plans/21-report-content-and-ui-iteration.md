@@ -1,6 +1,6 @@
 # Report content and UI iteration
 
-Status: planned
+Status: production templates implemented and reviewed; owner approved current design for commit; reader walkthrough pending
 
 ## Objective
 
@@ -44,19 +44,19 @@ existing profile schema and does not wait for every plan 20 phase to finish.
 
 ## 1. Diagnose the current report before choosing a style
 
-- [ ] Capture and annotate the current overview and detail views in English and Traditional
+- [x] Capture and annotate the current overview and detail views in English and Traditional
       Chinese at desktop and mobile sizes. Keep real-history captures under ignored local output;
       use fictional data for anything committed or shared publicly.
-- [ ] Audit existing research in `docs/ux/` and its recorded feedback. Those explorations are
+- [x] Audit existing research in `docs/ux/` and its recorded feedback. Those explorations are
       context, not approved templates for this redesign.
-- [ ] Record concrete weaknesses with examples and their reading consequences. Investigate the
+- [x] Record concrete weaknesses with examples and their reading consequences. Investigate the
       oversized generic hero, emphasis on activity rather than identity, repeated rounded panels,
       weak distinctions between section importance, repetitive headings, sparse role information,
       and the space consumed by four unresolved axes. These are hypotheses to inspect, not a
       requirement to replace every component.
-- [ ] Audit detail-page pacing: repeated claims, excessive quote repetition, unexplained technical
+- [x] Audit detail-page pacing: repeated claims, excessive quote repetition, unexplained technical
       names, skill inventories without a point, overly long coaching, and unclear evidence context.
-- [ ] Produce a prioritized critique: what to remove, combine, elevate, simplify, or redesign.
+- [x] Produce a prioritized critique: what to remove, combine, elevate, simplify, or redesign.
       Distinguish visual issues from missing analysis data and content-quality issues.
 
 Deliverable: `docs/ux/report-redesign/critique.md` with annotated fictional captures.
@@ -67,44 +67,44 @@ Create a content matrix before styling. For every candidate block, record the re
 its source field, the takeaway, view/position, approximate length, fallback, and exclusion behavior.
 Do not render every available field just because it exists in `Profile`.
 
-- [ ] Define three reading speeds: a first-screen impression, a brief visual scan, and a deeper
+- [x] Define three reading speeds: a first-screen impression, a brief visual scan, and a deeper
       read. State what a reader should learn at each speed without making unsupported promises.
-- [ ] Prioritize the overview around a role/character and one-line portrait, two or three supported
+- [x] Prioritize the overview around a role/character and one-line portrait, two or three supported
       signature behaviors when available, a compact collaboration pattern, and selected tool or
       activity signals. Evaluate which of these deserves the hero rather than assuming a large clock.
-- [ ] Move counts, generation metadata, engine details and methodological caveats to supporting
+- [x] Move counts, generation metadata, engine details and methodological caveats to supporting
       positions. Keep sampling and material uncertainty clear without making them the entire hero.
-- [ ] Limit overview charts to those that tell something distinctive. Consider whether prompt
+- [x] Limit overview charts to those that tell something distinctive. Consider whether prompt
       length, correction frequency and activity timing deserve default prominence; avoid treating
       high usage, late work or many skills as inherently impressive.
-- [ ] Specify an overview that still feels intentional when all four axes are unresolved, the
+- [x] Specify an overview that still feels intentional when all four axes are unresolved, the
       profile lacks a portrait, tool metadata is absent, or exclusions remove most personal details.
-- [ ] Define the detail sequence: introduction, representative interaction and turning points,
+- [x] Define the detail sequence: introduction, representative interaction and turning points,
       recurring habits and exceptions, relevant skills/tools, and optional next experiments.
       Avoid restating the same paragraph under portrait, traits and dimensions.
-- [ ] Connect skills to what the person uses them for when supported. Keep complete inventories
+- [x] Connect skills to what the person uses them for when supported. Keep complete inventories
       available but subordinate; never imply that agent tool events prove user expertise.
-- [ ] Define evidence presentation: original quotes, concise context, chronological order,
+- [x] Define evidence presentation: original quotes, concise context, chronological order,
       supporting versus contrary evidence, and recurrence. Preserve source text and privacy controls.
-- [ ] Mark which desired content is available now and which requires plan 20 B/C/E. A mockup must
+- [x] Mark which desired content is available now and which requires plan 20 B/C/E. A mockup must
       label synthetic examples and proposed fields; production must not fabricate missing content.
 
 Deliverables: content matrix, two-view outline, and realistic sample copy using fictional profiles.
 
 ## 3. Explore genuinely different visual directions
 
-- [ ] Produce three substantially different compositions using the same fictional content, not
+- [x] Produce three substantially different compositions using the same fictional content, not
       three palette changes. Possible starting points are a character-led portrait, an editorial
       field guide, and a diagram-led collaboration map; evaluate rather than preselect these labels.
-- [ ] For each direction, design the desktop first screen, overview structure, a representative
+- [x] For each direction, design the desktop first screen, overview structure, a representative
       detail passage with evidence, and a mobile composition. Show the mixed-evidence state too.
-- [ ] Define type scale, reading width, spacing rhythm, color roles, visual hierarchy, chart
+- [x] Define type scale, reading width, spacing rhythm, color roles, visual hierarchy, chart
       language, character placement and component shapes. Avoid making every block an equal card.
-- [ ] Include an original character study or an explicitly labeled placeholder; coordinate with
+- [x] Include an original character study or an explicitly labeled placeholder; coordinate with
       plan 20 D. Evaluate whether the character helps recognition without overwhelming the profile.
-- [ ] Compare the directions side by side with the current report, including tradeoffs in
+- [x] Compare the directions side by side with the current report, including tradeoffs in
       distinctiveness, readability, content density, unknown states and implementation cost.
-- [ ] Gather the owner's visual and content feedback and record the chosen direction and rejected
+- [x] Gather the owner's visual and content feedback and record the chosen direction and rejected
       elements. Technical validation is not aesthetic acceptance. If feedback has not arrived,
       label any working direction provisional and continue only reusable work without claiming approval.
 
@@ -160,9 +160,73 @@ under `docs/ux/report-redesign/`. No server or external assets should be require
       keyboard access, responsive overflow, unclipped text, offline operation and print coverage.
 - [ ] Visual inspection covers complete desktop/mobile reports in both languages and the card.
       Screenshots support inspection; snapshot matches alone do not establish good design.
-- [ ] Use behavior-first tests for implementation changes and verify new tests fail before the
+- [x] Use behavior-first tests for implementation changes and verify new tests fail before the
       corresponding fix. Do not write tests that merely assert arbitrary CSS values.
-- [ ] Run `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` and build checks
+- [x] Run `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test` and build checks
       appropriate to embedded assets. Record test-file counts and any remaining limitations.
 - [ ] Keep the durable design decisions in `docs/ux/report-redesign/`. When every box is complete,
       remove this plan and its index row, and fix incoming links in the same change.
+
+## Phase 1–3 handoff
+
+Fictional annotated baseline captures, critique, content matrix and three offline composition
+studies are in [report-redesign](../docs/ux/report-redesign/direction.md). Owner direction
+selection remains open; no production renderer changes, private-history reads or analysis calls.
+Independent Codex review is coordinated separately before requesting owner feedback.
+
+## Production iteration — original selectable templates
+
+The owner rejected A/B/C. The current baseline was relatively preferred, but remains
+insufficiently attractive. The owner accepted product UI research principles and authorized
+implementation of multiple original templates; the previous selection gate no longer blocks work.
+
+Prism, Slate and Folio now render through the existing `--look` path with matching cards.
+No profile, analysis or pipeline version changes are required. Look design version is 4;
+render manifest remains 2 because its format has not changed. Classic remains the default.
+
+Independent implementation review completed in two passes; R2 card overflow was fixed and
+confirmed. R1 was withdrawn after owner clarification: project names follow the same exclusion
+choice in the report and card. Post-fix checks passed: 43 test files / 486 tests, installed-package build check,
+27 report browser cases and 48 long CJK/mixed-script card cases. Complete edge-case visual
+acceptance and actual owner reader walkthrough remain outstanding. Do not treat technical checks as
+visual acceptance or delete this plan.
+
+## Explanation skill application
+
+Production overview charts now expose source units, stored tool session numerators, actual
+denominators, coverage and overlapping categories. Missing measurements, zero metadata coverage,
+zero cleaned samples and observed zero are distinct. Unknown preferences have no midpoint marker.
+Fixed bilingual explanations apply on re-render; description prompt changes apply only to future
+analysis (analysis version 11). See the [source audit and authored examples](../docs/ux/report-redesign/explanation-iteration.md).
+Owner visual acceptance and a reader walkthrough remain open; no real LLM evaluation is claimed.
+
+## Document layout follow-up
+
+Shared spacing and A4 print styles were implemented with six fictional PDF review artifacts.
+See [document layout observations](../docs/ux/report-redesign/document-layout.md) for physical
+page inspection and reproduction. Independent review completed in two passes; excess blank
+pages, Classic coverage and split capability headings were fixed and confirmed. The six review
+PDFs now have 10 pages each, and Classic is included in 33-case browser QA. The owner's complete
+visual walkthrough remains pending; this plan remains open.
+
+## Open composition follow-up
+
+The owner accepted the overall baseline and requested fewer card blocks and more varied
+presentation. The shared report body now uses inline statistics, unequal chart columns,
+a narrative/context aside, ruled traits and dimensions, and open capability/coaching text.
+Classic receives the same body improvements; its default status and the three selectable
+product identities remain. Look version is 7. See [open composition](../docs/ux/report-redesign/open-composition.md).
+The CLI output contract is documented: HTML/JSON/PNG are automatic; PDF is a manual browser
+print export from the same offline HTML, without another analysis. Owner review of this
+revision remains pending. Independent review completed with no findings; no aesthetic
+acceptance checkbox is inferred from implementation checks.
+
+
+## Owner decision - 2026-10-29
+
+The owner accepted the current open composition and requested scoped commits on main.
+This records acceptance of the current design iteration, not a completed unfamiliar-reader
+walkthrough or validation of every report/language edge case. Plan 21 remains open for those
+remaining acceptance items. Generated PDF review exports remain local; reproducible fictional
+HTML examples, research captures and QA tooling are versioned. The report explanation skill
+is versioned at `.agents/skills/prompt-profile-explain-reports/SKILL.md`.

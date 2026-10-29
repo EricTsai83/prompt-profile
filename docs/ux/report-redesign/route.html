@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>B / Decision route</title
+  ><link rel="stylesheet" href="prototype.css" />
+  <body class="route">
+    <header>
+      <small>prompt-profile / B / Decision route / unapproved study</small>
+      <nav>
+        <button data-view="overview" aria-pressed="true">Overview</button
+        ><button data-view="detail" aria-pressed="false">Detail</button
+        ><a href="comparison.html">Compare directions</a>
+      </nav>
+    </header>
+    <main>
+      <div class="overview">
+        <div class="hero">
+          <div class="identity">
+            <div class="eyebrow">Fictional collaborator / role wording study</div>
+            <h1>The boundary setter</h1>
+            <p class="lede">
+              Welcomes ideas about the route. Keeps responsibility for the destination.
+            </p>
+            <p>In this sample, discussing a change and authorizing it are separate acts.</p>
+          </div>
+          <aside class="character" aria-label="Character placeholder">
+            <b>↗</b><small>Character slot only<br />Plan 20 D<br />No role mapping approved</small>
+          </aside>
+        </div>
+        <div class="signatures">
+          <article>
+            <span class="num">01</span>
+            <h3>Make the choice visible</h3>
+            <p>Asks for steps and risks before edits begin.</p>
+          </article>
+          <article>
+            <span class="num">02</span>
+            <h3>Delegate inside a boundary</h3>
+            <p>Lets the agent choose implementation while preserving an existing API.</p>
+          </article>
+          <article>
+            <span class="num">03</span>
+            <h3>Ask what checks leave out</h3>
+            <p>Requests verification and its limits, rather than assuming success.</p>
+          </article>
+        </div>
+        <section class="pattern">
+          <small>Reading aid · not a measured sequence</small>
+          <h2>Where decisions sit</h2>
+          <div class="steps">
+            <span>You: choose direction</span><b aria-hidden="true">→</b
+            ><span>AI: choose implementation</span><b aria-hidden="true">→</b
+            ><span>You: judge evidence</span>
+          </div>
+          <p>A synthesis of separate examples, not an observed end-to-end episode.</p>
+        </section>
+        <aside class="uncertainty">
+          <small>Mixed evidence / not a score</small>
+          <h3>Control changes with the decision</h3>
+          <p>
+            Choosing the direction and delegating implementation both appear here. A dominant
+            control preference is unresolved. Pacing and closure are unresolved too; the examples do
+            not show reactions to completed work.
+          </p>
+        </aside>
+        <p><a href="?view=detail">Read the supporting and contrary evidence →</a></p>
+      </div>
+      <div class="detail" hidden>
+        <small>02 / Read the evidence · fictional source excerpts</small>
+        <h1>Freedom needs a clear boundary.</h1>
+        <p class="lede">
+          This developer uses AI to turn an uncertain idea into a testable result. The examples show
+          requests for evidence, not proof that the work succeeded.
+        </p>
+        <section>
+          <h2>A choice before changes</h2>
+          <div class="body">
+            <p>
+              The interface task opens with a request for options. This makes the next decision
+              visible before edits accumulate.
+            </p>
+            <details open>
+              <summary>Source excerpt</summary>
+              <blockquote>
+                Before editing, outline the steps and the risks. Wait for my choice.<cite
+                  >demo:one:1 · fictional prompt · no timestamp available</cite
+                >
+              </blockquote>
+            </details>
+          </div>
+        </section>
+        <section>
+          <h2>Room to choose the implementation</h2>
+          <div class="body">
+            <p>
+              The next excerpt assigns implementation choices to the agent. Compatibility is the
+              boundary, rather than a prescribed technical route.
+            </p>
+            <details open>
+              <summary>Source excerpt</summary>
+              <blockquote>
+                Choose the implementation, but preserve the existing API.<cite
+                  >demo:one:2 · fictional prompt · no timestamp available</cite
+                >
+              </blockquote>
+            </details>
+          </div>
+        </section>
+        <section>
+          <h2>Checks with limits</h2>
+          <div class="body">
+            <p>
+              A separate task asks for the limits of verification. This supports an interest in
+              explicit completion conditions; it cannot establish the quality of the delivered
+              result.
+            </p>
+            <details open>
+              <summary>Source excerpt</summary>
+              <blockquote>
+                Run the relevant checks and explain what they do not cover.<cite
+                  >demo:two:1 · fictional prompt · no timestamp available</cite
+                >
+              </blockquote>
+            </details>
+          </div>
+        </section>
+        <section class="contrary">
+          <h2>What complicates the portrait</h2>
+          <div class="body">
+            <p>
+              The first quote could suggest close control. The delegated implementation in
+              demo:one:2 limits that reading. These are different kinds of decisions; neither
+              establishes a fixed personality.
+            </p>
+            <h3>Contrary evidence · control axis</h3>
+            <p>
+              “Choose the implementation, but preserve the existing API.” — demo:one:2 (shown in
+              full above).
+            </p>
+            <p>
+              One planning checkpoint does not establish a recurring pace. No chronology, change
+              over time or measured strength is inferred.
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>Tools and next experiments</h2>
+          <div class="body">
+            <p>
+              No verified tool-to-purpose link is supplied in this portrait fixture. Agent tool
+              events alone would not establish user expertise.
+            </p>
+            <h3>Optional experiment · product suggestion</h3>
+            <p>
+              On one task, state who chooses the direction, the compatibility boundary, and what
+              evidence will count as completion.
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer>
+      Hand-written fictional copy from portrait.sample.json. Role name and layout synthesis are
+      proposed presentation copy, not analysed fields. No personal history, LLM calls or external
+      assets. Quotes have no dates; order follows fixture order only. English study; localized
+      production iteration follows direction selection.
+    </footer>
+    <script>
+      const views=[...document.querySelectorAll('[data-view]')];views.forEach(b=>b.onclick=()=>{const detail=b.dataset.view==='detail';document.querySelector('.overview').hidden=detail;document.querySelector('.detail').hidden=!detail;views.forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});const v=new URLSearchParams(location.search).get('view');if(v==='detail')views[1].click();
+    </script>
+  </body>
+</html>
