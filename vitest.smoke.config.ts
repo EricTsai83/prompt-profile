@@ -15,6 +15,9 @@ export default defineConfig({
           name: "data",
           include: ["test/smoke/**/*.test.ts"],
           exclude: ["test/smoke/llm-*.test.ts"],
+          // one file at a time: the read-time checks measure an adapter, not CPU contention
+          // with the others (reading compressed Codex rollouts is CPU-heavy)
+          fileParallelism: false,
         },
       },
       { test: { name: "llm", include: ["test/smoke/llm-*.test.ts"] } },
