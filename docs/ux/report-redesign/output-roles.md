@@ -85,3 +85,9 @@ The owner accepted this review round after opening the updated report: right-ali
 controls and the identity hero appearing only on the identity view. This acceptance is scoped
 to that interaction and layout change; it does not close PNG redesign, the earlier story-width
 question, exhaustive visual validation or unfamiliar-reader research.
+
+### Centered navigation amendment
+
+The owner's subsequent screenshot request supersedes right alignment: view controls are now
+centered above the selected purpose. Mobile retains full-width touch targets. A browser position
+check failed before the CSS change (367px off center at 1280px).
