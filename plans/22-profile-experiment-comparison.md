@@ -22,7 +22,7 @@ what was compared. This is a developer evaluation tool, not a new default model 
   and production rendering. Consolidate shared behavior instead of building a second pipeline.
 - Keep `pnpm eval:compare` as the main entry point. Preserve existing command usage or document
   an explicit migration. Keep real LLM execution opt-in and outside normal CI.
-- Plan 20 owns profile semantics and longitudinal history; plan 21 owns report/card design.
+- Plan 20 owns profile semantics and longitudinal history; the completed plan 21 records guide report/card design.
   This tool consumes their current outputs without requiring either plan to finish. It compares
   alternate analyses of one input, which is different from a person's changes over time.
 

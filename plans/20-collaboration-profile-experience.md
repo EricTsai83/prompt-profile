@@ -167,7 +167,7 @@ Implementation: `domain/Interaction.ts`, profile/LLM schemas, analysis verificat
 
 ## D. Design and ship original role characters
 
-Coordinate character studies and placement with [plan 21](21-report-content-and-ui-iteration.md),
+Coordinate character studies and placement with the [report design records](../docs/ux/report-redesign/output-roles.md),
 which owns the report visual direction; this phase owns the reusable asset system.
 
 Create a symbolic collaboration avatar, not an inferred likeness of the report subject.
@@ -224,7 +224,7 @@ applicable image-generation skill if creating raster art; code-native SVG work n
 
 ## F. Integrate and verify the final experience
 
-[Plan 21](21-report-content-and-ui-iteration.md) owns content hierarchy, design alternatives and
+The [completed report design iteration](../docs/ux/report-redesign/output-roles.md) owns content hierarchy, design alternatives and
 report UI iteration. Integrate its selected design here rather than run a competing redesign.
 
 - [ ] Refine the existing two-view report rather than reintroducing a long collapsed dashboard.

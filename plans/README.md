@@ -94,13 +94,13 @@ These version numbers are independent. Bump them whenever the corresponding thin
 | `Profile.schemaVersion` | `domain/Profile.ts` | 10 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | 11 | `map.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 4, others 10 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 5, others 11 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–19 and 23 are done
+in the change that finishes it; it stays in git history. Plans 01–19, 21 and 23 are done
 and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
@@ -111,8 +111,16 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
-| 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Production templates reviewed; current design approved; reader walkthrough pending |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
+| 24 | [First-run clarity and recovery](24-first-run-and-recovery.md) | Clear data flow, preflight, sparse reports and recovery | None | Ready; first delivery batch |
+| 25 | [Factual and identity report experience](25-factual-and-identity-reports.md) | Purpose-based identity/factual reading and matching exports | Existing report; builds on closed plan 21 | HTML split implemented; export integration and validation pending |
+| 26 | [Claim fidelity and analysis calibration](26-claim-fidelity-and-calibration.md) | Claim-support cases, calibration and evaluation | Plan 22 evaluation tools; episode cases extend after plan 20 B | Ready for fixtures and baseline; production rules follow findings |
+| 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements; plan 20 B enriches evidence later | Ready for contract and fixtures; implement after initial plan 26 findings |
+| 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Plan 26; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |
+| 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
+| 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
+| 31 | [Context and project retrospectives](31-context-and-project-retrospectives.md) | Bounded project/context selection and retrospectives | Plan 20 B/C; history comparison also requires plan 20 A/E | Planned; evidence foundation first |
+| 32 | [Product value and reader validation](32-product-value-validation.md) | Reader tasks, adoption evidence and product decision log | Current product; repeat after plans 24–31 and plan 20 milestones | Ready for protocol and fictional sessions; real sessions need participants |
 
 ## Shared rules for every plan
 
@@ -127,10 +135,39 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 ## What is left, in order
 
-Start plan 21 to iterate report content and visual direction against the current implementation.
-Plan 20 remains the product roadmap: history retention and character art studies can proceed
-independently, with visual decisions coordinated through plan 21. Final character mapping follows
-evidence and role calibration.
+The product exploration is now split into plans 24–32. These are planned tasks, not claims that
+features have shipped. Each plan can be executed separately; explicit dependencies and acceptance
+criteria define its handoff. Plan 20 remains the owner of the shared collaboration foundation;
+plan 21 is closed by owner decision (see the [closeout](../docs/ux/report-redesign/output-roles.md#owner-closeout--2026-10-29)), and plan 22 remains the experiment tooling owner.
+
+### Recommended execution batches
+
+1. **Clarify present value:** plan 24 (first run), plan 25 (identity/factual purposes), and
+   plan 32's research protocol. Begin plan 26's fictional quality cases alongside these.
+2. **Make the portrait specific and trustworthy:** plan 20 B (episodes), plan 26's production
+   calibration, and plan 20 C (contextual roles/signature moves). Ship a bounded episode-to-report
+   slice before expanding the catalog. Plan 22's local-history snapshots support optional evaluation.
+3. **Make reports useful after reading:** plan 27 (one experiment), plan 20 A (history library),
+   then plan 28 (reviewed preferences) and plan 29 (sharing). History A may start earlier independently.
+4. **Support recurring reflection:** plan 20 E (comparable change), plan 30 (annotations) and
+   plan 31 (project/context retrospectives). Use actual findings from plan 32 to refine priority.
+5. **Integrate rather than multiply experiences:** plan 20 F and plan 32 reader validation.
+   Plan 20 D starts with its small art study; full character expansion follows calibrated roles and
+   evidence that it helps recognition. It does not block the earlier value deliveries.
+
+### Ownership at shared boundaries
+
+- Plan 20 B owns episode schemas/provenance; plan 26 owns semantic-support evaluation, not a
+  duplicate episode pipeline. Plan 20 C owns roles; plan 26 provides calibration cases.
+- Plan 25 owns the identity/factual content contract; the durable report design records guide visual iteration. Both use one production renderer and the existing looks.
+- Plan 27 specifies actionable coaching; plan 20 E integrates it into narrative/history.
+- Plan 20 A/E own history and longitudinal comparability; plan 31 adds scoped contexts only.
+- Plan 32 supplies reader research evidence to each feature plan. Automated quality,
+  owner visual approval and unfamiliar-reader comprehension remain distinct evidence.
+
+Do not wait for every phase of plan 20 before delivering an independent plan. Mark progress in the
+owning plan and cross-reference the evidence in dependent plans; do not implement competing systems.
+All existing privacy, evidence, language and module-boundary rules apply to every batch.
 
 Released: `0.1.1` on npm (Trusted Publisher, provenance) and GitHub Releases
 with standalone binaries, 2026-10-24; how to release is in [CONTRIBUTING.md](../CONTRIBUTING.md).
