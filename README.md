@@ -51,7 +51,7 @@ in every look (`--look`; render only, no new analysis):
 1. Install [Claude Code](https://claude.com/claude-code) or [Codex](https://github.com/openai/codex)
    and log in once (`claude`, or `codex login`). prompt-profile uses it to analyse your prompts;
    **no API key needed**.
-2. Run it (Node.js ≥ 22):
+2. Run it (Node.js ≥ 24):
 
    ```bash
    npx prompt-profile@latest
@@ -94,7 +94,7 @@ folder. Move the executable to a folder on your `PATH` to run it as `prompt-prof
 
 ## Requirements
 
-- Node.js ≥ 22, or the standalone executable (no Node.js needed)
+- Node.js ≥ 24, or the standalone executable (no Node.js needed)
 - [Claude Code](https://claude.com/claude-code) (`claude`) or [Codex](https://github.com/openai/codex)
   (`codex`) installed and logged in
 - **No API key needed**: the analysis runs your own logged-in `claude -p` or `codex exec` in the

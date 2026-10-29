@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -53,7 +53,7 @@ jobs:
       # pnpm pack resolves `catalog:` versions; publish ships exactly this tested tarball
       - run: pnpm pack --out prompt-profile.tgz
       - run: node scripts/test-package.mjs prompt-profile.tgz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: package
           path: prompt-profile.tgz
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 24
@@ -78,7 +78,7 @@ jobs:
       - env:
           VERSION: ${{ needs.check.outputs.version }}
         run: node scripts/test-binary.mjs "dist-bin/prompt-profile-$VERSION-linux-x64.tar.gz"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: binaries
           path: |
@@ -92,10 +92,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: binaries
           path: binaries
@@ -116,7 +116,7 @@ jobs:
       contents: read
       id-token: write # npm Trusted Publishing (OIDC) + provenance; no NPM_TOKEN stored
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package
       - uses: actions/setup-node@v5

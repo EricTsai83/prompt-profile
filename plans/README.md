@@ -25,7 +25,7 @@ prompt-profile
 
 | Part | Choice |
 |---|---|
-| Language / runtime | TypeScript, Node.js ≥ 22 (ESM) |
+| Language / runtime | TypeScript, Node.js ≥ 24 (ESM) |
 | Package management | pnpm (with catalogs and supply-chain security settings enabled, modelled on ccusage) |
 | Core framework | **Effect 4** (`effect@4.0.x`): `effect/cli`, Schema, Stream, FileSystem, `effect/process` |
 | Node platform layer | `@effect/platform-node` |
