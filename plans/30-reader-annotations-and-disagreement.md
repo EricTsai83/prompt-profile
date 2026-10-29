@@ -9,7 +9,7 @@ rewriting source evidence or treating feedback as verified ground truth.
 
 ## Dependencies and ownership
 
-Depends on: Plan 20 B; plan 25; library integration uses plan 20 A.
+Depends on: Plan 20 B; the completed [purpose contract](../docs/ux/report-redesign/purpose-contract.md) (plan 25); library integration uses plan 20 A.
 
 Use a separate versioned annotation artifact keyed to a report and stable claim/evidence IDs.
 Annotations are user statements, never invisible edits to generated analysis.

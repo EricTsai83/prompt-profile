@@ -97,4 +97,13 @@ check failed before the CSS change (367px off center at 1280px).
 Story headings now align with the other report sections; only their prose retains a narrower
 measure. The PNG includes a compact measured usage summary and localized generator attribution,
 as requested in owner review. See purpose-contract.md for fields, fallbacks and inspection scope.
-The earlier statement that cards were unchanged is historical; revised PNG owner review is pending.
+The earlier statement that cards were unchanged is historical; the owner accepted the revised PNG
+in the closeout below.
+
+## Plan 25 owner closeout — 2026-10-29
+
+The owner accepted the revised PNG and explicitly closed plan 25 after the earlier content and
+purpose-interaction review. Centered navigation, purpose-specific openings, aligned story
+headings and the measured share-card summary are delivered. The durable
+[purpose contract](purpose-contract.md) records sources, fallbacks, exclusions and validation.
+Character art continues in plan 20 D; unfamiliar-reader research continues in plan 32.

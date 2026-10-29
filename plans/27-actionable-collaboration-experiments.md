@@ -12,7 +12,8 @@ habit and has a clear situation, action and observation for a later review.
 Depends on: Existing improvements; plan 20 B enriches evidence later.
 
 Extend existing improvements/rewrite behavior. This plan owns the detailed coaching contract;
-plan 20 E integrates it into narrative and comparison, and plan 25 controls its reading prominence.
+plan 20 E integrates it into narrative and comparison, and the completed
+[purpose contract](../docs/ux/report-redesign/purpose-contract.md) (plan 25) controls its reading prominence.
 
 ## Delivery sequence
 

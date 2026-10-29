@@ -9,7 +9,7 @@ private information is removed. Sharing is a complete local workflow, not just a
 
 ## Dependencies and ownership
 
-Depends on: Plan 25; reuse exclusions and output audit.
+Depends on: The completed [purpose contract](../docs/ux/report-redesign/purpose-contract.md) (plan 25); reuse exclusions and output audit.
 
 Existing render variants, PNGs, --exclude and rule-based audit remain the foundation. This plan
 owns selection/preview/export orchestration; it must not add cloud publishing or replace the audit.

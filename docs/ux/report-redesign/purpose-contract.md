@@ -57,7 +57,7 @@ No LLM call or stored prose change is introduced by card selection.
 
 This change does not claim a completed reader study or exhaustive visual approval. Earlier HTML
 capture findings remain in output-roles.md. The final inspection record below supersedes the earlier outstanding visual work. Unfamiliar-reader
-sessions remain in plan 32; revised PNG owner approval is not yet recorded.
+sessions remain in plan 32; final PNG owner approval is recorded below.
 
 ## Owner review amendment — PNG direction
 
@@ -116,3 +116,15 @@ render test records zero LLM runner creation; card tests prove source Profile im
 Repository gates passed with 59 test files and 644 tests. Final owner review is limited to the
 revised PNG and any newly noticed presentation issue. Content and purpose interaction approval
 are already recorded in output-roles.md; no unfamiliar-reader study is claimed.
+
+## Owner closeout — 2026-10-29
+
+The owner accepted the revised PNG and explicitly authorized closing plan 25. Earlier approval
+of the content and purpose interaction, the final layout/inspection record above, and this PNG
+acceptance complete the feature review. Plan 25 and its open-plan index row are removed; this
+contract and output-roles.md retain the decisions and evidence.
+
+Final automated validation: the browser QA suite exited 0 with 77 cases and no failures;
+repository typecheck, lint, format check and tests exited 0 (59 test files, 644 tests).
+No completed unfamiliar-reader or translation-quality study is claimed. Participant research
+remains in plan 32, character assets in plan 20 D, and export orchestration in plan 29.
