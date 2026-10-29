@@ -1,6 +1,8 @@
 # Profile experiment comparison
 
-Status: planned
+Status: config, fixed-input execution, provenance, rendering, offline comparison, `--from` and
+docs implemented with fake-runner tests ([usage](../docs/experiments.md)); local-history
+snapshots and the bounded real-LLM comparison remain
 
 ## Objective
 
@@ -59,97 +61,97 @@ Example configuration (model IDs below are placeholders that the owner replaces)
 }
 ```
 
-- [ ] Validate config, unique safe IDs, baseline membership, supported options, persona names,
+- [x] Validate config, unique safe IDs, baseline membership, supported options, persona names,
       positive repeats and budget before spending quota. Treat config as untrusted input; reject
       path traversal and conflicting options. Show useful English errors.
-- [ ] Start with engine/model comparisons. Allow explicit per-variant overrides for existing
+- [x] Start with engine/model comparisons. Allow explicit per-variant overrides for existing
       analysis options such as `full` and `languages`; show every changed factor. Do not invent
       temperature, seed or reasoning controls that the production runner does not expose.
-- [ ] Separate analysis factors from rendering factors. Render-only look/language-view comparisons
+- [x] Separate analysis factors from rendering factors. Render-only look/language-view comparisons
       reuse compatible saved profiles without an LLM call; a missing generated translation may
       require a separate analysis run and must never be silently synthesized by the renderer.
-- [ ] Explain `model: null`: the runner's CLI default, not a stable named model. Codex currently
+- [x] Explain `model: null`: the runner's CLI default, not a stable named model. Codex currently
       ignores user configuration, including its configured model. Preserve requested model and
       genuinely reported model separately; never label a requested value as independently verified.
-- [ ] Dry run prints expanded cases, effective options, prepared-input/chunk counts, expected
+- [x] Dry run prints expanded cases, effective options, prepared-input/chunk counts, expected
       minimum calls and the global attempt cap without sending prompts. Translation/retry costs
       must be included or explicitly described as uncertain; a budget is a cap, not a completion promise.
 
 ## 2. Hold the experiment input constant
 
-- [ ] Default to the hand-written fictional personas already in `test/eval/personas/`. Extend
+- [x] Default to the hand-written fictional personas already in `test/eval/personas/`. Extend
       fixtures only for meaningful missing cases such as sparse or mixed evidence and bilingual input.
-- [ ] Prepare a persona once per experiment using a fixed clock, timezone, source selection and
+- [x] Prepare a persona once per experiment using a fixed clock, timezone, source selection and
       pipeline options. Reuse those prepared records across engine/model variants and repeats.
-- [ ] Record input hashes, selected prompt/chunk IDs, sampling coverage and preprocessing options.
+- [x] Record input hashes, selected prompt/chunk IDs, sampling coverage and preprocessing options.
       Engine/model-only comparisons must have identical prepared input and selected chunks.
       When sampling itself is the tested factor, show the resulting coverage difference explicitly.
 - [ ] Support an explicit local-history mode as a second phase: collect and prepare history once,
       freeze the prepared input privately, then use that snapshot for all variants. Never repeatedly
       reread changing history during a matrix run. Do not commit personal snapshots or outputs.
-- [ ] Keep every repetition independent with analysis cache disabled and fresh per-case state.
+- [x] Keep every repetition independent with analysis cache disabled and fresh per-case state.
       Interleave variants within each persona/repeat; record actual execution order and timestamps.
       Repeats expose stochastic variation; do not promise deterministic LLM output or a fixed seed.
 
 ## 3. Execute safely and preserve provenance
 
-- [ ] Execute sequentially by default to keep quota and rate-limit behavior understandable.
+- [x] Execute sequentially by default to keep quota and rate-limit behavior understandable.
       Use existing runner isolation and retry behavior; count every underlying attempt, including
       retries and translation, against one global cap. Stop launching work when exhausted.
-- [ ] Detect required engines/login before execution. Record unavailable, failed, interrupted,
+- [x] Detect required engines/login before execution. Record unavailable, failed, interrupted,
       budget-skipped and successful cases distinctly; preserve completed results on failure.
       Unsupported models fail visibly rather than falling back to defaults.
-- [ ] Create a unique experiment directory; never overwrite a previous run by default. Keep one
+- [x] Create a unique experiment directory; never overwrite a previous run by default. Keep one
       case directory per persona, variant and repetition, with a manifest connecting all artifacts.
-- [ ] Record config and effective options, source revision/dirty state, package/CLI versions,
+- [x] Record config and effective options, source revision/dirty state, package/CLI versions,
       pipeline/analysis/profile/render versions, input hashes, requested/reported model provenance,
       timestamps, attempt/retry counts, durations, available usage and error categories.
       Unknown usage/cost/model values remain unknown; subscription usage is not a dollar estimate.
-- [ ] Store `profile.json`, `quality.json` and `run.json` for each successful case. Write failure
+- [x] Store `profile.json`, `quality.json` and `run.json` for each successful case. Write failure
       metadata even when no profile exists. Keep raw CLI output and personal prompt text out of
       routine terminal logs and failure summaries.
-- [ ] Use private atomic writes: created directories `0700`, files `0600`, no permission changes
+- [x] Use private atomic writes: created directories `0700`, files `0600`, no permission changes
       to pre-existing folders. Ignore generated experiment output in git. Fixture-based outputs
       also use the same safe write path so local-history mode cannot accidentally bypass it.
-- [ ] Define exit codes: successful execution with passing gates is zero; invalid configuration,
+- [x] Define exit codes: successful execution with passing gates is zero; invalid configuration,
       required unavailable cases, execution failure, incomplete budget or failed quality gates is
       nonzero. Persist the summary before exiting and distinguish these outcomes in the manifest.
 
 ## 4. Render the actual results and build an offline comparison
 
-- [ ] Use the production renderer to generate each successful case's complete HTML report and
+- [x] Use the production renderer to generate each successful case's complete HTML report and
       PNG cards for requested supported languages. Keep all report views and real generated prose;
       a shortened mockup is not evidence of the final result.
-- [ ] Generate a local `index.html` with persona, variant, repetition and language selectors;
+- [x] Generate a local `index.html` with persona, variant, repetition and language selectors;
       baseline/candidate panes; visible engine/model/effective-option labels; card previews;
       and links to full reports, profiles and run metadata. Show failed/missing cases explicitly.
-- [ ] Show actual reports side by side on desktop and stacked on narrow screens, with independent
+- [x] Show actual reports side by side on desktop and stacked on narrow screens, with independent
       scrolling and a way to open either full report. Use local relative artifacts, embedded assets
       and no server, external scripts, telemetry or network requirement.
-- [ ] Add a content comparison covering portrait/title, roles or dimensions, traits, evidence,
+- [x] Add a content comparison covering portrait/title, roles or dimensions, traits, evidence,
       suggestions, coverage and rubric results using fields available in the current profile schema.
       Distinguish changed wording, changed structured decisions and missing content. Preserve quote
       context; do not treat different prose length or more claims as inherently higher quality.
-- [ ] Escape generated content and error text, use safe paths, and preserve report CSP/privacy
+- [x] Escape generated content and error text, use safe paths, and preserve report CSP/privacy
       controls. Keep comparison UI copy English; reports retain their supported languages.
-- [ ] `--from` rebuilds renders/comparison from saved artifacts with zero LLM calls. Validate
+- [x] `--from` rebuilds renders/comparison from saved artifacts with zero LLM calls. Validate
       saved versions, use supported migrations, and report incompatible cases without overwriting
       original profiles. Record the renderer version used for each regenerated view.
 
 ## 5. Compare quality, variability and practical tradeoffs
 
-- [ ] Reuse the existing persona rubric and report exact failures, evidence retention and coverage.
+- [x] Reuse the existing persona rubric and report exact failures, evidence retention and coverage.
       Identify heuristic checks as heuristics; passing them does not establish portrait quality.
-- [ ] Present per-run values and repeat ranges for durations, attempts, retries and available token
+- [x] Present per-run values and repeat ranges for durations, attempts, retries and available token
       usage. Include compact charts with labeled units/sample sizes where they clarify comparisons.
       Do not infer statistical significance from a few repetitions or rank all models from one persona.
-- [ ] Show within-variant structured agreement and between-variant differences separately so a
+- [x] Show within-variant structured agreement and between-variant differences separately so a
       single unusual output is not automatically attributed to model choice. Do not use raw prose
       equality as a quality metric. Require an explicit baseline rather than an implicit winner.
-- [ ] Include a manual review template: fidelity to evidence, specificity, contradictions, usefulness,
+- [x] Include a manual review template: fidelity to evidence, specificity, contradictions, usefulness,
       language quality, report readability, card fit and preferred output with reasons. Link notes
       to exact cases. No LLM judge or additional hidden model calls in the first implementation.
-- [ ] Document a small starter experiment and how to expand it. Treat findings as local evidence
+- [x] Document a small starter experiment and how to expand it. Treat findings as local evidence
       for a future default-model decision; this plan does not change production model defaults.
 
 ## Implementation and acceptance
@@ -158,20 +160,20 @@ Example configuration (model IDs below are placeholders that the owner replaces)
       rendering/offline comparison; then local-history snapshots and manual review documentation.
       Keep reusable orchestration testable outside script entry points, without reversing module
       dependencies or making `report/` depend on evaluation/analysis internals.
-- [ ] Use TDD for behavior: fake runners prove model/options forwarding, fixed inputs, independent
+- [x] Use TDD for behavior: fake runners prove model/options forwarding, fixed inputs, independent
       repeats, budget including retries, partial failures, no accidental fallback, safe paths and
       unique output preservation. Verify each new test fails before its implementation.
-- [ ] Test offline artifact generation with fictional profiles, including bilingual/sparse content,
+- [x] Test offline artifact generation with fictional profiles, including bilingual/sparse content,
       hostile text, missing cases and saved-version incompatibility. Rebuilding from saved output
       must make zero LLM calls. Avoid tests that merely mirror markup or arbitrary CSS values.
 - [ ] Run a bounded opt-in real comparison with at least two engine/model variants on one identical
       persona; use two repetitions to inspect variability. Record unavailable CLIs/models honestly.
       Inspect full HTML reports and PNG cards, selectors/links, narrow layout and offline loading.
       No real-history content or screenshots enter committed fixtures or documentation.
-- [ ] Deliver usage documentation, a fictional config example and manual review template. A user
+- [x] Deliver usage documentation, a fictional config example and manual review template. A user
       can run one command and open a comparison showing what the final results actually look like,
       with traceable inputs and no silent engine/model substitutions.
-- [ ] Run `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test`; judge tests by exit
+- [x] Run `pnpm typecheck && pnpm lint && pnpm format:check && pnpm test`; judge tests by exit
       code and Test Files count. Run smoke checks only when the corresponding production adapter,
       pipeline rule or CLI invocation changes. Bump production versions only if their contracts change.
 - [ ] When all acceptance boxes are complete, remove this plan and its index row in the same change

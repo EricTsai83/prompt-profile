@@ -111,7 +111,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 |---|---|---|---|---|
 | 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | Planned |
 | 21 | [Report content and UI iteration](21-report-content-and-ui-iteration.md) | Content hierarchy, compared visual directions, complete prototypes, and a redesigned report/card | Existing profile and two-view renderer; coordinates with plan 20 | Production templates reviewed; current design approved; reader walkthrough pending |
-| 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Planned |
+| 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented ([usage](../docs/experiments.md)); local-history snapshots and a real-LLM run pending |
 
 ## Shared rules for every plan
 
