@@ -5,7 +5,7 @@
  * Not part of CI: it spends the user's subscription quota.
  */
 import { NodeServices } from "@effect/platform-node"
-import { DateTime, Effect, FileSystem, Layer, Path } from "effect"
+import { Effect, FileSystem, Layer, Path } from "effect"
 import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parseArgs } from "node:util"
@@ -17,9 +17,8 @@ import { makeRunner } from "../src/llm/detect.ts"
 import { LlmRunner } from "../src/llm/LlmRunner.ts"
 import { withRetry } from "../src/llm/retry.ts"
 import { writePrivateFile } from "../src/platform/files.ts"
-import { toRecords, type Persona } from "./eval-personas.ts"
+import { preparePersona } from "./experiment/prepare.ts"
 import { scoreProfile, type QualityRubric } from "./eval-quality.ts"
-import { processRecords } from "../src/pipeline/index.ts"
 
 const { values } = parseArgs({
   options: {
@@ -46,19 +45,21 @@ const program = Effect.gen(function* () {
   const runner = withRetry(yield* makeRunner(engine, { model: values.model }))
   const rows: Array<Record<string, unknown>> = []
   for (const name of personas) {
-    const persona = JSON.parse(readFileSync(join(root, name, "prompts.json"), "utf8")) as Persona
-    const { prompts, stats } = processRecords(toRecords(name, persona), {
-      since: null,
-      now: DateTime.makeUnsafe("2026-10-24T00:00:00Z"),
-      timezone: persona.timezone,
-      username: null,
-    })
+    const rubric = JSON.parse(
+      readFileSync(join(root, name, "rubric.json"), "utf8"),
+    ) as QualityRubric
+    // Same preparation as `pnpm eval:compare`: fixed clock, the persona's own time zone.
+    const { prompts, stats, timezone } = preparePersona(
+      name,
+      { raw: readFileSync(join(root, name, "prompts.json"), "utf8"), rubric },
+      null,
+    )
     const started = Date.now()
     const result = yield* analyze({
       prompts,
       stats,
       options: {
-        timezone: persona.timezone,
+        timezone,
         full: true,
         noCache: true,
         model: values.model ?? null,
@@ -76,9 +77,6 @@ const program = Effect.gen(function* () {
     }
     const profile = result.success
     yield* write(join(out, "profile.json"), encodeProfile(profile))
-    const rubric = JSON.parse(
-      readFileSync(join(root, name, "rubric.json"), "utf8"),
-    ) as QualityRubric
     const score = scoreProfile(profile, rubric)
     yield* write(join(out, "quality.json"), score)
     rows.push({

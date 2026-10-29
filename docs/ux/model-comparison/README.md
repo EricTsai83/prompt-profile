@@ -1,5 +1,10 @@
 # Model comparison (plan 11, stage 3)
 
+> Historical record. `pnpm eval:compare` has since become the experiment tool of plan 22
+> ([docs/experiments.md](../../experiments.md)): each run now writes a new folder under
+> `eval-output/comparisons/` (or `--out`) with rendered reports, instead of the `runs*/` layout
+> below. The commands quoted here document how these results were produced.
+
 Status: done on 2026-10-24 with synthetic personas only. One supported model per engine, two
 repeats per persona: 3 personas × 2 engines × 2 repeats = 12 profile analyses.
 

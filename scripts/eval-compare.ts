@@ -1,214 +1,233 @@
 /**
- * Controlled model comparison (plan 11, stage 3):
- * `pnpm eval:compare [--engines claude,codex] [--repeats 2] [--budget 60] [--out dir]`.
- * Runs the full analysis on every persona in test/eval/personas/, once per engine per repeat,
- * and writes docs/ux/model-comparison/runs/<engine>/<persona>/r<n>/ with profile.json and
- * run.json (provenance). Every CLI attempt, including retries, counts against one shared
- * budget; runs that do not fit are recorded as "not run". Spends subscription quota.
+ * Profile experiment comparison (plan 22), documented in docs/experiments.md:
+ *
+ *   pnpm eval:compare --config experiments/starter.json --dry-run
+ *   pnpm eval:compare --config experiments/starter.json --budget 40 [--out eval-output/comparisons]
+ *   pnpm eval:compare --from eval-output/comparisons/<experiment-id> [--looks classic,prism]
+ *
+ * The old form `--engines claude,codex --repeats 2` still works: it runs every persona with
+ * each CLI's default model. Real runs spend subscription quota; `--dry-run` and `--from` never
+ * call an LLM. Each run writes a new private folder and never overwrites an earlier one.
  */
-import { NodeServices } from "@effect/platform-node"
-import { DateTime, Effect, FileSystem, Layer, Path } from "effect"
+import { NodeRuntime, NodeServices } from "@effect/platform-node"
+import { Effect, Exit, Path } from "effect"
+import { defaultTeardown } from "effect/Runtime"
 import { execFileSync } from "node:child_process"
+import { randomBytes } from "node:crypto"
 import { readdirSync, readFileSync } from "node:fs"
+import { homedir } from "node:os"
 import { join } from "node:path"
 import { parseArgs } from "node:util"
-import { memoryCacheLayer } from "../src/analysis/cache.ts"
 import { sha256 } from "../src/analysis/hash.ts"
-import { analyze } from "../src/analysis/index.ts"
-import { selectChunks } from "../src/analysis/plan.ts"
-import { silentProgressLayer } from "../src/analysis/progress.ts"
 import { ANALYSIS_VERSION } from "../src/analysis/version.ts"
-import { encodeProfile } from "../src/domain/Profile.ts"
-import { makeRunner } from "../src/llm/detect.ts"
-import { CallBudgetExceeded, LlmRunner, type LlmRunnerShape } from "../src/llm/LlmRunner.ts"
-import { withRetry } from "../src/llm/retry.ts"
-import { writePrivateFile } from "../src/platform/files.ts"
-import { processRecords } from "../src/pipeline/index.ts"
+import { PROFILE_SCHEMA_VERSION } from "../src/domain/Profile.ts"
+import { detectRunner, makeRunner } from "../src/llm/detect.ts"
+import { resolveCacheDir } from "../src/platform/paths.ts"
 import { PIPELINE_VERSION } from "../src/pipeline/version.ts"
-import { scoreProfile, type QualityRubric } from "./eval-quality.ts"
-import { toRecords, type Persona } from "./eval-personas.ts"
+import { loadCjkFonts } from "../src/report/fonts.ts"
+import { LOOK_IDS, RENDER_MANIFEST_VERSION, type LookId } from "../src/report/looks.ts"
+import { lookOf } from "../src/report/theme.ts"
+import { legacyConfig, parseBudget, parseConfig, UsageError } from "./experiment/config.ts"
+import {
+  createExperimentDir,
+  EXIT_INVALID_CONFIG,
+  experimentId,
+  runExperiment,
+  type Manifest,
+  type Provenance,
+} from "./experiment/execute.ts"
+import { dryRunLines, preparePersona } from "./experiment/prepare.ts"
+import { publish } from "./experiment/publish.ts"
+import { readManifest } from "./experiment/render.ts"
 
-const { values } = parseArgs({
-  options: {
-    engines: { type: "string", default: "claude,codex" },
-    repeats: { type: "string", default: "2" },
-    budget: { type: "string", default: "60" },
-    out: { type: "string", default: join("docs", "ux", "model-comparison", "runs") },
-  },
-})
-const ENGINES = { claude: "claude-code", codex: "codex" } as const
-const engines = values.engines.split(",").map((e) => {
-  if (e !== "claude" && e !== "codex") throw new Error(`Unknown engine: ${e}`)
-  return { name: e as keyof typeof ENGINES, id: ENGINES[e] }
-})
-const repeats = Number(values.repeats)
-const budget = Number(values.budget)
-if (!Number.isSafeInteger(repeats) || repeats < 1) throw new Error("--repeats must be >= 1")
-if (!Number.isSafeInteger(budget) || budget < 1) throw new Error("--budget must be >= 1")
+const PERSONA_ROOT = new URL("../test/eval/personas/", import.meta.url).pathname
+const DEFAULT_OUT = join("eval-output", "comparisons")
 
-const root = new URL("../test/eval/personas/", import.meta.url).pathname
-const outRoot = values.out
-const now = DateTime.makeUnsafe("2026-10-24T00:00:00Z")
-
-const cliVersion = (bin: string) => {
+const git = (args: ReadonlyArray<string>): string | null => {
   try {
-    return execFileSync(bin, ["--version"], { encoding: "utf8", timeout: 20_000 }).trim()
+    return execFileSync("git", [...args], { encoding: "utf8", timeout: 10_000 }).trim()
   } catch {
-    return "unknown"
+    return null
   }
 }
 
-interface Attempt {
-  readonly ok: boolean
-  readonly error: string | null
-  readonly model: string | null
-  readonly durationMs: number
+const provenance = (): Provenance => {
+  const status = git(["status", "--porcelain"])
+  return {
+    git: { revision: git(["rev-parse", "HEAD"]), dirty: status === null ? null : status !== "" },
+    packageVersion: (
+      JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as {
+        version: string
+      }
+    ).version,
+    node: process.version,
+    versions: {
+      pipeline: PIPELINE_VERSION,
+      analysis: ANALYSIS_VERSION,
+      profileSchema: PROFILE_SCHEMA_VERSION,
+      renderManifest: RENDER_MANIFEST_VERSION,
+      looks: Object.fromEntries(LOOK_IDS.map((l) => [l, lookOf(l).version])),
+    },
+  }
 }
 
-/** Counts every attempt against a budget shared by all runs, and records each one. */
-const recording = (runner: LlmRunnerShape, shared: { used: number }, log: Array<Attempt>) => ({
-  ...runner,
-  generate: ((input) =>
-    Effect.suspend(() => {
-      if (shared.used >= budget)
-        return Effect.fail(new CallBudgetExceeded({ runner: runner.id, limit: budget }))
-      shared.used++
-      const started = Date.now()
-      return runner.generate(input).pipe(
-        Effect.tap((r) =>
-          Effect.sync(() =>
-            log.push({ ok: true, error: null, model: r.model, durationMs: r.durationMs }),
-          ),
-        ),
-        Effect.tapError((e) =>
-          Effect.sync(() =>
-            log.push({ ok: false, error: e._tag, model: null, durationMs: Date.now() - started }),
-          ),
-        ),
-      )
-    })) as LlmRunnerShape["generate"],
-})
+const parseLooks = (text: string): ReadonlyArray<LookId> => {
+  const looks = text.split(",").map((l) => l.trim())
+  for (const l of looks)
+    if (!LOOK_IDS.includes(l as LookId))
+      throw new UsageError(`Unknown look "${l}"; available: ${LOOK_IDS.join(", ")}`)
+  return looks as ReadonlyArray<LookId>
+}
+
+const printRenderProblems = (m: Manifest) => {
+  for (const r of m.renders) {
+    if (r.error !== null) console.log(`Not rendered: ${r.case} (${r.look}): ${r.error}`)
+    for (const c of r.cards)
+      if (c.error !== null) console.log(`No ${c.language} card: ${r.case} (${r.look}): ${c.error}`)
+  }
+}
 
 const program = Effect.gen(function* () {
-  const fs = yield* FileSystem.FileSystem
   const path = yield* Path.Path
-  const write = (file: string, data: unknown) =>
-    writePrivateFile(fs, path, file, `${JSON.stringify(data, null, 2)}\n`)
-  const shared = { used: 0 }
-  const versions = { claude: cliVersion("claude"), codex: cliVersion("codex") }
-  const personas = readdirSync(root).toSorted()
-  const rows: Array<Record<string, unknown>> = []
+  const { values } = yield* Effect.try({
+    try: () =>
+      parseArgs({
+        options: {
+          config: { type: "string" },
+          "dry-run": { type: "boolean", default: false },
+          budget: { type: "string", default: "60" },
+          out: { type: "string", default: DEFAULT_OUT },
+          from: { type: "string" },
+          looks: { type: "string" },
+          engines: { type: "string" },
+          repeats: { type: "string" },
+        },
+        strict: true,
+        allowPositionals: false,
+      }),
+    catch: (e) => new UsageError((e as Error).message),
+  })
+  const cjkFonts = loadCjkFonts(resolveCacheDir(process.env, homedir(), path))
 
-  // Persona, then repeat, then engine: both engines run close together on the same input.
-  for (const name of personas) {
-    const raw = readFileSync(join(root, name, "prompts.json"), "utf8")
-    const persona = JSON.parse(raw) as Persona
-    const rubric = JSON.parse(
-      readFileSync(join(root, name, "rubric.json"), "utf8"),
-    ) as QualityRubric
-    const { prompts, stats } = processRecords(toRecords(name, persona), {
-      since: null,
-      now,
-      timezone: persona.timezone,
-      username: null,
+  // ---- rebuild from saved artifacts: zero LLM calls ----------------------------------
+  if (values.from !== undefined) {
+    if (values.config !== undefined || values.engines !== undefined || values["dry-run"])
+      throw new UsageError("--from cannot be combined with --config, --engines or --dry-run")
+    const root = values.from
+    const looks = values.looks === undefined ? undefined : parseLooks(values.looks)
+    const manifest = yield* readManifest(root)
+    const { manifest: updated } = yield* publish(root, manifest, {
+      cjkFonts,
+      ...(looks ? { looks } : {}),
     })
-    const options = { timezone: persona.timezone, full: true, noCache: true, model: null }
-    const { chunks } = selectChunks(prompts, options)
-    const selectedPromptIds = chunks.flatMap((c) => c.prompts.map((p) => p.id))
-    const input = {
-      personaSha256: sha256(raw),
-      chunkIds: chunks.map((c) => c.id),
-      selectedPromptIds,
-      sampling: "full: every weekly chunk, no sampling; cache disabled",
-    }
-    for (let repeat = 1; repeat <= repeats; repeat++) {
-      for (const engine of engines) {
-        const dir = join(outRoot, engine.name, name, `r${repeat}`)
-        const base = {
-          persona: name,
-          engine: engine.id,
-          repeat,
-          requestedModel: null,
-          cliVersion: versions[engine.name],
-          analysisVersion: ANALYSIS_VERSION,
-          pipelineVersion: PIPELINE_VERSION,
-          input,
-        }
-        // A run needs at least one call per chunk plus the reduce; do not start one that cannot finish.
-        if (budget - shared.used < chunks.length + 1) {
-          yield* write(join(dir, "run.json"), { ...base, status: "not run", reason: "budget" })
-          rows.push({ persona: name, engine: engine.name, repeat, status: "not run (budget)" })
-          continue
-        }
-        const attempts: Array<Attempt> = []
-        const runner = withRetry(
-          recording(yield* makeRunner(engine.id, { model: undefined }), shared, attempts),
-        )
-        const started = Date.now()
-        const result = yield* analyze({ prompts, stats, options }).pipe(
-          Effect.provide(
-            Layer.mergeAll(
-              Layer.succeed(LlmRunner, runner),
-              memoryCacheLayer(),
-              silentProgressLayer,
-            ),
-          ),
-          Effect.result,
-        )
-        const seconds = Math.round((Date.now() - started) / 1000)
-        const calls = {
-          attempts: attempts.length,
-          failedAttempts: attempts.filter((a) => !a.ok).length,
-          errors: attempts.flatMap((a) => (a.error ? [a.error] : [])),
-          reportedModels: [...new Set(attempts.flatMap((a) => (a.ok ? [a.model] : [])))],
-        }
-        if (result._tag === "Failure") {
-          yield* write(join(dir, "run.json"), {
-            ...base,
-            status: "failed",
-            error: result.failure._tag,
-            calls,
-            seconds,
-          })
-          rows.push({ persona: name, engine: engine.name, repeat, status: "failed", seconds })
-          continue
-        }
-        const profile = result.success
-        const score = scoreProfile(profile, rubric)
-        yield* write(join(dir, "profile.json"), encodeProfile(profile))
-        yield* write(join(dir, "run.json"), {
-          ...base,
-          status: "ok",
-          // Codex does not report its model; null means unknown, not a guessed name.
-          reportedModel: profile.engine.model,
-          calls,
-          coverage: profile.coverage,
-          quality: score,
-          seconds,
-        })
-        rows.push({
-          persona: name,
-          engine: engine.name,
-          repeat,
-          status: score.passed ? "ok" : "rubric failed",
-          calls: calls.attempts,
-          retries: calls.failedAttempts,
-          traits: profile.traits.length,
-          emptyDimensions: score.emptyDimensions,
-          universalClaims: score.overgeneralisations,
-          improvements: profile.improvements.length,
-          archetype: profile.archetype.name,
-          seconds,
-        })
-      }
-    }
+    printRenderProblems(updated)
+    console.log(`Rebuilt without any LLM call: ${path.join(root, "index.html")}`)
+    return updated.renders.some((r) => r.error !== null || r.cards.some((c) => c.error !== null))
+      ? 1
+      : 0
   }
-  console.table(rows)
-  console.log(`CLI attempts used: ${shared.used} of ${budget}`)
-  yield* write(join(outRoot, "summary.json"), { budget, used: shared.used, versions, rows })
+
+  // ---- configuration ------------------------------------------------------------------
+  if (values.looks !== undefined) throw new UsageError("--looks is only used with --from")
+  const personas = readdirSync(PERSONA_ROOT).toSorted()
+  let raw: unknown
+  if (values.config !== undefined) {
+    if (values.engines !== undefined || values.repeats !== undefined)
+      throw new UsageError("--config cannot be combined with --engines or --repeats")
+    const text = readFileSync(values.config, "utf8")
+    try {
+      raw = JSON.parse(text)
+    } catch {
+      throw new UsageError(`${values.config} is not valid JSON`)
+    }
+  } else {
+    const repeats = Number(values.repeats ?? "2")
+    raw = legacyConfig((values.engines ?? "claude,codex").split(","), repeats, personas)
+  }
+  const budget = parseBudget(values.budget)
+  const parsed = parseConfig(raw, personas)
+  if (!parsed.ok) {
+    console.error("Invalid experiment configuration:")
+    for (const e of parsed.errors) console.error(`  - ${e}`)
+    return EXIT_INVALID_CONFIG
+  }
+  const { config } = parsed
+  const prepared = new Map(
+    config.personas.map((name) => [
+      name,
+      preparePersona(
+        name,
+        {
+          raw: readFileSync(join(PERSONA_ROOT, name, "prompts.json"), "utf8"),
+          rubric: JSON.parse(readFileSync(join(PERSONA_ROOT, name, "rubric.json"), "utf8")),
+        },
+        config.timezone,
+      ),
+    ]),
+  )
+  if (values["dry-run"]) {
+    for (const line of dryRunLines(config, prepared, budget)) console.log(line)
+    return 0
+  }
+
+  // ---- run ----------------------------------------------------------------------------
+  const id = experimentId(new Date(), randomBytes(2).toString("hex"))
+  const root = yield* createExperimentDir(values.out, id)
+  console.log(`Experiment ${id}: ${root}`)
+  const manifest = yield* runExperiment(
+    {
+      id,
+      root,
+      config,
+      configSha256: sha256(JSON.stringify(raw)),
+      prepared,
+      budget,
+      provenance: provenance(),
+    },
+    {
+      makeRunner: (engine, model) => makeRunner(engine, { model: model ?? undefined }),
+      detect: detectRunner,
+    },
+  )
+  const { manifest: published } = yield* publish(root, manifest, { cjkFonts })
+  printRenderProblems(published)
+  console.table(
+    manifest.cases.map((c) => ({
+      case: c.id,
+      status: c.status + (c.error ? ` (${c.error})` : ""),
+      seconds: c.durationMs === null ? null : Math.round(c.durationMs / 1000),
+      attempts: c.calls.attempts,
+      failedAttempts: c.calls.failedAttempts,
+      rubric: c.quality === null ? null : c.quality.passed ? "passed" : "failed",
+    })),
+  )
+  console.log(`CLI attempts used: ${manifest.budget.used} of ${manifest.budget.cap}`)
+  console.log(`Outcome: ${published.outcome}. Open ${path.join(root, "index.html")}`)
+  return published.exitCode ?? 1
 })
 
-Effect.runPromise(program.pipe(Effect.provide(NodeServices.layer))).catch((error: unknown) => {
-  console.error(error)
-  process.exitCode = 1
-})
+program.pipe(
+  Effect.catchDefect((e) =>
+    e instanceof UsageError
+      ? Effect.sync(() => {
+          console.error(e.message)
+          return EXIT_INVALID_CONFIG
+        })
+      : Effect.die(e),
+  ),
+  Effect.catch((e) =>
+    Effect.sync(() => {
+      if (e instanceof UsageError) {
+        console.error(e.message)
+        return EXIT_INVALID_CONFIG
+      }
+      console.error(e instanceof Error ? e.message : String(e))
+      return 1
+    }),
+  ),
+  Effect.provide(NodeServices.layer),
+  NodeRuntime.runMain({
+    teardown: (exit, onExit) =>
+      Exit.isSuccess(exit) ? onExit(exit.value as number) : defaultTeardown(exit, onExit),
+  }),
+)
