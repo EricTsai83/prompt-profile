@@ -6,7 +6,7 @@ import { decodeProfile } from "../../src/domain/Profile.ts"
 import { LOOK_IDS, PRODUCT_LOOK_IDS } from "../../src/report/looks.ts"
 
 const PNG = [0x89, 0x50, 0x4e, 0x47]
-const QUOTE = "break the plan into small steps"
+const QUOTE = "舊的連結要繼續能用"
 
 describe("siteFiles", () => {
   let files: ReadonlyMap<string, string | Uint8Array>
@@ -32,11 +32,28 @@ describe("siteFiles", () => {
     }
   })
 
+  it("demonstrates recurring user-side moves with outcomes left unknown", () => {
+    const report = text("demo/full/report.html")
+    expect(report).toContain("Say what should stay")
+    expect(report).toContain("No supported benefit or cost claim here")
+    expect(report).toContain(QUOTE)
+  })
+
   it("keeps the sample report, card and profile at their published paths", async () => {
     expect(text("sample-report.html")).toContain(QUOTE)
     expect(isPng("sample-card.png")).toBe(true)
     const profile = await Effect.runPromise(decodeProfile(JSON.parse(text("sample-profile.json"))))
-    expect(profile.archetype.name).toBe("The Midnight Architect")
+    expect(profile.archetype.name).toBe("A collaboration example")
+    expect(profile.stats.analyzedPrompts).toBe(8)
+    expect(profile.episodes).toHaveLength(4)
+    const quotes = new Set(profile.episodes.flatMap((e) => e.turns.map((t) => t.quote)))
+    for (const chapter of profile.portrait!.chapters)
+      for (const evidence of chapter.evidence) expect(quotes.has(evidence.quote)).toBe(true)
+    expect(profile.episodes.every((e) => e.ending.kind === "unknown")).toBe(true)
+    expect(profile.translations["zh-TW"]?.headline).toBe("先說需求，看到草稿再調整。")
+    expect(text("sample-report.html")).toContain(profile.headline)
+    expect(text("sample-report.html")).toContain("先說需求，看到草稿再調整。")
+    expect(text("sample-report.html")).not.toContain("perfectionist")
   })
 
   it("renders the shareable report without prompt quotes", () => {

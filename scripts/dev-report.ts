@@ -7,24 +7,21 @@ import { Effect } from "effect"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { decodeProfile } from "../src/domain/Profile.ts"
+import { loadCjkFonts } from "../src/report/fonts.ts"
 import { writeReport } from "../src/report/index.ts"
 
 const program = Effect.gen(function* () {
-  const json = JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))
-  const portrait = JSON.parse(readFileSync("test/fixtures/portrait.sample.json", "utf8"))
-  // Keep this preview entirely fictional and English; the older fixture also tests translations.
-  const profile = yield* decodeProfile({
-    ...json,
-    languages: ["en"],
-    translations: {},
-    portrait,
-    archetype: {
-      name: "Collaboration Portrait",
-      description: "A fictional example of evidence-led collaboration.",
-    },
-    headline: "Clear destinations, room to explore the route",
-  })
-  console.log(yield* writeReport(profile, join("tmp", "report")))
+  const json = JSON.parse(readFileSync("test/fixtures/profile.demo.json", "utf8"))
+  const profile = yield* decodeProfile(json)
+  console.log(
+    yield* writeReport(
+      profile,
+      join("tmp", "report"),
+      undefined,
+      null,
+      loadCjkFonts(join("tmp", "font-cache")),
+    ),
+  )
 })
 
 Effect.runPromise(program.pipe(Effect.provide(NodeServices.layer))).catch((e: unknown) => {

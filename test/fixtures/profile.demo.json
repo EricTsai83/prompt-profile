@@ -1,0 +1,1618 @@
+{
+  "narrative": null,
+  "historyComparison": null,
+  "evidenceOrigins": [
+    {
+      "promptId": "claude-code:demo-1:1",
+      "session": "claude-code:demo-1",
+      "time": "2026-10-11T01:01:00.000Z",
+      "turn": 1,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-1:2",
+      "session": "claude-code:demo-1",
+      "time": "2026-10-11T01:02:00.000Z",
+      "turn": 2,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-2:1",
+      "session": "claude-code:demo-2",
+      "time": "2026-10-12T01:01:00.000Z",
+      "turn": 1,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-2:2",
+      "session": "claude-code:demo-2",
+      "time": "2026-10-12T01:02:00.000Z",
+      "turn": 2,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-3:1",
+      "session": "claude-code:demo-3",
+      "time": "2026-10-13T01:01:00.000Z",
+      "turn": 1,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-3:2",
+      "session": "claude-code:demo-3",
+      "time": "2026-10-13T01:02:00.000Z",
+      "turn": 2,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-4:1",
+      "session": "claude-code:demo-4",
+      "time": "2026-10-14T01:01:00.000Z",
+      "turn": 1,
+      "of": 2
+    },
+    {
+      "promptId": "claude-code:demo-4:2",
+      "session": "claude-code:demo-4",
+      "time": "2026-10-14T01:02:00.000Z",
+      "turn": 2,
+      "of": 2
+    }
+  ],
+  "collaboration": {
+    "moves": [
+      {
+        "name": "Say what should stay",
+        "description": "For the website and form, they first name what must be kept, then request checks before handoff.",
+        "episodeIds": [
+          "E1",
+          "E2"
+        ],
+        "benefit": null,
+        "cost": null,
+        "support": {
+          "sessions": 2,
+          "weeks": 1
+        }
+      },
+      {
+        "name": "Choose a draft, then adjust it",
+        "description": "For the notice and meeting notes, they ask for two options, choose one and name the next edit.",
+        "episodeIds": [
+          "E3",
+          "E4"
+        ],
+        "benefit": null,
+        "cost": null,
+        "support": {
+          "sessions": 2,
+          "weeks": 1
+        }
+      }
+    ],
+    "signals": [
+      {
+        "kind": "verification",
+        "basis": "user_request",
+        "observation": "They ask to check the mobile view, links and submit button, and to name checks still missing.",
+        "context": "Website and registration-form changes",
+        "evidence": [
+          {
+            "promptId": "claude-code:demo-1:2",
+            "quote": "完成後請檢查手機畫面，並確認每個連結都能打開。"
+          },
+          {
+            "promptId": "claude-code:demo-2:2",
+            "quote": "改完請檢查送出按鈕，並告訴我哪些地方還沒檢查。"
+          }
+        ],
+        "support": {
+          "sessions": 2,
+          "weeks": 1
+        }
+      }
+    ],
+    "rejected": {
+      "moves": 0,
+      "signals": 0,
+      "effects": 0
+    }
+  },
+  "portrait": {
+    "introduction": "This fictional example follows four conversations about a website, a form and two writing tasks. They say what matters before asking AI to work. When choosing wording or structure, they ask for options and then specify the next edit.",
+    "chapters": [
+      {
+        "title": "Start with what must stay",
+        "body": "For the club website, they ask to keep the old links working. For the form, they ask to keep information people have already entered. In both requests, AI can change the presentation while preserving something important.",
+        "evidence": [
+          {
+            "promptId": "claude-code:demo-1:1",
+            "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+          },
+          {
+            "promptId": "claude-code:demo-2:1",
+            "quote": "幫我調整報名表，原本填過的資料要保留。"
+          }
+        ]
+      },
+      {
+        "title": "Make the next edit easy to understand",
+        "body": "For the event notice, they choose an opening and ask to shorten the rest so the time and place stand out. For meeting notes, they choose a list and move the action items to the top. Each follow-up names a concrete edit.",
+        "evidence": [
+          {
+            "promptId": "claude-code:demo-3:1",
+            "quote": "幫我寫活動通知，先給我兩種開頭讓我選。"
+          },
+          {
+            "promptId": "claude-code:demo-3:2",
+            "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+          },
+          {
+            "promptId": "claude-code:demo-4:1",
+            "quote": "幫我整理這份會議紀錄，先給我兩種排法。"
+          },
+          {
+            "promptId": "claude-code:demo-4:2",
+            "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+          }
+        ]
+      },
+      {
+        "title": "Ask for checks before handoff",
+        "body": "They request a mobile-view and link check for the website, and a submit-button check for the form. They also ask which checks are still missing. The record shows these requests; it does not show whether the checks passed or the work was finished.",
+        "evidence": [
+          {
+            "promptId": "claude-code:demo-1:2",
+            "quote": "完成後請檢查手機畫面，並確認每個連結都能打開。"
+          },
+          {
+            "promptId": "claude-code:demo-2:2",
+            "quote": "改完請檢查送出按鈕，並告訴我哪些地方還沒檢查。"
+          }
+        ]
+      }
+    ],
+    "axes": [
+      {
+        "key": "framing",
+        "explanation": "They name what should stay before asking for changes.",
+        "sides": [
+          {
+            "pole": "first",
+            "context": "Website and form changes",
+            "evidence": [
+              {
+                "promptId": "claude-code:demo-1:1",
+                "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+              },
+              {
+                "promptId": "claude-code:demo-2:1",
+                "quote": "幫我調整報名表，原本填過的資料要保留。"
+              }
+            ],
+            "sessions": 2
+          }
+        ]
+      },
+      {
+        "key": "pacing",
+        "explanation": "For writing, they request options before choosing the next edit.",
+        "sides": []
+      },
+      {
+        "key": "control",
+        "explanation": "They choose the opening or structure themselves.",
+        "sides": [
+          {
+            "pole": "first",
+            "context": "Choosing wording and structure",
+            "evidence": [
+              {
+                "promptId": "claude-code:demo-3:2",
+                "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+              },
+              {
+                "promptId": "claude-code:demo-4:2",
+                "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+              }
+            ],
+            "sessions": 2
+          }
+        ]
+      },
+      {
+        "key": "closure",
+        "explanation": "They request checks on working features; writing tasks instead continue with edits.",
+        "sides": [
+          {
+            "pole": "first",
+            "context": "Website and form checks",
+            "evidence": [
+              {
+                "promptId": "claude-code:demo-1:2",
+                "quote": "完成後請檢查手機畫面，並確認每個連結都能打開。"
+              },
+              {
+                "promptId": "claude-code:demo-2:2",
+                "quote": "改完請檢查送出按鈕，並告訴我哪些地方還沒檢查。"
+              }
+            ],
+            "sessions": 2
+          }
+        ]
+      }
+    ]
+  },
+  "schemaVersion": 16,
+  "languages": [
+    "zh-TW",
+    "en"
+  ],
+  "translations": {
+    "zh-TW": {
+      "collaboration": {
+        "moves": [
+          {
+            "name": "先說哪些地方不能改",
+            "description": "修改網頁與報名表時，先說要保留什麼，再要求交付前檢查。",
+            "benefit": null,
+            "cost": null
+          },
+          {
+            "name": "先選草稿，再說怎麼改",
+            "description": "寫通知與整理會議紀錄時，先看兩個選項，選好後再指出下一步要改的地方。",
+            "benefit": null,
+            "cost": null
+          }
+        ],
+        "signals": [
+          {
+            "observation": "會要求檢查手機畫面、連結與送出按鈕，也會問還有哪些地方沒檢查。",
+            "context": "修改網頁與活動報名表時"
+          }
+        ]
+      },
+      "portrait": {
+        "introduction": "這份虛構示例整理了四段對話，內容是修改網頁、調整報名表，以及兩項寫作任務。這位使用者會先說明在意什麼，再請 AI 協助。需要決定文字或排法時，會先看選項，再指出下一步要改的地方。",
+        "chapters": [
+          {
+            "title": "先說哪些地方不能改",
+            "body": "修改社團網頁時，會要求舊連結繼續能用；調整報名表時，則要求保留大家已經填過的資料。這兩次都先講清楚要保留什麼，再讓 AI 修改。"
+          },
+          {
+            "title": "讓 AI 知道下一步怎麼改",
+            "body": "活動通知選好開頭後，會要求縮短後面的內容，讓時間和地點更醒目。會議紀錄則選用條列版，再把待辦事項移到最前面。每次接著提出的要求，都指向一個具體修改。"
+          },
+          {
+            "title": "交回來之前，先確認能不能用",
+            "body": "網頁會要求檢查手機畫面與連結；報名表會要求檢查送出按鈕，也會問還有哪些地方沒檢查。這些是使用者提出的要求，紀錄沒有顯示檢查是否通過，也看不到最後是否完成。"
+          }
+        ],
+        "axes": [
+          {
+            "key": "framing",
+            "explanation": "先說明要保留什麼，再請 AI 修改。",
+            "sides": [
+              {
+                "context": "修改網頁與報名表時"
+              }
+            ]
+          },
+          {
+            "key": "pacing",
+            "explanation": "寫作時會先看選項，再決定下一步。",
+            "sides": []
+          },
+          {
+            "key": "control",
+            "explanation": "開頭與排法由自己選，再請 AI 繼續調整。",
+            "sides": [
+              {
+                "context": "選擇文字開頭與內容排法時"
+              }
+            ]
+          },
+          {
+            "key": "closure",
+            "explanation": "網頁與表單會要求功能檢查；寫作任務則繼續調整內容。",
+            "sides": [
+              {
+                "context": "確認網頁與表單功能時"
+              }
+            ]
+          }
+        ]
+      },
+      "headline": "先說需求，看到草稿再調整。",
+      "archetype": {
+        "name": "協作方式示例",
+        "description": "先說哪些地方要保留，再指出下一步要改什麼。"
+      },
+      "dimensions": [
+        {
+          "key": "work_style",
+          "title": "怎麼把事情往前推",
+          "summary": "先說需求，再指出下一步要改什麼。"
+        },
+        {
+          "key": "communication",
+          "title": "怎麼說明要改什麼",
+          "summary": "會直接指出細節，例如保留舊連結、縮短通知、把待辦移到最前面。"
+        },
+        {
+          "key": "tech_profile",
+          "title": "任務涉及哪些工具",
+          "summary": "這些案例包含網頁與報名表，無法只靠這幾段對話判斷技術熟練程度。"
+        },
+        {
+          "key": "interests",
+          "title": "當時在處理什麼",
+          "summary": "請 AI 協助社團網頁、活動報名、通知與會議紀錄。"
+        },
+        {
+          "key": "growth",
+          "title": "還有哪些事看不出來",
+          "summary": "紀錄看得到要求與修改方向，但看不到最後成果，也不足以判斷學習變化。"
+        }
+      ],
+      "traits": [
+        {
+          "name": "先說哪些地方不能改",
+          "description": "會先說明舊連結或既有資料要保留。"
+        },
+        {
+          "name": "直接指出下一步要改什麼",
+          "description": "選好草稿後，會指定文字或順序要怎麼調整。"
+        }
+      ],
+      "funFacts": [],
+      "improvements": [],
+      "episodes": [
+        {
+          "task": "更新社團網頁"
+        },
+        {
+          "task": "調整活動報名表"
+        },
+        {
+          "task": "撰寫活動通知"
+        },
+        {
+          "task": "整理會議紀錄"
+        }
+      ],
+      "patterns": []
+    }
+  },
+  "generatedAt": "2026-10-24T02:00:00.000Z",
+  "engine": {
+    "runner": "claude-code",
+    "model": null,
+    "modelSource": null,
+    "modelsUsed": [],
+    "effort": null,
+    "analysisVersion": "21"
+  },
+  "coverage": {
+    "chunksTotal": 1,
+    "chunksAnalyzed": 1,
+    "chunksFromCache": 0,
+    "chunksFailed": 0,
+    "sampled": false,
+    "sessionsAnalyzed": 4,
+    "promptsAnalyzed": 8,
+    "evidenceKept": 8,
+    "evidenceDropped": 0,
+    "episodes": null
+  },
+  "headline": "Explain the need, then refine the draft.",
+  "archetype": {
+    "name": "A collaboration example",
+    "description": "They say what should stay, then ask for specific changes."
+  },
+  "dimensions": [
+    {
+      "key": "work_style",
+      "title": "How they move the work forward",
+      "summary": "They name the requirement, then give a concrete next step.",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+        },
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。"
+        },
+        {
+          "promptId": "claude-code:demo-3:1",
+          "quote": "幫我寫活動通知，先給我兩種開頭讓我選。"
+        },
+        {
+          "promptId": "claude-code:demo-3:2",
+          "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+        },
+        {
+          "promptId": "claude-code:demo-4:1",
+          "quote": "幫我整理這份會議紀錄，先給我兩種排法。"
+        },
+        {
+          "promptId": "claude-code:demo-4:2",
+          "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+        }
+      ]
+    },
+    {
+      "key": "communication",
+      "title": "How they explain a change",
+      "summary": "They name specific details: old links, a shorter notice or action items at the top.",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+        },
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。"
+        },
+        {
+          "promptId": "claude-code:demo-3:1",
+          "quote": "幫我寫活動通知，先給我兩種開頭讓我選。"
+        },
+        {
+          "promptId": "claude-code:demo-3:2",
+          "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+        },
+        {
+          "promptId": "claude-code:demo-4:1",
+          "quote": "幫我整理這份會議紀錄，先給我兩種排法。"
+        },
+        {
+          "promptId": "claude-code:demo-4:2",
+          "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+        }
+      ]
+    },
+    {
+      "key": "tech_profile",
+      "title": "What the tasks involve",
+      "summary": "These examples cover a website and a registration form. They do not establish technical expertise.",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+        },
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。"
+        }
+      ]
+    },
+    {
+      "key": "interests",
+      "title": "What they are working on",
+      "summary": "They ask for help with a club website, event registration, a notice and meeting notes.",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+        },
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。"
+        },
+        {
+          "promptId": "claude-code:demo-3:1",
+          "quote": "幫我寫活動通知，先給我兩種開頭讓我選。"
+        },
+        {
+          "promptId": "claude-code:demo-3:2",
+          "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+        },
+        {
+          "promptId": "claude-code:demo-4:1",
+          "quote": "幫我整理這份會議紀錄，先給我兩種排法。"
+        },
+        {
+          "promptId": "claude-code:demo-4:2",
+          "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+        }
+      ]
+    },
+    {
+      "key": "growth",
+      "title": "What remains unknown",
+      "summary": "The conversations show requests and revisions, but no completed outcome or learning trend.",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:2",
+          "quote": "完成後請檢查手機畫面，並確認每個連結都能打開。"
+        },
+        {
+          "promptId": "claude-code:demo-2:2",
+          "quote": "改完請檢查送出按鈕，並告訴我哪些地方還沒檢查。"
+        }
+      ]
+    }
+  ],
+  "traits": [
+    {
+      "name": "State what must stay",
+      "description": "They name links or existing information that should be preserved.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。"
+        },
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 1
+      }
+    },
+    {
+      "name": "Give a concrete next edit",
+      "description": "They choose a draft and ask for a specific change to wording or order.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "promptId": "claude-code:demo-3:1",
+          "quote": "幫我寫活動通知，先給我兩種開頭讓我選。"
+        },
+        {
+          "promptId": "claude-code:demo-3:2",
+          "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。"
+        },
+        {
+          "promptId": "claude-code:demo-4:1",
+          "quote": "幫我整理這份會議紀錄，先給我兩種排法。"
+        },
+        {
+          "promptId": "claude-code:demo-4:2",
+          "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。"
+        }
+      ],
+      "support": {
+        "sessions": 2,
+        "weeks": 1
+      }
+    }
+  ],
+  "funFacts": [],
+  "improvements": [],
+  "previous": null,
+  "episodes": [
+    {
+      "id": "E1",
+      "session": "claude-code:demo-1",
+      "sessionTurns": 2,
+      "split": false,
+      "taskType": "change",
+      "task": "Update a club website",
+      "turns": [
+        {
+          "promptId": "claude-code:demo-1:1",
+          "quote": "幫我更新社團網頁，舊的連結要繼續能用。",
+          "role": "ask",
+          "turn": 1,
+          "time": "2026-10-11T01:01:00.000Z"
+        },
+        {
+          "promptId": "claude-code:demo-1:2",
+          "quote": "完成後請檢查手機畫面，並確認每個連結都能打開。",
+          "role": "verify",
+          "turn": 2,
+          "time": "2026-10-11T01:02:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "unknown",
+        "promptId": null
+      }
+    },
+    {
+      "id": "E2",
+      "session": "claude-code:demo-2",
+      "sessionTurns": 2,
+      "split": false,
+      "taskType": "change",
+      "task": "Update a registration form",
+      "turns": [
+        {
+          "promptId": "claude-code:demo-2:1",
+          "quote": "幫我調整報名表，原本填過的資料要保留。",
+          "role": "ask",
+          "turn": 1,
+          "time": "2026-10-12T01:01:00.000Z"
+        },
+        {
+          "promptId": "claude-code:demo-2:2",
+          "quote": "改完請檢查送出按鈕，並告訴我哪些地方還沒檢查。",
+          "role": "verify",
+          "turn": 2,
+          "time": "2026-10-12T01:02:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "unknown",
+        "promptId": null
+      }
+    },
+    {
+      "id": "E3",
+      "session": "claude-code:demo-3",
+      "sessionTurns": 2,
+      "split": false,
+      "taskType": "write",
+      "task": "Write an event notice",
+      "turns": [
+        {
+          "promptId": "claude-code:demo-3:1",
+          "quote": "幫我寫活動通知，先給我兩種開頭讓我選。",
+          "role": "ask",
+          "turn": 1,
+          "time": "2026-10-13T01:01:00.000Z"
+        },
+        {
+          "promptId": "claude-code:demo-3:2",
+          "quote": "我選第二種開頭。請把後面縮短，讓大家一眼就看到時間和地點。",
+          "role": "redirect",
+          "turn": 2,
+          "time": "2026-10-13T01:02:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "unknown",
+        "promptId": null
+      }
+    },
+    {
+      "id": "E4",
+      "session": "claude-code:demo-4",
+      "sessionTurns": 2,
+      "split": false,
+      "taskType": "write",
+      "task": "Summarize meeting notes",
+      "turns": [
+        {
+          "promptId": "claude-code:demo-4:1",
+          "quote": "幫我整理這份會議紀錄，先給我兩種排法。",
+          "role": "ask",
+          "turn": 1,
+          "time": "2026-10-14T01:01:00.000Z"
+        },
+        {
+          "promptId": "claude-code:demo-4:2",
+          "quote": "用條列的那版。請把待辦事項移到最前面，其他內容再短一點。",
+          "role": "redirect",
+          "turn": 2,
+          "time": "2026-10-14T01:02:00.000Z"
+        }
+      ],
+      "ending": {
+        "kind": "unknown",
+        "promptId": null
+      }
+    }
+  ],
+  "patterns": [],
+  "steering": null,
+  "usage": null,
+  "stats": {
+    "window": {
+      "since": "2026-10-01T00:00:00.000Z",
+      "until": "2026-10-24T02:00:00.000Z"
+    },
+    "timezone": "Asia/Taipei",
+    "totalPrompts": 8,
+    "analyzedPrompts": 8,
+    "totalSessions": 4,
+    "bySource": {
+      "claude-code": 8,
+      "codex": 0
+    },
+    "byOrigin": {
+      "interactive": 8,
+      "sdk": 0,
+      "exec": 0,
+      "unknown": 0
+    },
+    "dateRange": {
+      "from": "2026-10-11T01:01:00.000Z",
+      "to": "2026-10-14T01:02:00.000Z"
+    },
+    "activeDays": 4,
+    "hourHistogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      8,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "weekdayHistogram": [
+      2,
+      2,
+      2,
+      0,
+      0,
+      0,
+      2
+    ],
+    "activityGrid": [
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "promptLength": {
+      "median": 21,
+      "p90": 28.3
+    },
+    "languageMix": {
+      "zh": 1,
+      "en": 0,
+      "mixed": 0
+    },
+    "topProjects": [],
+    "topSlashCommands": [],
+    "correctionRate": 0,
+    "imageRate": 0,
+    "longestStreakDays": 4,
+    "latestTime": null,
+    "activity": {
+      "projects": [],
+      "days": [
+        {
+          "date": "2026-10-11",
+          "count": 2,
+          "byProject": [
+            2
+          ]
+        },
+        {
+          "date": "2026-10-12",
+          "count": 2,
+          "byProject": [
+            2
+          ]
+        },
+        {
+          "date": "2026-10-13",
+          "count": 2,
+          "byProject": [
+            2
+          ]
+        },
+        {
+          "date": "2026-10-14",
+          "count": 2,
+          "byProject": [
+            2
+          ]
+        }
+      ],
+      "gridByProject": [
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            2
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            2
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            2
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ],
+        [
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            2
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ],
+          [
+            0
+          ]
+        ]
+      ]
+    },
+    "techniques": {
+      "coveredSessions": 0,
+      "tools": {
+        "subagents": {
+          "count": 0,
+          "sessions": 0
+        },
+        "skills": {
+          "count": 0,
+          "sessions": 0
+        },
+        "planMode": {
+          "count": 0,
+          "sessions": 0
+        },
+        "mcp": {
+          "count": 0,
+          "sessions": 0
+        },
+        "web": {
+          "count": 0,
+          "sessions": 0
+        },
+        "background": {
+          "count": 0,
+          "sessions": 0
+        },
+        "askUser": {
+          "count": 0,
+          "sessions": 0
+        },
+        "worktrees": {
+          "count": 0,
+          "sessions": 0
+        },
+        "pullRequests": {
+          "count": 0,
+          "sessions": 0
+        }
+      },
+      "prompts": {
+        "planFirst": 0,
+        "context": 0,
+        "filePaths": 0,
+        "constraints": 0.125,
+        "acceptance": 0,
+        "examples": 0,
+        "verification": 0.125,
+        "structured": 0,
+        "whyExplain": 0,
+        "outputFormat": 0
+      },
+      "monthly": [
+        {
+          "month": "2026-10",
+          "sessions": 4,
+          "covered": 0,
+          "prompts": 8,
+          "tools": {
+            "subagents": 0,
+            "skills": 0,
+            "planMode": 0,
+            "mcp": 0,
+            "web": 0,
+            "background": 0,
+            "askUser": 0,
+            "worktrees": 0,
+            "pullRequests": 0
+          },
+          "techniques": {
+            "planFirst": 0,
+            "context": 0,
+            "filePaths": 0,
+            "constraints": 1,
+            "acceptance": 0,
+            "examples": 0,
+            "verification": 1,
+            "structured": 0,
+            "whyExplain": 0,
+            "outputFormat": 0
+          }
+        }
+      ],
+      "maxParallel": 1,
+      "parallelDays": 0,
+      "details": {
+        "skills": [],
+        "subagentTypes": [],
+        "mcpServers": [],
+        "models": []
+      }
+    },
+    "promptHabits": {
+      "terseShare": 0,
+      "longSessionShare": 0,
+      "reusedOpenings": {
+        "openings": 0,
+        "sessions": 0
+      }
+    }
+  }
+}

@@ -17,9 +17,9 @@ import { LOOK_IDS, PRODUCT_LOOK_IDS, REPORT_PARTS, type LookId } from "../src/re
 const fixture = (name: string): unknown =>
   JSON.parse(readFileSync(new URL(`../test/fixtures/${name}`, import.meta.url), "utf8"))
 
-/** The fictional sample profile. Its zh-TW translation predates portraits, so it has none. */
+/** The authored bilingual demo; the stress-test sample remains a separate fixture. */
 const sampleProfile = (): Promise<Profile> =>
-  Effect.runPromise(decodeProfile(fixture("profile.sample.json")))
+  Effect.runPromise(decodeProfile(fixture("profile.demo.json")))
 
 /** Folder of a look under `demo/`; the classic default keeps its older `full` URL. */
 const lookFolder = (look: LookId): string => (look === "classic" ? "full" : look)
@@ -54,11 +54,7 @@ const home = (): string => {
 /** Every generated file of the site, by path relative to the site root. */
 export const siteFiles = async (): Promise<ReadonlyMap<string, string | Uint8Array>> => {
   const sample = await sampleProfile()
-  // Reports also show the fictional portrait; it is English only, untranslated.
-  const profile = {
-    ...sample,
-    portrait: fixture("portrait.sample.json") as Exclude<Profile["portrait"], undefined>,
-  }
+  const profile = sample
   const fonts = embeddedFonts()
   const files = new Map<string, string | Uint8Array>()
   for (const look of LOOK_IDS) {
