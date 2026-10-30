@@ -91,28 +91,27 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 13 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 16 | `map.md` / `merge.md` / `reduce.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 16 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 21 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 11, others 17 / 2 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 17, others 23 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–19, 21 and 23–26 are done
+in the change that finishes it; it stays in git history. Plans 01–21 and 23–26 are done
 and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
 
 Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
-`plans/20-<name>.md` and run the acceptance criteria when done."
+`plans/27-<name>.md` and run the acceptance criteria when done."
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 20 | [Collaboration profile experience](20-collaboration-profile-experience.md) | Local report history, structured episodes, original roles and avatars, deeper narrative, and integrated evaluation | Existing portrait and two-view report implementation | B (episodes) delivered; A, C–F planned |
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements; plan 20 B enriches evidence later | Ready for contract and fixtures; calibration baseline delivered |
+| 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements and completed episode evidence | Ready for contract and fixtures; calibration baseline delivered |
 | 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Completed claim calibration; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |
 | 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
 | 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
@@ -132,34 +131,28 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 ## What is left, in order
 
 The product exploration continues through plans 24–31. These are planned tasks, not claims that
-features have shipped. Each plan can be executed separately; explicit dependencies and acceptance
-criteria define its handoff. Plan 20 remains the owner of the shared collaboration foundation;
-plan 21 is closed by owner decision (see the [closeout](../docs/ux/report-redesign/output-roles.md#owner-closeout--2026-10-29)), and plan 22 remains the experiment tooling owner.
+features have shipped. Each remaining plan can be executed separately; explicit dependencies and acceptance criteria
+define its handoff. Plan 20 is complete; its usage, owner amendments and limitations are in the
+[collaboration guide](../docs/collaboration-experience.md). Plan 21 is closed by owner decision
+(see the [closeout](../docs/ux/report-redesign/output-roles.md#owner-closeout--2026-10-29)),
+and plan 22 remains the experiment tooling owner.
 
 ### Recommended execution batches
 
-1. **Clarify present value:** plan 24 (first run; done, usage in the
-   [README](../README.md#small-histories-and-stopped-runs)), plan 25 (identity/factual purposes; done, see the
-   [purpose contract](../docs/ux/report-redesign/purpose-contract.md)). Claim calibration is also complete; see the
-   [cases, safeguards and limitations](../docs/ux/model-comparison/claim-support.md).
-2. **Make the portrait specific and trustworthy:** plan 20 B (episodes; delivered), the completed
-   [claim calibration](../docs/ux/model-comparison/claim-support.md), and plan 20 C (contextual roles/signature moves). Ship a bounded episode-to-report
-   slice before expanding the catalog. Plan 22's local-history snapshots support optional evaluation.
-3. **Make reports useful after reading:** plan 27 (one experiment), plan 20 A (history library),
-   then plan 28 (reviewed preferences) and plan 29 (sharing). History A may start earlier independently.
-4. **Support recurring reflection:** plan 20 E (comparable change), plan 30 (annotations) and
-   plan 31 (project/context retrospectives). Use owner feedback from actual report use to refine priority.
-5. **Integrate rather than multiply experiences:** plan 20 F, iterated through owner review.
-   Plan 20 D starts with its small art study; full character expansion follows calibrated roles and
-   evidence that it helps recognition. It does not block the earlier value deliveries.
+1. **Make reports useful after reading:** plan 27 (one experiment), then plan 28 (reviewed
+   preferences) and plan 29 (sharing). The completed library and evidence foundation are available.
+2. **Support recurring reflection:** plan 30 (annotations) and plan 31 (project/context
+   retrospectives). Comparable-window history is implemented; scoped selection remains future work.
+3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
+   from the completed fictional collaboration calibration. Owner use can refine priorities.
 
 ### Ownership at shared boundaries
 
-- Plan 20 B owns episode schemas/provenance; the completed [claim calibration](../docs/ux/model-comparison/claim-support.md) owns semantic-support evaluation, not a
-  duplicate episode pipeline. Plan 20 C owns roles; the calibration record provides authored cases.
+- The completed episode foundation owns schemas/provenance; the completed [claim calibration](../docs/ux/model-comparison/claim-support.md) owns semantic-support evaluation, not a
+  duplicate episode pipeline. The completed collaboration foundation owns roles; the calibration record provides authored cases.
 - The completed plan 25 established the [identity/factual content contract](../docs/ux/report-redesign/purpose-contract.md); the durable report design records guide visual iteration. Both use one production renderer and the existing looks.
-- Plan 27 specifies actionable coaching; plan 20 E integrates it into narrative/history.
-- Plan 20 A/E own history and longitudinal comparability; plan 31 adds scoped contexts only.
+- Plan 27 specifies actionable coaching beyond the completed narrative/history integration.
+- The completed library and comparison foundation owns history and longitudinal comparability; plan 31 adds scoped contexts only.
 - The owner is the current reader. Iterate together through owner use and feedback, supported
   by fictional cases and automated checks. External participants and reader studies are not
   prerequisites; automated checks do not establish human comprehension.
@@ -168,8 +161,8 @@ Plan 32 (external reader research) was removed by owner decision on 2026-10-29, 
 completed. Its protocol and fictional rehearsal were discarded. Do not reintroduce participant
 recruitment, interviews or follow-up requirements without an explicit owner request.
 
-Do not wait for every phase of plan 20 before delivering an independent plan. Mark progress in the
-owning plan and cross-reference the evidence in dependent plans; do not implement competing systems.
+Mark progress in the owning plan and cross-reference evidence in dependent plans; do not implement
+competing systems for the completed collaboration foundation.
 All existing privacy, evidence, language and module-boundary rules apply to every batch.
 
 Released: `0.1.1` on npm (Trusted Publisher, provenance) and GitHub Releases
