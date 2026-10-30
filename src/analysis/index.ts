@@ -1,3 +1,7 @@
+import { verifyNarrative } from "./narrative.ts"
+import { verifyCollaboration } from "./collaboration.ts"
+import { factsFromStats } from "./facts.ts"
+import { sourceContext } from "./source-context.ts"
 import { verifyPortrait } from "./portrait.ts"
 import { roleCode, ROLE_NAMES } from "../domain/Interaction.ts"
 import { Clock, DateTime, Effect, Option, Ref } from "effect"
@@ -13,7 +17,7 @@ import {
   LlmChunkObservations,
   LlmProfileDraft,
 } from "../domain/llm/LlmSchemas.ts"
-import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
+import { LlmRunner, makeLlmSchema, type LlmError, type ModelSource } from "../llm/LlmRunner.ts"
 import { AnalysisCache } from "./cache.ts"
 import type { Chunk } from "./chunk.ts"
 import {
@@ -115,6 +119,7 @@ interface MapOutcome {
   readonly observations: ChunkObservations | null
   readonly fromCache: boolean
   readonly model: string | null
+  readonly modelSource: ModelSource
   readonly error: LlmError | null
 }
 
@@ -155,12 +160,20 @@ export const analyze = (input: {
             observations: cached.value.value,
             fromCache: true,
             model: cached.value.producedBy,
+            modelSource: cached.value.producedSource ?? null,
             error: null,
           }
         }
         // after a rate limit, stop sending new chunks
         if ((yield* Ref.get(rateLimited)) !== null) {
-          return { chunk, observations: null, fromCache: false, model: null, error: null }
+          return {
+            chunk,
+            observations: null,
+            fromCache: false,
+            model: null,
+            modelSource: null,
+            error: null,
+          }
         }
         yield* progress.onChunkStart(index, total)
         const result = yield* runner
@@ -177,10 +190,22 @@ export const analyze = (input: {
             failed: true,
             durationMs: null,
           })
-          return { chunk, observations: null, fromCache: false, model: null, error }
+          return {
+            chunk,
+            observations: null,
+            fromCache: false,
+            model: null,
+            modelSource: null,
+            error,
+          }
         }
         const observations = fromLlmChunkObservations(result.success.value, chunk.id)
-        yield* cache.set({ ...parts, producedBy: result.success.model, value: observations })
+        yield* cache.set({
+          ...parts,
+          producedBy: result.success.model,
+          producedSource: result.success.modelSource ?? null,
+          value: observations,
+        })
         yield* progress.onChunkDone({
           index,
           total,
@@ -188,7 +213,14 @@ export const analyze = (input: {
           failed: false,
           durationMs: result.success.durationMs,
         })
-        return { chunk, observations, fromCache: false, model: result.success.model, error: null }
+        return {
+          chunk,
+          observations,
+          fromCache: false,
+          model: result.success.model,
+          modelSource: result.success.modelSource ?? null,
+          error: null,
+        }
       })
 
     const outcomes = yield* Effect.forEach(chunks, mapChunk, {
@@ -325,15 +357,28 @@ export const analyze = (input: {
             time: p.timestamp.toString(),
           })),
       )
-    const reducePrompt = `promptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(episodes))}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
-    const draft = yield* runner
+    const contextSources = sourceContext(
+      outcomes.filter((o) => o.observations !== null).flatMap((o) => o.chunk.prompts),
+      citedIds,
+    )
+    const reducePrompt = `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(episodes))}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
+    const initialDraft = yield* runner
       .generate({
         system: loadPrompt("reduce"),
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
       })
       .pipe(Effect.mapError(stageError("reduce-failed")))
-    yield* progress.onReduceDone(draft.durationMs)
+    // Keep original source context available: reviewing only the draft cannot recover omissions.
+    // A failed review fails the stage; never publish the unreviewed draft as a fallback.
+    const draft = yield* runner
+      .generate({
+        system: `${loadPrompt("reduce")}\n\n${loadPrompt("review")}`,
+        prompt: `draft:\n${JSON.stringify(initialDraft.value)}\n\n${reducePrompt}`,
+        schema: DRAFT_SCHEMA,
+      })
+      .pipe(Effect.mapError(stageError("reduce-failed")))
+    yield* progress.onReduceDone(initialDraft.durationMs + draft.durationMs)
 
     // ---- verify (reduce) ------------------------------------------------------------
     const counts: EvidenceCounts = { kept: 0, dropped: 0 }
@@ -347,6 +392,17 @@ export const analyze = (input: {
       engine: {
         runner: runner.id,
         model: draft.model ?? outcomes.find((o) => o.model !== null)?.model ?? options.model,
+        modelSource:
+          draft.model !== null ? (draft.modelSource ?? null) : options.model ? "requested" : null,
+        modelsUsed: [
+          ...new Set([
+            ...outcomes
+              .filter((o) => o.observations !== null)
+              .map((o) => (o.modelSource === "reported" ? o.model : null)),
+            initialDraft.modelSource === "reported" ? initialDraft.model : null,
+            draft.modelSource === "reported" ? draft.model : null,
+          ]),
+        ],
         effort: options.effort ?? null,
         analysisVersion: ANALYSIS_VERSION,
       },
@@ -374,7 +430,29 @@ export const analyze = (input: {
         ),
     )
     const finalTexts = new Map(analyzedPrompts.map((p) => [p.id, p.text]))
-    const portrait = verifyPortrait(profile.portrait, finalTexts, origins, counts)
+    const collaboration = verifyCollaboration(
+      draft.value.collaboration,
+      episodes,
+      finalTexts,
+      origins,
+      counts,
+    )
+    const patterns = verifyPatterns(draft.value.patterns, episodes, episodeCounts)
+    const narrative = verifyNarrative(
+      draft.value.narrative,
+      profile.portrait,
+      episodes,
+      patterns,
+      finalTexts,
+    )
+    const narrativeRejected = profile.portrait !== null && !narrative
+    const portraitStart = counts.kept
+    const checkedPortrait = verifyPortrait(profile.portrait, finalTexts, origins, counts)
+    if (narrativeRejected) {
+      counts.dropped += counts.kept - portraitStart
+      counts.kept = portraitStart
+    }
+    const portrait = narrativeRejected ? null : checkedPortrait
     const code = portrait ? roleCode(portrait.axes) : null
     const traits = verifyTraits(
       profile.traits,
@@ -390,10 +468,10 @@ export const analyze = (input: {
       ),
     )
     const dimensions = verifyDimensions(profile.dimensions, finalTexts, counts)
-    const improvements = verifyImprovements(profile.improvements, finalTexts, counts)
-    const patterns = verifyPatterns(draft.value.patterns, episodes, episodeCounts)
+    const improvements = verifyImprovements(profile.improvements.slice(0, 2), finalTexts, counts)
     yield* progress.onVerified(counts.kept, counts.dropped)
     const summariesUnsafe =
+      narrativeRejected ||
       counts.dropped > 0 ||
       !(
         portrait ||
@@ -408,10 +486,11 @@ export const analyze = (input: {
       portrait: summariesUnsafe ? null : portrait,
       archetype: summariesUnsafe
         ? { name: "Collaboration observations", description: "" }
-        : portrait
-          ? { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" }
-          : profile.archetype,
+        : { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" },
       traits,
+      collaboration,
+      narrative: summariesUnsafe ? null : narrative,
+      funFacts: factsFromStats(input.stats),
       dimensions,
       improvements,
       episodes: episodes.map(toProfileEpisode),
@@ -419,11 +498,49 @@ export const analyze = (input: {
       steering,
       coverage: {
         ...profile.coverage,
+        narrativeRejected: narrativeRejected ? 1 : 0,
         evidenceKept: counts.kept,
         evidenceDropped: counts.dropped,
         episodes: episodeCoverage(episodeCounts, episodes.length),
       },
     }
+    const cited = new Set([
+      ...verifiedProfile.traits.flatMap((t) => t.evidence.map((e) => e.promptId)),
+      ...verifiedProfile.dimensions.flatMap((t) => t.evidence.map((e) => e.promptId)),
+      ...verifiedProfile.improvements.flatMap((t) => t.evidence.map((e) => e.promptId)),
+      ...(verifiedProfile.portrait?.chapters.flatMap((t) => t.evidence.map((e) => e.promptId)) ??
+        []),
+      ...(verifiedProfile.portrait?.axes.flatMap((a) =>
+        a.sides.flatMap((t) => t.evidence.map((e) => e.promptId)),
+      ) ?? []),
+      ...(verifiedProfile.collaboration?.signals.flatMap((t) =>
+        t.evidence.map((e) => e.promptId),
+      ) ?? []),
+      ...verifiedProfile.episodes.flatMap((e) => e.turns.map((t) => t.promptId)),
+    ])
+    const evidenceOrigins = outcomes
+      .filter((o) => o.observations !== null)
+      .flatMap((o) =>
+        o.chunk.prompts
+          .filter((p) => cited.has(p.id))
+          .flatMap((p) => {
+            const position = o.chunk.positions.get(p.id)
+            return position
+              ? [
+                  {
+                    promptId: p.id,
+                    session: position.session,
+                    time: p.timestamp,
+                    turn: position.turn,
+                    of: position.of,
+                  },
+                ]
+              : []
+          }),
+      )
     // ---- translate (verified text only) ---------------------------------------------
-    return yield* addTranslations(verifiedProfile, options.languages ?? ["en"])
+    return yield* addTranslations(
+      { ...verifiedProfile, evidenceOrigins },
+      options.languages ?? ["en"],
+    )
   })

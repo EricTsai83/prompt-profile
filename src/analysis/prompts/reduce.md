@@ -125,3 +125,98 @@ Describe a single event as a single event. Preserve contrary examples and contex
 choices explicitly; do not average them into a universal preference. Never hide contrary
 quotes to meet an evidence count. If a compact claim cannot preserve its qualifications,
 keep separate observations or omit the inference. Tool events alone do not establish mastery.
+
+## Independent collaboration axes
+
+Classify each axis from its own observable choice. Never fill the other axes from a role
+stereotype, prompt length, short follow-ups, activity volume or tool-event counts.
+
+- Framing: define = gives a target or constraint before solutions; explore = asks to discover
+  alternatives before choosing a target. An open research task can explain exploration without
+  making all implementation work exploratory. A bare "continue" supports neither pole.
+- Pacing: stepwise = requests intermediate checkpoints; whole task = requests a complete unit
+  before review. This says WHEN to return, not WHO decides. "Choose the approach, show one step
+  at a time" is stepwise plus delegated. "Implement my exact design end to end" is whole task
+  plus directed. A short message or long agent run alone supports neither pole.
+- Control: direct = reserves implementation choices for the user; delegate = explicitly gives
+  the agent implementation choices. A safety approval boundary does not revoke delegation
+  within it. A tool invocation without a user choice supports neither pole.
+- Closure: criteria = states how completion will be checked; refinement = requests successive
+  review of results to decide what to change. A request for tests is a criterion, not proof
+  of passing tests. A correction of a broken constraint alone is not aesthetic refinement.
+
+Both ways may recur in different task contexts. Preserve the context for each; never treat
+one as a deficit or erase it because the other appears. Choose distinct quoted excerpts from
+independent sessions. Copied boilerplate across sessions counts once, and extra turns in one
+conversation do not increase support. Report only selected evidence, not population frequency.
+
+For recurring episode patterns, use a short memorable action sequence as the claim, for example
+"Inspect, then check boundaries". Include the task context and only observable user moves.
+Describe where this sequence helps only when the episodes show it; include a cost only when
+it is visible. Otherwise omit the benefit/cost. Retain episodes showing other contextual choices.
+Do not infer assistant actions or success from the sequence.
+
+Separate three kinds of evidence in the existing narrative and traits: usage intensity comes
+from statistics; technique breadth concerns observed requests; demonstrated understanding needs
+specific evidence of managing context, recognizing uncertainty, setting tool boundaries,
+checking results or recovering from a mistake. A question about a tool is not evidence of
+using it. Autonomous agent actions are not user understanding. Missing evidence means unobserved,
+including for a sparse but expert-looking history; heavy usage does not establish expertise.
+
+`sourceExcerpts` supplies bounded prefixes of already-redacted source prompts that existing
+observations or episodes cite. Unlike promptContext metadata, this is source evidence and
+may supply exact quotations. Read it to recover choices omitted by a shorter citation. Each
+entry states whether it is truncated, and coverage says how many eligible prompts are included.
+Missing tails or excluded prompts mean unknown. Never infer assistant actions between turns:
+adding a constraint later does not establish that the agent acted before receiving it. An
+improvement needs a visible reported cost; otherwise omit it instead of filling the impact
+with an assumption.
+
+## Structured collaboration evidence
+
+Return `collaboration` with `moves` and `signals` (empty arrays when not observed).
+
+- `moves`: 0–3 memorable action sequences. Each has an original short `name`, a bounded
+  `description`, and `episodeIds` from two or more different conversations. Every supporting
+  episode must contain two or more ordered user turns. Context comes from those episodes;
+  never manufacture assistant replies or a successful ending. `benefit` and `cost` are null
+  unless the user explicitly reports that effect in a supporting episode's user_reported
+  ending. If supplied, each has `claim` and exact `evidence` from that ending. Attribute it to
+  the user and do not imply proven causality. A request for a check is never an effect.
+- `signals`: 0–10 specific observations, each with `kind` (context, uncertainty,
+  tool_boundaries, verification, recovery), `basis` (user_request, user_report, agent_action,
+  tool_question), `observation`, task `context`, and exact `evidence`. Label the actor and mode
+  correctly. The application excludes autonomous agent actions and tool questions from
+  understanding signals. A requested practice remains a request; user reports stay attributed.
+  One conversation may show a practice, but does not establish recurrence or global expertise.
+
+Usage intensity belongs to statistics, technique breadth to observed requests, and these
+signals to specific supported practices. Never turn sparse activity into low ability or heavy
+activity into expertise. Missing signals mean unobserved. Preserve both contextual choices.
+
+## Plan the narrative before prose
+
+Return `narrative` before composing the portrait. When portrait is null, narrative is null.
+Otherwise return:
+
+- `thread`: `text` (the exact intended 2–3 sentence introduction) and exact `evidence`.
+- `representativeEpisodeId`: a selected episode ID, or null when there is no suitable episode.
+- `chapters`: in the portrait chapter order, each with the exact same `title`, a `focus`
+  claim (`text`, exact `evidence`), `episodeIds` it discusses, and `patternClaims` copied
+  exactly from recurring patterns it connects to. Leave references empty when not applicable.
+- `nuance`: a supported qualification (`text`, exact `evidence`) that appears verbatim in a
+  chapter body. It explains context or limits without inventing a deficiency.
+- `closing`: a supported final sentence (`text`, exact `evidence`) that ends the final chapter.
+
+Copy thread.text exactly into portrait.introduction. Include each chapter focus.text verbatim
+in that chapter's body, then develop it with supported detail and transitions. Every chapter
+citation must also occur in its focus evidence. Thread, nuance and closing evidence must also
+be cited by a chapter, so a reader can inspect it. Never use unknown episodes or unsupported
+pattern claims as narrative bridges. A planned review is not an observed result.
+Choose a different narrative arc when the person's evidence calls for it, rather than copying
+one fixed story. If support is invalid, omit the portrait rather than preserving an unsupported
+opening or ending. No extra model call is needed: planning and prose share this response.
+
+Coaching is secondary: return at most two optional improvements. Tie each to quoted behavior
+and a visible cost, and return none when the record does not justify one. Do not invent an
+experiment contract or treat a role-label difference as personal growth.

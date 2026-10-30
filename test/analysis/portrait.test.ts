@@ -74,6 +74,77 @@ describe("interaction portrait", () => {
     expect(axisState(sameSession.axes[0]!)).toBe("none")
   })
 
+  it("does not turn repeated boilerplate in separate sessions into independent support", () => {
+    const repeatedTexts = new Map(texts).set("b", texts.get("a")!)
+    const input = {
+      ...portrait,
+      axes: [
+        {
+          ...portrait.axes[0]!,
+          sides: [
+            {
+              ...side("first", "reviews", []),
+              evidence: [quote("a"), { promptId: "b", quote: texts.get("a")! }],
+            },
+          ],
+        },
+      ],
+    }
+    const out = verifyPortrait(input, repeatedTexts, origins, counts())!
+    expect(out.axes[0]!.sides[0]!.sessions).toBe(1)
+    expect(out.axes[0]!.sides[0]!.evidence).toHaveLength(2)
+    expect(axisState(out.axes[0]!)).toBe("none")
+  })
+
+  it("counts independent support regardless of quote order and ignores unknown origins", () => {
+    const build = (ids: ReadonlyArray<string>) => ({
+      ...portrait,
+      axes: [{ ...portrait.axes[0]!, sides: [side("first", "reviews", ids)] }],
+    })
+    const repeated = new Map(texts).set("b", texts.get("a")!)
+    const source = new Map(origins).set("c", origins.get("a")!)
+    const input = build(["a", "b", "c", "d"])
+    input.axes[0]!.sides[0]!.evidence = input.axes[0]!.sides[0]!.evidence.map((e) => ({
+      ...e,
+      quote: repeated.get(e.promptId)!,
+    }))
+    const forward = verifyPortrait(input, repeated, source, counts())!
+    const backward = verifyPortrait(
+      {
+        ...input,
+        axes: input.axes.map((a) => ({
+          ...a,
+          sides: a.sides.map((s) => ({ ...s, evidence: s.evidence.toReversed() })),
+        })),
+      },
+      repeated,
+      source,
+      counts(),
+    )!
+    expect(forward.axes[0]!.sides[0]!.sessions).toBe(3)
+    expect(backward.axes[0]!.sides[0]!.sessions).toBe(3)
+    expect(verifyPortrait(input, repeated, new Map(), counts())!.axes[0]!.sides[0]!.sessions).toBe(
+      0,
+    )
+  })
+
+  it("does not multiply a copied source template by quoting different fragments", () => {
+    const repeated = "Define the expected result first. Run the checks before finishing."
+    const source = new Map(texts).set("a", repeated).set("b", repeated)
+    const input = {
+      ...portrait,
+      axes: [{ ...portrait.axes[0]!, sides: [side("first", "reviews", ["a", "b"])] }],
+    }
+    const out = verifyPortrait(input, source, origins, counts())!
+    expect(out.axes[0]!.sides[0]!.sessions).toBe(1)
+    expect(out.axes[0]!.coverage).toEqual({
+      citedSessions: 2,
+      analysedSessions: 4,
+      periods: 2,
+      scope: "cited_choices",
+    })
+  })
+
   it("rejects the portrait when a side cites fabricated evidence", () => {
     const fake = {
       ...portrait,

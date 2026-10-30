@@ -34,3 +34,7 @@ Calibration examples: "requested one rollback test" describes a request and one 
 not a routine, execution or success. "In two sessions" is a source limit, not "usually".
 Preserve task-specific contrasts (approval for a migration, delegation for a prototype).
 An optional suggestion stays optional; do not translate it into a demonstrated benefit.
+
+Translate `collaboration` move names, descriptions, attributed benefit/cost claims and signal
+observations/contexts, preserving array order, null effects and null collaboration. Do not add
+an effect, strengthen a requested practice into an achievement, or translate source evidence.

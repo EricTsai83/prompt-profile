@@ -125,7 +125,9 @@ describe("before confirmation", () => {
         expect(r.stdout).toContain("Read, cleaned and redacted on this computer")
         expect(r.stdout).toMatch(/Sent off this computer: .*through your logged-in Claude Code CLI/)
         expect(r.stdout).toMatch(/No API key: uses your subscription quota/)
-        expect(r.stdout).toMatch(/base estimate 3 calls \(2 chunks \+ 1 final profile\)/)
+        expect(r.stdout).toMatch(
+          /base estimate 4 calls \(2 chunks \+ 1 final profile \+ 1 evidence review\)/,
+        )
         expect(r.stdout).toMatch(/merges and retries .* can add calls/)
         expect(r.stdout).toContain("No hard limit: add --max-calls")
         // the free inspection route
@@ -140,7 +142,7 @@ describe("before confirmation", () => {
       const h = makeHarness()
       const r = yield* h.run(["--since", "all", "--max-calls", "9", "--lang", "zh-TW,en"])
       expect(r.stdout).toMatch(
-        /base estimate 4 calls \(2 chunks \+ 1 final profile \+ 1 translation\)/,
+        /base estimate 5 calls \(2 chunks \+ 1 final profile \+ 1 evidence review \+ 1 translation\)/,
       )
       expect(r.stdout).toContain("Hard limit: at most 9 CLI calls, including retries")
       expect(r.stdout).not.toContain("No hard limit")
@@ -264,8 +266,8 @@ describe("during and after a run", () => {
         detail: "x",
         stderrTail: "",
       })
-      // 2 chunks + final profile, then the translation fails
-      const h = makeHarness({ fake: { failures: new Map([[4, failed]]) } })
+      // 2 chunks + final profile + evidence review, then the translation fails
+      const h = makeHarness({ fake: { failures: new Map([[5, failed]]) } })
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--since", "all", "--out", out, "--lang", "zh-TW,en"])
       expect(r.code).toBe(0)
@@ -273,11 +275,11 @@ describe("during and after a run", () => {
       expect(profile.languages).toEqual(["en"])
       expect(r.stdout).toContain("zh-TW is missing")
       expect(r.stdout).toContain(`prompt-profile --since all --out ${out} --lang zh-TW,en --yes`)
-      // the suggested re-run reuses the cached chunks: final profile + translation only
+      // The suggested re-run reuses cached chunks: final profile + review + translation.
       const again = makeHarness({ env: { ...h.environment } })
       const r2 = yield* again.run(["--since", "all", "--out", out, "--lang", "zh-TW,en", "--yes"])
       expect(r2.code).toBe(0)
-      expect(calls(again)).toBe(2)
+      expect(calls(again)).toBe(3)
       expect(JSON.parse(readFileSync(join(out, "profile.json"), "utf8")).languages).toEqual([
         "zh-TW",
         "en",
@@ -327,7 +329,7 @@ describe("recovery", () => {
       const r2 = yield* again.run(command.slice("prompt-profile ".length).split(" "))
       expect(r2.code).toBe(0)
       // only the final profile is called: both chunks come from the cache
-      expect(calls(again)).toBe(1)
+      expect(calls(again)).toBe(2)
       expect(existsSync(join(out, "report.html"))).toBe(true)
     }),
   )

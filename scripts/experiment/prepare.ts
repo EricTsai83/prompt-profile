@@ -82,7 +82,7 @@ export const selection = (persona: PreparedPersona, variant: Variant): Selection
     selectedPromptIds: chunks.flatMap((c) => c.prompts.map((p) => p.id)),
     chunksTotal: all.length,
     sampled,
-    minimumCalls: chunks.length === 0 ? 0 : chunks.length + 1 + translationCalls(options),
+    minimumCalls: chunks.length === 0 ? 0 : chunks.length + 2 + translationCalls(options),
   }
 }
 

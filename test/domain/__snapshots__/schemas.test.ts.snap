@@ -254,6 +254,177 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
       ],
       "type": "object",
     },
+    "collaboration": {
+      "additionalProperties": false,
+      "properties": {
+        "moves": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "benefit": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "type": "string",
+                  },
+                  "evidence": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "promptId": {
+                          "type": "string",
+                        },
+                        "quote": {
+                          "type": "string",
+                        },
+                      },
+                      "required": [
+                        "promptId",
+                        "quote",
+                      ],
+                      "type": "object",
+                    },
+                    "type": "array",
+                  },
+                },
+                "required": [
+                  "claim",
+                  "evidence",
+                ],
+                "type": [
+                  "object",
+                  "null",
+                ],
+              },
+              "cost": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "type": "string",
+                  },
+                  "evidence": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "promptId": {
+                          "type": "string",
+                        },
+                        "quote": {
+                          "type": "string",
+                        },
+                      },
+                      "required": [
+                        "promptId",
+                        "quote",
+                      ],
+                      "type": "object",
+                    },
+                    "type": "array",
+                  },
+                },
+                "required": [
+                  "claim",
+                  "evidence",
+                ],
+                "type": [
+                  "object",
+                  "null",
+                ],
+              },
+              "description": {
+                "type": "string",
+              },
+              "episodeIds": {
+                "items": {
+                  "type": "string",
+                },
+                "type": "array",
+              },
+              "name": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "name",
+              "description",
+              "episodeIds",
+              "benefit",
+              "cost",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "signals": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "basis": {
+                "enum": [
+                  "user_request",
+                  "user_report",
+                  "agent_action",
+                  "tool_question",
+                ],
+                "type": "string",
+              },
+              "context": {
+                "type": "string",
+              },
+              "evidence": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "promptId": {
+                      "type": "string",
+                    },
+                    "quote": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "promptId",
+                    "quote",
+                  ],
+                  "type": "object",
+                },
+                "type": "array",
+              },
+              "kind": {
+                "enum": [
+                  "context",
+                  "uncertainty",
+                  "tool_boundaries",
+                  "verification",
+                  "recovery",
+                ],
+                "type": "string",
+              },
+              "observation": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "kind",
+              "basis",
+              "observation",
+              "context",
+              "evidence",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+      },
+      "required": [
+        "moves",
+        "signals",
+      ],
+      "type": [
+        "object",
+        "null",
+      ],
+    },
     "dimensions": {
       "items": {
         "additionalProperties": false,
@@ -376,6 +547,186 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
         "type": "object",
       },
       "type": "array",
+    },
+    "narrative": {
+      "additionalProperties": false,
+      "properties": {
+        "chapters": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "episodeIds": {
+                "items": {
+                  "type": "string",
+                },
+                "type": "array",
+              },
+              "focus": {
+                "additionalProperties": false,
+                "properties": {
+                  "evidence": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "promptId": {
+                          "type": "string",
+                        },
+                        "quote": {
+                          "type": "string",
+                        },
+                      },
+                      "required": [
+                        "promptId",
+                        "quote",
+                      ],
+                      "type": "object",
+                    },
+                    "type": "array",
+                  },
+                  "text": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "text",
+                  "evidence",
+                ],
+                "type": "object",
+              },
+              "patternClaims": {
+                "items": {
+                  "type": "string",
+                },
+                "type": "array",
+              },
+              "title": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "title",
+              "focus",
+              "episodeIds",
+              "patternClaims",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "closing": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "promptId": {
+                    "type": "string",
+                  },
+                  "quote": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "promptId",
+                  "quote",
+                ],
+                "type": "object",
+              },
+              "type": "array",
+            },
+            "text": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "text",
+            "evidence",
+          ],
+          "type": "object",
+        },
+        "nuance": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "promptId": {
+                    "type": "string",
+                  },
+                  "quote": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "promptId",
+                  "quote",
+                ],
+                "type": "object",
+              },
+              "type": "array",
+            },
+            "text": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "text",
+            "evidence",
+          ],
+          "type": "object",
+        },
+        "representativeEpisodeId": {
+          "type": [
+            "string",
+            "null",
+          ],
+        },
+        "thread": {
+          "additionalProperties": false,
+          "properties": {
+            "evidence": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "promptId": {
+                    "type": "string",
+                  },
+                  "quote": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "promptId",
+                  "quote",
+                ],
+                "type": "object",
+              },
+              "type": "array",
+            },
+            "text": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "text",
+            "evidence",
+          ],
+          "type": "object",
+        },
+      },
+      "required": [
+        "thread",
+        "representativeEpisodeId",
+        "chapters",
+        "nuance",
+        "closing",
+      ],
+      "type": [
+        "object",
+        "null",
+      ],
     },
     "patterns": {
       "items": {
@@ -581,6 +932,8 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     },
   },
   "required": [
+    "narrative",
+    "collaboration",
     "portrait",
     "headline",
     "archetype",
@@ -613,6 +966,89 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
         "description",
       ],
       "type": "object",
+    },
+    "collaboration": {
+      "additionalProperties": false,
+      "properties": {
+        "moves": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "benefit": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "claim",
+                ],
+                "type": [
+                  "object",
+                  "null",
+                ],
+              },
+              "cost": {
+                "additionalProperties": false,
+                "properties": {
+                  "claim": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "claim",
+                ],
+                "type": [
+                  "object",
+                  "null",
+                ],
+              },
+              "description": {
+                "type": "string",
+              },
+              "name": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "name",
+              "description",
+              "benefit",
+              "cost",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "signals": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "context": {
+                "type": "string",
+              },
+              "observation": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "observation",
+              "context",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+      },
+      "required": [
+        "moves",
+        "signals",
+      ],
+      "type": [
+        "object",
+        "null",
+      ],
     },
     "dimensions": {
       "items": {
@@ -808,6 +1244,7 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
     },
   },
   "required": [
+    "collaboration",
     "portrait",
     "headline",
     "archetype",

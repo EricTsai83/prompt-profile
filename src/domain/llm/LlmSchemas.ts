@@ -1,5 +1,6 @@
+import { SIGNAL_BASES, UNDERSTANDING_KINDS } from "../Collaboration.ts"
 import { AXIS_KEYS } from "../Interaction.ts"
-import { Schema } from "effect"
+import { Effect, Schema } from "effect"
 import type { ChunkObservations } from "../ChunkObservations.ts"
 import { ENDINGS, TASK_TYPES, TURN_ROLES } from "../Episode.ts"
 import { INTERVENTION_KINDS } from "../Steering.ts"
@@ -95,7 +96,55 @@ const LlmPortrait = Schema.Struct({
   ),
 })
 
+const LlmNarrativeClaim = Schema.Struct({
+  text: Schema.String,
+  evidence: Schema.Array(LlmEvidence),
+})
+export const LlmNarrative = Schema.Struct({
+  thread: LlmNarrativeClaim,
+  representativeEpisodeId: Schema.NullOr(Schema.String),
+  chapters: Schema.Array(
+    Schema.Struct({
+      title: Schema.String,
+      focus: LlmNarrativeClaim,
+      episodeIds: Schema.Array(Schema.String),
+      patternClaims: Schema.Array(Schema.String),
+    }),
+  ),
+  nuance: LlmNarrativeClaim,
+  closing: LlmNarrativeClaim,
+})
+
+const LlmEffect = Schema.NullOr(
+  Schema.Struct({ claim: Schema.String, evidence: Schema.Array(LlmEvidence) }),
+)
+export const LlmCollaboration = Schema.Struct({
+  moves: Schema.Array(
+    Schema.Struct({
+      name: Schema.String,
+      description: Schema.String,
+      episodeIds: Schema.Array(Schema.String),
+      benefit: LlmEffect,
+      cost: LlmEffect,
+    }),
+  ),
+  signals: Schema.Array(
+    Schema.Struct({
+      kind: Schema.Literals(UNDERSTANDING_KINDS),
+      basis: Schema.Literals(SIGNAL_BASES),
+      observation: Schema.String,
+      context: Schema.String,
+      evidence: Schema.Array(LlmEvidence),
+    }),
+  ),
+})
+export type LlmCollaboration = typeof LlmCollaboration.Type
+
 export const LlmProfileDraft = Schema.Struct({
+  narrative: Schema.NullOr(LlmNarrative).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
+  collaboration: Schema.NullOr(LlmCollaboration).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
   portrait: Schema.NullOr(LlmPortrait),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
@@ -192,6 +241,10 @@ export interface ProfileExtras {
  */
 export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtras): Profile => ({
   schemaVersion: PROFILE_SCHEMA_VERSION,
+  narrative: null,
+  historyComparison: null,
+  evidenceOrigins: [],
+  collaboration: null,
   portrait:
     draft.portrait === null
       ? null

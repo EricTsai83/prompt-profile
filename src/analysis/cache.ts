@@ -39,8 +39,9 @@ export const CacheEntry = Schema.Struct({
   runner: Schema.String,
   model: Schema.NullOr(Schema.String),
   effort: Schema.NullOr(Schema.String).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
-  /** Model reported by the CLI when the entry was produced. */
+  /** Model name and provenance when the entry was produced; missing provenance is unknown. */
   producedBy: Schema.NullOr(Schema.String),
+  producedSource: Schema.optionalKey(Schema.NullOr(Schema.Literals(["reported", "requested"]))),
   value: ChunkObservations,
 })
 export type CacheEntry = typeof CacheEntry.Type

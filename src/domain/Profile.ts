@@ -1,3 +1,7 @@
+import { EvidenceOrigin } from "./EvidenceOrigin.ts"
+import { HistoryComparison } from "./History.ts"
+import { NarrativePlan } from "./Narrative.ts"
+import { Collaboration, CollaborationText } from "./Collaboration.ts"
 import { AXIS_KEYS } from "./Interaction.ts"
 import { Effect, Schema } from "effect"
 import { Episode, EpisodeCoverage, Pattern } from "./Episode.ts"
@@ -17,10 +21,10 @@ import { Usage } from "./Usage.ts"
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
  * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
  * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
- * where the person redirected the AI or asked for repairs). 14: `engine.effort`. Versions 2–13
+ * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. Versions 2–15
  * are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 14 as const
+export const PROFILE_SCHEMA_VERSION = 16 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -93,6 +97,14 @@ export const Portrait = Schema.Struct({
     Schema.Struct({
       key: Schema.Literals(AXIS_KEYS),
       explanation: Schema.String,
+      coverage: Schema.optionalKey(
+        Schema.Struct({
+          citedSessions: Count,
+          analysedSessions: Count,
+          periods: Count,
+          scope: Schema.Literal("cited_choices"),
+        }),
+      ),
       /** At most one per pole. */
       sides: Schema.Array(AxisSide),
     }),
@@ -142,6 +154,7 @@ export type Improvement = typeof Improvement.Type
 
 /** Filled by the program, never by the LLM. */
 export const Coverage = Schema.Struct({
+  narrativeRejected: Schema.optionalKey(Count),
   chunksTotal: Count,
   chunksAnalyzed: Count,
   chunksFromCache: Count,
@@ -161,6 +174,8 @@ export type Coverage = typeof Coverage.Type
 export const Engine = Schema.Struct({
   runner: SourceId,
   model: Schema.NullOr(Schema.String),
+  modelSource: Schema.optionalKey(Schema.NullOr(Schema.Literals(["reported", "requested"]))),
+  modelsUsed: Schema.optionalKey(Schema.Array(Schema.NullOr(Schema.String))),
   /** `--effort` as requested; null = the CLI's default (and before schema version 14). */
   effort: Schema.NullOr(Effort).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   analysisVersion: Schema.String,
@@ -184,6 +199,9 @@ const ImprovementText = Schema.Struct({
 
 /** What the translation call returns: every field required (LLM strict-schema subset). */
 export const LlmTranslation = Schema.Struct({
+  collaboration: Schema.NullOr(CollaborationText).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
   portrait: Schema.NullOr(PortraitText),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
@@ -199,6 +217,7 @@ export const LlmTranslation = Schema.Struct({
 
 /** Generated text in one non-English language, aligned with the English fields. */
 export const Translation = Schema.Struct({
+  collaboration: Schema.optionalKey(Schema.NullOr(CollaborationText)),
   portrait: Schema.optionalKey(Schema.NullOr(PortraitText)),
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
@@ -222,6 +241,10 @@ export const Translation = Schema.Struct({
 export type Translation = typeof Translation.Type
 
 const ProfileFields = Schema.Struct({
+  narrative: Schema.optionalKey(Schema.NullOr(NarrativePlan)),
+  historyComparison: Schema.optionalKey(Schema.NullOr(HistoryComparison)),
+  evidenceOrigins: Schema.optionalKey(Schema.Array(EvidenceOrigin)),
+  collaboration: Schema.optionalKey(Schema.NullOr(Collaboration)),
   portrait: Schema.optionalKey(Schema.NullOr(Portrait)),
   schemaVersion: Schema.Literal(PROFILE_SCHEMA_VERSION),
   /** Offered languages, the default first. */
@@ -256,10 +279,26 @@ const ProfileFields = Schema.Struct({
 export const matchesBase = (
   base: Pick<
     typeof ProfileFields.Type,
-    "dimensions" | "traits" | "funFacts" | "improvements" | "portrait" | "episodes" | "patterns"
+    | "dimensions"
+    | "traits"
+    | "funFacts"
+    | "improvements"
+    | "portrait"
+    | "episodes"
+    | "patterns"
+    | "collaboration"
   >,
   t: Translation,
 ): boolean =>
+  (!base.collaboration ||
+    (t.collaboration != null &&
+      t.collaboration.moves.length === base.collaboration.moves.length &&
+      t.collaboration.signals.length === base.collaboration.signals.length &&
+      base.collaboration.moves.every(
+        (m, i) =>
+          Boolean(m.benefit) === Boolean(t.collaboration!.moves[i]?.benefit) &&
+          Boolean(m.cost) === Boolean(t.collaboration!.moves[i]?.cost),
+      ))) &&
   (!base.portrait ||
     (t.portrait != null &&
       t.portrait.chapters.length === base.portrait.chapters.length &&
@@ -313,7 +352,7 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }

@@ -34,7 +34,7 @@ export interface AnalysisPlan {
   readonly chunks: ReadonlyArray<Chunk>
   readonly sampled: boolean
   readonly cacheHits: number
-  /** Base estimate: uncached map calls + final reduce + translations; merges and retries are additional. */
+  /** Base estimate: uncached map calls + final reduce + evidence review + translations; merges and retries are additional. */
   readonly llmCalls: number
   /** Of `llmCalls`: one per uncached chunk. */
   readonly mapCalls: number
@@ -98,7 +98,7 @@ export const plan = (input: {
       chunks,
       sampled,
       cacheHits,
-      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 1 + translations : 0),
+      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 2 + translations : 0),
       mapCalls: chunks.length - cacheHits,
       translationCalls: translations,
       charsToSend,

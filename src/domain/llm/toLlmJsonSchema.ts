@@ -70,7 +70,7 @@ const collapseNullable = (node: unknown): unknown => {
 
 /** Produce the JSON Schema sent to `claude --json-schema` / `codex --output-schema`. */
 export const toLlmJsonSchema = (schema: Schema.Top): JsonSchemaNode => {
-  const doc = Schema.toJsonSchemaDocument(schema, { onExcessProperty: "error" })
+  const doc = Schema.toJsonSchemaDocument(Schema.toType(schema), { onExcessProperty: "error" })
   const inlined = inlineRefs(doc.schema, doc.definitions as Record<string, unknown>, new Set())
   const result = collapseNullable(inlined) as JsonSchemaNode
   const violations = validateLlmJsonSchema(result)

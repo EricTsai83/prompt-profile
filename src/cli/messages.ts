@@ -56,6 +56,7 @@ export const messages = {
     `  No API key: uses your subscription quota, base estimate ${count(calls, "call", "calls")} (${[
       `${count(map, "chunk", "chunks")}${cached > 0 ? `, ${n(cached)} more cached` : ""}`,
       "1 final profile",
+      "1 evidence review",
       ...(translations > 0 ? [count(translations, "translation", "translations")] : []),
     ].join(" + ")})`,
   callEstimateNote: "  Intermediate merges and retries (up to 2 per call) can add calls.",
@@ -96,12 +97,12 @@ export const messages = {
   limitedEvidence:
     "  Limited evidence: nothing has verified quotes from 2+ sessions yet, so the report shows observations without a role or coaching. A longer --since or more history adds evidence.",
   missingLanguages: (languages: string, command: string) =>
-    `  ⚠ ${languages} is missing: its translation failed. To add it, re-run (cached chunks are reused; the final profile and translation calls run again):\n    ${command}`,
+    `  ⚠ ${languages} is missing: its translation failed. To add it, re-run (cached chunks are reused; the final profile, evidence review and translation calls run again):\n    ${command}`,
   // ---- recovery (plan 24): what is saved, what a re-run reuses, the exact command ----
   saved:
     "Chunk results finished before the stop are saved in the analysis cache. No report was written.",
   reuse:
-    "A re-run with the cache reuses finished chunks and merges; the final profile step and translations always run again.",
+    "A re-run with the cache reuses finished chunks and merges; the final profile step and translations always run again. The profile step includes draft generation and evidence review.",
   rerun: (command: string) => `Re-run:\n  ${command}`,
   interrupted: (command: string) =>
     `Interrupted. ${messages.saved}\n${messages.reuse}\n${messages.rerun(command)}`,

@@ -6,6 +6,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "description": "",
     "name": "Collaboration observations",
   },
+  "collaboration": null,
   "coverage": {
     "chunksAnalyzed": 12,
     "chunksFailed": 0,
@@ -26,6 +27,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
     "evidenceDropped": 2,
     "evidenceKept": 7,
+    "narrativeRejected": 0,
     "promptsAnalyzed": 80,
     "sampled": false,
     "sessionsAnalyzed": 80,
@@ -72,17 +74,47 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "16",
+    "analysisVersion": "21",
     "effort": null,
     "model": "fake-model",
+    "modelSource": "reported",
+    "modelsUsed": [
+      "fake-model",
+    ],
     "runner": "claude-code",
   },
   "episodes": [],
+  "evidenceOrigins": [
+    {
+      "of": 1,
+      "promptId": "claude-code:d0s0:0",
+      "session": "claude-code:d0s0",
+      "time": "2026-08-01T01:00:00.000Z",
+      "turn": 1,
+    },
+    {
+      "of": 1,
+      "promptId": "claude-code:d2s0:0",
+      "session": "claude-code:d2s0",
+      "time": "2026-08-03T01:00:00.000Z",
+      "turn": 1,
+    },
+    {
+      "of": 1,
+      "promptId": "claude-code:d8s0:0",
+      "session": "claude-code:d8s0",
+      "time": "2026-08-09T01:00:00.000Z",
+      "turn": 1,
+    },
+  ],
   "funFacts": [
-    "longest streak: 3 days",
+    "Selected history: 0 recorded prompts across 0 conversations.",
+    "Recorded prompts appear on 0 days in this history.",
+    "Longest streak in this history: 0 consecutive days with recorded prompts.",
   ],
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "headline": "Collaboration observations",
+  "historyComparison": null,
   "improvements": [
     {
       "evidence": [
@@ -104,10 +136,11 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "languages": [
     "en",
   ],
+  "narrative": null,
   "patterns": [],
   "portrait": null,
   "previous": null,
-  "schemaVersion": 14,
+  "schemaVersion": 16,
   "stats": {
     "activeDays": 0,
     "activity": {

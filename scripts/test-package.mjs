@@ -46,6 +46,7 @@ try {
     "prompts/map.md",
     "prompts/merge.md",
     "prompts/reduce.md",
+    "prompts/review.md",
     "fonts/Inter-Regular.woff",
     "fonts/Inter-Bold.woff",
     "fonts/Inter-OFL.txt",

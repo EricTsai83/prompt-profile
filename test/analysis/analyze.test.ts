@@ -124,6 +124,135 @@ const run = (
   )
 
 describe("analyze", () => {
+  it.effect("reviews the draft against source evidence before classification and translation", () =>
+    Effect.gen(function* () {
+      const fake = makeFakeLlmRunner({
+        respond: (input) => {
+          if (input.schemaName === "LlmTranslation") {
+            return JSON.parse(input.prompt.split("\n\nprofile:\n")[1]!)
+          }
+          const response = respond(input) as {
+            traits: Array<{ evidence: Array<{ promptId: string; quote: string }> }>
+            [key: string]: unknown
+          }
+          if (input.schemaName !== "LlmProfileDraft") return response
+          const reviewed = input.system.includes("Collaboration draft review")
+          const evidence = response.traits[0]!.evidence
+          return {
+            ...response,
+            traits: response.traits.slice(0, 1),
+            improvements: [],
+            narrative: {
+              thread: { text: reviewed ? "They request checks." : "The tests passed.", evidence },
+              representativeEpisodeId: null,
+              chapters: [
+                {
+                  title: "Checks",
+                  focus: {
+                    text: reviewed ? "They request checks." : "The tests passed.",
+                    evidence,
+                  },
+                  episodeIds: [],
+                  patternClaims: [],
+                },
+              ],
+              nuance: { text: reviewed ? "They request checks." : "The tests passed.", evidence },
+              closing: { text: reviewed ? "They request checks." : "The tests passed.", evidence },
+            },
+            portrait: {
+              introduction: reviewed ? "They request checks." : "The tests passed.",
+              chapters: [
+                {
+                  title: "Checks",
+                  body: reviewed ? "They request checks." : "The tests passed.",
+                  evidence,
+                },
+              ],
+              axes: [
+                {
+                  key: "framing",
+                  explanation: "Context-dependent choices.",
+                  sides: [
+                    { pole: "first", context: "implementation", evidence: evidence.slice(0, 2) },
+                    ...(reviewed
+                      ? [{ pole: "second", context: "discovery", evidence: evidence.slice(1, 3) }]
+                      : []),
+                  ],
+                },
+              ],
+            },
+          }
+        },
+      })
+      const p = yield* run(fake, makeMemoryCache(), { ...options, languages: ["zh-TW", "en"] })
+      expect(p.portrait?.introduction).toBe("They request checks.")
+      expect(p.translations["zh-TW"]?.portrait?.introduction).toBe("They request checks.")
+      const translation = fake.log.find((c) => c.schema === "LlmTranslation")!
+      expect(translation.prompt).not.toContain("The tests passed.")
+      expect(p.portrait?.axes[0]?.sides.map((s) => s.pole)).toEqual(["first", "second"])
+      const review = fake.log.find((c) => c.system.includes("Collaboration draft review"))!
+      expect(review.prompt).toContain("The tests passed.")
+      expect(review.prompt).toContain("observations:")
+      expect(review.prompt).toContain("promptContext:")
+      expect(review.prompt).toContain("sourceExcerpts:")
+      expect(review.prompt).toContain(prompts[0]!.text.slice(0, 100))
+      expect(fake.log.filter((c) => c.schema === "LlmProfileDraft")).toHaveLength(2)
+    }),
+  )
+
+  it.effect(
+    "rejects fabricated evidence introduced by the review instead of restoring the draft",
+    () =>
+      Effect.gen(function* () {
+        const fake = makeFakeLlmRunner({
+          respond: (input) => {
+            const response = respond(input) as {
+              traits: Array<{ name: string; evidence: unknown }>
+              [key: string]: unknown
+            }
+            if (!input.system.includes("Collaboration draft review")) return response
+            return {
+              ...response,
+              traits: [
+                {
+                  ...response.traits[0]!,
+                  evidence: [{ promptId: "invented", quote: "Tests passed" }],
+                },
+              ],
+            }
+          },
+        })
+        const p = yield* run(fake)
+        expect(p.traits.some((t) => t.name === "steady")).toBe(false)
+        expect(p.coverage.evidenceDropped).toBeGreaterThan(0)
+        expect(p.headline).toBe("Collaboration observations")
+      }),
+  )
+
+  it.effect("does not publish an unreviewed draft when the review fails", () =>
+    Effect.gen(function* () {
+      const warm = makeFakeLlmRunner({ respond })
+      yield* run(warm)
+      const firstDraft = warm.log.findIndex((c) => c.schema === "LlmProfileDraft") + 1
+      const fake = makeFakeLlmRunner({
+        respond,
+        failures: new Map([
+          [
+            firstDraft + 1,
+            new ProcessFailed({
+              runner: "claude-code",
+              exitCode: 1,
+              detail: "review failed",
+              stderrTail: "review failed",
+            }),
+          ],
+        ]),
+      })
+      const error = yield* Effect.flip(run(fake))
+      expect(error).toMatchObject({ _tag: "AnalysisFailed", reason: "reduce-failed" })
+    }),
+  )
+
   it.effect(
     "rejects global narrative summaries when part of their supporting narrative is fabricated",
     () =>
@@ -220,11 +349,18 @@ describe("analyze", () => {
       expect(profile.improvements.map((i) => [i.title, i.rewrite !== null])).toEqual([
         ["Say the goal first", true],
       ])
+      expect(profile.funFacts).toEqual([
+        "Selected history: 0 recorded prompts across 0 conversations.",
+        "Recorded prompts appear on 0 days in this history.",
+        "Longest streak in this history: 0 consecutive days with recorded prompts.",
+      ])
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
+        modelSource: "reported",
+        modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "16",
+        analysisVersion: "21",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -257,12 +393,13 @@ describe("analyze", () => {
       const second = makeFakeLlmRunner({ respond })
       const profile = yield* run(second, cache)
       expect(second.log.filter((c) => c.schema === "LlmChunkAnalysis")).toHaveLength(0)
-      expect(second.calls()).toBe(1) // reduce only
+      expect(second.calls()).toBe(2) // draft and evidence review
       expect(profile.coverage.chunksFromCache).toBe(chunkCalls)
+      expect(profile.engine.modelsUsed).toEqual(["fake-model"])
       // --no-cache skips reads
       const third = makeFakeLlmRunner({ respond })
       yield* run(third, cache, { ...options, noCache: true })
-      expect(third.calls()).toBe(chunkCalls + 1)
+      expect(third.calls()).toBe(chunkCalls + 2)
     }),
   )
 
@@ -409,7 +546,7 @@ describe("analyze", () => {
         options: { ...options, languages: ["zh-TW", "en"] },
         runner: "claude-code",
       }).pipe(Effect.provideService(AnalysisCache, makeMemoryCache()))
-      expect(p.llmCalls).toBe(p.chunks.length + 2)
+      expect(p.llmCalls).toBe(p.chunks.length + 3)
     }),
   )
 
@@ -420,13 +557,13 @@ describe("analyze", () => {
         Effect.provideService(AnalysisCache, cache),
       )
       expect(before.cacheHits).toBe(0)
-      expect(before.llmCalls).toBe(before.chunks.length + 1)
+      expect(before.llmCalls).toBe(before.chunks.length + 2)
       yield* run(makeFakeLlmRunner({ respond }), cache)
       const after = yield* plan({ prompts, options, runner: "claude-code" }).pipe(
         Effect.provideService(AnalysisCache, cache),
       )
       expect(after.cacheHits).toBe(after.chunks.length)
-      expect(after.llmCalls).toBe(1)
+      expect(after.llmCalls).toBe(2)
       expect(after.charsToSend).toBe(0)
     }),
   )

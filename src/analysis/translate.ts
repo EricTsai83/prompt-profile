@@ -19,6 +19,20 @@ export const LANGUAGE_NAMES: Record<Exclude<Language, "en">, string> = {
 
 /** The generated text only: no quotes, evidence, confidence or statistics leave the program. */
 export const translationInput = (p: Profile): TranslationType => ({
+  collaboration: p.collaboration
+    ? {
+        moves: p.collaboration.moves.map(({ name, description, benefit, cost }) => ({
+          name,
+          description,
+          benefit: benefit ? { claim: benefit.claim } : null,
+          cost: cost ? { claim: cost.claim } : null,
+        })),
+        signals: p.collaboration.signals.map(({ observation, context }) => ({
+          observation,
+          context,
+        })),
+      }
+    : null,
   portrait: p.portrait
     ? {
         introduction: p.portrait.introduction,

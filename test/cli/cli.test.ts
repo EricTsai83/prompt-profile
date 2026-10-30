@@ -69,7 +69,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const firstCalls = h.fakes[0]!.calls()
       yield* h.run(["--yes", "--since", "all"])
       expect(firstCalls).toBeGreaterThan(1)
-      expect(h.fakes[1]!.calls()).toBe(1)
+      expect(h.fakes[1]!.calls()).toBe(2)
     }),
   )
 
@@ -99,7 +99,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
       // everything is cached for codex: only the final reduce call is left
       expect(plan.cacheHits).toBe(plan.chunksSelected)
-      expect(plan.llmCalls).toBe(1)
+      expect(plan.llmCalls).toBe(2)
       expect(h.fakes).toHaveLength(1)
     }),
   )
@@ -329,7 +329,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const report = readFileSync(join(out, "report.html"), "utf8")
       expect(report).toMatch(/id="lang-zh-TW"[^>]*checked/)
       expect(report).toContain('id="lang-en"')
-      expect(report).toContain("譯 The Fixer")
+      expect(report).toContain("譯 Collaboration Portrait")
       expect(existsSync(join(out, "card.png"))).toBe(true)
       expect(existsSync(join(out, "card.en.png"))).toBe(true)
       expect(existsSync(join(out, "share.html"))).toBe(false)
