@@ -70,3 +70,9 @@ the final chapter with closing.text. Any correction to evidence, intro or ending
 both structures. References must name selected episodes and exact surviving pattern claims.
 Never leave an unsupported transition after removing its evidence. If the outline cannot be
 supported, return both narrative and portrait as null. At most two improvements remain.
+
+Review experiment.when against its cited task context; experiment.observe must be a future
+observation, never an asserted outcome or promised benefit. Keep just one concrete action in
+suggestion. Return experiment null if it cannot be grounded. Never add unsupported task
+requirements to rewrite.after; preserve its original language. Respect clear short follow-ups
+and contradictory contexts, and permit zero improvements.

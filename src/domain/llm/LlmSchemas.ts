@@ -181,6 +181,9 @@ export const LlmProfileDraft = Schema.Struct({
       suggestion: Schema.String,
       evidence: Schema.Array(LlmEvidence),
       /** `promptId` of one evidence prompt and the suggested prompt; empty strings for none. */
+      experiment: Schema.NullOr(
+        Schema.Struct({ when: Schema.String, observe: Schema.String }),
+      ).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
       rewrite: Schema.Struct({ promptId: Schema.String, after: Schema.String }),
     }),
   ),
@@ -292,6 +295,7 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     impact: i.impact,
     suggestion: i.suggestion,
     evidence: i.evidence.map(toEvidence),
+    experiment: i.experiment,
     rewrite: i.rewrite.promptId === "" || i.rewrite.after.trim() === "" ? null : i.rewrite,
   })),
   // the analysis fills both after verifying them against the map step's episodes

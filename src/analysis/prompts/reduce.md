@@ -27,7 +27,7 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   correct, redirect or check), never the assistant's replies or an outcome the episode's
   `ending` does not show; an `unknown` ending means the result is not visible. Return an empty
   list when no habit recurs in two sessions.
-- `improvements`: 2–4 concrete ways this person's prompts could work better, built mainly from
+- `improvements`: 0–2 concrete ways this person's prompts could work better, built mainly from
   the `prompting` observations (other observations may support them). Each has a `title` (2–6
   words, an action such as "State the expected result first"), a one-sentence `pattern` (what
   they do), a one-sentence `impact` (what it visibly costs in these prompts, such as the
@@ -218,5 +218,11 @@ one fixed story. If support is invalid, omit the portrait rather than preserving
 opening or ending. No extra model call is needed: planning and prose share this response.
 
 Coaching is secondary: return at most two optional improvements. Tie each to quoted behavior
-and a visible cost, and return none when the record does not justify one. Do not invent an
-experiment contract or treat a role-label difference as personal growth.
+and a visible cost, and return none when the record does not justify one. For each justified improvement, return `experiment` with `when` (a bounded future situation)
+and `observe` (one thing the reader can inspect next time), or null when no concrete test is
+supported. The existing suggestion is one concrete action, not a list of changes. Evidence
+belongs to the observed pattern, never proof of the proposed effect. Do not promise saved time,
+infer causality, or treat a role-label difference as personal growth. Preserve contradictory
+contexts and short follow-ups that are clear in context; bilingual prompts are not a deficiency.
+Never invent task requirements in a rewrite; preserve the original language and only use
+information supported by the cited prompts. The reader decides whether to try anything.

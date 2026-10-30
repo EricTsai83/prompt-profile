@@ -507,6 +507,25 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
             },
             "type": "array",
           },
+          "experiment": {
+            "additionalProperties": false,
+            "properties": {
+              "observe": {
+                "type": "string",
+              },
+              "when": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "when",
+              "observe",
+            ],
+            "type": [
+              "object",
+              "null",
+            ],
+          },
           "impact": {
             "type": "string",
           },
@@ -542,6 +561,7 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
           "impact",
           "suggestion",
           "evidence",
+          "experiment",
           "rewrite",
         ],
         "type": "object",
@@ -1108,6 +1128,25 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
       "items": {
         "additionalProperties": false,
         "properties": {
+          "experiment": {
+            "additionalProperties": false,
+            "properties": {
+              "observe": {
+                "type": "string",
+              },
+              "when": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "when",
+              "observe",
+            ],
+            "type": [
+              "object",
+              "null",
+            ],
+          },
           "impact": {
             "type": "string",
           },
@@ -1126,6 +1165,7 @@ exports[`LLM schemas > LlmTranslation produces a subset-compliant JSON Schema 1`
           "pattern",
           "impact",
           "suggestion",
+          "experiment",
         ],
         "type": "object",
       },

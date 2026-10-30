@@ -176,7 +176,9 @@ export const verifyImprovements = (
       i.rewrite !== null && evidence.some((e) => e.promptId === i.rewrite!.promptId)
         ? i.rewrite
         : null
-    return [{ ...i, evidence, rewrite }]
+    const experiment =
+      i.experiment?.when.trim() && i.experiment.observe.trim() ? i.experiment : null
+    return [{ ...i, evidence, rewrite, ...(i.experiment !== undefined ? { experiment } : {}) }]
   })
 
 /** Empty or partially rejected support cannot leave a generated dimension assertion. */

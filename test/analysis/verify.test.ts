@@ -286,3 +286,40 @@ describe("improvements", () => {
     expect(counts).toEqual({ kept: 1, dropped: 3 })
   })
 })
+
+describe("optional collaboration experiments", () => {
+  const make = (when: string, observe: string, quote = "拆成小步驟") => ({
+    title: "One checkpoint",
+    pattern: "Requested steps",
+    impact: "One reported correction",
+    suggestion: "Ask for one checkpoint",
+    experiment: { when, observe },
+    evidence: [{ promptId: "p1", quote }],
+    rewrite: null,
+  })
+  it("allows no experiments and rejects removed or contradictory quotation support", () => {
+    expect(verifyImprovements([], texts, { kept: 0, dropped: 0 })).toEqual([])
+    const counts = { kept: 0, dropped: 0 }
+    expect(
+      verifyImprovements([make("Next task", "Inspect the checkpoint", "invented")], texts, counts),
+    ).toEqual([])
+    expect(counts.dropped).toBe(1)
+    expect(
+      verifyImprovements([make("Next task", "Inspect the checkpoint")], new Map(), {
+        kept: 0,
+        dropped: 0,
+      }),
+    ).toEqual([])
+  })
+  it("retains exact bilingual quotes and removes incomplete experiment detail", () => {
+    const valid = verifyImprovements([make("Next task", "Inspect the checkpoint")], texts, {
+      kept: 0,
+      dropped: 0,
+    })
+    expect(valid[0]?.evidence[0]?.quote).toBe("拆成小步驟")
+    expect(valid[0]?.experiment?.observe).toBe("Inspect the checkpoint")
+    expect(
+      verifyImprovements([make(" ", "Inspect")], texts, { kept: 0, dropped: 0 })[0]?.experiment,
+    ).toBeNull()
+  })
+})

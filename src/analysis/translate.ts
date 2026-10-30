@@ -49,11 +49,12 @@ export const translationInput = (p: Profile): TranslationType => ({
   dimensions: p.dimensions.map(({ key, title, summary }) => ({ key, title, summary })),
   traits: p.traits.map(({ name, description }) => ({ name, description })),
   funFacts: p.funFacts,
-  improvements: p.improvements.map(({ title, pattern, impact, suggestion }) => ({
+  improvements: p.improvements.map(({ title, pattern, impact, suggestion, experiment }) => ({
     title,
     pattern,
     impact,
     suggestion,
+    experiment: experiment ?? null,
   })),
   episodes: p.episodes.map(({ task }) => ({ task })),
   patterns: p.patterns.map(({ claim }) => ({ claim })),

@@ -74,7 +74,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "21",
+    "analysisVersion": "22",
     "effort": null,
     "model": "fake-model",
     "modelSource": "reported",
@@ -123,6 +123,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
           "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
         },
       ],
+      "experiment": null,
       "impact": "i",
       "pattern": "p",
       "rewrite": {
@@ -140,7 +141,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "patterns": [],
   "portrait": null,
   "previous": null,
-  "schemaVersion": 16,
+  "schemaVersion": 17,
   "stats": {
     "activeDays": 0,
     "activity": {

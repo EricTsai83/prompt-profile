@@ -38,3 +38,5 @@ An optional suggestion stays optional; do not translate it into a demonstrated b
 Translate `collaboration` move names, descriptions, attributed benefit/cost claims and signal
 observations/contexts, preserving array order, null effects and null collaboration. Do not add
 an effect, strengthen a requested practice into an achievement, or translate source evidence.
+
+Translate experiment.when and experiment.observe alongside the suggestion; preserve null absence. Do not translate rewrites or source quotes. Keep proposed observations distinct from observed results.

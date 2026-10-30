@@ -21,10 +21,10 @@ import { Usage } from "./Usage.ts"
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
  * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
  * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
- * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. Versions 2–15
+ * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. 17: optional collaboration experiments. Versions 2–16
  * are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 16 as const
+export const PROFILE_SCHEMA_VERSION = 17 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -135,6 +135,9 @@ export const Trait = Schema.Struct({
 })
 export type Trait = typeof Trait.Type
 
+/** Optional experiment detail; the parent supplies the action and verified evidence. */
+export const Experiment = Schema.Struct({ when: Schema.String, observe: Schema.String })
+
 /** A way the prompts could improve, with verified evidence and one suggested rewrite. */
 export const Improvement = Schema.Struct({
   title: Schema.String,
@@ -143,6 +146,7 @@ export const Improvement = Schema.Struct({
   /** What it visibly costs in the prompts, e.g. follow-up corrections (one sentence). */
   impact: Schema.String,
   suggestion: Schema.String,
+  experiment: Schema.optionalKey(Schema.NullOr(Experiment)),
   evidence: Schema.Array(Evidence),
   /**
    * `promptId` is one of `evidence` (its quote is the "before"); `after` is the suggested
@@ -195,6 +199,7 @@ const ImprovementText = Schema.Struct({
   pattern: Schema.String,
   impact: Schema.String,
   suggestion: Schema.String,
+  experiment: Schema.optionalKey(Schema.NullOr(Experiment)),
 })
 
 /** What the translation call returns: every field required (LLM strict-schema subset). */
@@ -210,7 +215,14 @@ export const LlmTranslation = Schema.Struct({
   ),
   traits: Schema.Array(Schema.Struct({ name: Schema.String, description: Schema.String })),
   funFacts: Schema.Array(Schema.String),
-  improvements: Schema.Array(ImprovementText),
+  improvements: Schema.Array(
+    Schema.Struct({
+      ...ImprovementText.fields,
+      experiment: Schema.NullOr(Experiment).pipe(
+        Schema.withDecodingDefaultKey(Effect.succeed(null)),
+      ),
+    }),
+  ),
   episodes: Schema.Array(Schema.Struct({ task: Schema.String })),
   patterns: Schema.Array(Schema.Struct({ claim: Schema.String })),
 })
@@ -310,6 +322,9 @@ export const matchesBase = (
       ))) &&
   t.traits.length === base.traits.length &&
   t.improvements.length === base.improvements.length &&
+  base.improvements.every(
+    (x, i) => Boolean(x.experiment) === Boolean(t.improvements[i]?.experiment),
+  ) &&
   t.episodes.length === base.episodes.length &&
   t.patterns.length === base.patterns.length &&
   t.funFacts.length === base.funFacts.length &&
@@ -352,7 +367,7 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
