@@ -116,6 +116,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
 | 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
 | 31 | [Context and project retrospectives](31-context-and-project-retrospectives.md) | Bounded project/context selection and retrospectives | Plan 20 B/C; history comparison also requires plan 20 A/E | Planned; evidence foundation first |
+| 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | Planned; source review complete |
 
 ## Shared rules for every plan
 
@@ -145,6 +146,8 @@ and plan 22 remains the experiment tooling owner.
    retrospectives). Comparable-window history is implemented; scoped selection remains future work.
 3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
    from the completed fictional collaboration calibration. Owner use can refine priorities.
+4. **Explain each execution:** plan 33 extends the command lifecycle and run accounting using
+   reviewed Deepsec patterns. Deliver summaries and recovery before the optional cost threshold.
 
 ### Ownership at shared boundaries
 
