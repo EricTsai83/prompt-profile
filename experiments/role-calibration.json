@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "personas": ["contextual-collaborator"],
+  "repeats": 2,
+  "baseline": "claude-default",
+  "shared": {
+    "languages": ["en", "zh-TW"],
+    "full": true,
+    "looks": ["classic"]
+  },
+  "variants": [
+    {
+      "id": "claude-default",
+      "engine": "claude",
+      "model": null
+    }
+  ]
+}

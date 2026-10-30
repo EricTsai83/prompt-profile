@@ -1,0 +1,19 @@
+{
+  "timezone": "Europe/Berlin",
+  "sessions": [
+    {
+      "start": "2026-08-03T08:00:00Z",
+      "project": "/home/dev/fictional-controls",
+      "prompts": [
+        "Keep transaction isolation explicit; show the concurrent-write test before changing the lock boundary."
+      ]
+    },
+    {
+      "start": "2026-08-04T08:00:00Z",
+      "project": "/home/dev/fictional-controls",
+      "prompts": [
+        "The previous schema applies. Check null and empty input; if isolation cannot be verified, state that uncertainty."
+      ]
+    }
+  ]
+}

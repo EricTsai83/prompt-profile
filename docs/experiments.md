@@ -24,7 +24,7 @@ pnpm eval:compare --from eval-output/comparisons/<experiment-id> --looks classic
 ```
 
 The starter compares the Claude Code and Codex defaults on one persona, with two repetitions and
-English plus Traditional Chinese: 4 cases, at least 20 calls.
+English plus Traditional Chinese: 4 cases, at least 24 calls.
 
 ## Configuration
 
@@ -169,3 +169,9 @@ evidence for a future default-model decision.
 
 A frozen snapshot of your own local history, as an experiment input, is planned (plan 22,
 §2). Until then, experiments use only the fictional personas.
+
+Role calibration uses `experiments/role-calibration.json`: two repetitions of one fictional
+contextual collaborator, one engine, both languages, eight expected calls. See the
+[authored rubric and measured limitations](ux/model-comparison/collaboration-roles.md).
+The additional `heavy-questions` and `sparse-boundaries` personas check that usage and prompt
+length do not become expertise judgments; their semantic expectations require manual review.

@@ -34,6 +34,13 @@ export const scoreProfile = (
     ...profile.traits.flatMap((t) => [t.name, t.description]),
     ...profile.dimensions.flatMap((d) => [d.title, d.summary]),
     ...profile.funFacts,
+    ...(profile.collaboration?.signals.flatMap((s) => [s.observation, s.context]) ?? []),
+    ...(profile.collaboration?.moves.flatMap((m) => [
+      m.name,
+      m.description,
+      m.benefit?.claim ?? "",
+      m.cost?.claim ?? "",
+    ]) ?? []),
     ...(profile.portrait
       ? [
           profile.portrait.introduction,
@@ -88,6 +95,23 @@ export const scoreProfile = (
               path: `improvements[${i}]`,
               evidence: item.evidence,
             })),
+            ...(profile.collaboration?.signals.map((s, i) => ({
+              path: `collaboration.signals[${i}]`,
+              evidence: s.evidence,
+            })) ?? []),
+            ...(profile.collaboration?.moves.flatMap((m, i) => [
+              {
+                path: `collaboration.moves[${i}]`,
+                evidence: profile.episodes
+                  .filter((e) => m.episodeIds.includes(e.id))
+                  .flatMap((e) => e.turns.map(({ promptId, quote }) => ({ promptId, quote }))),
+              },
+              ...(["benefit", "cost"] as const).flatMap((key) =>
+                m[key]
+                  ? [{ path: `collaboration.moves[${i}].${key}`, evidence: m[key]!.evidence }]
+                  : [],
+              ),
+            ]) ?? []),
             ...(profile.portrait
               ? [
                   { path: "portrait.introduction", evidence: [] },

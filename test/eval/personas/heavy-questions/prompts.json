@@ -1,0 +1,29 @@
+{
+  "timezone": "Europe/Berlin",
+  "sessions": [
+    {
+      "start": "2026-08-03T08:00:00Z",
+      "project": "/home/dev/fictional-controls",
+      "prompts": [
+        "What does this error mean?",
+        "What is a transaction?",
+        "What is a rollback?",
+        "What does this index do?",
+        "What is a worktree?",
+        "What does this error mean?"
+      ]
+    },
+    {
+      "start": "2026-08-04T08:00:00Z",
+      "project": "/home/dev/fictional-controls",
+      "prompts": [
+        "What is a mutex?",
+        "What does this warning mean?",
+        "What is a race condition?",
+        "Can you explain that again?",
+        "What does this error mean?",
+        "What is a lock?"
+      ]
+    }
+  ]
+}

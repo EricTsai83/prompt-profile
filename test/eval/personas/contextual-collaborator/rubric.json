@@ -1,0 +1,8 @@
+{
+  "requiredConcepts": [],
+  "forbiddenPatterns": ["personality score", "percentile", "proven expertise"],
+  "minTraits": 0,
+  "minEvidenceRetention": 0.8,
+  "maxEmptyDimensions": 5,
+  "minImprovements": 0
+}
