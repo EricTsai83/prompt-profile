@@ -1279,3 +1279,26 @@ export const AVATAR_MESSAGES = {
     },
   },
 } as const
+
+/** Optional experiments are proposals, never observed outcomes. */
+export const EXPERIMENT_MESSAGES = {
+  en: {
+    when: "When to try",
+    observe: "What to observe next time",
+    action: "One action to try",
+    note: "Optional experiment. Its effect is untested; later metric changes do not prove it worked.",
+    alternatives: "Other optional suggestions",
+    copy: "Suggested prompt: focus this text, select all and copy (Ctrl/Cmd+A, Ctrl/Cmd+C). Works offline; review before use.",
+    absent:
+      "No supported experiment is offered. Clear prompts and limited evidence do not require a shortcoming.",
+  },
+  "zh-TW": {
+    when: "何時嘗試",
+    observe: "下次可以觀察什麼",
+    action: "可以嘗試的一個動作",
+    note: "這是可選的小實驗，效果尚未驗證；後續指標變化不能證明它有效。",
+    alternatives: "其他可選建議",
+    copy: "建議提示文字：移到文字框後，全選並複製（Ctrl/Cmd+A、Ctrl/Cmd+C）。離線也可使用，使用前請先檢查。",
+    absent: "目前沒有證據足夠的實驗建議。提示已經清楚或證據有限時，不必勉強找出缺點。",
+  },
+} as const

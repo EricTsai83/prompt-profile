@@ -1,3 +1,4 @@
+import { EXPERIMENT_MESSAGES } from "./messages.ts"
 import { avatarFor, avatarPortrait, avatarStyle } from "./avatar.ts"
 import { AVATAR_MESSAGES } from "./messages.ts"
 import { historySection, historyStyle } from "./history.ts"
@@ -288,7 +289,16 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
     <header><span class="improve-n">${i + 1}</span><h3>${loc.text((_m, c, l) => scrub(c.improvement(i).title, l))}</h3></header>
     <p class="improve-pattern">${loc.text((_m, c, l) => scrub(c.improvement(i).pattern, l))}</p>
     <p class="improve-impact">${loc.text((_m, c, l) => scrub(c.improvement(i).impact, l))}</p>
+    ${
+      imp.experiment
+        ? html`<p class="note">${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].note)}</p>
+    <h4>${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].when)}</h4>
+    <p>${loc.text((_m, c, l) => scrub((c.improvement(i).experiment ?? imp.experiment)!.when, l))}</p>
+    <h4>${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].action)}</h4>`
+        : ""
+    }
     <p class="improve-tip">${loc.text((_m, c, l) => scrub(c.improvement(i).suggestion, l))}</p>
+    ${imp.experiment ? html`<h4>${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].observe)}</h4><p>${loc.text((_m, c, l) => scrub((c.improvement(i).experiment ?? imp.experiment)!.observe, l))}</p>` : ""}
     ${
       before && imp.rewrite
         ? html`<div class="rewrite">
@@ -298,7 +308,9 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
             </div>
             <div>
               <span class="rw-label">${loc.text((m) => m.after)}</span>
-              <p class="rw-after" title="${loc.attr((m) => m.suggested)}">${makeVerbatim(loc, v, scrub)(imp.rewrite.after)}</p>
+              <p class="experiment-print-copy">${makeVerbatim(loc, v, scrub)(imp.rewrite.after)}</p>
+              <label class="experiment-copy-help" for="experiment-copy-${i}">${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].copy)}</label>
+              <textarea id="experiment-copy-${i}" class="rw-after" title="${loc.attr((m) => m.suggested)}" readonly rows="4" style="width:100%;font:inherit">${loc.attr((_m, _c, l) => scrub(imp.rewrite!.after, l))}</textarea>
             </div>
           </div>`
         : ""
@@ -690,7 +702,10 @@ export const renderHtml = (
         <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
-        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
+        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
+.experiment-print-copy{display:none}
+@media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
+</style>
       </head>
       <body>
         <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
@@ -1046,7 +1061,7 @@ export const renderHtml = (
           }
 
           ${
-            coaching && (profile.improvements.length > 0 || signals !== null || progress !== null)
+            coaching
               ? html`<section class="coaching">
                   <div class="section-head">
                     ${defined(
@@ -1058,7 +1073,8 @@ export const renderHtml = (
                     )}
                   </div>
                   <div class="improves">
-                    ${profile.improvements.map((_x, i) => improvementCard(profile, i, loc, v, scrub))}
+                    ${profile.improvements.length ? improvementCard(profile, 0, loc, v, scrub) : html`<p>${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].absent)}</p>`}
+                    ${profile.improvements.length > 1 ? html`<details class="experiment-alternatives"><summary>${loc.text((_m, _c, l) => EXPERIMENT_MESSAGES[l].alternatives)}</summary>${profile.improvements.slice(1).map((_x, i) => improvementCard(profile, i + 1, loc, v, scrub))}</details>` : ""}
                   </div>
                   ${
                     signals

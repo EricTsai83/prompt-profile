@@ -59,7 +59,7 @@ describe("prompt coaching", () => {
       const p = yield* sample()
       const out = renderHtml(p)
       expect(out).toContain(p.translations["zh-TW"]!.improvements[0]!.title)
-      expect(out.split(p.improvements[0]!.rewrite!.after).length - 1).toBe(1)
+      expect(out.split(p.improvements[0]!.rewrite!.after).length - 1).toBe(2)
     }),
   )
 

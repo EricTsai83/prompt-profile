@@ -13,6 +13,7 @@ export interface Content {
     readonly title: string
     readonly pattern: string
     readonly impact: string
+    readonly experiment?: { readonly when: string; readonly observe: string } | null
     readonly suggestion: string
   }
 }

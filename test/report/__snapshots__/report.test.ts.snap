@@ -529,6 +529,9 @@ html:root .about{margin-top:4mm;font-size:8.5pt;line-height:1.45;padding:3mm 0}
 html:root .tip::after,html:root .tip::before{display:none!important}
 html:root .tech-time{overflow:visible;font-size:8pt}
 }
+
+.experiment-print-copy{display:none}
+@media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
 </style>
       </head>
       <body>
@@ -3536,7 +3539,9 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     <header><span class="improve-n">1</span><h3><span data-l="en" lang="en">State the expected result first</span><span data-l="zh-TW" lang="zh-Hant-TW">先講預期結果</span></h3></header>
     <p class="improve-pattern"><span data-l="en" lang="en">You often describe the change and add the real requirement only after the first answer.</span><span data-l="zh-TW" lang="zh-Hant-TW">你常先描述要改什麼，等第一次回答後才補上真正的要求。</span></p>
     <p class="improve-impact"><span data-l="en" lang="en">Several follow-ups in this sample start with a correction such as “no, keep the old API”.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份樣本裡有幾個追問是以糾正開頭，例如「不對，保留舊的 API」。</span></p>
+
     <p class="improve-tip"><span data-l="en" lang="en">Put the expected result and the constraints in the first prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">在第一個 prompt 就寫出預期結果和限制。</span></p>
+
     <div class="rewrite">
             <div>
               <span class="rw-label"><span data-l="en" lang="en">You wrote</span><span data-l="zh-TW" lang="zh-Hant-TW">你寫的</span></span>
@@ -3544,15 +3549,20 @@ html:root .tech-time{overflow:visible;font-size:8pt}
             </div>
             <div>
               <span class="rw-label"><span data-l="en" lang="en">Try</span><span data-l="zh-TW" lang="zh-Hant-TW">可以試試</span></span>
-              <p class="rw-after" title="Suggested rewrite">Plan only, no code yet: break the change into small steps, list the risks of each, and keep the public API unchanged.</p>
+              <p class="experiment-print-copy">Plan only, no code yet: break the change into small steps, list the risks of each, and keep the public API unchanged.</p>
+              <label class="experiment-copy-help" for="experiment-copy-0"><span data-l="en" lang="en">Suggested prompt: focus this text, select all and copy (Ctrl/Cmd+A, Ctrl/Cmd+C). Works offline; review before use.</span><span data-l="zh-TW" lang="zh-Hant-TW">建議提示文字：移到文字框後，全選並複製（Ctrl/Cmd+A、Ctrl/Cmd+C）。離線也可使用，使用前請先檢查。</span></label>
+              <textarea id="experiment-copy-0" class="rw-after" title="Suggested rewrite" readonly rows="4" style="width:100%;font:inherit">Plan only, no code yet: break the change into small steps, list the risks of each, and keep the public API unchanged.</textarea>
             </div>
           </div>
 
-  </article><article class="improve">
+  </article>
+                    <details class="experiment-alternatives"><summary><span data-l="en" lang="en">Other optional suggestions</span><span data-l="zh-TW" lang="zh-Hant-TW">其他可選建議</span></summary><article class="improve">
     <header><span class="improve-n">2</span><h3><span data-l="en" lang="en">Name the file and the error</span><span data-l="zh-TW" lang="zh-Hant-TW">指出檔案和錯誤訊息</span></h3></header>
     <p class="improve-pattern"><span data-l="en" lang="en">Debugging prompts rarely say which file or which error message.</span><span data-l="zh-TW" lang="zh-Hant-TW">除錯的 prompt 很少說是哪個檔案、哪個錯誤。</span></p>
     <p class="improve-impact"><span data-l="en" lang="en">The AI has to ask or guess before it can help.</span><span data-l="zh-TW" lang="zh-Hant-TW">AI 必須先問或先猜，才能幫上忙。</span></p>
+
     <p class="improve-tip"><span data-l="en" lang="en">Paste the error line and name the file and function in the same prompt.</span><span data-l="zh-TW" lang="zh-Hant-TW">同一個 prompt 裡貼上錯誤那一行，並寫出檔案和函式名稱。</span></p>
+
 
     <details open>
             <summary><span data-l="en" lang="en">1 quote as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">1 段引文佐證</span></summary>
@@ -3560,7 +3570,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     <li><blockquote>&lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</blockquote></li>
   </ul>
           </details>
-  </article>
+  </article></details>
                   </div>
                   <h3 class="sub-h"><span data-l="en" lang="en">Signals worth a look</span><span data-l="zh-TW" lang="zh-Hant-TW">值得注意的訊號</span></h3>
                           <ul class="signals">
