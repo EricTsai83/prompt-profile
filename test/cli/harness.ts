@@ -1,7 +1,7 @@
 import { NodeServices } from "@effect/platform-node"
 import { Effect, Exit as EffectExit, Layer, Option, Queue, Terminal, type Cause } from "effect"
 import { TestClock, TestConsole } from "effect/testing"
-import { mkdtempSync } from "node:fs"
+import { mkdtempSync, readFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { runCli } from "../../src/cli/main.ts"
@@ -179,4 +179,18 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     }).pipe(Effect.provide(layer))
 
   return { root, run, fakes, opened, environment }
+}
+
+/** Analysis artifacts live in the latest completed run; standalone renders keep their folder. */
+export const reportPath = (root: string, name: string): string => {
+  try {
+    const index = JSON.parse(readFileSync(join(root, "library.json"), "utf8")) as {
+      latest?: string
+    }
+    if (index.latest && /^[a-zA-Z0-9-]+$/u.test(index.latest))
+      return join(root, "reports", index.latest, name)
+  } catch {
+    /* No library for a standalone output or a blocked run. */
+  }
+  return join(root, name)
 }

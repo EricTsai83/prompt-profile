@@ -1,3 +1,4 @@
+import { AVATAR_CHOICES, type AvatarChoice } from "../report/avatar.ts"
 import { DateTime, Effect } from "effect"
 import { LANGUAGES, type Language } from "../domain/Profile.ts"
 import {
@@ -58,8 +59,11 @@ export const parseRenderOptions = (
   cardHide: string | undefined,
   exclude?: string | undefined,
   name?: string | undefined,
+  avatar?: string | undefined,
 ): Effect.Effect<RenderOptions, InvalidArgument> =>
   Effect.gen(function* () {
+    if (avatar !== undefined && !(AVATAR_CHOICES as ReadonlyArray<string>).includes(avatar))
+      return yield* new InvalidArgument({ flag: "--avatar", value: avatar })
     const list = (value: string | undefined) =>
       value === undefined ? [] : value.split(",").map((p) => p.trim())
     const hide = list(cardHide)
@@ -78,6 +82,7 @@ export const parseRenderOptions = (
       return yield* new InvalidArgument({ flag: "--name", value: name! })
     return {
       look,
+      avatar: (avatar ?? "auto") as AvatarChoice,
       cardHide: hide,
       exclude: REPORT_PARTS.filter((p) => parts.includes(p)),
       name: trimmed === "" ? null : trimmed,
@@ -128,6 +133,7 @@ export interface RunFlags {
   readonly yes: boolean
   readonly maxCalls?: string | undefined
   readonly lang?: string | undefined
+  readonly avatar?: AvatarChoice | undefined
   readonly look?: LookId | undefined
   readonly cardHide?: string | undefined
   readonly exclude?: string | undefined
@@ -168,6 +174,7 @@ export const rerunCommand = (f: RunFlags): string =>
     ...(f.full ? ["--full"] : []),
     ...flag("--lang", f.lang),
     ...flag("--look", f.look, "classic"),
+    ...flag("--avatar", f.avatar, "auto"),
     ...flag("--card-hide", f.cardHide),
     ...flag("--exclude", f.exclude),
     ...flag("--name", f.name),
@@ -184,6 +191,7 @@ export const rerunCommand = (f: RunFlags): string =>
 export const renderRetryCommand = (profileJson: string, outDir: string, f: RunFlags): string => {
   const options = [
     ...flag("--look", f.look, "classic"),
+    ...flag("--avatar", f.avatar, "auto"),
     ...flag("--card-hide", f.cardHide),
     ...flag("--exclude", f.exclude),
     ...flag("--name", f.name),

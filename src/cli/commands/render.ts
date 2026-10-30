@@ -1,3 +1,6 @@
+import type { AvatarChoice } from "../../report/avatar.ts"
+import { archivedSource, protectsAnalysisDirectory } from "../../platform/library.ts"
+import { libraryIo } from "../library.ts"
 import { Effect, FileSystem, Path } from "effect"
 import type { CheckMode } from "../../pipeline/audit.ts"
 import { decodeProfile } from "../../domain/Profile.ts"
@@ -17,6 +20,7 @@ import { resolveOut, writeReportFiles } from "../steps.ts"
 export const runRender = (options: {
   readonly file: string
   readonly out: string | undefined
+  readonly avatar?: AvatarChoice | undefined
   readonly look: LookId
   readonly cardHide: string | undefined
   readonly exclude?: string | undefined
@@ -30,6 +34,7 @@ export const runRender = (options: {
       options.cardHide,
       options.exclude,
       options.name,
+      options.avatar,
     )
     const allow = yield* parseAllow(options.allow)
     const fs = yield* FileSystem.FileSystem
@@ -45,16 +50,37 @@ export const runRender = (options: {
       catch: () => new FileError({ path: input, detail: "not valid JSON" }),
     })
     const profile = yield* decodeProfile(json)
+    const archive = yield* libraryIo(input, () => archivedSource(input))
     const outDir = options.out
       ? yield* resolveOut(options.out)
-      : isDefaultRender(renderOptions)
-        ? path.dirname(input)
-        : path.join(path.dirname(input), "variants", variantName(renderOptions))
-    const source = path.relative(outDir, input)
-    const files = yield* writeReportFiles(profile, outDir, renderOptions, source, {
-      mode: options.check ?? "mask",
-      allow,
-    })
+      : archive
+        ? path.join(path.dirname(archive), "variants", variantName(renderOptions))
+        : isDefaultRender(renderOptions)
+          ? path.dirname(input)
+          : path.join(path.dirname(input), "variants", variantName(renderOptions))
+    if (yield* libraryIo(outDir, () => protectsAnalysisDirectory(outDir)))
+      return yield* new FileError({
+        path: outDir,
+        detail:
+          "Archived analysis is immutable. Omit --out for a render variant or choose an external output folder.",
+      })
+    const source = path.relative(outDir, archive ?? input)
+    const libraryHref =
+      archive && outDir.startsWith(`${path.dirname(archive)}${path.sep}`)
+        ? path
+            .relative(outDir, path.resolve(path.dirname(archive), "../..", "index.html"))
+            .replaceAll("\\", "/")
+        : undefined
+    const files = yield* writeReportFiles(
+      profile,
+      outDir,
+      { ...renderOptions, ...(libraryHref ? { libraryHref } : {}) },
+      source,
+      {
+        mode: options.check ?? "mask",
+        allow,
+      },
+    )
     const t = messages
     yield* out.line(t.rendered(files.html))
     yield* out.line(t.renderedNoAnalysis)

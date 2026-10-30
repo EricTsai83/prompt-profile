@@ -131,8 +131,8 @@ const RENDERERS: Renderers = {
           : e.reason === "input-too-large"
             ? "The observations are still too large after merging. No final profile call was sent and no report was written. Try a shorter --since range; completed chunks stay cached."
             : e.reason === "merge-failed"
-              ? `An intermediate merge of the observations failed. No report was written. Chunk results and finished merges are cached; a re-run repeats the unfinished merges, then the final profile and translation calls.\n${t.rerun(rerun)}`
-              : `The final profile step failed. No report was written. Chunk results (and any merges) are cached, so a re-run repeats only the final profile and translation calls.\n${t.rerun(rerun)}`,
+              ? `An intermediate merge of the observations failed. No report was written. Chunk results and finished merges are cached; a re-run repeats the unfinished merges, then the final profile and translation calls (including evidence review).\n${t.rerun(rerun)}`
+              : `The final profile step failed. No report was written. Chunk results (and any merges) are cached, so a re-run repeats only the final profile and translation calls (including evidence review).\n${t.rerun(rerun)}`,
   }),
   NeedsConfirmation: () => ({
     code: EXIT.usage,

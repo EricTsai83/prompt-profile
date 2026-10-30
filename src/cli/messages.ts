@@ -79,6 +79,11 @@ export const messages = {
   translationFailed: (language: string) =>
     `⚠ Translation into ${language} failed; the report is written without it`,
   writing: "● Writing report files…",
+  historySkipped: (reasons: string) =>
+    `  Historical change comparison omitted: ${reasons}. Completed reports are still retained.`,
+  libraryLine: (file: string) => `  Library ${file}`,
+  historyRepaired: (runs: number, skipped: number, file: string) =>
+    `Library rebuilt: ${runs} completed reports, ${skipped} unreadable entries skipped. ${file}`,
   done: "✔ Done!",
   reportLine: (p: string, opened: boolean) =>
     `  Report ${p}${opened ? " (opened in your browser)" : ""}`,

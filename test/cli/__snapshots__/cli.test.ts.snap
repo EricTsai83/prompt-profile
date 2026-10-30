@@ -28,13 +28,14 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 ● Writing report files…
 
 ✔ Done!
-  Report <tmp>/out/report.html
-  Card   <tmp>/out/card.png
-  Data   <tmp>/out/profile.json
+  Report <tmp>/out/reports/<run>/report.html
+  Card   <tmp>/out/reports/<run>/card.png
+  Data   <tmp>/out/reports/<run>/profile.json
+  Library <tmp>/out/index.html
   Contains  8 quotes · 4 project names · exact dates · 1 improvement · 3 fun facts · plans, usage and API list-price equivalent
   Check  no secrets or personal data found
   Before sharing, skim the quotes yourself: the check is rule-based.
-  To leave parts out: prompt-profile render <tmp>/out/profile.json --exclude personal"
+  To leave parts out: prompt-profile render <tmp>/out/reports/<run>/profile.json --exclude personal"
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `

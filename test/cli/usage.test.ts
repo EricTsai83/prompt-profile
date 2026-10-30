@@ -5,7 +5,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import type { RunnerStatus } from "../../src/llm/detect.ts"
 import { fakeCodexAuth, FAKE_SECRETS } from "../adapters/credentials.ts"
-import { fixture, makeHarness, ok } from "./harness.ts"
+import { fixture, makeHarness, ok, reportPath } from "./harness.ts"
 
 /** The prompt fixtures plus the usage fixtures and fake credentials, in temporary homes. */
 const homes = () => {
@@ -50,8 +50,8 @@ describe("usage, plan and API list-price equivalent (plan 23)", () => {
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--out", out, "--since", "all", ...args])
       expect(r.code).toBe(0)
-      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
-      return { r, out, cache, profile, html: readFileSync(join(out, "report.html"), "utf8") }
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
+      return { r, out, cache, profile, html: readFileSync(reportPath(out, "report.html"), "utf8") }
     })
 
   it.effect("profile.json carries usage per source, priced, with the detected plans", () =>

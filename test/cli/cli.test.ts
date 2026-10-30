@@ -5,12 +5,13 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from "node:path"
 import { NotLoggedIn, RateLimited } from "../../src/llm/LlmRunner.ts"
 import { VERSION } from "../../src/version.ts"
-import { fixture, makeHarness, ok } from "./harness.ts"
+import { fixture, makeHarness, ok, reportPath } from "./harness.ts"
 
 // The version changes on every release; snapshots must not
 const scrub = (s: string, root: string) =>
   s
     .replaceAll(root, "<tmp>")
+    .replace(/\d{8}T\d{6}Z-[a-f0-9]{32}/gu, "<run>")
     .replaceAll(fixture(""), "<fixtures>/")
     .replaceAll(`v${VERSION}`, "v<version>")
 
@@ -30,11 +31,11 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const r = yield* h.run(["--yes", "--out", out, "--since", "all"])
       expect(r.code).toBe(0)
       for (const f of ["report.html", "card.png", "profile.json"])
-        expect(existsSync(join(out, f))).toBe(true)
+        expect(existsSync(reportPath(out, f))).toBe(true)
       expect(scrub(r.stdout, h.root)).toMatchSnapshot("stdout")
       // non-TTY: do not open a browser
       expect(h.opened).toEqual([])
-      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
       expect(profile.engine.runner).toBe("claude-code")
     }),
   )
@@ -56,9 +57,9 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const r = yield* h.run(["--yes", "--engine", "codex", "--out", out, "--since", "all"])
       expect(r.code).toBe(0)
       expect(r.stdout).toContain("your logged-in Codex CLI")
-      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
       expect(profile.engine.runner).toBe("codex")
-      expect(existsSync(join(out, "card.png"))).toBe(true)
+      expect(existsSync(reportPath(out, "card.png"))).toBe(true)
     }),
   )
 
@@ -126,11 +127,11 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("render re-creates the report; unknown schemaVersion is a clear error", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const good = join(h.root, "profile.json")
+      const good = reportPath(h.root, "profile.json")
       writeFileSync(good, readFileSync(fixture("profile.sample.json")))
       const r1 = yield* h.run(["render", good])
       expect(r1.code).toBe(0)
-      expect(existsSync(join(h.root, "report.html"))).toBe(true)
+      expect(existsSync(reportPath(h.root, "report.html"))).toBe(true)
 
       const bad = join(h.root, "future.json")
       writeFileSync(
@@ -156,25 +157,27 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("render --look writes a new variant folder and keeps the original report", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const profile = join(h.root, "profile.json")
+      const profile = reportPath(h.root, "profile.json")
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       expect((yield* h.run(["render", profile])).code).toBe(0)
-      const original = readFileSync(join(h.root, "report.html"), "utf8")
-      const originalCard = readFileSync(join(h.root, "card.png"))
+      const original = readFileSync(reportPath(h.root, "report.html"), "utf8")
+      const originalCard = readFileSync(reportPath(h.root, "card.png"))
 
       const r = yield* h.run(["render", profile, "--look", "signal", "--card-hide", "stats"])
       expect(r.code).toBe(0)
       expect(r.stdout).toContain("No new analysis, no LLM calls")
       const variant = join(h.root, "variants", "signal-no-stats")
-      expect(readFileSync(join(variant, "report.html"), "utf8")).toContain('data-look="signal"')
-      expect(existsSync(join(variant, "card.png"))).toBe(true)
-      expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
+      expect(readFileSync(reportPath(variant, "report.html"), "utf8")).toContain(
+        'data-look="signal"',
+      )
+      expect(existsSync(reportPath(variant, "card.png"))).toBe(true)
+      expect(JSON.parse(readFileSync(reportPath(variant, "render.json"), "utf8"))).toMatchObject({
         look: "signal",
         cardHidden: ["stats"],
         source: "../../profile.json",
       })
-      expect(readFileSync(join(h.root, "report.html"), "utf8")).toBe(original)
-      expect(readFileSync(join(h.root, "card.png"))).toEqual(originalCard)
+      expect(readFileSync(reportPath(h.root, "report.html"), "utf8")).toBe(original)
+      expect(readFileSync(reportPath(h.root, "card.png"))).toEqual(originalCard)
       expect(h.fakes.length).toBe(0)
     }),
   )
@@ -182,16 +185,16 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("render --exclude writes a variant without those parts and records them", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const profile = join(h.root, "profile.json")
+      const profile = reportPath(h.root, "profile.json")
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       const r = yield* h.run(["render", profile, "--exclude", "personal"])
       expect(r.code).toBe(0)
       const variant = join(h.root, "variants", "classic-without-personal")
-      const report = readFileSync(join(variant, "report.html"), "utf8")
+      const report = readFileSync(reportPath(variant, "report.html"), "utf8")
       expect(report).not.toContain("<blockquote")
       expect(report).not.toContain('class="usage"')
       expect(existsSync(join(variant, "share.html"))).toBe(false)
-      expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
+      expect(JSON.parse(readFileSync(reportPath(variant, "render.json"), "utf8"))).toMatchObject({
         renderVersion: 3,
         excluded: ["quotes", "projects", "dates", "coaching", "funfacts", "custom-names", "usage"],
       })
@@ -216,17 +219,17 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
         const h = makeHarness()
         const dir = join(h.root, name)
         mkdirSync(dir)
-        writeFileSync(join(dir, "profile.json"), JSON.stringify(leaky))
-        return { h, dir, profile: join(dir, "profile.json") }
+        writeFileSync(reportPath(dir, "profile.json"), JSON.stringify(leaky))
+        return { h, dir, profile: reportPath(dir, "profile.json") }
       }
 
       const masked = setup("mask")
       const r = yield* masked.h.run(["render", masked.profile])
       expect(r.code).toBe(0)
-      const report = readFileSync(join(masked.dir, "report.html"), "utf8")
+      const report = readFileSync(reportPath(masked.dir, "report.html"), "utf8")
       expect(report).not.toContain(TOKEN)
       expect(report).not.toContain(EMAIL)
-      expect(readFileSync(join(masked.dir, "profile.json"), "utf8")).not.toContain(TOKEN)
+      expect(readFileSync(reportPath(masked.dir, "profile.json"), "utf8")).not.toContain(TOKEN)
       expect(r.stdout).toContain("Check  2 masked")
       expect(r.stdout).toContain("api-token (Fun facts › 1)")
       expect(r.stdout).toContain("email (Traits › 2)")
@@ -236,7 +239,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const strict = setup("strict")
       const rs = yield* strict.h.run(["render", strict.profile, "--check", "strict"])
       expect(rs.code).toBe(1)
-      expect(existsSync(join(strict.dir, "report.html"))).toBe(false)
+      expect(existsSync(reportPath(strict.dir, "report.html"))).toBe(false)
       expect(rs.stderr).toContain("--check strict")
       expect(rs.stderr).toContain("email (Traits › 2)")
       expect(rs.stdout + rs.stderr).not.toContain(EMAIL)
@@ -244,7 +247,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const warn = setup("warn")
       const rw = yield* warn.h.run(["render", warn.profile, "--check", "warn"])
       expect(rw.code).toBe(0)
-      const warned = readFileSync(join(warn.dir, "report.html"), "utf8")
+      const warned = readFileSync(reportPath(warn.dir, "report.html"), "utf8")
       expect(warned).toContain(EMAIL)
       expect(warned).not.toContain(TOKEN)
       expect(rw.stdout).toContain("1 kept (--check warn): email (Traits › 2)")
@@ -252,7 +255,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const allowed = setup("allow")
       const ra = yield* allowed.h.run(["render", allowed.profile, "--allow", "email"])
       expect(ra.code).toBe(0)
-      expect(readFileSync(join(allowed.dir, "report.html"), "utf8")).toContain(EMAIL)
+      expect(readFileSync(reportPath(allowed.dir, "report.html"), "utf8")).toContain(EMAIL)
       const bad = yield* allowed.h.run(["render", allowed.profile, "--allow", "api-token"])
       expect(bad.code).toBe(2)
       expect(bad.stderr).toContain("--allow")
@@ -262,7 +265,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("after writing, lists what the report contains and how to leave parts out", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const profile = join(h.root, "profile.json")
+      const profile = reportPath(h.root, "profile.json")
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       const r = yield* h.run(["render", profile])
       expect(r.stdout).toContain(
@@ -276,7 +279,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("with --exclude personal there is nothing personal to point out", () =>
     Effect.gen(function* () {
       const h2 = makeHarness()
-      const profile2 = join(h2.root, "profile.json")
+      const profile2 = reportPath(h2.root, "profile.json")
       writeFileSync(profile2, readFileSync(fixture("profile.sample.json")))
       const r2 = yield* h2.run(["render", profile2, "--exclude", "personal"])
       expect(r2.stdout).toContain("Contains  no quotes, project names or exact dates")
@@ -288,7 +291,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("the final check reports a clean profile", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const profile = join(h.root, "profile.json")
+      const profile = reportPath(h.root, "profile.json")
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       const r = yield* h.run(["render", profile])
       expect(r.stdout).toContain("Check  no secrets or personal data found")
@@ -298,7 +301,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
   it.effect("render rejects an unknown look or card part", () =>
     Effect.gen(function* () {
       const h = makeHarness()
-      const profile = join(h.root, "profile.json")
+      const profile = reportPath(h.root, "profile.json")
       writeFileSync(profile, readFileSync(fixture("profile.sample.json")))
       expect((yield* h.run(["render", profile, "--look", "neon"])).code).toBe(2)
       const r = yield* h.run(["render", profile, "--card-hide", "stats,quotes"])
@@ -314,8 +317,8 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const out = join(h.root, "studio")
       const r = yield* h.run(["--yes", "--since", "all", "--look", "studio", "--out", out])
       expect(r.code).toBe(0)
-      expect(readFileSync(join(out, "report.html"), "utf8")).toContain('data-look="studio"')
-      expect(existsSync(join(out, "render.json"))).toBe(true)
+      expect(readFileSync(reportPath(out, "report.html"), "utf8")).toContain('data-look="studio"')
+      expect(existsSync(reportPath(out, "render.json"))).toBe(true)
     }),
   )
 
@@ -326,14 +329,14 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const r = yield* h.run(["--yes", "--since", "all", "--lang", "zh-TW,en", "--out", out])
       expect(r.code).toBe(0)
       expect(r.stdout).toContain("Translated into zh-TW")
-      const report = readFileSync(join(out, "report.html"), "utf8")
+      const report = readFileSync(reportPath(out, "report.html"), "utf8")
       expect(report).toMatch(/id="lang-zh-TW"[^>]*checked/)
       expect(report).toContain('id="lang-en"')
       expect(report).toContain("譯 Collaboration Portrait")
-      expect(existsSync(join(out, "card.png"))).toBe(true)
-      expect(existsSync(join(out, "card.en.png"))).toBe(true)
+      expect(existsSync(reportPath(out, "card.png"))).toBe(true)
+      expect(existsSync(reportPath(out, "card.en.png"))).toBe(true)
       expect(existsSync(join(out, "share.html"))).toBe(false)
-      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
       expect(profile.languages).toEqual(["zh-TW", "en"])
       // one translation call on top of the map and reduce calls
       expect(h.fakes.at(-1)!.log.filter((c) => c.schema === "LlmTranslation")).toHaveLength(1)
@@ -345,14 +348,14 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const h = makeHarness({ env: { locale: "zh_TW.UTF-8" } })
       const out = join(h.root, "zh")
       expect((yield* h.run(["--yes", "--since", "all", "--out", out])).code).toBe(0)
-      expect(JSON.parse(readFileSync(join(out, "profile.json"), "utf8")).languages).toEqual([
+      expect(JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8")).languages).toEqual([
         "zh-TW",
         "en",
       ])
       const en = makeHarness()
       const outEn = join(en.root, "en")
       expect((yield* en.run(["--yes", "--since", "all", "--out", outEn])).code).toBe(0)
-      expect(readFileSync(join(outEn, "report.html"), "utf8")).not.toContain('name="lang"')
+      expect(readFileSync(reportPath(outEn, "report.html"), "utf8")).not.toContain('name="lang"')
       expect(en.fakes.at(-1)!.log.some((c) => c.schema === "LlmTranslation")).toBe(false)
     }),
   )
@@ -367,20 +370,20 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("retains a snapshot without presenting an unverified comparison", () =>
+  it.effect("retains history without comparing unbounded overlapping reports", () =>
     Effect.gen(function* () {
       const h = makeHarness()
       const out = join(h.root, "again")
       expect((yield* h.run(["--yes", "--since", "all", "--out", out])).code).toBe(0)
-      const first = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      const first = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
       expect(first.previous).toBeNull()
       expect((yield* h.run(["--yes", "--since", "all", "--out", out, "--no-cache"])).code).toBe(0)
-      const second = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
-      expect(second.previous.generatedAt).toBe(first.generatedAt)
-      expect(second.previous.improvements).toEqual(
-        first.improvements.map((i: { title: string }) => i.title),
+      const second = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
+      expect(second.previous).toBeNull()
+      expect(second.historyComparison).toBeNull()
+      expect(readFileSync(reportPath(out, "report.html"), "utf8")).not.toContain(
+        "Since your last report",
       )
-      expect(readFileSync(join(out, "report.html"), "utf8")).not.toContain("Since your last report")
     }),
   )
 

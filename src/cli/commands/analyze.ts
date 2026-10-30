@@ -1,3 +1,11 @@
+import type { AvatarChoice } from "../../report/avatar.ts"
+import { variantName } from "../../report/looks.ts"
+import { writeAnalysisReport, previousProfile } from "../library.ts"
+import { compareHistory } from "../../domain/History.ts"
+import { scanLibrary } from "../../platform/library.ts"
+import { PIPELINE_VERSION } from "../../pipeline/version.ts"
+import { libraryIo } from "../library.ts"
+import { snapshotOf } from "../../domain/Progress.ts"
 import { DateTime, Effect, Path } from "effect"
 import { Prompt } from "effect/cli"
 import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../analysis/index.ts"
@@ -28,14 +36,7 @@ import {
   type RunFlags,
 } from "../options.ts"
 import { LlmProvider, Opener, Output, type OutputShape } from "../services.ts"
-import {
-  previousSnapshot,
-  readSources,
-  resolveOut,
-  runPipelineStep,
-  writeFileOrFail,
-  writeReportFiles,
-} from "../steps.ts"
+import { readSources, resolveOut, runPipelineStep, writeFileOrFail } from "../steps.ts"
 
 /** The main command: read → pipeline → (confirm) → analyse → report. */
 
@@ -52,6 +53,7 @@ export interface MainOptions extends Omit<RunFlags, "engine"> {
   /** Report languages, comma-separated; default from the system locale. */
   readonly lang?: string | undefined
   /** Render-only: the report/card look and the card parts to hide (default: classic, none). */
+  readonly avatar?: AvatarChoice | undefined
   readonly look?: LookId
   readonly cardHide?: string | undefined
   readonly exclude?: string | undefined
@@ -77,7 +79,7 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
       cacheHits: p.cacheHits,
       llmCalls: p.llmCalls,
       llmCallsEstimate:
-        "Uncached chunks + final profile + translations; intermediate merges and retries are additional.",
+        "Uncached chunks + final profile + evidence review + translations; intermediate merges and retries are additional.",
       charsToSend: p.charsToSend,
       promptsAnalyzed: p.promptsAnalyzed,
       sessionsAnalyzed: p.sessionsAnalyzed,
@@ -220,8 +222,10 @@ export const runMain = (options: MainOptions) =>
       options.cardHide,
       options.exclude,
       options.name,
+      options.avatar,
     )
     const allow = yield* parseAllow(options.allow)
+    const path = yield* Path.Path
     const env = yield* Environment
     const languages = yield* parseLanguages(options.lang, env.locale)
     // The flags a re-run repeats, started the way this run was.
@@ -308,13 +312,28 @@ export const runMain = (options: MainOptions) =>
     // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
     const usage = summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
     // The report in this folder before this run, if any: "since your last report".
-    const previous = yield* previousSnapshot(outDir)
+    const previousReport = yield* previousProfile(outDir)
+    const priorIndex = yield* libraryIo(outDir, () => scanLibrary(outDir))
+    const priorManifest = priorIndex.runs.find((r) => r.id === priorIndex.latest)
+    const compared = previousReport
+      ? compareHistory(
+          profile,
+          previousReport,
+          { schema: profile.schemaVersion, pipeline: PIPELINE_VERSION },
+          {
+            schema: priorManifest?.schemaVersion ?? 0,
+            pipeline: priorManifest?.pipelineVersion ?? "unknown",
+          },
+        )
+      : { comparison: null, reasons: [] }
+    const previous =
+      previousReport && compared.comparison?.toolComparable ? snapshotOf(previousReport) : null
+    if (compared.reasons.length) yield* out.debug(t.historySkipped(compared.reasons.join(", ")))
     yield* out.line(t.writing)
-    const files = yield* writeReportFiles(
-      { ...profile, previous, usage },
+    const files = yield* writeAnalysisReport(
+      { ...profile, previous, historyComparison: compared.comparison, usage },
       outDir,
       renderOptions,
-      null,
       {
         mode: options.check ?? "mask",
         allow,
@@ -329,8 +348,17 @@ export const runMain = (options: MainOptions) =>
         card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
       )
     if (files.cards.some((c) => c.file === null))
-      yield* out.line(t.cardRetry(renderRetryCommand(files.profileJson, outDir, flags)))
+      yield* out.line(
+        t.cardRetry(
+          renderRetryCommand(
+            files.profileJson,
+            path.join(path.dirname(files.profileJson), "variants", variantName(renderOptions)),
+            flags,
+          ),
+        ),
+      )
     yield* out.line(t.dataLine(files.profileJson))
+    yield* out.line(t.libraryLine(files.libraryHome))
     for (const line of summaryLines(
       reportContents(files.profile, renderOptions),
       files.findings,

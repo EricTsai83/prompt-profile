@@ -3,12 +3,12 @@ import { Effect, Fiber } from "effect"
 import { TestClock } from "effect/testing"
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, dirname } from "node:path"
 import { AnalysisFailed, type AnalyzeError } from "../../src/analysis/errors.ts"
 import { renderError } from "../../src/cli/render-error.ts"
 import { Interrupted, ProcessFailed, RateLimited } from "../../src/llm/LlmRunner.ts"
 import { VERSION } from "../../src/version.ts"
-import { makeHarness, ok, type HarnessOptions } from "./harness.ts"
+import { makeHarness, ok, reportPath, type HarnessOptions } from "./harness.ts"
 
 /*
  * First run and recovery (plan 24): what the user is told before, during and after a run,
@@ -246,7 +246,7 @@ describe("during and after a run", () => {
       expect(r.code).toBe(0)
       expect(r.stdout).toMatch(/3 prompts in 1 session after cleaning/)
       expect(r.stdout).toContain("Limited evidence")
-      const page = readFileSync(join(out, "report.html"), "utf8")
+      const page = readFileSync(reportPath(out, "report.html"), "utf8")
       expect(page).toContain("Early observations")
       // the generated role name is not presented as an identity
       expect(page).not.toContain("The Fixer")
@@ -254,7 +254,7 @@ describe("during and after a run", () => {
       // observations and measurements stay readable
       expect(page).toContain('class="dims"')
       expect(page).toContain('class="sigs"')
-      expect(existsSync(join(out, "card.png"))).toBe(true)
+      expect(existsSync(reportPath(out, "card.png"))).toBe(true)
     }),
   )
 
@@ -271,16 +271,16 @@ describe("during and after a run", () => {
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--since", "all", "--out", out, "--lang", "zh-TW,en"])
       expect(r.code).toBe(0)
-      const profile = JSON.parse(readFileSync(join(out, "profile.json"), "utf8"))
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
       expect(profile.languages).toEqual(["en"])
       expect(r.stdout).toContain("zh-TW is missing")
       expect(r.stdout).toContain(`prompt-profile --since all --out ${out} --lang zh-TW,en --yes`)
-      // The suggested re-run reuses cached chunks: final profile + review + translation.
+      // the suggested re-run reuses the cached chunks: final profile + evidence review + translation only
       const again = makeHarness({ env: { ...h.environment } })
       const r2 = yield* again.run(["--since", "all", "--out", out, "--lang", "zh-TW,en", "--yes"])
       expect(r2.code).toBe(0)
       expect(calls(again)).toBe(3)
-      expect(JSON.parse(readFileSync(join(out, "profile.json"), "utf8")).languages).toEqual([
+      expect(JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8")).languages).toEqual([
         "zh-TW",
         "en",
       ])
@@ -293,23 +293,52 @@ describe("during and after a run", () => {
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--since", "all", "--out", out, "--lang", "zh-TW,en"])
       expect(r.code).toBe(0)
-      expect(existsSync(join(out, "card.png"))).toBe(false)
-      expect(existsSync(join(out, "card.en.png"))).toBe(true)
+      expect(existsSync(reportPath(out, "card.png"))).toBe(false)
+      expect(existsSync(reportPath(out, "card.en.png"))).toBe(true)
       expect(r.stdout).toContain("(zh-TW) not created: font download failed")
       expect(r.stdout).toContain(
-        `Retry missing cards without new analysis: prompt-profile render ${out}/profile.json`,
+        `Retry missing cards without new analysis: prompt-profile render ${reportPath(out, "profile.json")}`,
       )
       // the command works once the font is available, and calls no LLM
       const fixed = makeHarness({ env: { ...h.environment } })
-      const r2 = yield* fixed.run(["render", `${out}/profile.json`])
+      const r2 = yield* fixed.run(["render", `${reportPath(out, "profile.json")}`])
       expect(r2.code).toBe(0)
-      expect(existsSync(join(out, "card.png"))).toBe(true)
+      expect(
+        existsSync(
+          join(dirname(reportPath(out, "profile.json")), "variants", "classic", "card.png"),
+        ),
+      ).toBe(true)
       expect(fixed.fakes).toHaveLength(0)
     }),
   )
 })
 
 describe("recovery", () => {
+  it.effect("does not write a report when the budget ends between drafting and review", () =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const out = join(h.root, "review-budget")
+      const result = yield* h.run(["--yes", "--since", "all", "--out", out, "--max-calls", "3"])
+      expect(result.code).toBe(1)
+      expect(calls(h)).toBe(3)
+      expect(result.stderr).toContain("No report was written")
+      expect(existsSync(reportPath(out, "profile.json"))).toBe(false)
+      expect(existsSync(reportPath(out, "report.html"))).toBe(false)
+      const again = makeHarness({ env: { ...h.environment } })
+      const resumed = yield* again.run([
+        "--yes",
+        "--since",
+        "all",
+        "--out",
+        out,
+        "--max-calls",
+        "2",
+      ])
+      expect(resumed.code).toBe(0)
+      expect(calls(again)).toBe(2)
+    }),
+  )
+
   it.effect("a call budget states what is saved; the given command resumes from the cache", () =>
     Effect.gen(function* () {
       const h = makeHarness()
@@ -323,14 +352,14 @@ describe("recovery", () => {
       expect(r.stderr).toContain("the final profile step and translations always run again")
       const command = `prompt-profile --since all --out ${out} --max-calls 2 --yes`
       expect(r.stderr).toContain(command)
-      expect(existsSync(join(out, "report.html"))).toBe(false)
+      expect(existsSync(reportPath(out, "report.html"))).toBe(false)
       const again = makeHarness({ env: { ...h.environment } })
       expect(command.startsWith("prompt-profile ")).toBe(true)
       const r2 = yield* again.run(command.slice("prompt-profile ".length).split(" "))
       expect(r2.code).toBe(0)
-      // only the final profile is called: both chunks come from the cache
+      // draft and review are called: both chunks come from the cache
       expect(calls(again)).toBe(2)
-      expect(existsSync(join(out, "report.html"))).toBe(true)
+      expect(existsSync(reportPath(out, "report.html"))).toBe(true)
     }),
   )
 

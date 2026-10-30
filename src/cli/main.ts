@@ -1,3 +1,5 @@
+import { AVATAR_CHOICES } from "../report/avatar.ts"
+import { runHistory } from "./commands/history.ts"
 import { Effect, Option } from "effect"
 import { Argument, Command, Flag } from "effect/cli"
 import { CliError } from "effect/cli"
@@ -75,6 +77,13 @@ const exclude = Flag.String("exclude").pipe(
   Flag.optional,
 )
 
+const avatar = Flag.Literals("avatar", AVATAR_CHOICES).pipe(
+  Flag.withDescription(
+    "Render-only geometric symbol: auto, planner, explorer, coordinator, verifier, neutral or none",
+  ),
+  Flag.withDefault("auto"),
+)
+
 const optional = <A>(o: Option.Option<A>): A | undefined => Option.getOrUndefined(o)
 
 /**
@@ -139,6 +148,7 @@ const renderCommand = Command.make(
       Flag.optional,
     ),
     look,
+    avatar,
     cardHide,
     exclude,
     name,
@@ -152,6 +162,7 @@ const renderCommand = Command.make(
         file: f.file,
         out: optional(f.out),
         look: f.look,
+        avatar: f.avatar,
         cardHide: optional(f.cardHide),
         exclude: optional(f.exclude),
         name: optional(f.name),
@@ -161,6 +172,10 @@ const renderCommand = Command.make(
       f,
     ),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
+
+const historyCommand = Command.make("history", { out, verbose }, (f) =>
+  handle(runHistory(f.out), f),
+).pipe(Command.withDescription("Rebuild the local report library index without analysis"))
 
 const cacheClearCommand = Command.make("clear", { verbose }, (f) =>
   handle(withCache(runCacheClear), f),
@@ -198,6 +213,7 @@ export const command = Command.make(
     out,
     lang,
     look,
+    avatar,
     cardHide,
     exclude,
     name,
@@ -240,6 +256,7 @@ export const command = Command.make(
       dryRun: f.dryRun,
       lang: optional(f.lang),
       look: f.look,
+      avatar: f.avatar,
       cardHide: optional(f.cardHide),
       exclude: optional(f.exclude),
       name: optional(f.name),
@@ -254,7 +271,7 @@ export const command = Command.make(
   Command.withDescription(
     "Read your Claude Code / Codex prompt history on this computer, redact it, and analyse it with your logged-in claude or codex CLI (uses your subscription quota, no API key; selected redacted prompts leave this computer). Writes a local report. Free first: --dry-run or `prompt-profile stats`.",
   ),
-  Command.withSubcommands([statsCommand, renderCommand, cacheCommand]),
+  Command.withSubcommands([statsCommand, renderCommand, historyCommand, cacheCommand]),
 )
 
 /** Parse errors are already rendered by effect/cli; map them to exit code 2. */
