@@ -91,16 +91,16 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 16 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 21 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 17 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 22 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 17, others 23 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 18, others 24 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–21 and 23–26 are done
+in the change that finishes it; it stays in git history. Plans 01–21 and 23–27 are done
 and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
@@ -111,7 +111,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 27 | [Actionable collaboration experiments](27-actionable-collaboration-experiments.md) | One optional actionable experiment and follow-up contract | Existing improvements and completed episode evidence | Ready for contract and fixtures; calibration baseline delivered |
 | 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Completed claim calibration; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |
 | 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
 | 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
@@ -140,7 +139,7 @@ and plan 22 remains the experiment tooling owner.
 
 ### Recommended execution batches
 
-1. **Make reports useful after reading:** plan 27 (one experiment), then plan 28 (reviewed
+1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); next are plan 28 (reviewed
    preferences) and plan 29 (sharing). The completed library and evidence foundation are available.
 2. **Support recurring reflection:** plan 30 (annotations) and plan 31 (project/context
    retrospectives). Comparable-window history is implemented; scoped selection remains future work.
@@ -154,7 +153,7 @@ and plan 22 remains the experiment tooling owner.
 - The completed episode foundation owns schemas/provenance; the completed [claim calibration](../docs/ux/model-comparison/claim-support.md) owns semantic-support evaluation, not a
   duplicate episode pipeline. The completed collaboration foundation owns roles; the calibration record provides authored cases.
 - The completed plan 25 established the [identity/factual content contract](../docs/ux/report-redesign/purpose-contract.md); the durable report design records guide visual iteration. Both use one production renderer and the existing looks.
-- Plan 27 specifies actionable coaching beyond the completed narrative/history integration.
+- Completed plan 27 delivers [optional report experiments](../docs/collaboration-experiments.md).
 - The completed library and comparison foundation owns history and longitudinal comparability; plan 31 adds scoped contexts only.
 - The owner is the current reader. Iterate together through owner use and feedback, supported
   by fictional cases and automated checks. External participants and reader studies are not
