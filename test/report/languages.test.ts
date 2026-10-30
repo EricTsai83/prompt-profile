@@ -70,7 +70,7 @@ describe("report languages", () => {
     Effect.gen(function* () {
       const out = renderHtml(englishOnly(yield* sample()))
       expect(out).not.toContain("My AI collaboration profile")
-      expect(out).toContain('class="clock"')
+      expect(out).toContain('data-avatar="geometric-v1-neutral-0"')
       expect(out).toContain('class="heat"')
       expect(out).toContain('class="heat-top')
       expect(out).toContain('class="cal"')

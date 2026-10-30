@@ -1,7 +1,8 @@
+import { structuredMoves } from "./collaboration.ts"
 import type { Profile } from "../domain/Profile.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { VIEW_MESSAGES } from "./messages.ts"
+import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
 import type { Scrub } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -20,7 +21,9 @@ const signatureTraits = (p: Profile): ReadonlyArray<number> =>
 
 /** First-screen signatures in the hero of document looks. */
 export const identitySignatures = (p: Profile, loc: Loc, scrub: Scrub): Raw =>
-  html`<div class="identity-signatures">${signatureTraits(p).map((i) => html`<article><h2>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h2><p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p></article>`)}</div>`
+  p.collaboration?.moves.length
+    ? html`<div class="identity-signatures">${p.collaboration.moves.slice(0, 3).map((m, i) => html`<article><h2>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.name ?? m.name, l))}</h2><p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.description ?? m.description, l))}</p></article>`)}</div>`
+    : html`<div class="identity-signatures">${signatureTraits(p).map((i) => html`<article><h2>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h2><p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p></article>`)}</div>`
 
 /**
  * The identity view's signature habits: the same traits as the hero signatures, each with one of
@@ -34,6 +37,39 @@ export const identityMoves = (
   describe: boolean,
   quote: ((text: string) => Raw | string) | null,
 ): Raw => {
+  const structured = structuredMoves(p, loc, scrub, quote)
+  if (structured) return structured
+  if (p.patterns.length > 0) {
+    return html`<section class="identity-moves">
+      ${defined(
+        html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].moves)}</h2>`,
+        definition(
+          loc,
+          loc.text((_m, _c, l) => EPISODE_MESSAGES[l].userOnly),
+          loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].selectedMoves),
+        ),
+      )}
+      <ol>${p.patterns.slice(0, 3).map(
+        (pattern, i) => html`<li>
+        <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.patterns[i]?.claim ?? pattern.claim, l))}</h3>
+        <p>${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].spread(pattern.support.sessions, pattern.support.weeks))}</p>
+        ${[
+          p.episodes.find((e) => pattern.episodeIds.includes(e.id)),
+          p.episodes.find((e) => pattern.counterEpisodeIds.includes(e.id)) ??
+            p.episodes.filter((e) => pattern.episodeIds.includes(e.id))[1],
+        ]
+          .filter((e) => e !== undefined)
+          .map((e) => {
+            const index = p.episodes.indexOf(e)
+            return html`<article>
+            <p>${e.id} · ${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? e.task, l))}${pattern.counterEpisodeIds.includes(e.id) ? html` · ${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].against)}` : ""}</p>
+            ${quote ? html`<ol>${e.turns.map((t) => html`<li>${t.turn}. ${quote(t.quote)}</li>`)}</ol>` : ""}
+          </article>`
+          })}
+      </li>`,
+      )}</ol>
+    </section>`
+  }
   const selected = signatureTraits(p)
   return html`<section class="identity-moves">
     ${defined(
@@ -67,9 +103,10 @@ const D = "[data-composition=document]"
  */
 export const variantStyle = `
 .identity-moves{margin:var(--space-8) 0}.identity-moves>.note{margin-top:var(--space-2);max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
-.identity-moves ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
-.identity-moves li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
-.identity-moves li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
+.identity-moves>ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
+.identity-moves>ol>li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
+.identity-moves>ol>li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
+.identity-moves article{margin-top:var(--space-4)}.identity-moves article ol{list-style:none;display:block;margin:8px 0;padding-left:20px}.identity-moves article li{padding:4px 0;border:0;font-size:var(--text-sm);line-height:1.7}
 html${D} .identity-signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0 8px}
 .identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:var(--text-base);line-height:1.5}.identity-signatures p{font-size:var(--text-sm);line-height:1.8;color:var(--muted);margin-top:8px}
 ${D} .hero{background:var(--card);color:var(--fg);overflow:visible}

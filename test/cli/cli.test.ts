@@ -192,7 +192,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(report).not.toContain('class="usage"')
       expect(existsSync(join(variant, "share.html"))).toBe(false)
       expect(JSON.parse(readFileSync(join(variant, "render.json"), "utf8"))).toMatchObject({
-        renderVersion: 2,
+        renderVersion: 3,
         excluded: ["quotes", "projects", "dates", "coaching", "funfacts", "custom-names", "usage"],
       })
       const r2 = yield* h.run(["render", profile, "--exclude", "dates,quotes"])
@@ -367,7 +367,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
     }),
   )
 
-  it.effect("a new analysis compares with the previous report in the same folder", () =>
+  it.effect("retains a snapshot without presenting an unverified comparison", () =>
     Effect.gen(function* () {
       const h = makeHarness()
       const out = join(h.root, "again")
@@ -380,7 +380,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(second.previous.improvements).toEqual(
         first.improvements.map((i: { title: string }) => i.title),
       )
-      expect(readFileSync(join(out, "report.html"), "utf8")).toContain("Since your last report")
+      expect(readFileSync(join(out, "report.html"), "utf8")).not.toContain("Since your last report")
     }),
   )
 

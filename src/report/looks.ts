@@ -1,3 +1,4 @@
+import type { AvatarChoice } from "./avatar.ts"
 /**
  * Render-only choices: a look (report + card design), the card parts to hide and the report
  * parts to leave out. They never change the profile, the analysis or its cache; see
@@ -41,6 +42,9 @@ export const EXCLUDE_GROUPS: Readonly<Record<string, ReadonlyArray<ReportPart>>>
 
 export interface RenderOptions {
   readonly look: LookId
+  readonly avatar?: AvatarChoice
+  /** Internal relative navigation for archived reports; never an appearance choice. */
+  readonly libraryHref?: string
   readonly cardHide: ReadonlyArray<CardPart>
   /** Report parts left out; none when absent. */
   readonly exclude?: ReadonlyArray<ReportPart>
@@ -50,15 +54,18 @@ export interface RenderOptions {
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = { look: "classic", cardHide: [], exclude: [] }
 
-/** Version of the companion `render.json` written next to a non-default render. */
-export const RENDER_MANIFEST_VERSION = 2
+/** Version of the companion `render.json` written next to every successful render. */
+export const RENDER_MANIFEST_VERSION = 3
 
 /** Excluded parts in REPORT_PARTS order, without duplicates. */
 export const excludedParts = (o: RenderOptions): Array<ReportPart> =>
   REPORT_PARTS.filter((p) => o.exclude?.includes(p) ?? false)
 
 export const isDefaultRender = (o: RenderOptions): boolean =>
-  o.look === DEFAULT_RENDER_OPTIONS.look && o.cardHide.length === 0 && excludedParts(o).length === 0
+  o.look === DEFAULT_RENDER_OPTIONS.look &&
+  o.cardHide.length === 0 &&
+  excludedParts(o).length === 0 &&
+  (o.avatar === undefined || o.avatar === "auto")
 
 /** Hidden parts in CARD_PARTS order, without duplicates. */
 export const hiddenParts = (o: RenderOptions): Array<CardPart> =>
@@ -73,6 +80,7 @@ export const variantName = (o: RenderOptions): string => {
   const named = excluded.length === REPORT_PARTS.length ? ["personal"] : excluded
   return [
     o.look,
+    ...(o.avatar && o.avatar !== "auto" ? [`avatar-${o.avatar}`] : []),
     ...hiddenParts(o).map((p, i) => (i === 0 ? `no-${p}` : p)),
     ...named.map((p, i) => (i === 0 ? `without-${p}` : p)),
   ].join("-")

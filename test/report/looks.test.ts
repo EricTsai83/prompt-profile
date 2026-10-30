@@ -212,7 +212,7 @@ describe("looks: writeReport", () => {
     Effect.gen(function* () {
       const outDir = join(mkdtempSync(join(tmpdir(), "pp-look-")), "out")
       yield* writeReport(yield* sample(), outDir)
-      expect(existsSync(join(outDir, "render.json"))).toBe(false)
+      expect(existsSync(join(outDir, "render.json"))).toBe(true)
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 
@@ -229,9 +229,9 @@ describe("looks: writeReport", () => {
       expect(statSync(manifest).mode & 0o777).toBe(0o600)
       const render = JSON.parse(readFileSync(manifest, "utf8"))
       expect(render).toMatchObject({
-        renderVersion: 2,
+        renderVersion: 3,
         look: "afterhours",
-        lookVersion: 17,
+        lookVersion: 23,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

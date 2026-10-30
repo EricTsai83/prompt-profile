@@ -189,6 +189,25 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .sigs{grid-template-columns:repeat(2,1fr)}.rewrite{grid-template-columns:1fr}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
 .dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
+.understanding{margin:36px 0}.understanding h2{font-size:var(--text-xl)}.understanding article{border-top:1px solid var(--border);padding:16px 0}.understanding h3{font-size:var(--text-base);margin-bottom:8px}.understanding p{line-height:1.8}.understanding .note,.structured-moves .note{font-size:var(--text-sm);color:var(--muted)}.understanding blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);overflow-wrap:anywhere;line-height:1.8}.history-comparison{margin:36px 0}.history-comparison h2{font-size:var(--text-xl)}.history-comparison article{padding:20px 0;border-top:1px solid var(--border)}.history-comparison h3{font-size:var(--text-lg);margin-bottom:12px}.history-comparison h4{margin-top:20px}.history-comparison p{line-height:1.8}.history-comparison blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);line-height:1.8;overflow-wrap:anywhere}.quote-source{display:block;margin-top:8px;font-size:var(--text-xs);color:var(--muted)}
+html:root .hero .role-avatar img{display:block;width:100%;height:auto}
+html:root .hero:has(.role-avatar)>.report-facts{grid-column:1/-1;grid-row:2;margin:0;padding-top:16px;border-top:1px solid var(--border)}
+
+html:root .hero:has(.role-avatar){display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,26%);gap:20px;align-items:center}
+html:root .hero:has(.role-avatar) .copy{max-width:none;min-width:0}
+html:root .hero .graphic.role-avatar{display:block;position:static;grid-column:2;grid-row:1;width:100%;max-width:230px;height:auto;aspect-ratio:2/3;transform:none;margin:0;justify-self:end}
+html:root .hero:has(.role-avatar) .identity-signatures{grid-column:1/-1;grid-row:3}
+@media(max-width:760px){
+html:root .hero:has(.role-avatar){grid-template-columns:minmax(0,1fr) clamp(64px,18vw,120px);gap:12px 16px;align-items:center}
+html:root .hero:has(.role-avatar) .copy{display:contents}
+html:root .hero:has(.role-avatar) .copy>h1{grid-column:1;grid-row:1;font-size:clamp(var(--text-2xl),4.8vw,calc(var(--text-2xl)*1.4));max-width:none;margin:0;overflow-wrap:anywhere}
+html:root .hero:has(.role-avatar) .copy>:not(h1){grid-column:1/-1;margin-top:0}
+html:root .hero .graphic.role-avatar{grid-column:2;grid-row:1;width:100%;max-width:120px;height:auto;aspect-ratio:1;margin:0;align-self:center}
+html:root .hero:has(.role-avatar)>.report-facts{grid-row:auto}
+html:root .hero:has(.role-avatar) .identity-signatures{grid-row:auto}
+}
+@media(max-width:380px){html:root .hero:has(.role-avatar) .copy>h1{font-size:calc(var(--text-base)*1.6)}}
+
 
 .cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
 .hours{--n:24}.weekdays{--n:7;gap:10px}
@@ -346,9 +365,10 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 @media print{.def>summary{display:none}.def::details-content{content-visibility:visible;display:block}.def-body{position:static;width:auto;max-width:none;padding:4px 0 0;border:0;box-shadow:none;color:var(--muted)}}
 
 .identity-moves{margin:var(--space-8) 0}.identity-moves>.note{margin-top:var(--space-2);max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
-.identity-moves ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
-.identity-moves li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
-.identity-moves li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
+.identity-moves>ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
+.identity-moves>ol>li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
+.identity-moves>ol>li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
+.identity-moves article{margin-top:var(--space-4)}.identity-moves article ol{list-style:none;display:block;margin:8px 0;padding-left:20px}.identity-moves article li{padding:4px 0;border:0;font-size:var(--text-sm);line-height:1.7}
 html[data-composition=document] .identity-signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0 8px}
 .identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:var(--text-base);line-height:1.5}.identity-signatures p{font-size:var(--text-sm);line-height:1.8;color:var(--muted);margin-top:8px}
 [data-composition=document] .hero{background:var(--card);color:var(--fg);overflow:visible}
@@ -538,6 +558,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                         >
                   </nav>
           </header>
+
           <nav class="view-nav" aria-label="Report views">
             <label for="report-overview"><span data-l="en" lang="en">Who they are</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這個人</span></label>
             <label for="report-detail"><span data-l="en" lang="en">Facts &amp; evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">事實與證據</span></label>
@@ -551,7 +572,9 @@ html:root .tech-time{overflow:visible;font-size:8pt}
               <p class="tagline"><span data-l="en" lang="en">A perfectionist who argues with AI about naming at midnight</span><span data-l="zh-TW" lang="zh-Hant-TW">半夜跟 AI 爭論命名的完美主義者</span></p>
               <p class="desc"><span data-l="en" lang="en">Ships features by day, refactors by night.</span><span data-l="zh-TW" lang="zh-Hant-TW">白天出貨，晚上重構。</span></p>
 
-              <dl class="report-facts">
+
+            </div>
+                          <dl class="report-facts">
                 <div>
                   <dt><span data-l="en" lang="en">Data period</span><span data-l="zh-TW" lang="zh-Hant-TW">資料區間</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。</span></p></div></details></dt>
                   <dd>
@@ -571,51 +594,28 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   </dd>
                 </div>
               </dl>
-            </div>
-            <div class="hero-clock"><figure class="clock">
-    <svg viewBox="0 0 260 260" aria-hidden="true">
-      <circle cx="130" cy="130" r="60" class="clock-dial" />
-      <path d="M130.0 68.0L130.0 51.3" class="clock-bar" /><path d="M146.0 70.1L148.9 59.5" class="clock-bar" /><path d="M161.0 76.3L164.4 70.4" class="clock-bar" /><path d="M173.8 86.2L177.3 82.7" class="clock-bar" /><path d="M183.7 99.0L187.2 97.0" class="clock-bar" /><path d="M189.9 114.0L193.8 112.9" class="clock-bar" /><path d="M192.0 130.0L196.3 130.0" class="clock-bar" /><path d="M189.9 146.0L195.0 147.4" class="clock-bar" /><path d="M183.7 161.0L192.7 166.2" class="clock-bar" /><path d="M173.8 173.8L190.4 190.4" class="clock-bar" /><path d="M161.0 183.7L178.6 214.1" class="clock-bar" /><path d="M146.0 189.9L156.9 230.6" class="clock-bar" /><path d="M130.0 192.0L130.0 221.4" class="clock-bar" /><path d="M114.0 189.9L103.9 227.5" class="clock-bar" /><path d="M99.0 183.7L74.8 225.7" class="clock-bar" /><path d="M86.2 173.8L49.6 210.4" class="clock-bar" /><path d="M76.3 161.0L35.7 184.4" class="clock-bar" /><path d="M70.1 146.0L30.0 156.8" class="clock-bar" /><path d="M68.0 130.0L35.4 130.0" class="clock-bar" /><path d="M70.1 114.0L35.6 104.7" class="clock-bar" /><path d="M76.3 99.0L37.1 76.4" class="clock-bar on" /><path d="M86.2 86.2L47.4 47.4" class="clock-bar on" /><path d="M99.0 76.3L70.0 26.1" class="clock-bar on" /><path d="M114.0 70.1L103.1 29.4" class="clock-bar on" /><text
-      x="130.0"
-      y="84.0"
-      text-anchor="middle"
-      class="clock-tick"
-      >00</text
-    ><text
-      x="180.0"
-      y="134.0"
-      text-anchor="middle"
-      class="clock-tick"
-      >06</text
-    ><text
-      x="130.0"
-      y="184.0"
-      text-anchor="middle"
-      class="clock-tick"
-      >12</text
-    ><text
-      x="80.0"
-      y="134.0"
-      text-anchor="middle"
-      class="clock-tick"
-      >18</text
-    >
-    </svg>
-    <figcaption><span data-l="en" lang="en">Most active 20:00–00:00</span><span data-l="zh-TW" lang="zh-Hant-TW">最活躍在 20:00–00:00</span></figcaption>
-  </figure></div>
+            <picture class="graphic role-avatar" data-avatar="geometric-v1-neutral-0">
+                    <source media="(min-width:761px)" srcset="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgNDgwIiBmaWxsPSJub25lIj48cGF0aCBkPSJNMTE0IDgzUTE0NSAyMyAyMDUgNDhRMjY1IDc1IDIzNSAxMzlNMTA0IDMwNVE2MCAzNjUgMTEyIDM5MyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjU5YjkxIiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjIwNSIgY3k9IjQ4IiByPSIyMiIgZmlsbD0iI2RmYjA2ZCIgc3Ryb2tlPSIjMjkzYjQzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxyZWN0IHg9Ijc5IiB5PSI2NSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjIwIiByeD0iMTAiIHRyYW5zZm9ybT0icm90YXRlKC0xNSAxMDIgNzUpIiBmaWxsPSIjY2U4OTc3IiBzdHJva2U9IiMyOTNiNDMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCA2NSkiPjxlbGxpcHNlIGN4PSIxNjAiIGN5PSIyNzkiIHJ4PSIxMTIiIHJ5PSIxMSIgZmlsbD0iIzY1OWI5MSIgZmlsbC1vcGFjaXR5PSIuMTYiLz48ZyB0cmFuc2Zvcm09InJvdGF0ZSgtOSAxNjAgMTYwKSI+PHJlY3QgeD0iNjkiIHk9IjgzIiB3aWR0aD0iMTIzIiBoZWlnaHQ9IjE0MyIgcng9IjMwIiBmaWxsPSIjZjVlZmUyIiBzdHJva2U9IiMyOTNiNDMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGNpcmNsZSBjeD0iMjAxIiBjeT0iMTY5IiByPSI2OCIgZmlsbD0iIzY1OWI5MSIgc3Ryb2tlPSIjMjkzYjQzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xNDMgMTMwYTYyIDYyIDAgMCAxIDAgNzkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Y1ZWZlMiIgc3Ryb2tlLXdpZHRoPSIxMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHBhdGggZD0iTTkxIDEyM2gzMG0tMzAgMjVoMjEiIHN0cm9rZT0iIzI5M2I0MyIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48Y2lyY2xlIGN4PSIyMTkiIGN5PSIxMDciIHI9IjE4IiBmaWxsPSIjZGZiMDZkIiBzdHJva2U9IiMyOTNiNDMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHJlY3QgeD0iOTQiIHk9IjIzMSIgd2lkdGg9IjQzIiBoZWlnaHQ9IjE4IiByeD0iOSIgZmlsbD0iI2NlODk3NyIgc3Ryb2tlPSIjMjkzYjQzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvZz48L2c+PHBhdGggZD0iTTg2IDM4OWwxMjQtOSAyMCA0My0xMjQgOVoiIGZpbGw9IiNmNWVmZTIiIHN0cm9rZT0iIzI5M2I0MyIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTEzIDQwNGw4MC02bS03MiAyMCA0OS00IiBzdHJva2U9IiM2NTliOTEiIHN0cm9rZS13aWR0aD0iNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PC9zdmc+" />
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMzIwIiBmaWxsPSJub25lIj48ZWxsaXBzZSBjeD0iMTYwIiBjeT0iMjc5IiByeD0iMTEyIiByeT0iMTEiIGZpbGw9IiM2NTliOTEiIGZpbGwtb3BhY2l0eT0iLjE2Ii8+PGcgdHJhbnNmb3JtPSJyb3RhdGUoLTkgMTYwIDE2MCkiPjxyZWN0IHg9IjY5IiB5PSI4MyIgd2lkdGg9IjEyMyIgaGVpZ2h0PSIxNDMiIHJ4PSIzMCIgZmlsbD0iI2Y1ZWZlMiIgc3Ryb2tlPSIjMjkzYjQzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjIwMSIgY3k9IjE2OSIgcj0iNjgiIGZpbGw9IiM2NTliOTEiIHN0cm9rZT0iIzI5M2I0MyIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTQzIDEzMGE2MiA2MiAwIDAgMSAwIDc5IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNWVmZTIiIHN0cm9rZS13aWR0aD0iMTIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxwYXRoIGQ9Ik05MSAxMjNoMzBtLTMwIDI1aDIxIiBzdHJva2U9IiMyOTNiNDMiIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGNpcmNsZSBjeD0iMjE5IiBjeT0iMTA3IiByPSIxOCIgZmlsbD0iI2RmYjA2ZCIgc3Ryb2tlPSIjMjkzYjQzIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxyZWN0IHg9Ijk0IiB5PSIyMzEiIHdpZHRoPSI0MyIgaGVpZ2h0PSIxOCIgcng9IjkiIGZpbGw9IiNjZTg5NzciIHN0cm9rZT0iIzI5M2I0MyIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L2c+PC9zdmc+" alt="Abstract geometric symbol for contextual or unresolved preferences" />
+                  </picture>
           </section>
 
 
           <header class="view-heading"><h2><span data-l="en" lang="en">Meet the collaborator</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這位協作者</span></h2><p><span data-l="en" lang="en">An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。</span></p></header>
           <section class="identity-moves">
-    <div class="def-head"><h2><span data-l="en" lang="en">Featured observations, in their own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與本人原話</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Up to three observations with medium or high confidence and a verified quote, each shown with one of the person’s own prompts. They are not ranked by strength. Confidence and the remaining evidence are on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">最多三項信心為中或高、且附有已驗證引述的觀察，各附一則本人寫下的提示，並未依強弱排序。信心程度與其餘證據列在「事實與證據」頁。</span></p></div></details></div>
-
-    <ol><li>
-        <h3><span data-l="en" lang="en">Plan first</span><span data-l="zh-TW" lang="zh-Hant-TW">先規劃</span></h3>
-        <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
-        <blockquote>don&#39;t write code yet, break the plan into small steps</blockquote>
+      <div class="def-head"><h2><span data-l="en" lang="en">Featured observations, in their own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與本人原話</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。</span></p><p><span data-l="en" lang="en">Selected conversations illustrate the sequence and another context when available. The facts view contains the complete selected episode record.</span><span data-l="zh-TW" lang="zh-Hant-TW">這裡挑選對話呈現動作順序，有其他情境時也一併列出。完整的片段紀錄在事實與證據頁。</span></p></div></details></div>
+      <ol><li>
+        <h3><span data-l="en" lang="en">Adds scope and corrections after the first request instead of restating the whole task</span><span data-l="zh-TW" lang="zh-Hant-TW">提出第一個需求後，再補上範圍與修正，而不是重寫整個任務</span></h3>
+        <p><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span></p>
+        <article>
+            <p>E1 · <span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></p>
+            <ol><li>1. don&#39;t write code yet, break the plan into small steps</li><li>2. same for the SVG export</li><li>5. no, keep the old API</li></ol>
+          </article><article>
+            <p>E2 · <span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span></p>
+            <ol><li>3. &lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</li><li>4. 改完跑一次測試確認</li><li>6. 好了，這樣可以了</li></ol>
+          </article>
       </li></ol>
-  </section>
+    </section>
           <p class="note"><span data-l="en" lang="en">A collaboration portrait is not available in this profile. The Facts &amp; evidence page contains the available observations.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份 profile 尚未包含協作側寫；「事實與證據」頁仍可閱讀既有的觀察與證據。</span></p>
 
           <section>
@@ -2901,7 +2901,10 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 
           </section>
 
-
+          <section class="understanding">
+  <div class="def-head"><h2><span data-l="en" lang="en">Observed understanding signals</span><span data-l="zh-TW" lang="zh-Hant-TW">對話中呈現的理解訊號</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Usage intensity, requested technique breadth and understanding signals answer different questions. Counts and tool events are not ability grades. Tool events may be autonomous agent actions; only quoted user choices support these signals. Missing evidence means unobserved, not lack of competence.</span><span data-l="zh-TW" lang="zh-Hant-TW">使用量、要求採用的技巧廣度與理解訊號，回答的是不同問題。次數和工具事件不是能力評分。工具事件可能是 AI 自主動作；這裡的訊號只採用有引述的使用者選擇。缺乏證據代表尚未觀察到，不代表沒有能力。</span></p></div></details></div>
+  <p class="note"><span data-l="en" lang="en">This analysis did not assess structured understanding signals.</span><span data-l="zh-TW" lang="zh-Hant-TW">這次分析尚未評估結構化的理解訊號。</span></p>
+</section>
 
           <section class="steering">
     <div class="def-head"><h2><span data-l="en" lang="en">How they steer the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">如何引導 AI</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p><p><span data-l="en" lang="en">The analysing model labels follow-up prompts by meaning, and every label is checked against the prompt text: a judgement, not an exact count. 3 labels were rejected.</span><span data-l="zh-TW" lang="zh-Hant-TW">由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。有 3 個標記未通過比對。</span></p></div></details></div>
@@ -2922,7 +2925,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           <ul class="episode-patterns">
             <li>
                 <p><span data-l="en" lang="en">Adds scope and corrections after the first request instead of restating the whole task</span><span data-l="zh-TW" lang="zh-Hant-TW">提出第一個需求後，再補上範圍與修正，而不是重寫整個任務</span></p>
-                <p class="note"><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span> · <span data-l="en" lang="en">Episodes</span><span data-l="zh-TW" lang="zh-Hant-TW">片段</span>: <a href="#episode-E1">E1</a>, <a href="#episode-E3">E3</a> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">反例</span>: <a href="#episode-E2">E2</a></p>
+                <p class="note"><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span> · <span data-l="en" lang="en">Episodes</span><span data-l="zh-TW" lang="zh-Hant-TW">片段</span>: <a href="#episode-E1">E1</a>, <a href="#episode-E3">E3</a> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span>: <a href="#episode-E2">E2</a></p>
               </li>
           </ul>
     <ol class="episode-list">
@@ -3569,48 +3572,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           <span><span data-l="en" lang="en">If you type these yourself, save them as a slash command, a skill or a CLAUDE.md / AGENTS.md note.</span><span data-l="zh-TW" lang="zh-Hant-TW">如果這些是你自己打的，把它們存成 slash command、skill，或寫進 CLAUDE.md / AGENTS.md。</span></span>
         </li>
   </ul>
-                  <div class="progress">
-    <h3 class="sub-h">
-      <span data-l="en" lang="en">Since your last report (Sep 24, 2026)</span><span data-l="zh-TW" lang="zh-Hant-TW">跟上次報告比（2026年9月24日）</span>
-    </h3>
-    <ul class="changes">
-      <li class="chg good">
-    <span><span data-l="en" lang="en">Prompts that correct the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">糾正 AI 的 prompt</span></span>
-    <b>16% → 12%</b>
-    <i>▼ 4</i>
-  </li>
-      <li class="chg good">
-    <span><span data-l="en" lang="en">Very short prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">太短的 prompt</span></span>
-    <b>38% → 31%</b>
-    <i>▼ 7</i>
-  </li>
-      <li class="chg flat">
-    <span><span data-l="en" lang="en">Prompts at night</span><span data-l="zh-TW" lang="zh-Hant-TW">深夜的 prompt</span></span>
-    <b>21% → 19%</b>
-    <i>▼ 2</i>
-  </li>
-      <li class="chg flat">
-    <span><span data-l="en" lang="en">Delegates to subagents</span><span data-l="zh-TW" lang="zh-Hant-TW">委派子代理</span></span>
-    <b>6% → 26%</b>
-    <i>▲ 20</i>
-  </li><li class="chg flat">
-    <span><span data-l="en" lang="en">Ships pull requests</span><span data-l="zh-TW" lang="zh-Hant-TW">發 pull request</span></span>
-    <b>11% → 27%</b>
-    <i>▲ 16</i>
-  </li><li class="chg flat">
-    <span><span data-l="en" lang="en">Uses skills</span><span data-l="zh-TW" lang="zh-Hant-TW">使用 skills</span></span>
-    <b>2% → 10%</b>
-    <i>▲ 8</i>
-  </li><li class="chg flat">
-    <span><span data-l="en" lang="en">Connects MCP tools</span><span data-l="zh-TW" lang="zh-Hant-TW">串接 MCP 工具</span></span>
-    <b>4% → 11%</b>
-    <i>▲ 7</i>
-  </li>
-    </ul>
-    <p class="last-tips">
-            <span data-l="en" lang="en">Suggested last time: State the expected result first · Paste the error line</span><span data-l="zh-TW" lang="zh-Hant-TW">上次的建議: State the expected result first · Paste the error line</span>
-          </p>
-  </div>
+
                 </section>
 
           <section class="usage">
@@ -3880,11 +3842,12 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           <section class="about">
                   <h2><span data-l="en" lang="en">How this was measured</span><span data-l="zh-TW" lang="zh-Hant-TW">這份報告怎麼量的</span></h2>
                   <p>
-                    <span data-l="en" lang="en">Engine: Claude Code (claude-opus-5-5) · Generated: Oct 24, 2026, 10:00 AM</span><span data-l="zh-TW" lang="zh-Hant-TW">分析引擎：Claude Code（claude-opus-5-5） · 產生時間：2026年10月24日 上午10:00</span>
+                    <span data-l="en" lang="en">Engine: Claude Code (claude-opus-5-5) · Generated: Oct 24, 2026, 10:00 AM · model identity unverified</span><span data-l="zh-TW" lang="zh-Hant-TW">分析引擎：Claude Code（claude-opus-5-5） · 產生時間：2026年10月24日 上午10:00 · 模型身分未經確認</span>
                   </p>
                   <p>
                     <span data-l="en" lang="en">41 pieces of evidence verified (3 invalid or duplicate quotes removed) · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">已驗證 41 段證據（移除 3 段無效或重複的引文） · 1 段分析失敗，已略過</span>
                   </p>
+
 
                   <p><span data-l="en" lang="en">Privacy: prompts were read, cleaned and redacted on this computer. Selected redacted prompts were then sent through the logged-in Claude Code or Codex CLI to its model service, using that subscription&#39;s quota (no API key). prompt-profile never uploads this report.</span><span data-l="zh-TW" lang="zh-Hant-TW">隱私：prompt 在這台電腦上讀取、清理並遮蔽敏感資訊；選出的 prompt 遮蔽後，才透過已登入的 Claude Code 或 Codex CLI 送到它的模型服務分析，使用該訂閱方案的額度（不需要 API key）。prompt-profile 不會上傳這份報告。</span></p>
                 </section>

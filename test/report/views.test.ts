@@ -47,7 +47,7 @@ describe("report views", () => {
     // the copy states the selection rule; it does not claim the strongest or most consistent
     expect(identity).toContain("medium or high confidence")
     expect(identity).not.toMatch(/most consistent|best-supported|最一致|證據最充分/)
-    expect(identity).toContain("Plan first")
+    expect(identity).toContain("Adds scope and corrections after the first request")
     expect(identity).not.toContain("Type purist")
     expect(identity).toContain('class="preference-map panel"')
     expect(identity).toContain("The work starts before the code")
@@ -97,7 +97,7 @@ describe("report views", () => {
     expect(facts).not.toContain('class="preference-evidence"')
   })
   it("describes featured habits only where the hero does not, and states when none has medium or high confidence", async () => {
-    const p = await sample()
+    const p = { ...(await sample()), patterns: [] }
     const moves = (page: string) =>
       views(page).identity.split('class="identity-moves"')[1]!.split("</section>")[0]!
     const description = p.traits[0]!.description

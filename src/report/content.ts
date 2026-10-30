@@ -1,3 +1,5 @@
+import { roleCode, ROLE_NAMES } from "../domain/Interaction.ts"
+import { ROLE_NAMES_ZH } from "./messages.ts"
 import type { DimensionKey, Language, Profile } from "../domain/Profile.ts"
 
 /** The generated text in one language: English is the base, others come from `translations`. */
@@ -17,9 +19,13 @@ export interface Content {
 
 export const contentIn = (p: Profile, lang: Language): Content => {
   const t = lang === "en" ? undefined : p.translations[lang]
+  const code = p.portrait ? roleCode(p.portrait.axes) : null
+  const archetype = t?.archetype ?? p.archetype
   return {
     headline: t?.headline ?? p.headline,
-    archetype: t?.archetype ?? p.archetype,
+    archetype: code
+      ? { ...archetype, name: (lang === "en" ? ROLE_NAMES : ROLE_NAMES_ZH)[code]! }
+      : archetype,
     dimension: (key) => {
       const base = p.dimensions.find((d) => d.key === key)!
       return t?.dimensions.find((d) => d.key === key) ?? base
@@ -28,4 +34,18 @@ export const contentIn = (p: Profile, lang: Language): Content => {
     funFacts: t?.funFacts ?? p.funFacts,
     improvement: (i) => t?.improvements[i] ?? p.improvements[i]!,
   }
+}
+
+/** The share card names recurring moves when available, otherwise supported legacy traits. */
+export const signatureNames = (p: Profile, lang: Language): ReadonlyArray<string> => {
+  if (p.collaboration?.moves.length)
+    return p.collaboration.moves
+      .slice(0, 2)
+      .map((m, i) => p.translations[lang]?.collaboration?.moves[i]?.name ?? m.name)
+  const content = contentIn(p, lang)
+  return p.traits
+    .flatMap((t, i) =>
+      t.confidence !== "low" && t.evidence.length > 0 ? [content.trait(i).name] : [],
+    )
+    .slice(0, 2)
 }

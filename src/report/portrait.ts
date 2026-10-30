@@ -1,8 +1,9 @@
-import { axisState, MIN_SIDE_SESSIONS, roleCode } from "../domain/Interaction.ts"
+import { sourceLabel } from "./evidence-origin.ts"
+import { axisState, INTERACTION_AXES, MIN_SIDE_SESSIONS, roleCode } from "../domain/Interaction.ts"
 import type { Language, Profile } from "../domain/Profile.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
+import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -14,12 +15,13 @@ const evidenceList = (
   loc: Loc,
   v: Visibility,
   scrub: Scrub,
+  p: Profile,
 ): Raw =>
   !v.quotes || items.length === 0
     ? html``
     : html`<details open class="portrait-evidence">
       <summary>${loc.text((m) => m.showEvidence(items.length))}</summary>
-      ${items.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}</blockquote>`)}
+      ${items.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`)}
     </details>`
 
 /** The identity view's story: the introduction and chapters, each with its own quotes. */
@@ -43,7 +45,7 @@ export const portraitStory = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub)
       (chapter, i) => html`<article class="portrait-chapter">
       <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.portrait?.chapters[i]?.title ?? chapter.title, l))}</h3>
       <p>${text(() => chapter.body, i)}</p>
-      ${evidenceList(chapter.evidence, loc, v, scrub)}
+      ${evidenceList(chapter.evidence, loc, v, scrub, p)}
     </article>`,
     )}
   </section>`
@@ -71,6 +73,20 @@ export const preferenceEvidence = (
         loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].rule),
       ),
     )}
+    ${
+      code
+        ? html`<article class="role-catalog">
+      <h3>${loc.text((_m, c) => c.archetype.name)}</h3>
+      <p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].catalogNote)}</p>
+      ${(["rhythm", "contexts", "friction"] as const)
+        .filter((part) => v.coaching || part !== "friction")
+        .map(
+          (part) => html`<h4>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l][part])}</h4>
+        <p>${loc.text((_m, _c, l) => INTERACTION_AXES.map((axis, i) => ROLE_CATALOG_MESSAGES[l][part][axis.key][code[i] === axis.codes[0] ? 0 : 1]).join(" "))}</p>`,
+        )}
+    </article>`
+        : ""
+    }
     ${portrait.axes.map((axis, a) => {
       const state = axisState(axis)
       const translated = (l: Language) => p.translations[l]?.portrait?.axes[a]
@@ -78,6 +94,7 @@ export const preferenceEvidence = (
       <b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[axis.key][0])}</b>
       <span>${loc.text((_m, _c, l) => (state === "none" ? PORTRAIT_MESSAGES[l].notObserved : state === "both" ? PORTRAIT_MESSAGES[l].both : PORTRAIT_MESSAGES[l].axes[axis.key][state === "first" ? 1 : 2]))}</span>
       ${axis.explanation ? html`<p>${loc.text((_m, _c, l) => scrub(translated(l)?.explanation ?? axis.explanation, l))}</p>` : ""}
+      ${axis.coverage ? html`<p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].choiceCoverage(axis.coverage!.citedSessions, axis.coverage!.analysedSessions, axis.coverage!.periods))}</p>` : ""}
       ${axis.sides.map(
         (side, i) => html`<div class="axis-side">
         <h3>${loc.text((_m, _c, l) => {
@@ -92,7 +109,8 @@ export const preferenceEvidence = (
             .filter((x) => x !== null)
             .join(" · ")
         })}</h3>
-        ${evidenceList(side.evidence, loc, v, scrub)}
+        <p class="note">${loc.text((_m, _c, l) => `${PORTRAIT_MESSAGES[l].independent}: ${PORTRAIT_MESSAGES[l].coverage(side.sessions, p.coverage.sessionsAnalyzed)}`)}</p>
+        ${evidenceList(side.evidence, loc, v, scrub, p)}
       </div>`,
       )}
     </div>`

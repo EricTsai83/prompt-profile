@@ -1,3 +1,4 @@
+import { avatarSvg } from "../../src/report/avatar.ts"
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, FileSystem, PlatformError } from "effect"
@@ -71,6 +72,21 @@ describe("renderHtml", () => {
     }),
   )
 
+  it.effect("explains when unsupported narrative transitions were removed", () =>
+    Effect.gen(function* () {
+      const profile = yield* sample()
+      const out = renderHtml({
+        ...profile,
+        coverage: { ...profile.coverage, narrativeRejected: 1 },
+      })
+      expect(out).toContain("unsupported introduction and ending claims were omitted")
+      expect(out).toContain("部分敘事證據無法驗證")
+      expect(renderHtml(profile)).not.toContain(
+        "unsupported introduction and ending claims were omitted",
+      )
+    }),
+  )
+
   it.effect("flags dimensions without evidence and shows coverage", () =>
     Effect.gen(function* () {
       const out = renderHtml(yield* sample())
@@ -93,16 +109,21 @@ describe("card", () => {
     }),
   )
 
-  it.effect("the default card wears the classic report's dark colors and its hour clock", () =>
-    Effect.gen(function* () {
-      const profile = yield* sample()
-      const tree = JSON.stringify(cardTree(profile))
-      const { bg, card, fg, accent } = lookOf("classic").color.dark
-      // Full bleed like the looks: the hero's color edge to edge, no page around it
-      expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
-      expect(tree).not.toContain(bg)
-      expect(tree).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
-    }),
+  it.effect(
+    "the default card wears classic colors and a neutral symbol, with a chart opt-out fallback",
+    () =>
+      Effect.gen(function* () {
+        const profile = yield* sample()
+        const tree = JSON.stringify(cardTree(profile))
+        const { bg, card, fg, accent } = lookOf("classic").color.dark
+        // Full bleed like the looks: the hero's color edge to edge, no page around it
+        expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
+        expect(tree).not.toContain(bg)
+        expect(tree).toContain(svgDataUrl(avatarSvg("neutral").svg))
+        expect(
+          JSON.stringify(cardTree(profile, { look: "classic", cardHide: [], avatar: "none" })),
+        ).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
+      }),
   )
 
   it.effect("never contains prompt quotes", () =>

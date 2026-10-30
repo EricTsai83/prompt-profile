@@ -41,7 +41,11 @@ export type Scrub = (text: string, lang: Language) => string
 export const makeScrub = (p: Profile, v: Visibility): Scrub => {
   if (v.projects) return (text) => text
   const names = [
-    ...new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)]),
+    ...new Set([
+      ...p.stats.activity.projects,
+      ...p.stats.topProjects.map((x) => x.name),
+      ...(p.historyComparison?.previousProjects ?? []),
+    ]),
   ].toSorted((a, b) => b.length - a.length)
   return (text, lang) =>
     names.reduce((out, name, i) => {
@@ -65,6 +69,18 @@ export const scrubIdentity = (p: Profile, scrub: Scrub, lang: Language): Profile
       name: s(p.archetype.name),
       description: s(p.archetype.description),
     },
+    ...(p.collaboration
+      ? {
+          collaboration: {
+            ...p.collaboration,
+            moves: p.collaboration.moves.map((m) => ({
+              ...m,
+              name: s(m.name),
+              description: s(m.description),
+            })),
+          },
+        }
+      : {}),
     traits: p.traits.map((x) => ({ ...x, name: s(x.name), description: s(x.description) })),
     translations:
       t === undefined
@@ -75,6 +91,18 @@ export const scrubIdentity = (p: Profile, scrub: Scrub, lang: Language): Profile
               ...t,
               headline: s(t.headline),
               archetype: { name: s(t.archetype.name), description: s(t.archetype.description) },
+              ...(t.collaboration
+                ? {
+                    collaboration: {
+                      ...t.collaboration,
+                      moves: t.collaboration.moves.map((m) => ({
+                        ...m,
+                        name: s(m.name),
+                        description: s(m.description),
+                      })),
+                    },
+                  }
+                : {}),
               traits: t.traits.map((x) => ({ name: s(x.name), description: s(x.description) })),
             },
           },
@@ -99,10 +127,19 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
   const p = limitedView(profile)
   const evidence = (xs: ReadonlyArray<{ readonly evidence: ReadonlyArray<unknown> }>) =>
     xs.reduce((sum, x) => sum + x.evidence.length, 0)
-  const names = new Set([...p.stats.activity.projects, ...p.stats.topProjects.map((x) => x.name)])
+  const names = new Set([
+    ...p.stats.activity.projects,
+    ...p.stats.topProjects.map((x) => x.name),
+    ...(p.historyComparison?.previousProjects ?? []),
+  ])
   return {
     quotes: v.quotes
       ? evidence(p.traits) +
+        (p.historyComparison?.changes.reduce(
+          (n, c) => n + c.previousEvidence.length + c.evidence.length,
+          0,
+        ) ?? 0) +
+        evidence(p.collaboration?.signals ?? []) +
         evidence(p.dimensions) +
         (v.coaching ? evidence(p.improvements) : 0) +
         (p.portrait

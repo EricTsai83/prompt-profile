@@ -1,3 +1,10 @@
+import { avatarFor, avatarPortrait, avatarStyle } from "./avatar.ts"
+import { AVATAR_MESSAGES } from "./messages.ts"
+import { historySection, historyStyle } from "./history.ts"
+import { HISTORY_MESSAGES } from "./messages.ts"
+import { LIBRARY_MESSAGES } from "./messages.ts"
+import { understandingSection, collaborationStyle } from "./collaboration.ts"
+import { contentIn } from "./content.ts"
 import { documentLayoutStyle } from "./document-layout.ts"
 import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
 import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
@@ -324,22 +331,16 @@ const signalRow = (p: Profile, loc: Loc): Raw | null => {
   </ul>`
 }
 
-/** One "before → now" row; `better` says which direction is an improvement, if any. */
-const change = (label: Raw, before: number, now: number, better: "down" | "up" | null): Raw => {
+/** Observed frequency differences, without judging either direction as improvement. */
+const change = (label: Raw, before: number, now: number): Raw => {
   const delta = Math.round(now * 100) - Math.round(before * 100)
-  const tone =
-    better === null || delta === 0 ? "flat" : delta < 0 === (better === "down") ? "good" : "bad"
-  return html`<li class="chg ${tone}">
-    <span>${label}</span>
-    <b>${Math.round(before * 100)}% → ${Math.round(now * 100)}%</b>
-    <i>${delta === 0 ? "=" : delta > 0 ? `▲ ${delta}` : `▼ ${-delta}`}</i>
-  </li>`
+  return html`<li class="chg flat"><span>${label}</span><b>${Math.round(before * 100)}% → ${Math.round(now * 100)}%</b><i>${delta === 0 ? "=" : delta > 0 ? `▲ ${delta}` : `▼ ${-delta}`}</i></li>`
 }
 
 /** "Since your last report": habits and the techniques that moved most. */
 const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
   const prev = p.previous
-  if (prev === null) return null
+  if (prev === null || !p.historyComparison?.toolComparable) return null
   const s = p.stats
   const t = s.techniques
   const movers =
@@ -371,21 +372,18 @@ const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw |
         loc.text((m) => m.correctionsShare),
         prev.correctionRate,
         s.correctionRate,
-        "down",
       )}
       ${change(
         loc.text((m) => m.terseLabel),
         prev.terseShare,
         s.promptHabits.terseShare,
-        "down",
       )}
       ${change(
         loc.text((m) => m.nightLabel),
         prev.nightShare,
         nightShare(s),
-        null,
       )}
-      ${movers.map((x) => change(x.label, x.before, x.now, null))}
+      ${movers.map((x) => change(x.label, x.before, x.now))}
     </ul>
     ${
       prev.improvements.length > 0
@@ -637,70 +635,11 @@ export const renderHtml = (
   // the usage's own period: it is summed over the whole window, not only the prompts' days
   const usagePeriod = periodOf(profile.usage?.range ?? null)
   const usage = usageSection(profile, loc, v, (l) => usagePeriod(MESSAGES[l]))
-  const graphic = !clock ? graphicSvg(identity.graphic, s.hourHistogram, identity) : null
+  const avatar = avatarFor(profile, options.avatar)
+  const graphic =
+    avatar ?? (!clock ? graphicSvg(identity.graphic, s.hourHistogram, identity) : null)
 
-  const page = html`<!doctype html>
-    <html lang="${LANG_TAGS[loc.langs[0]!]}" ${raw(themeAttributes(theme))}>
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="referrer" content="no-referrer" />
-        <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${theme.type.display ? "; font-src data:" : ""}"
-        />
-        <title>${scrub(profile.archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
-        <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
-        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
-      </head>
-      <body>
-        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
-        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}" />
-        ${
-          multi
-            ? loc.langs.map(
-                (l, i) =>
-                  html`<input
-                    type="radio"
-                    name="lang"
-                    id="lang-${l}"
-                    class="lang-input"
-                    ${i === 0 ? raw("checked") : ""}
-                  />`,
-              )
-            : ""
-        }
-        <div class="page">
-          <header class="topbar">
-            <span class="brand">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].brand(options.name ?? null))}</span>
-            ${
-              multi
-                ? html`<nav class="switch" aria-label="${loc.attr((m) => m.switchLabel)}">
-                    ${loc.langs.map(
-                      (l) =>
-                        html`<label for="lang-${l}" lang="${LANG_TAGS[l]}"
-                          >${MESSAGES[l].languageName}</label
-                        >`,
-                    )}
-                  </nav>`
-                : ""
-            }
-          </header>
-          <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].navigation)}">
-            <label for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overview)}</label>
-            <label for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detail)}</label>
-          </nav>
-          <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
-          <section class="hero">
-            ${identity.split ? html`<div class="split"></div>` : ""}
-            <div class="copy">
-              <h1>${loc.text((_m, ct, l) => scrub(ct.archetype.name, l))}</h1>
-              <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
-              <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
-              ${clock ? "" : html`<p class="chrono">${windowText}</p>`}
-              <dl class="report-facts">
+  const heroFacts = html`              <dl class="report-facts">
                 <div>
                   <dt>${loc.text((m) => m.dataPeriod)} ${definition(
                     loc,
@@ -737,15 +676,80 @@ export const renderHtml = (
                     )}
                   </dd>
                 </div>
-              </dl>
+              </dl>`
+  const page = html`<!doctype html>
+    <html lang="${LANG_TAGS[loc.langs[0]!]}" ${raw(themeAttributes(theme))}>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="referrer" content="no-referrer" />
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${theme.type.display ? "; font-src data:" : ""}"
+        />
+        <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
+        <style>
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}</style>
+      </head>
+      <body>
+        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
+        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}" />
+        ${
+          multi
+            ? loc.langs.map(
+                (l, i) =>
+                  html`<input
+                    type="radio"
+                    name="lang"
+                    id="lang-${l}"
+                    class="lang-input"
+                    ${i === 0 ? raw("checked") : ""}
+                  />`,
+              )
+            : ""
+        }
+        <div class="page">
+          <header class="topbar">
+            <span class="brand">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].brand(options.name ?? null))}</span>
+            ${
+              multi
+                ? html`<nav class="switch" aria-label="${loc.attr((m) => m.switchLabel)}">
+                    ${loc.langs.map(
+                      (l) =>
+                        html`<label for="lang-${l}" lang="${LANG_TAGS[l]}"
+                          >${MESSAGES[l].languageName}</label
+                        >`,
+                    )}
+                  </nav>`
+                : ""
+            }
+          </header>
+          ${options.libraryHref && /^(?:\.\.\/)+index\.html$/u.test(options.libraryHref) ? html`<p class="library-back"><a href="${options.libraryHref}">${loc.text((_m, _c, l) => LIBRARY_MESSAGES[l].back)}</a></p>` : ""}
+          <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].navigation)}">
+            <label for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overview)}</label>
+            <label for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detail)}</label>
+          </nav>
+          <main>
+          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
+          <section class="hero">
+            ${identity.split ? html`<div class="split"></div>` : ""}
+            <div class="copy">
+              <h1>${loc.text((_m, ct, l) => scrub(ct.archetype.name, l))}</h1>
+              <p class="tagline">${loc.text((_m, ct, l) => scrub(ct.headline, l))}</p>
+              <p class="desc">${loc.text((_m, ct, l) => scrub(ct.archetype.description, l))}</p>
+              ${clock ? "" : html`<p class="chrono">${windowText}</p>`}
+              ${avatar ? "" : heroFacts}
             </div>
+            ${avatar ? heroFacts : ""}
             ${theme.layout.signatures === "none" ? "" : identitySignatures(profile, loc, scrub)}${
               graphic
-                ? html`<img
-                    class="graphic"
-                    src="${svgDataUrl(graphic.svg)}"
-                    alt="${loc.attr((m) => m.graphicAlt)}"
-                  />`
+                ? avatar
+                  ? html`<picture class="graphic role-avatar" data-avatar="${avatar.id}">
+                    <source media="(min-width:761px)" srcset="${svgDataUrl(avatarPortrait(avatar).svg)}" />
+                    <img src="${svgDataUrl(avatar.svg)}" alt="${loc.attr((_m, _c, l) => AVATAR_MESSAGES[l].alt[avatar.kind])}" />
+                  </picture>`
+                  : html`<img class="graphic" src="${svgDataUrl(graphic.svg)}" alt="${loc.attr((m) => m.graphicAlt)}" />`
                 : html`<div class="hero-clock">${radialClock(s, window, windowText)}</div>`
             }
           </section>
@@ -1002,7 +1006,7 @@ export const renderHtml = (
             }
           </section>
 
-          ${preferences ?? ""}
+          ${preferences ?? ""}${historySection(profile, loc, v, scrub)}${understandingSection(profile, loc, v, scrub)}
 
           ${steering ?? ""}
 
@@ -1073,8 +1077,8 @@ export const renderHtml = (
                   <h2>${loc.text((m) => m.howMeasured)}</h2>
                   <p>
                     ${loc.text(
-                      (m) =>
-                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model, profile.engine.effort)} · ${m.generatedAt((v.dates ? formatDateTime : formatMonth)(profile.generatedAt, tz, m.locale))}`,
+                      (m, _c, l) =>
+                        `${m.engine(RUNNER_NAMES[profile.engine.runner], profile.engine.model, profile.engine.effort)} · ${m.generatedAt((v.dates ? formatDateTime : formatMonth)(profile.generatedAt, tz, m.locale))}${profile.engine.model && profile.engine.modelSource !== "reported" ? ` · ${HISTORY_MESSAGES[l].unverifiedModel}` : ""}`,
                     )}
                   </p>
                   <p>
@@ -1083,6 +1087,7 @@ export const renderHtml = (
                         `${m.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? ` · ${m.chunksSkipped(c.chunksFailed)}` : ""}`,
                     )}
                   </p>
+                  ${(c.narrativeRejected ?? 0) > 0 ? html`<p class="note">${loc.text((_m, _c, l) => HISTORY_MESSAGES[l].narrativeLimit)}</p>` : ""}
                   ${excluded.length > 0 ? html`<p>${loc.text((m) => m.leftOut(excluded.join(", ")))}</p>` : ""}
                   <p>${loc.text((m) => m.privacy)}</p>
                 </section>

@@ -9,13 +9,18 @@ import { LIMITED_MESSAGES } from "./messages.ts"
  * characteristic way of working on a preference axis (2+ sessions, `verifyPortrait`).
  */
 export const isLimitedEvidence = (p: Profile): boolean =>
+  !(p.collaboration?.moves.some((m) => m.support.sessions >= 2) ?? false) &&
+  !(
+    p.collaboration?.signals.some((s) => s.support.sessions >= 2 && s.evidence.length > 0) ?? false
+  ) &&
   !p.traits.some(
     (t) =>
       t.evidence.length > 0 &&
       // The verified spread when recorded: the model may state "low" despite it. Profiles
       // before `support` was stored only have the capped confidence.
       (t.support ? t.support.sessions >= 2 : t.confidence !== "low"),
-  ) && !(p.portrait?.axes.some((a) => axisState(a) !== "none") ?? false)
+  ) &&
+  !(p.portrait?.axes.some((a) => axisState(a) !== "none") ?? false)
 
 /**
  * What the report and card show for a limited profile: fixed text in place of the generated

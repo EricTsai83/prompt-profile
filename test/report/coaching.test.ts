@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@effect/vitest"
-import { Effect } from "effect"
+import { Effect, DateTime } from "effect"
 import { readFileSync } from "node:fs"
 import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { escapeHtml } from "../../src/report/html-template.ts"
@@ -65,12 +65,26 @@ describe("prompt coaching", () => {
 
   it.effect("since the last report: habits and moved techniques, part of coaching", () =>
     Effect.gen(function* () {
-      const p = englishOnly(yield* sample())
+      const base = englishOnly(yield* sample())
+      expect(renderHtml(base)).not.toContain("Since your last report")
+      const since = DateTime.makeUnsafe("2026-09-01T00:00:00Z"),
+        until = DateTime.makeUnsafe("2026-09-08T00:00:00Z")
+      const p: Profile = {
+        ...base,
+        historyComparison: {
+          previousProjects: [],
+          previousGeneratedAt: base.previous!.generatedAt,
+          previousWindow: { since, until },
+          currentWindow: { since: until, until: DateTime.makeUnsafe("2026-09-15T00:00:00Z") },
+          toolComparable: true,
+          changes: [],
+        },
+      }
       const out = renderHtml(p)
       expect(out).toContain("Since your last report")
-      // corrections went from 16% to 12%: an improvement
+      // A count difference is shown only with comparable history metadata.
       expect(out).toMatch(
-        /class="chg good">\s*<span>Prompts that correct the AI<\/span>\s*<b>16% → 12%<\/b>/,
+        /class="chg flat">\s*<span>Prompts that correct the AI<\/span>\s*<b>16% → 12%<\/b>/,
       )
       expect(out).toContain("Delegates to subagents")
       expect(out).toContain("Suggested last time: State the expected result first")

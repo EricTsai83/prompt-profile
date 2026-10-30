@@ -1,3 +1,4 @@
+import { avatarFor, type avatarSvg } from "./avatar.ts"
 import { Effect } from "effect"
 import { Resvg, initWasm } from "@resvg/resvg-wasm"
 import satori from "satori"
@@ -8,7 +9,7 @@ import type { FontData } from "./fonts.ts"
 import { clockSvg, graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
 import { lookOf, type CardTokens, type Theme } from "./theme.ts"
-import { contentIn } from "./content.ts"
+import { contentIn, signatureNames } from "./content.ts"
 import { cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
@@ -118,27 +119,23 @@ const identityCopy = (
         : h(
             "div",
             { display: "flex", gap: card.chips.gap, flexWrap: "nowrap", marginTop: card.chips.top },
-            profile.traits
-              .map((t, i) => ({ t, i }))
-              .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
-              .slice(0, 2)
-              .map(({ i }) =>
-                h(
-                  "div",
-                  {
-                    display: "flex",
-                    fontSize: card.size.chip,
-                    padding: card.chips.padding,
-                    maxWidth: 320,
-                    maxHeight: 40,
-                    overflow: "hidden",
-                    lineClamp: 1,
-                    borderRadius: 999,
-                    ...colors.chip,
-                  },
-                  clip(c.trait(i).name, 32),
-                ),
+            signatureNames(profile, lang).map((chipName) =>
+              h(
+                "div",
+                {
+                  display: "flex",
+                  fontSize: card.size.chip,
+                  padding: card.chips.padding,
+                  maxWidth: 320,
+                  maxHeight: 40,
+                  overflow: "hidden",
+                  lineClamp: 1,
+                  borderRadius: 999,
+                  ...colors.chip,
+                },
+                clip(chipName, 32),
               ),
+            ),
           ),
     ],
   )
@@ -234,6 +231,7 @@ const classicTree = (
   lang: Language,
   showUsage: boolean,
   exactDates: boolean,
+  avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
   const t = MESSAGES[lang]
   const k = schemeOf(theme)
@@ -244,7 +242,7 @@ const classicTree = (
   const left = CARD_WIDTH - card.graphic.right - size
   const top = (CARD_HEIGHT - size) / 2
   const scale = size / clock.width
-  const ticks = [0, 6, 12, 18].map((hour) => {
+  const ticks = (avatar ? [] : [0, 6, 12, 18]).map((hour) => {
     const a = (hour / 24) * Math.PI * 2 - Math.PI / 2
     return h(
       "div",
@@ -279,7 +277,7 @@ const classicTree = (
             {
               type: "img",
               props: {
-                src: svgDataUrl(clock.svg),
+                src: svgDataUrl(avatar?.svg ?? clock.svg),
                 width: size,
                 height: size,
                 style: { position: "absolute", left, top },
@@ -320,12 +318,13 @@ const identityTree = (
   lang: Language,
   showUsage: boolean,
   exactDates: boolean,
+  avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
   const t = MESSAGES[lang]
   const id = theme.identity
   const card = theme.card
   const showGraphic = !hide.includes("graphic")
-  const graphic = graphicSvg(id.graphic, profile.stats.hourHistogram, id)
+  const graphic = avatar ?? graphicSvg(id.graphic, profile.stats.hourHistogram, id)
   const { right, top, width } = card.graphic
   return h(
     "div",
@@ -396,6 +395,7 @@ const productTree = (
   lang: Language,
   showUsage: boolean,
   exactDates: boolean,
+  avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
   const c = contentIn(p, lang)
   const k = schemeOf(theme)
@@ -403,11 +403,8 @@ const productTree = (
   const pad = card.padding.x
   const inner = CARD_WIDTH - 2 * pad
   const support = card.support
-  const graphic = graphicSvg("bars", p.stats.hourHistogram, theme.identity)
-  const traits = p.traits
-    .map((t, i) => ({ t, i }))
-    .filter(({ t }) => t.confidence !== "low" && t.evidence.length > 0)
-    .slice(0, 2)
+  const graphic = avatar ?? graphicSvg("bars", p.stats.hourHistogram, theme.identity)
+  const traits = signatureNames(p, lang)
   return h(
     "div",
     {
@@ -509,7 +506,7 @@ const productTree = (
                       marginTop: card.chips.top,
                       fontSize: card.size.chip,
                     },
-                    traits.map(({ i }) =>
+                    traits.map((name) =>
                       h(
                         "div",
                         {
@@ -524,7 +521,7 @@ const productTree = (
                           overflow: "hidden",
                           wordBreak: "normal",
                         },
-                        clip(c.trait(i).name.replace(/\s+/g, " "), 48),
+                        clip(name.replace(/\s+/g, " "), 48),
                       ),
                     ),
                   ),
@@ -547,8 +544,8 @@ const productTree = (
                     type: "img",
                     props: {
                       src: svgDataUrl(graphic.svg),
-                      width: card.graphic.width,
-                      height: 100,
+                      width: avatar ? 160 : card.graphic.width,
+                      height: avatar ? 160 : 100,
                     },
                   },
               hide.includes("stats")
@@ -618,7 +615,15 @@ export const cardTree = (
   const hide: RenderOptions["cardHide"] = isLimitedEvidence(profile)
     ? [...new Set([...options.cardHide, "traits" as const])]
     : options.cardHide
-  return TREES[theme.card.composition](p, theme, hide, lang, v.usage, v.dates)
+  return TREES[theme.card.composition](
+    p,
+    theme,
+    hide,
+    lang,
+    v.usage,
+    v.dates,
+    avatarFor(profile, options.avatar),
+  )
 }
 
 let wasmReady: Promise<void> | null = null

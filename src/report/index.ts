@@ -1,3 +1,4 @@
+import { avatarFor, AVATAR_ART_VERSION } from "./avatar.ts"
 import { Effect, FileSystem, Path } from "effect"
 import { createHash } from "node:crypto"
 import { encodeProfile, LANGUAGES, type Language, type Profile } from "../domain/Profile.ts"
@@ -9,7 +10,6 @@ import {
   DEFAULT_RENDER_OPTIONS,
   excludedParts,
   hiddenParts,
-  isDefaultRender,
   RENDER_MANIFEST_VERSION,
   type RenderOptions,
 } from "./looks.ts"
@@ -53,7 +53,7 @@ const noCjkFonts: CjkFonts = Effect.fail(new FontUnavailable({ reason: "no CJK f
 
 /**
  * Write `report.html`, `profile.json` and one card per language into `outDir` (overwriting
- * only those files). A card failure never fails the report. A non-default render also writes
+ * only those files). A card failure never fails the report. Every render also writes
  * `render.json`: its options and the profile it came from (`source`, relative to `outDir`).
  */
 export const writeReport = (
@@ -86,9 +86,15 @@ export const writeReport = (
     const profileText = `${JSON.stringify(encodeProfile(profile), null, 2)}\n`
     yield* write(profileJson, profileText)
     yield* write(html, renderHtml(profile, options))
-    if (!isDefaultRender(options)) {
+    {
       const manifest = {
         renderVersion: RENDER_MANIFEST_VERSION,
+        avatar: {
+          choice: options.avatar ?? "auto",
+          artVersion: AVATAR_ART_VERSION,
+          id: avatarFor(profile, options.avatar)?.id ?? null,
+        },
+        name: options.name ?? null,
         look: options.look,
         lookVersion: lookOf(options.look).version,
         cardHidden: hiddenParts(options),
