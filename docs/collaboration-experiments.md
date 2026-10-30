@@ -41,3 +41,16 @@ keyboard selection and print visibility. The generated sample is fictional. Brow
 are local under `tmp/plan27/`; they are not source fixtures. No actual productivity outcome or
 human comprehension result was measured. Broader visual polish and owner feedback remain
 possible without changing this contract.
+
+## Owner scope decision — 2026-10-31
+
+The product delivers a useful HTML report from the available history. The report can explain
+an observed collaboration pattern, suggest an action or instruction, and show how a prompt
+could be rewritten, with evidence and uncertainty where available. Readers do not need to
+accept or reject the suggestions inside the product.
+
+Plan 28's separate reviewed-preference export workflow was removed by owner decision.
+Do not require a review file, selection, approval, export or agent configuration installation
+to obtain value from these suggestions. Existing report improvements and suggested rewrites
+already provide the intended surface; this decision adds no new analysis or report fields.
+Suggestions remain proposals, not established user preferences or demonstrated improvements.

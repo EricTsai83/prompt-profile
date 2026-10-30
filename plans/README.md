@@ -111,7 +111,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 28 | [Reviewed collaboration preference export](28-reviewed-collaboration-preferences.md) | User-reviewed portable collaboration instructions | Completed claim calibration; plan 27 can provide candidate actions | Planned; follow initial evidence and experiment delivery |
 | 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
 | 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
 | 31 | [Context and project retrospectives](31-context-and-project-retrospectives.md) | Bounded project/context selection and retrospectives | Plan 20 B/C; history comparison also requires plan 20 A/E | Planned; evidence foundation first |
@@ -139,8 +138,7 @@ and plan 22 remains the experiment tooling owner.
 
 ### Recommended execution batches
 
-1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); next are plan 28 (reviewed
-   preferences) and plan 29 (sharing). The completed library and evidence foundation are available.
+1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); next is plan 29 (sharing). The completed library and evidence foundation are available.
 2. **Support recurring reflection:** plan 30 (annotations) and plan 31 (project/context
    retrospectives). Comparable-window history is implemented; scoped selection remains future work.
 3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
@@ -158,6 +156,11 @@ and plan 22 remains the experiment tooling owner.
 - The owner is the current reader. Iterate together through owner use and feedback, supported
   by fictional cases and automated checks. External participants and reader studies are not
   prerequisites; automated checks do not establish human comprehension.
+
+Plan 28 (reviewed collaboration preference export) was removed by owner decision on
+2026-10-31, rather than completed. Collaboration suggestions and prompt rewrites belong in
+the report; do not add acceptance/rejection, preference export or configuration installation
+workflows. See the [report scope decision](../docs/collaboration-experiments.md#owner-scope-decision--2026-10-31).
 
 Plan 32 (external reader research) was removed by owner decision on 2026-10-29, rather than
 completed. Its protocol and fictional rehearsal were discarded. Do not reintroduce participant
