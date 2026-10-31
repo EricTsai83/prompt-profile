@@ -1,16 +1,18 @@
 /**
  * CLI checks shared by the npm package check (test-package.mjs) and the standalone binary
- * check (test-binary.mjs): version, help, offline render of HTML + JSON + 1200x630 PNG, a look.
+ * check (test-binary.mjs): version, help, a dry run over the fixture history, offline render of
+ * HTML + JSON + 1200x630 PNG, a look.
  * `cli(args, options)` runs the program under test and returns stdout.
  */
 import assert from "node:assert/strict"
-import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs"
+import { cpSync, existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs"
 import { join } from "node:path"
 
 export const checkCli = ({ repo, root, version, cli }) => {
   assert.equal(cli(["--version"]).trim(), `prompt-profile v${version}`)
   assert.match(cli(["--help"]), /--max-calls/)
   assert.match(cli(["--help"]), /--max-cost-usd/)
+  checkDryRun({ repo, root, cli })
   const input = join(root, "sample profile.json")
   const output = join(root, "rendered report")
   // English only: a zh-TW card would download the CJK font, which this check must not need.
@@ -71,4 +73,41 @@ export const checkCli = ({ repo, root, version, cli }) => {
   assert.equal(signalCard.readUInt32BE(16), 1200)
   assert.match(readFileSync(join(root, "signal", "report.html"), "utf8"), /data-look="signal"/)
   assert.ok(existsSync(join(root, "signal", "render.json")))
+}
+
+/**
+ * The main command up to the first LLM call: read the fictional Claude Code and Codex history,
+ * filter, redact, chunk and write the preview. `--dry-run` sends nothing; a `claude` / `codex`
+ * on PATH is only asked for its version and login state.
+ */
+const checkDryRun = ({ repo, root, cli }) => {
+  const home = join(root, "home")
+  const out = join(root, "dry run")
+  // Copies: a real `claude` on PATH writes its own config into CLAUDE_CONFIG_DIR when asked
+  const history = join(root, "history")
+  cpSync(join(repo, "test", "fixtures", "claude-code"), join(history, "claude-code"), {
+    recursive: true,
+  })
+  cpSync(join(repo, "test", "fixtures", "codex"), join(history, "codex"), { recursive: true })
+  cli(["--dry-run", "--since", "all", "--out", out], {
+    env: {
+      ...process.env,
+      // never the real history of the machine running the check
+      HOME: home,
+      USERPROFILE: home,
+      CLAUDE_CONFIG_DIR: join(history, "claude-code"),
+      CODEX_HOME: join(history, "codex"),
+      XDG_CACHE_HOME: join(root, "cache"),
+    },
+  })
+  const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
+  assert.ok(plan.chunksSelected > 0, "The dry run selected no chunk from the fixture history")
+  const chunks = readdirSync(join(out, "chunks"))
+  assert.equal(chunks.length, plan.chunksSelected)
+  assert.match(readFileSync(join(out, "chunks", chunks[0]), "utf8"), /^<prompt id="/)
+  if (process.platform !== "win32") {
+    for (const file of ["plan.json", join("chunks", chunks[0])]) {
+      assert.equal(statSync(join(out, file)).mode & 0o777, 0o600)
+    }
+  }
 }

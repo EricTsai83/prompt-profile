@@ -41,7 +41,9 @@ try {
         ...options,
       }),
   })
-  console.log(`Binary check passed (${basename(archive)}): version, help, HTML, JSON, PNG, a look.`)
+  console.log(
+    `Binary check passed (${basename(archive)}): version, help, a dry run, HTML, JSON, PNG, a look.`,
+  )
 } finally {
   rmSync(root, { recursive: true, force: true })
 }

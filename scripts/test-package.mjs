@@ -1,7 +1,7 @@
 /** Install the actual tarball outside the checkout and exercise its public CLI, offline rendering and assets. */
 import assert from "node:assert/strict"
 import { execFileSync } from "node:child_process"
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs"
+import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
@@ -42,17 +42,18 @@ try {
     const shim = run(join(root, "node_modules", ".bin", "prompt-profile"), ["--version"])
     assert.equal(shim.trim(), `prompt-profile v${pkg.version}`)
   }
-  for (const file of [
-    "prompts/map.md",
-    "prompts/merge.md",
-    "prompts/reduce.md",
-    "prompts/review.md",
-    "fonts/Inter-Regular.woff",
-    "fonts/Inter-Bold.woff",
-    "fonts/Inter-OFL.txt",
-    "fonts/BricolageGrotesque-ExtraBold.woff",
-    "fonts/BricolageGrotesque-OFL.txt",
-  ]) {
+  // Every file tsdown copies beside dist/bin.js (tsdown.config.ts), listed from the sources so
+  // a new prompt or font is checked without editing this list
+  const shipped = (dir, to) =>
+    readdirSync(join(repo, dir))
+      .filter((f) => !f.startsWith("."))
+      .map((f) => `${to}/${f}`)
+  const assets = [
+    ...shipped("src/analysis/prompts", "prompts"),
+    ...shipped("src/report/fonts", "fonts"),
+  ]
+  assert.ok(assets.some((f) => f === "prompts/map.md") && assets.some((f) => f.endsWith(".woff")))
+  for (const file of assets) {
     assert.ok(statSync(join(installed, "dist", file)).size > 0, `Missing package asset: ${file}`)
   }
   checkCli({
@@ -62,7 +63,7 @@ try {
     cli: (args, options = {}) => run(process.execPath, [bin, ...args], options),
   })
   console.log(
-    "Installed-package check passed: version, help, prompts, fonts, HTML, JSON, 1200x630 PNG and a look.",
+    "Installed-package check passed: version, help, prompts, fonts, a dry run, HTML, JSON, 1200x630 PNG and a look.",
   )
 } finally {
   rmSync(root, { recursive: true, force: true })
