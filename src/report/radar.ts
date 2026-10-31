@@ -4,6 +4,23 @@ import type { Loc } from "./loc.ts"
 import { RADAR_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
+/** Label font size on the large radar (`.radar-label`), and the room a label needs beside it. */
+const LABEL_FONT = 12
+const WIDE = /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60]/u
+
+/** Side margin for the longest label (CJK glyphs about 1em, others about 0.6em), at least 80. */
+const labelRoom = (labels: ReadonlyArray<string>): number =>
+  Math.max(
+    80,
+    Math.ceil(
+      Math.max(
+        ...labels.map((t) =>
+          Array.from(t).reduce((w, ch) => w + (WIDE.test(ch) ? 1 : 0.6) * LABEL_FONT, 0),
+        ),
+      ) + 18,
+    ),
+  )
+
 /** Fewest measured traits a radar needs; fewer stay in the trait list only. */
 export const MIN_RADAR_TRAITS = 3
 /** Most project radars shown, busiest first. */
@@ -93,7 +110,13 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
       overall,
       (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${overall[i]}%`),
       (i) => loc.attr((_m, _c, l) => `${name(i)(l)}: ${overall[i]}%`),
-      { r: 130, padX: 130, padY: 26 },
+      {
+        r: 130,
+        padX: labelRoom(
+          traits.map((_, i) => p.languages.map((l) => `${name(i)(l)} ${overall[i]}%`)).flat(),
+        ),
+        padY: 26,
+      },
     )}</div>
     <ul class="radar-values">${traits.map(
       (t, i) =>
@@ -114,7 +137,10 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
         () => null,
         (i) => loc.attr((_m, _c, l) => `${project} · ${name(i)(l)}: ${values[i]}%`),
         { r: 60, padX: 10, padY: 10 },
-      )}</figure>`
+      )}<ul class="radar-mini-values">${traits.map(
+        (_, i) =>
+          html`<li><span>${loc.text((_m, _c, l) => name(i)(l))}</span> <b>${values[i]}%</b></li>`,
+      )}</ul></figure>`
     })}</div>
   </section>`
   }`
@@ -136,5 +162,7 @@ export const radarStyle = `
 .radar-grid-list figcaption{font-size:var(--text-sm);font-weight:600}
 .radar-grid-list figcaption small{display:block;font-weight:400;color:var(--muted)}
 .radar-grid-list svg{display:block;margin:4px auto 0;max-width:100%;height:auto}
+.radar-mini-values{list-style:none;padding:0;margin:6px auto 0;max-width:200px;display:grid;gap:2px;font-size:var(--text-xs);text-align:left}
+.radar-mini-values li{display:flex;justify-content:space-between;gap:8px}.radar-mini-values span{color:var(--muted)}
 @media print{.trait-radar,.trait-radar-projects{break-inside:avoid}}
 `

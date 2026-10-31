@@ -80,6 +80,34 @@ describe("trait radar", () => {
     expect(hidden).not.toContain("PROJECT_ALPHA")
   })
 
+  it("lists each trait's share under every project radar, so its spokes can be read", async () => {
+    const p = await measured()
+    const projects = section(renderHtml(p), "trait-radar-projects")
+    const alpha = /<figure>(?:(?!<\/figure>)[\s\S])*PROJECT_ALPHA[\s\S]*?<\/figure>/
+      .exec(projects)![0]
+      .replace(/<svg[\s\S]*?<\/svg>/, "")
+    // PROJECT_ALPHA: 70 of 120 (58%), 120 of 120 (100%), 10 of 120 (8%)
+    for (const share of ["58%", "100%", "8%"]) expect(alpha).toContain(share)
+    expect(alpha).toContain(p.traits[0]!.name)
+  })
+
+  it("leaves room beside the radar for its longest label", async () => {
+    const p = await measured()
+    const width = (html: string) =>
+      Number(/<section class="trait-radar">[\s\S]*?<svg viewBox="0 0 (\d+)/.exec(html)![1])
+    const long = {
+      ...p,
+      traits: p.traits.map((t, i) =>
+        i === 1 ? { ...t, name: "An unusually long trait name that runs on" } : t,
+      ),
+      translations: {},
+      languages: ["en"] as const,
+    }
+    expect(width(renderHtml(long))).toBeGreaterThan(
+      width(renderHtml({ ...p, translations: {}, languages: ["en"] as const })),
+    )
+  })
+
   it("is left out with fewer than three measured traits", async () => {
     const p = await measured()
     const two = { ...p, traits: p.traits.map((t, i) => (i === 2 ? { ...t, frequency: null } : t)) }
