@@ -74,7 +74,8 @@ git push --follow-tags
 
 [`release.yml`](.github/workflows/release.yml) then checks that the tag equals the
 `package.json` version, runs every check, packs and tests the tarball, builds the standalone
-binaries, creates the GitHub Release (generated notes, tarball, binaries, `SHA256SUMS`) and
+binaries and runs each on a runner of its own platform
+([`binaries.yml`](.github/workflows/binaries.yml), which CI also runs), creates the GitHub Release (generated notes, tarball, binaries, `SHA256SUMS`) and
 only then publishes to npm through the Trusted Publisher, with provenance. A suffixed version is
 a prerelease on the npm dist-tag `next`. If any job fails, nothing is published: fix it on
 `main`, move the tag (`git push origin :refs/tags/vX.Y.Z`, `git tag -f vX.Y.Z`, push it again)

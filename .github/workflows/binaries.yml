@@ -1,0 +1,69 @@
+name: Binaries
+
+# Standalone executables (plan 19), called by ci.yml and release.yml: cross-compile every target
+# with Bun on Linux, then run each archive's CLI checks on a runner of its own platform, so a
+# binary that does not start there (signing, embedded files, paths) is caught before a release.
+# Uploads the archives and SHA256SUMS as the `binaries` artifact of the calling run.
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:binaries
+      - uses: actions/upload-artifact@v7
+        with:
+          name: binaries
+          path: |
+            dist-bin/*.tar.gz
+            dist-bin/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 7
+
+  # One row per target in scripts/build-binaries.ts
+  test:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux-x64
+            os: ubuntu-latest
+          - target: linux-arm64
+            os: ubuntu-24.04-arm
+          - target: darwin-arm64
+            os: macos-latest
+          - target: darwin-x64
+            os: macos-15-intel
+          - target: windows-x64
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      # The checks read the fixtures and scripts/; they need Node but no dependencies
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          # No pnpm in this job; v5 would otherwise find it in `packageManager` and fail
+          package-manager-cache: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: binaries
+          path: dist-bin
+      # bash also on Windows, so the glob expands
+      - shell: bash
+        run: node scripts/test-binary.mjs dist-bin/prompt-profile-*-${{ matrix.target }}.tar.gz

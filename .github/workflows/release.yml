@@ -59,32 +59,10 @@ jobs:
           path: prompt-profile.tgz
           if-no-files-found: error
 
-  # Standalone executables (plan 19), cross-compiled with Bun; the native one is checked
+  # Standalone executables (plan 19): cross-compiled, then each run on its own platform
   binaries:
     needs: check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build:binaries
-      - env:
-          VERSION: ${{ needs.check.outputs.version }}
-        run: node scripts/test-binary.mjs "dist-bin/prompt-profile-$VERSION-linux-x64.tar.gz"
-      - uses: actions/upload-artifact@v7
-        with:
-          name: binaries
-          path: |
-            dist-bin/*.tar.gz
-            dist-bin/SHA256SUMS
-          if-no-files-found: error
+    uses: ./.github/workflows/binaries.yml
 
   github-release:
     needs: [check, verify, binaries]

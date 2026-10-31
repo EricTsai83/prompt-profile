@@ -19,7 +19,12 @@ if (!archive || !existsSync(archive)) {
 }
 const root = mkdtempSync(join(tmpdir(), "prompt-profile binary "))
 try {
-  execFileSync("tar", ["-xzf", archive, "-C", root])
+  // Windows' own bsdtar: a GNU tar earlier on PATH (Git's) reads `C:\...` as a remote host
+  const tar =
+    process.platform === "win32"
+      ? join(process.env["SystemRoot"] ?? "C:\\Windows", "System32", "tar.exe")
+      : "tar"
+  execFileSync(tar, ["-xzf", archive, "-C", root])
   const folder = join(root, basename(archive, ".tar.gz"))
   const exe = join(folder, process.platform === "win32" ? "prompt-profile.exe" : "prompt-profile")
   const { version } = JSON.parse(readFileSync(join(repo, "package.json"), "utf8"))
