@@ -121,7 +121,7 @@ export const renderHtml = (
   // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
   const coaching = v.coaching && !limited
   const story = portraitStory(profile, loc, v, scrub)
-  const balance = axisBalanceSection(profile, loc)
+  const balance = axisBalanceSection(profile, loc, v, scrub)
   const radar = traitRadar(profile, loc, v, scrub)
   const preferences = preferenceEvidence(profile, loc, v, scrub)
   const episodes = episodesSection(profile, loc, v, scrub, (t, l) =>

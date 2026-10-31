@@ -92,3 +92,32 @@ describe("preference evidence next to the scale", () => {
     expect(measured).not.toContain(note)
   })
 })
+
+describe("examples of each way", () => {
+  it("quotes what was counted under each axis, unless quotes are excluded", async () => {
+    const base = await sample()
+    const p = {
+      ...base,
+      axisBalance: {
+        axes: [
+          {
+            key: "framing" as const,
+            first: 9,
+            second: 3,
+            examples: {
+              first: [{ promptId: "p1", quote: "DEFINE_FIRST_QUOTE" }],
+              second: [{ promptId: "p2", quote: "EXPLORE_FIRST_QUOTE" }],
+            },
+          },
+        ],
+        conversations: 40,
+        rejected: 0,
+      },
+    }
+    const out = /<section class="axis-balance">.*?<\/section>/s.exec(renderHtml(p))![0]
+    expect(out).toContain("DEFINE_FIRST_QUOTE")
+    expect(out).toContain("EXPLORE_FIRST_QUOTE")
+    const hidden = renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })
+    expect(hidden).not.toContain("DEFINE_FIRST_QUOTE")
+  })
+})

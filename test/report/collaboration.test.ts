@@ -50,7 +50,8 @@ it("separates requested practices from ability and keeps structured moves tied t
   expect(out).toContain("Compare then check")
   expect(out).toContain("Observed understanding signals")
   expect(out).toContain("Requested practice")
-  expect(out).toContain("Not observed in this evidence")
+  // its only signal is a one-off: the section says nothing recurred
+  expect(out).toContain("No understanding signal recurred in two or more conversations")
   expect(out).toContain("No supported benefit or cost claim here")
   expect(out).toContain("PRIVATE_SIGNAL_QUOTE")
   expect(out).toContain("prompt 2/8")
@@ -154,4 +155,34 @@ it("shows each example conversation under one habit only on the identity view", 
   expect(section.split(task).length - 1).toBe(1)
   // the second habit still gets the example nobody showed yet
   expect(section).toContain(base.episodes[2]!.task)
+})
+
+it("says once that no understanding signal recurred, instead of a row of empty kinds", async () => {
+  const base = await Effect.runPromise(
+    decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+  )
+  const once = (kind: "verification" | "context") => ({
+    kind,
+    basis: "user_request" as const,
+    observation: `ONE_OFF_${kind}`,
+    context: "c",
+    evidence: [],
+    support: { sessions: 1, weeks: 1 },
+  })
+  const out = renderHtml({
+    ...base,
+    languages: ["en"] as const,
+    translations: {},
+    collaboration: {
+      moves: [],
+      signals: [once("verification"), once("context")],
+      rejected: { moves: 0, signals: 0, effects: 0 },
+    },
+  })
+  const section = /<section class="understanding">.*?<\/section>/s.exec(out)![0]
+  expect(section).toContain("No understanding signal recurred in two or more conversations")
+  expect(section).not.toContain("Not observed in this evidence")
+  // the one-offs stay readable behind a single disclosure
+  expect(section.match(/<details class="signal-once">/g)).toHaveLength(1)
+  expect(section).toContain("ONE_OFF_verification")
 })

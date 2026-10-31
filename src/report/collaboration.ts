@@ -48,6 +48,14 @@ export const structuredMoves = (
   </section>`
 }
 
+/** One signal: what was observed, its basis, context and spread, then its quotes. */
+const signalBody = (p: Profile, s: Signal, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
+  const index = p.collaboration!.signals.indexOf(s)
+  return html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.signals[index]?.observation ?? s.observation, l))}</p>
+          <p class="note">${loc.text((_m, _c, l) => `${s.basis === "user_request" ? COLLABORATION_MESSAGES[l].requested : COLLABORATION_MESSAGES[l].reported} · ${scrub(p.translations[l]?.collaboration?.signals[index]?.context ?? s.context, l)} · ${EPISODE_MESSAGES[l].spread(s.support.sessions, s.support.weeks)}`)}</p>
+          ${v.quotes ? s.evidence.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`) : ""}`
+}
+
 export const understandingSection = (
   p: Profile,
   loc: Loc,
@@ -64,22 +72,24 @@ export const understandingSection = (
   ${
     !p.collaboration
       ? html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].legacy)}</p>`
-      : UNDERSTANDING_KINDS.map((kind) => {
-          const signals = p.collaboration!.signals.filter((s) => s.kind === kind)
-          const signal = (s: Signal) => {
-            const index = p.collaboration!.signals.indexOf(s)
-            return html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.signals[index]?.observation ?? s.observation, l))}</p>
-          <p class="note">${loc.text((_m, _c, l) => `${s.basis === "user_request" ? COLLABORATION_MESSAGES[l].requested : COLLABORATION_MESSAGES[l].reported} · ${scrub(p.translations[l]?.collaboration?.signals[index]?.context ?? s.context, l)} · ${EPISODE_MESSAGES[l].spread(s.support.sessions, s.support.weeks)}`)}</p>
-          ${v.quotes ? s.evidence.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`) : ""}`
-          }
-          // one conversation is an event, not a recurring signal: kept, but folded away
-          const recurring = signals.filter((s) => s.support.sessions >= MIN_SIGNAL_SESSIONS)
-          const once = signals.filter((s) => s.support.sessions < MIN_SIGNAL_SESSIONS)
-          return html`<article><h3>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].kinds[kind])}</h3>
+      : !p.collaboration.signals.some((s) => s.support.sessions >= MIN_SIGNAL_SESSIONS)
+        ? // nothing recurred: one line, with the one-offs behind a single disclosure
+          html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].noneRecurring)}</p>${
+            p.collaboration.signals.length === 0
+              ? ""
+              : html`<details class="signal-once"><summary>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].once(p.collaboration!.signals.length))}</summary>${p.collaboration.signals.map((s) => signalBody(p, s, loc, v, scrub))}</details>`
+          }`
+        : UNDERSTANDING_KINDS.map((kind) => {
+            const signals = p.collaboration!.signals.filter((s) => s.kind === kind)
+            const signal = (s: Signal) => signalBody(p, s, loc, v, scrub)
+            // one conversation is an event, not a recurring signal: kept, but folded away
+            const recurring = signals.filter((s) => s.support.sessions >= MIN_SIGNAL_SESSIONS)
+            const once = signals.filter((s) => s.support.sessions < MIN_SIGNAL_SESSIONS)
+            return html`<article><h3>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].kinds[kind])}</h3>
       ${recurring.length === 0 ? html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].none)}</p>` : recurring.map(signal)}
       ${once.length === 0 ? "" : html`<details class="signal-once"><summary>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].once(once.length))}</summary>${once.map(signal)}</details>`}
     </article>`
-        })
+          })
   }
 </section>`
 

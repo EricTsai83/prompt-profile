@@ -1146,6 +1146,8 @@ export const COLLABORATION_MESSAGES = {
     legacy: "This analysis did not assess structured understanding signals.",
     none: "Not observed in this evidence",
     once: (n: number) => `Seen in one conversation only (${n})`,
+    noneRecurring:
+      "No understanding signal recurred in two or more conversations in this evidence.",
     requested: "Requested practice",
     reported: "User-reported practice",
     moveTitle: "How you work with AI",
@@ -1170,6 +1172,7 @@ export const COLLABORATION_MESSAGES = {
     legacy: "這次分析尚未評估結構化的理解訊號。",
     none: "這份證據中尚未觀察到",
     once: (n: number) => `只在一段對話中看到（${n}）`,
+    noneRecurring: "這份證據中，沒有任何理解訊號出現在兩段以上的對話。",
     requested: "要求採用的做法",
     reported: "使用者回報的做法",
     moveTitle: "你習慣怎麼和 AI 一起做事",
