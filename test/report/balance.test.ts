@@ -56,3 +56,37 @@ describe("axis balance scale", () => {
     )
   })
 })
+
+describe("preference evidence next to the scale", () => {
+  it("drops the cited-choice coverage note for an axis the scale measures", async () => {
+    const base = await sample()
+    const portrait = {
+      introduction: "Intro.",
+      chapters: [{ title: "Chapter", body: "Body.", evidence: [] }],
+      axes: (["framing", "pacing", "control", "closure"] as const).map((key) => ({
+        key,
+        explanation: "Observed.",
+        coverage: {
+          citedSessions: 4,
+          analysedSessions: 288,
+          periods: 4,
+          scope: "cited_choices" as const,
+        },
+        sides: [{ pole: "first" as const, context: "reviews", sessions: 2, evidence: [] }],
+      })),
+    }
+    const note = "4 conversations with cited choices"
+    expect(renderHtml({ ...base, portrait, axisBalance: null })).toContain(note)
+    const measured = renderHtml({
+      ...base,
+      portrait,
+      axisBalance: balance([
+        ["framing", 9, 3],
+        ["pacing", 2, 2],
+        ["control", 5, 5],
+        ["closure", 4, 1],
+      ]),
+    })
+    expect(measured).not.toContain(note)
+  })
+})

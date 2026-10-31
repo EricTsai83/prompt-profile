@@ -8,10 +8,12 @@ import { BALANCE_MESSAGES, PORTRAIT_MESSAGES } from "./messages.ts"
  * fewer than MIN_BALANCE_CONVERSATIONS conversations behind them are left out; nothing is
  * shown for a profile without a measurement.
  */
+/** The axes with enough conversations behind them to show a share. */
+export const measuredAxes = (p: Profile) =>
+  (p.axisBalance?.axes ?? []).filter((a) => a.first + a.second >= MIN_BALANCE_CONVERSATIONS)
+
 export const axisBalanceSection = (p: Profile, loc: Loc): Raw | null => {
-  const axes = (p.axisBalance?.axes ?? []).filter(
-    (a) => a.first + a.second >= MIN_BALANCE_CONVERSATIONS,
-  )
+  const axes = measuredAxes(p)
   if (axes.length === 0) return null
   return html`<section class="axis-balance">
     <h2>${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].title)}</h2>

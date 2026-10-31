@@ -12,6 +12,7 @@ import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, viewMessages } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
+import { measuredAxes } from "./balance.ts"
 
 type Portrait = NonNullable<Profile["portrait"]>
 
@@ -75,6 +76,8 @@ export const preferenceEvidence = (
   )
     return null
   const code = roleCode(portrait.axes)
+  // the scale measures these axes: the cited-choice coverage would only understate them
+  const measured = new Set(measuredAxes(p).map((a) => a.key))
   return html`<section class="preference-evidence">
     ${defined(
       html`<h2>${loc.text((_m, _c, l) => viewMessages(l, p.voice).preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>`,
@@ -106,7 +109,7 @@ export const preferenceEvidence = (
       <b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[axis.key][0])}</b>
       ${state === "none" ? "" : html`<span>${loc.text((_m, _c, l) => (state === "both" ? PORTRAIT_MESSAGES[l].both : PORTRAIT_MESSAGES[l].axes[axis.key][state === "first" ? 1 : 2]))}</span>`}
       ${axis.explanation ? html`<p>${loc.text((_m, _c, l) => scrub(translated(l)?.explanation ?? axis.explanation, l))}</p>` : ""}
-      ${axis.coverage ? html`<p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].choiceCoverage(axis.coverage!.citedSessions, axis.coverage!.analysedSessions, axis.coverage!.periods))}</p>` : ""}
+      ${axis.coverage && !measured.has(axis.key) ? html`<p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].choiceCoverage(axis.coverage!.citedSessions, axis.coverage!.analysedSessions, axis.coverage!.periods))}</p>` : ""}
       ${axis.sides.map(
         (side, i) => html`<div class="axis-side">
         <h3>${loc.text((_m, _c, l) => {
