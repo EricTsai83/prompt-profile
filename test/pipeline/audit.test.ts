@@ -212,3 +212,19 @@ describe("final output check", () => {
     }),
   )
 })
+
+it.effect(
+  "preserves only a valid context identity, while auditing prose and malformed identities",
+  () =>
+    Effect.gen(function* () {
+      const p = yield* sample()
+      const identity = "c4c884978a31db79e95a7a7d0611873a651e6c21cd2a878bb85f44bd3939a402"
+      const context = { identity, selected: 1, excluded: 0, missing: 0 }
+      const result = check({ ...p, context, headline: identity }, "mask")
+      expect(result.profile.context?.identity).toBe(identity)
+      expect(result.profile.headline).toBe("[SECRET]")
+      expect(
+        check({ ...p, context: { ...context, identity: EMAIL } }, "mask").profile.context?.identity,
+      ).toBe("[EMAIL]")
+    }),
+)

@@ -190,6 +190,14 @@ export const checkOutput = (profile: Profile, options: CheckOptions): CheckResul
 
   const walk = (value: unknown, path: Path): unknown => {
     if (typeof value === "string") {
+      // Only the validated, non-displayed scope hash is metadata; arbitrary identities remain audited.
+      if (
+        path.length === 2 &&
+        path[0] === "context" &&
+        path[1] === "identity" &&
+        /^[a-f0-9]{64}$/.test(value)
+      )
+        return value
       if (DATE_LIKE.test(value) || isModelId(path)) return value
       const out = checkText(value, path)
       return path.at(-1) === "quote" && out !== value ? fitQuote(out) : out
