@@ -117,7 +117,7 @@ html:root .dim-body{padding:0 3mm 2mm}
 html:root .dim-body blockquote{font-size:8.5pt;line-height:1.4;padding:2px 8px}
 html:root .about{border:0;border-radius:0;border-top:1px solid var(--border);padding:4mm 0;break-inside:avoid}
 
-html:root .cols,html:root .stack{height:100px}
+html:root .stack{height:100px}
 html:root .heat-c{height:14px}
 html:root .cap p,html:root .trait p,html:root .dim-body p,html:root .improve p{font-size:9pt;line-height:1.5}
 html:root .overview-bars li{font-size:9pt;gap:8px}
@@ -125,7 +125,7 @@ html:root .panel .note{font-size:8pt;line-height:1.5}
 html:root .panel{padding:4mm;margin-bottom:4mm;border-radius:0;break-inside:auto}
 html:root .overview-charts{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
 html:root .overview-charts>.panel{margin-bottom:0;break-inside:avoid}
-html:root .panel:has(.heat),html:root .panel:has(.cal),html:root .panel:has(.cols),html:root .panel:has(.stack){break-inside:avoid}
+html:root .panel:has(.heat),html:root .panel:has(.cal),html:root .panel:has(.stack){break-inside:avoid}
 html:root .cap{display:block}
 html:root .cap>*+*{margin-top:3mm}
 html:root .portrait{display:block;max-width:none;margin:5mm 0}

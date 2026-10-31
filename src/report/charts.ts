@@ -1,18 +1,16 @@
-import type { Stats } from "../domain/Stats.ts"
-import { peakHour } from "../domain/Stats.ts"
+import { type Stats, peakHour } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"
 import type { Chapter } from "./derive.ts"
 import { CLOCK_DIAL, clockBars } from "./graphic.ts"
+import { hh, percent } from "./format.ts"
 
 /**
  * Charts drawn from `stats` only, as HTML/CSS so they reflow on small screens. Hover (or tap)
  * shows a CSS tooltip from `data-tip-<lang>`; no JavaScript. Project colors are `--p0`… and
  * `--po` (other).
  */
-
-const hh = (h: number) => `${String(h).padStart(2, "0")}:00`
 
 /** What a chart may reveal: `--exclude projects` / `dates` hide names and exact dates. */
 export interface ChartView {
@@ -68,54 +66,6 @@ const addDays = (date: string, n: number) =>
 const mondayOf = (date: string) => {
   const day = new Date(`${date}T00:00:00Z`).getUTCDay()
   return addDays(date, -((day + 6) % 7))
-}
-
-// ---- bars ---------------------------------------------------------------------------------
-
-const columnBars = (
-  values: ReadonlyArray<number>,
-  highlight: number | null,
-  tip: (i: number) => Raw,
-  label: (i: number) => Raw | null,
-  className: string,
-): Raw => {
-  const max = Math.max(1, ...values)
-  return html`<div class="cols ${className}">
-    ${values.map(
-      (n, i) =>
-        html`<div class="col ${tipClass(i, values.length)}" ${tip(i)} tabindex="-1">
-          <span
-            class="col-fill${i === highlight ? " peak" : ""}"
-            style="height:${n === 0 ? "2px" : `${pct(n, max)}%`}"
-          ></span>
-          <span class="col-label">${label(i)}</span>
-        </div>`,
-    )}
-  </div>`
-}
-
-export const hourChart = (s: Stats, loc: Loc): Raw =>
-  html`<div role="img" aria-label="${loc.attr((m) => m.byHour)}">
-    ${columnBars(
-      s.hourHistogram,
-      peakHour(s),
-      (h) => loc.tip((m) => m.hourTip(hh(h), s.hourHistogram[h]!)),
-      (h) => (h % 6 === 0 ? html`${String(h).padStart(2, "0")}` : null),
-      "hours",
-    )}
-  </div>`
-
-export const weekdayChart = (s: Stats, loc: Loc): Raw => {
-  const best = s.weekdayHistogram.indexOf(Math.max(...s.weekdayHistogram))
-  return html`<div role="img" aria-label="${loc.attr((m) => m.byWeekday)}">
-    ${columnBars(
-      s.weekdayHistogram,
-      s.weekdayHistogram[best]! > 0 ? best : null,
-      (d) => loc.tip((m) => `${m.weekdays[d]} · ${m.prompts(s.weekdayHistogram[d]!)}`),
-      (d) => loc.text((m) => m.weekdays[d]!),
-      "weekdays",
-    )}
-  </div>`
 }
 
 // ---- heatmap: weekday × hour --------------------------------------------------------------
@@ -381,14 +331,92 @@ export const projectWeeks = (s: Stats, loc: Loc, view: ChartView = PRIVATE_VIEW)
   </div>`
 }
 
+// ---- shares (inline SVG / CSS) ----------------------------------------------------------
+
+/** A donut of ratios with a legend; segments use the accent at three strengths. */
+export const donut = (
+  parts: ReadonlyArray<{ readonly value: number; readonly label: Raw }>,
+): Raw => {
+  let offset = 0
+  const total = Math.max(
+    1e-9,
+    parts.reduce((a, p) => a + p.value, 0),
+  )
+  const rings = parts.map((p, i) => {
+    const share = (p.value / total) * 100
+    const ring = html`<circle
+      cx="60"
+      cy="60"
+      r="44"
+      pathLength="100"
+      class="seg s${i}"
+      stroke-dasharray="${share.toFixed(2)} ${(100 - share).toFixed(2)}"
+      stroke-dashoffset="${(25 - offset).toFixed(2)}"
+    />`
+    offset += share
+    return ring
+  })
+  const top = parts.reduce((a, p) => (p.value > a.value ? p : a), parts[0]!)
+  return html`<div class="donut">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="44" class="track" />
+      ${rings}
+      <text x="60" y="66" text-anchor="middle" class="donut-value">
+        ${Math.round((top.value / total) * 100)}%
+      </text>
+    </svg>
+    <ul class="legend">
+      ${parts.map(
+        (p, i) =>
+          html`<li><i class="dot s${i}"></i>${p.label}<b>${Math.round((p.value / total) * 100)}%</b></li>`,
+      )}
+    </ul>
+  </div>`
+}
+
+/** Horizontal share bars (CSS widths). */
+export const shareBars = (
+  rows: ReadonlyArray<{ readonly label: Raw; readonly n: number }>,
+): Raw => {
+  const total = Math.max(
+    1,
+    rows.reduce((a, r) => a + r.n, 0),
+  )
+  return html`<ul class="shares">
+    ${rows
+      .filter((r) => r.n > 0)
+      .map(
+        (r) =>
+          html`<li>
+            <span class="share-label">${r.label}</span>
+            <span class="share-track"
+              ><span class="share-fill" style="width:${((100 * r.n) / total).toFixed(1)}%"></span
+            ></span>
+            <b>${Math.round((100 * r.n) / total)}%</b>
+          </li>`,
+      )}
+  </ul>`
+}
+
+export const ring = (value: number, label: Raw): Raw =>
+  html`<div class="ring">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="26" class="track" />
+      <circle
+        cx="32"
+        cy="32"
+        r="26"
+        pathLength="100"
+        class="seg s0"
+        stroke-dasharray="${Math.max(0.5, value * 100).toFixed(1)} 100"
+        stroke-dashoffset="25"
+      />
+    </svg>
+    <div><b>${percent(value)}%</b><span>${label}</span></div>
+  </div>`
+
 /** CSS for the charts and tooltips; `langs` selects the tooltip attribute per language. */
 export const chartStyle = (langs: ReadonlyArray<string>): string => `
-.cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
-.hours{--n:24}.weekdays{--n:7;gap:10px}
-.col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding-bottom:20px;outline:none}
-.col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity var(--motion-fast) var(--ease-out)}
-.col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
-.col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:var(--text-2xs);color:var(--muted);white-space:nowrap}
 .heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
 .heat-top{position:relative;height:56px;display:flex;align-items:flex-end;outline:none}
 .heat-top i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.35}
@@ -449,7 +477,6 @@ ${
 }
 @media (max-width:640px){
 .cal-w:nth-last-child(n+19){display:none}
-.cols{height:140px}.hours{gap:2px}
 .heat{grid-template-columns:20px repeat(24,minmax(0,1fr)) 28px;gap:2px}
 .heat-top{height:34px}
 .chapters{flex-direction:column}

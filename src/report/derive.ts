@@ -1,4 +1,4 @@
-import type { Stats } from "../domain/Stats.ts"
+import type { Stats } from "../domain/index.ts"
 
 /**
  * Measures derived from `stats` for the report: deterministic, with plain definitions shown to
@@ -6,7 +6,6 @@ import type { Stats } from "../domain/Stats.ts"
  */
 
 /** Share of prompts sent 22:00–04:59 (0 without prompts). */
-export { nightShare } from "../domain/Stats.ts"
 
 /** The busiest four consecutive hours (wrapping past midnight); `end` is exclusive. */
 export const chronotype = (

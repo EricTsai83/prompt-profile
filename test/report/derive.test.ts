@@ -1,10 +1,9 @@
 import { describe, expect, it } from "@effect/vitest"
-import type { Stats } from "../../src/domain/Stats.ts"
+import { nightShare, type Stats } from "../../src/domain/Stats.ts"
 import {
   chapters,
   chronotype,
   correctionEvery,
-  nightShare,
   promptsPerSession,
 } from "../../src/report/derive.ts"
 

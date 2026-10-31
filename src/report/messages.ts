@@ -1,6 +1,11 @@
-import type { Voice } from "../domain/Voice.ts"
-import type { Confidence, DimensionKey, Language } from "../domain/Profile.ts"
-import type { PromptTechnique, ToolTechnique } from "../domain/Techniques.ts"
+import type {
+  Voice,
+  Confidence,
+  DimensionKey,
+  Language,
+  PromptTechnique,
+  ToolTechnique,
+} from "../domain/index.ts"
 
 export interface Messages {
   /** Name of the language in its own script, for the switch. */
@@ -20,12 +25,8 @@ export interface Messages {
   readonly sampled: (analyzed: number, total: number) => string
   readonly totalPrompts: string
   readonly activeDays: string
-  readonly longestStreak: string
   readonly peakHour: string
   readonly days: (n: number) => string
-  readonly byHour: string
-  readonly byHourNote: (peak: string, latest: string) => string
-  readonly byWeekday: string
   readonly weekdays: ReadonlyArray<string>
   readonly languageMix: string
   readonly languageNames: { readonly zh: string; readonly en: string; readonly mixed: string }
@@ -57,14 +58,8 @@ export interface Messages {
   readonly privacy: string
   readonly project: string
   readonly none: string
-  readonly madeFrom: string
-  readonly cardPrompts: string
-  readonly cardStreak: string
-  readonly cardLatest: string
-  readonly cardPeak: string
   readonly graphicAlt: string
   readonly daily: string
-  readonly dailyNote: string
   readonly less: string
   readonly more: string
   readonly prompts: (n: number) => string
@@ -91,7 +86,6 @@ export interface Messages {
   readonly support: (sessions: number, weeks: number, quotes: number) => string
   readonly howMeasured: string
   readonly projectAnon: string
-  readonly cardActive: string
   readonly coaching: string
   readonly coachingNote: string
   readonly before: string
@@ -101,16 +95,10 @@ export interface Messages {
   readonly techniques: string
   readonly techniquesNote: string
   readonly workflow: string
-  readonly promptCraft: string
-  readonly ofSessions: (pct: number) => string
   readonly ofPrompts: (pct: number) => string
   readonly sessionsUsed: (n: number) => string
   readonly parallel: (max: number, days: number) => string
   readonly since: (month: string) => string
-  readonly moreCount: (n: number) => string
-  readonly unitSessions: string
-  readonly unitPrompts: string
-  readonly growing: string
   readonly coverageNote: (sessions: number) => string
   readonly noData: string
   readonly adoption: string
@@ -163,12 +151,8 @@ const en: Messages = {
   sampled: (a, t) => `${a} of ${t} analysis chunks sampled`,
   totalPrompts: "Prompts",
   activeDays: "Active days",
-  longestStreak: "Longest streak",
   peakHour: "Peak hour",
   days: (n) => plural(n, "day", "days"),
-  byHour: "Prompts by hour",
-  byHourNote: (peak, latest) => `Busiest at ${peak} · latest ${latest}`,
-  byWeekday: "Prompts by weekday",
   weekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
   languageMix: "Prompt language",
   languageNames: { zh: "Chinese", en: "English", mixed: "Mixed" },
@@ -215,14 +199,8 @@ const en: Messages = {
     "Privacy: prompts were read, cleaned and redacted on this computer. Selected redacted prompts were then sent through the logged-in Claude Code or Codex CLI to its model service, using that subscription's quota (no API key). prompt-profile never uploads this report.",
   project: "prompt-profile",
   none: "—",
-  madeFrom: "Made from my prompts.",
-  cardPrompts: "prompts",
-  cardStreak: "longest streak",
-  cardLatest: "latest session",
-  cardPeak: "peak hour",
   graphicAlt: "Prompts by hour of day",
   daily: "Every day",
-  dailyNote: "One square per day; darker = more prompts",
   less: "Less",
   more: "More",
   prompts: (n) => plural(n, "prompt", "prompts"),
@@ -252,7 +230,6 @@ const en: Messages = {
     `Selected evidence: ${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "analysis chunk", "analysis chunks")}; not full-history frequencies. Context and exceptions are in the quoted prompts.`,
   howMeasured: "How this was measured",
   projectAnon: "Project",
-  cardActive: "most active",
   coaching: "Improve your prompts",
   coachingNote: "From your own prompts; each suggestion cites what it is based on",
   before: "You wrote",
@@ -263,16 +240,10 @@ const en: Messages = {
   techniquesNote:
     "Tool records show activity; prompt wording shows requests. Neither proves expertise or completed work. Hover for individual definitions.",
   workflow: "Workflow",
-  promptCraft: "Prompt craft",
-  ofSessions: (p) => `${p}% of sessions`,
   ofPrompts: (p) => `${p}% of prompts`,
   sessionsUsed: (n) => plural(n, "session", "sessions"),
   parallel: (m, d) => `Up to ${m} sessions at once · parallel on ${plural(d, "day", "days")}`,
   since: (m) => `since ${m}`,
-  moreCount: (n) => `${n} more`,
-  unitSessions: "share of sessions",
-  unitPrompts: "share of prompts",
-  growing: "growing fastest",
   noData: "no transcripts kept",
   adoption: "Adoption over time",
   stages: {
@@ -375,12 +346,8 @@ const zhTW: Messages = {
   sampled: (a, t) => `抽樣分析 ${a} / ${t} 個區塊`,
   totalPrompts: "prompt 數",
   activeDays: "活躍天數",
-  longestStreak: "最長連續",
   peakHour: "最活躍時段",
   days: (n) => `${n} 天`,
-  byHour: "各時段的 prompt",
-  byHourNote: (peak, latest) => `最忙 ${peak} · 最晚 ${latest}`,
-  byWeekday: "星期分布",
   weekdays: ["一", "二", "三", "四", "五", "六", "日"],
   languageMix: "prompt 語言",
   languageNames: { zh: "中文", en: "英文", mixed: "混合" },
@@ -421,14 +388,8 @@ const zhTW: Messages = {
     "隱私：prompt 在這台電腦上讀取、清理並遮蔽敏感資訊；選出的 prompt 遮蔽後，才透過已登入的 Claude Code 或 Codex CLI 送到它的模型服務分析，使用該訂閱方案的額度（不需要 API key）。prompt-profile 不會上傳這份報告。",
   project: "prompt-profile",
   none: "—",
-  madeFrom: "用我的 prompt 做成。",
-  cardPrompts: "則 prompt",
-  cardStreak: "最長連續",
-  cardLatest: "最晚的 session",
-  cardPeak: "最活躍時段",
   graphicAlt: "各時段的 prompt 數",
   daily: "每一天",
-  dailyNote: "每格代表一天，顏色越深代表 prompt 越多",
   less: "少",
   more: "多",
   prompts: (n) => `${n.toLocaleString("zh-TW")} 個 prompt`,
@@ -456,7 +417,6 @@ const zhTW: Messages = {
     `所選證據：${q} 段引文，來自 ${se} 個對話、${w} 個分析區塊；不代表完整歷史中的頻率。情境與例外請參照引文。`,
   howMeasured: "這份報告怎麼量的",
   projectAnon: "專案",
-  cardActive: "最活躍時段",
   coaching: "讓 prompt 更好",
   coachingNote: "來自你自己的 prompt；每個建議都標出根據",
   before: "你寫的",
@@ -467,16 +427,10 @@ const zhTW: Messages = {
   techniquesNote:
     "工具紀錄顯示活動，提示文字顯示要求；兩者都不能證明專業程度或工作已完成。滑過各項可查看定義。",
   workflow: "工作流程",
-  promptCraft: "prompt 寫法",
-  ofSessions: (p) => `${p}% 的 session`,
   ofPrompts: (p) => `${p}% 的 prompt`,
   sessionsUsed: (n) => `${n.toLocaleString("zh-TW")} 個 session`,
   parallel: (m, d) => `最多同時 ${m} 個 session · ${d} 天平行作業`,
   since: (m) => `從 ${m} 開始`,
-  moreCount: (n) => `另外 ${n} 項`,
-  unitSessions: "佔 session 的比例",
-  unitPrompts: "佔 prompt 的比例",
-  growing: "成長最快",
   noData: "沒有保留紀錄",
   adoption: "隨時間的採用情況",
   stages: {
@@ -1245,7 +1199,6 @@ export const HISTORY_MESSAGES = {
     note: "These are differences in observed choices, not personal growth or regression. Task contexts can differ. Windows, sampling, analysis/schema/pipeline versions and reported model provenance were checked first.",
     earlier: "Earlier window",
     current: "Current window",
-    storedContext: "Context as recorded",
     source: (conversation: number, turn: number, of: number, date: string) =>
       `Conversation ${conversation} · prompt ${turn}/${of} · ${date}`,
     unverifiedModel: "model identity unverified",
@@ -1257,7 +1210,6 @@ export const HISTORY_MESSAGES = {
     note: "這些是觀察到的選擇差異，不代表個人成長或退步；任務情境也可能不同。比較前已檢查資料期間、取樣、分析與資料格式及處理版本，還有模型回報的來源。",
     earlier: "較早的期間",
     current: "本次期間",
-    storedContext: "紀錄中的情境",
     source: (conversation: number, turn: number, of: number, date: string) =>
       `對話 ${conversation} · 第 ${turn}/${of} 則提示 · ${date}`,
     unverifiedModel: "模型身分未經確認",

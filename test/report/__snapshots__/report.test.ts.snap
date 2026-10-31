@@ -210,12 +210,6 @@ html:root .hero:has(.role-avatar) .identity-signatures{grid-row:auto}
 @media(max-width:380px){html:root .hero:has(.role-avatar) .copy>h1{font-size:calc(var(--text-base)*1.6)}}
 
 
-.cols{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:4px;height:170px;align-items:end}
-.hours{--n:24}.weekdays{--n:7;gap:10px}
-.col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding-bottom:20px;outline:none}
-.col-fill{display:block;border-radius:4px 4px 2px 2px;background:var(--accent);opacity:.35;transition:opacity var(--motion-fast) var(--ease-out)}
-.col-fill.peak,.col:hover .col-fill,.col:focus .col-fill{opacity:1}
-.col-label{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:var(--text-2xs);color:var(--muted);white-space:nowrap}
 .heat{display:grid;grid-template-columns:28px repeat(24,minmax(0,1fr)) 56px;gap:3px;margin-top:12px}
 .heat-top{position:relative;height:56px;display:flex;align-items:flex-end;outline:none}
 .heat-top i{display:block;width:100%;border-radius:3px 3px 0 0;background:var(--accent);opacity:.35}
@@ -268,7 +262,6 @@ html:root .hero:has(.role-avatar) .identity-signatures{grid-row:auto}
 #lang-zh-TW:checked~.page .tip:hover::after,#lang-zh-TW:checked~.page .tip:focus::after{content:attr(data-tip-zh-TW)}
 @media (max-width:640px){
 .cal-w:nth-last-child(n+19){display:none}
-.cols{height:140px}.hours{gap:2px}
 .heat{grid-template-columns:20px repeat(24,minmax(0,1fr)) 28px;gap:2px}
 .heat-top{height:34px}
 .chapters{flex-direction:column}
@@ -512,7 +505,7 @@ html:root .dim-body{padding:0 3mm 2mm}
 html:root .dim-body blockquote{font-size:8.5pt;line-height:1.4;padding:2px 8px}
 html:root .about{border:0;border-radius:0;border-top:1px solid var(--border);padding:4mm 0;break-inside:avoid}
 
-html:root .cols,html:root .stack{height:100px}
+html:root .stack{height:100px}
 html:root .heat-c{height:14px}
 html:root .cap p,html:root .trait p,html:root .dim-body p,html:root .improve p{font-size:9pt;line-height:1.5}
 html:root .overview-bars li{font-size:9pt;gap:8px}
@@ -520,7 +513,7 @@ html:root .panel .note{font-size:8pt;line-height:1.5}
 html:root .panel{padding:4mm;margin-bottom:4mm;border-radius:0;break-inside:auto}
 html:root .overview-charts{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
 html:root .overview-charts>.panel{margin-bottom:0;break-inside:avoid}
-html:root .panel:has(.heat),html:root .panel:has(.cal),html:root .panel:has(.cols),html:root .panel:has(.stack){break-inside:avoid}
+html:root .panel:has(.heat),html:root .panel:has(.cal),html:root .panel:has(.stack){break-inside:avoid}
 html:root .cap{display:block}
 html:root .cap>*+*{margin-top:3mm}
 html:root .portrait{display:block;max-width:none;margin:5mm 0}
