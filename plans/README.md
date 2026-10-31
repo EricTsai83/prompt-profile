@@ -117,7 +117,9 @@ and deleted. Plan 34 is also complete; its [interaction and owner-feedback recor
 Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 `plans/27-<name>.md` and run the acceptance criteria when done."
 
-No open plans.
+| Plan | Topic |
+| ---- | ----- |
+| [35](./35-measured-support.md) | Measured support for traits and habits, instead of counting the cited quotes |
 
 ## Shared rules for every plan
 
