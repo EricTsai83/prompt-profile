@@ -87,6 +87,7 @@ it("picks the symbol from the measured share when every axis leans one way", asy
       key,
       first: axes[i]![0],
       second: axes[i]![1],
+      examples: { first: [], second: [] },
     })),
     conversations: 50,
     rejected: 0,

@@ -15,7 +15,7 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-export const PROFILE_SCHEMA_VERSION = 22 as const
+export const PROFILE_SCHEMA_VERSION = 23 as const
 
 /**
  * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,

@@ -52,17 +52,41 @@ describe("measureAxisBalance", () => {
         signal("d:1", "framing", "second", "a few options for the dashboard"),
       ]),
     ])
-    expect(balance.axes.find((a) => a.key === "framing")).toEqual({
+    expect(balance.axes.find((a) => a.key === "framing")).toMatchObject({
       key: "framing",
       first: 3,
       second: 1,
     })
-    expect(balance.axes.find((a) => a.key === "pacing")).toEqual({
+    expect(balance.axes.find((a) => a.key === "pacing")).toMatchObject({
       key: "pacing",
       first: 0,
       second: 0,
     })
     expect(balance).toMatchObject({ conversations: 4, rejected: 0 })
+  })
+
+  it("keeps up to two verified example quotes per way, from different conversations", () => {
+    const balance = measureAxisBalance([
+      outcome([
+        signal("a:1", "framing", "first", "the export must pass these three checks"),
+        signal("a:2", "framing", "first", "Done when the CSV matches"),
+        signal("b:1", "framing", "first", "Acceptance: the totals equal the ledger"),
+        signal("c:1", "framing", "first", "Requirement first"),
+        signal("d:1", "framing", "second", "a few options for the dashboard"),
+      ]),
+    ])
+    const framing = balance.axes.find((a) => a.key === "framing")!
+    expect(framing.examples.first).toEqual([
+      { promptId: "claude-code:a:1", quote: "the export must pass these three checks" },
+      { promptId: "claude-code:b:1", quote: "Acceptance: the totals equal the ledger" },
+    ])
+    expect(framing.examples.second).toEqual([
+      { promptId: "claude-code:d:1", quote: "a few options for the dashboard" },
+    ])
+    expect(balance.axes.find((a) => a.key === "pacing")!.examples).toEqual({
+      first: [],
+      second: [],
+    })
   })
 
   it("lets one conversation count for both ways of an axis", () => {

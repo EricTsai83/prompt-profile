@@ -1104,13 +1104,17 @@ describe("interaction episodes", () => {
         ),
       )
       expect(profile.axisBalance?.conversations).toBe(4)
-      expect(profile.axisBalance?.axes).toEqual([
+      expect(
+        profile.axisBalance?.axes.map(({ key, first, second }) => ({ key, first, second })),
+      ).toEqual([
         { key: "framing", first: 4, second: 0 },
         { key: "pacing", first: 0, second: 4 },
         { key: "control", first: 0, second: 0 },
         { key: "closure", first: 0, second: 0 },
       ])
       expect(profile.axisBalance?.rejected).toBeGreaterThan(0)
+      // verified examples, one per conversation
+      expect(profile.axisBalance?.axes[0]!.examples.first).toHaveLength(2)
     }),
   )
 

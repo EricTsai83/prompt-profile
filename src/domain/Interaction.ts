@@ -1,4 +1,4 @@
-import { Schema } from "effect"
+import { Effect, Schema } from "effect"
 
 /** Original collaboration preferences, not a psychological assessment or ability score. */
 export const INTERACTION_AXES = [
@@ -85,9 +85,23 @@ const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
  * conversations with a verified prompt for each pole. A conversation may count for both poles.
  * A share of conversations, not a personality score.
  */
+const Example = Schema.Struct({ promptId: Schema.String, quote: Schema.String })
+
+/** Example quotes kept per way of working. */
+export const MAX_AXIS_EXAMPLES = 2
+
 export const AxisBalance = Schema.Struct({
   axes: Schema.Array(
-    Schema.Struct({ key: Schema.Literals(AXIS_KEYS), first: Count, second: Count }),
+    Schema.Struct({
+      key: Schema.Literals(AXIS_KEYS),
+      first: Count,
+      second: Count,
+      /** Verified quotes from different conversations, at most MAX_AXIS_EXAMPLES per way. */
+      examples: Schema.Struct({
+        first: Schema.Array(Example),
+        second: Schema.Array(Example),
+      }).pipe(Schema.withDecodingDefaultKey(Effect.succeed({ first: [], second: [] }))),
+    }),
   ),
   /** Conversations with a prompt in the analysed chunks (a sample of the history). */
   conversations: Count,

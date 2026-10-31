@@ -16,6 +16,7 @@ const balance = (axes: Array<[string, number, number]>) => ({
     key: key as "framing" | "pacing" | "control" | "closure",
     first,
     second,
+    examples: { first: [], second: [] },
   })),
   conversations: 40,
   rejected: 0,
