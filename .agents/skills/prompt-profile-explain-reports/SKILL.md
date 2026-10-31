@@ -39,7 +39,7 @@ The official reference is https://www.asd-ste100.org/assets/files/ASD-STE100_ISS
   paragraph. Prefer short active sentences and stable terms; explain unfamiliar technical names
   at first use. Aim for roughly 25 words or fewer in English descriptive sentences when useful,
   but preserve meaning and qualifiers over mechanical word limits.
-- Write connected third-person descriptions of observed collaboration. Prefer specific verbs
+- Write connected descriptions of observed collaboration in second person addressed to the profile owner (you/your; 你/你的). Prefer specific verbs
   over abstract personality adjectives. Keep the person recognizable without hype or diagnosis.
 - Distinguish a request from an action, a completed outcome and expertise. A request to test
   is not proof that tests passed. A tool event is not proof of user mastery.
@@ -51,8 +51,8 @@ The official reference is https://www.asd-ste100.org/assets/files/ASD-STE100_ISS
   strength and numbers. Do not apply English word counts to Chinese or make it sound like a
   maintenance procedure. Fixed bilingual UI copy belongs in src/report/messages.ts.
 
-Example (synthetic): "They exhibit a verification-oriented disposition" becomes
-"They ask for checks before accepting a change." Add the sample limit nearby when necessary:
+Example (synthetic): "You exhibit a verification-oriented disposition" becomes
+"You ask for checks before accepting a change." Add the sample limit nearby when necessary:
 "This appears in two conversations; other tasks may differ."
 
 ## Explain quantitative and categorical visuals

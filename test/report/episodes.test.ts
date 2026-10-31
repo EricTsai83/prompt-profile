@@ -122,3 +122,9 @@ describe("interaction episodes in the report", () => {
     ).toBe("")
   })
 })
+
+it("uses meaningful episode titles for readers, retaining internal link targets only", async () => {
+  const out = renderHtml(english(await sample()))
+  expect(out).toContain('id="episode-E1"')
+  expect(out).not.toMatch(/>E\d+<\/|>E\d+ ·/)
+})

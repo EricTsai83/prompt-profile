@@ -75,7 +75,15 @@ export const episodesSection = (
       : []),
   ]
   const links = (ids: ReadonlyArray<string>) =>
-    ids.map((id, i) => html`${i > 0 ? ", " : ""}<a href="#episode-${id}">${id}</a>`)
+    ids
+      .flatMap((id) => {
+        const index = p.episodes.findIndex((e) => e.id === id)
+        if (index < 0) return []
+        return [
+          html`<a href="#episode-${id}">${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? p.episodes[index]!.task, l))}</a>`,
+        ]
+      })
+      .map((link, i) => html`${i > 0 ? ", " : ""}${link}`)
   return html`<section class="episodes">
     ${defined(html`<h2>${text((m) => m.title)}</h2>`, definition(loc, ...notes.map((pick) => text(pick))))}
     ${p.episodes.length === 0 ? html`<p class="note">${text((m) => m.none)}</p>` : ""}
@@ -97,7 +105,7 @@ export const episodesSection = (
         ? html`<ol class="episode-list">
           ${p.episodes.map(
             (e, i) => html`<li class="episode" id="episode-${e.id}">
-              <h3><span class="episode-id">${e.id}</span> ${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[i]?.task ?? e.task, l))}</h3>
+              <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[i]?.task ?? e.task, l))}</h3>
               <p class="episode-meta">${text((m) => [m.taskTypes[e.taskType], m.conversation(sessions.indexOf(e.session) + 1, e.sessionTurns), ...(e.split ? [m.split] : [])].join(" · "))}</p>
               ${turnList(e, loc, v, scrub, when)}
               <p class="episode-ending">${text((_m, l) => endingText(e, l))}</p>

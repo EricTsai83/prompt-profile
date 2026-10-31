@@ -23,7 +23,7 @@ describe("steering in the report", () => {
   it("replaces '1 in N prompts' with conversations where the AI was redirected", async () => {
     const out = facts(renderHtml(english(await sample())))
     expect(out).toContain("41 of 196")
-    expect(out).toContain("conversations where they redirected the AI")
+    expect(out).toContain("conversations where you redirected the AI")
     expect(out).not.toContain("prompts corrects the AI")
   })
 

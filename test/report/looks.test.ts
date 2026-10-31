@@ -231,7 +231,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 3,
         look: "afterhours",
-        lookVersion: 24,
+        lookVersion: 25,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

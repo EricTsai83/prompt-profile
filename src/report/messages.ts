@@ -148,7 +148,7 @@ const plural = (n: number, one: string, many: string) =>
 const en: Messages = {
   languageName: "English",
   locale: "en",
-  title: "My AI collaboration profile",
+  title: "AI collaboration profile",
   switchLabel: "Language",
   period: (from, to) => `${from} – ${to}`,
   dataPeriod: "Data period",
@@ -359,7 +359,7 @@ const en: Messages = {
 const zhTW: Messages = {
   languageName: "中文",
   locale: "zh-TW",
-  title: "我的 AI 協作側寫",
+  title: "AI 協作側寫",
   switchLabel: "語言",
   period: (from, to) => `${from} – ${to}`,
   dataPeriod: "資料區間",
@@ -576,7 +576,7 @@ export const PORTRAIT_MESSAGES = {
     contexts: "Contexts to consider",
     friction: "Possible coordination friction",
     catalogNote:
-      "This is a description of the role catalog, not an additional finding about this person. Contexts and friction are possibilities to discuss, not observed outcomes.",
+      "This is a description of the role catalog, not an additional finding about you. Contexts and friction are possibilities to discuss, not observed outcomes.",
     rule: "A way of working counts as characteristic once distinct verified excerpts show it in two or more conversations. Copied excerpts count once; conversation length adds no weight. A complete role is named only when every line has exactly one characteristic way.",
     axes: {
       framing: ["Starting point", "Define first", "Explore first"],
@@ -588,7 +588,7 @@ export const PORTRAIT_MESSAGES = {
   "zh-TW": {
     title: "一個人如何與 AI 共事",
     preferences: "對話中展現的協作偏好",
-    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分。同一條線的兩種做法都可能是這個人的特色，各自出現在不同的任務或專案中。",
+    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分。同一條線的兩種做法都可能是你的特色，各自出現在不同的任務或專案中。",
     supporting: "更多行為證據、使用紀錄與實用建議",
     notObserved: "尚未在兩段以上的對話中看到",
     both: "兩種都有，視情境而定",
@@ -605,7 +605,7 @@ export const PORTRAIT_MESSAGES = {
     contexts: "可考慮的情境",
     friction: "可能需要協調的地方",
     catalogNote:
-      "這是角色目錄的描述，不是對這個人的額外判斷。適用情境與協調提醒是可討論的可能性，不代表已觀察到的結果。",
+      "這是角色目錄的描述，不是對你的額外判斷。適用情境與協調提醒是可討論的可能性，不代表已觀察到的結果。",
     rule: "一種做法要在兩段以上的對話中有不同的已驗證引述，才算特色。重複引述只計一次，對話長度不會增加權重。只有每一條線都剛好只有一種特色做法時，才會給出完整的角色名稱。",
     axes: {
       framing: ["起手方式", "先定義", "先探索"],
@@ -621,26 +621,26 @@ export const VIEW_MESSAGES = {
   en: {
     navigation: "Report views",
     brand: (name: string | null) => (name ? `${name}’s prompt profile` : "prompt profile"),
-    overview: "Who they are",
+    overview: "How you collaborate",
     detail: "Facts & evidence",
-    overviewTitle: "Meet the collaborator",
+    overviewTitle: "Your collaboration portrait",
     detailTitle: "What the records show",
     overviewNote:
-      "An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts & evidence page.",
+      "An introduction built from selected observations with medium or high confidence. Quotes are your own prompts. Every measurement, source and unknown is on the Facts & evidence page.",
     detailNote:
       "Every measurement with its source and denominator, all observations with their evidence, and what remains unknown. Evidence is expanded by default.",
     next: "See the facts and evidence →",
     back: "← Back to the introduction",
-    moves: "Featured observations, in their own words",
+    moves: "Featured observations, in your own words",
     movesNote:
-      "Up to three observations with medium or high confidence and a verified quote, each shown with one of the person’s own prompts. They are not ranked by strength. Confidence and the remaining evidence are on the Facts & evidence page.",
+      "Up to three observations with medium or high confidence and a verified quote, each shown with one of your own prompts. They are not ranked by strength. Confidence and the remaining evidence are on the Facts & evidence page.",
     noMoves:
       "No observation has medium or high confidence with a verified quote, so none is featured here. The Facts & evidence page lists every observation with its confidence.",
     preferenceEvidence: "Evidence for each preference",
     tools: "Which tools appear in conversations?",
     promptTechniques: "What do the prompts ask for?",
     toolsNote:
-      "A session is one recorded conversation. Tool records describe agent activity, not the person’s ability. Categories overlap; percentages need not add to 100%.",
+      "A session is one recorded conversation. Tool records describe agent activity, not your ability. Categories overlap; percentages need not add to 100%.",
     promptsNote:
       "Rules detect wording in prompts after cleaning removes injected content. Categories overlap; a match is not a quality grade or proof the request was completed.",
     noTools: "0 sessions have tool metadata. Tool use is unknown, not zero.",
@@ -658,19 +658,19 @@ export const VIEW_MESSAGES = {
   "zh-TW": {
     navigation: "報告頁面",
     brand: (name: string | null) => (name ? `${name} 的 prompt profile` : "prompt profile"),
-    overview: "認識這個人",
+    overview: "你的協作方式",
     detail: "事實與證據",
-    overviewTitle: "認識這位協作者",
+    overviewTitle: "你的協作側寫",
     detailTitle: "紀錄呈現了什麼",
     overviewNote:
-      "以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。",
+      "以中或高信心的精選觀察介紹你的協作方式。引述都是你寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。",
     detailNote:
       "每項量測都附來源與分母，每項觀察都附證據，也列出仍然未知的部分。證據預設展開，不必逐一點開。",
     next: "查看事實與證據 →",
     back: "← 回到人物介紹",
-    moves: "精選觀察與本人原話",
+    moves: "精選觀察與你的原話",
     movesNote:
-      "最多三項信心為中或高、且附有已驗證引述的觀察，各附一則本人寫下的提示，並未依強弱排序。信心程度與其餘證據列在「事實與證據」頁。",
+      "最多三項信心為中或高、且附有已驗證引述的觀察，各附一則你寫下的提示，並未依強弱排序。信心程度與其餘證據列在「事實與證據」頁。",
     noMoves:
       "目前沒有信心為中或高、且附有已驗證引述的觀察，因此這裡不列出。「事實與證據」頁列出每項觀察與其信心程度。",
     preferenceEvidence: "每項偏好的證據",
@@ -953,10 +953,10 @@ export const STEERING_MESSAGES = {
   en: {
     tile: (steered: number, withFollowUps: number) =>
       withFollowUps === 0 ? "—" : `${steered} of ${withFollowUps}`,
-    tileLabel: "conversations where they redirected the AI",
+    tileLabel: "conversations where you redirected the AI",
     tileDef:
       "Analysed conversations with follow-up prompts in which at least one prompt overrides or changes the AI’s approach. Repairs of broken results are counted separately.",
-    title: "How they steer the AI",
+    title: "How you steer the AI",
     denominator: (withFollowUps: number, conversations: number) =>
       `${withFollowUps} of the ${conversations} analysed conversations have follow-up prompts. The other ${conversations - withFollowUps} were a single request, with nothing to steer.`,
     steer: "Redirected the AI’s approach",

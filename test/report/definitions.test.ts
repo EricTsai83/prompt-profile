@@ -38,7 +38,7 @@ describe("measurement definitions", () => {
     for (const [label, words] of [
       ["at night", "22:00 and 04:59"],
       ["typical prompt", "Median length"],
-      ["conversations where they redirected the AI", "follow-up prompts"],
+      ["conversations where you redirected the AI", "follow-up prompts"],
       ["prompts per session", "divided by the conversations"],
     ] as const)
       expect(definitionOf(out, label)).toContain(words)
@@ -55,7 +55,7 @@ describe("measurement definitions", () => {
       ["Prompt language", "classified by script"],
       ["Where you prompt", "client"],
       ["Habits", "90th percentile"],
-      ["How they steer the AI", "single request"],
+      ["How you steer the AI", "single request"],
       ["How conversations unfolded", "Only the user’s prompts are recorded"],
       ["Evidence for each preference", "two or more conversations"],
       ["Usage during this period", "not what was paid"],
@@ -91,4 +91,11 @@ describe("measurement definitions", () => {
       /@media print\{\.def>summary\{display:none\}\.def::details-content\{content-visibility:visible/,
     )
   })
+})
+
+it("exposes definitions on hover and keyboard focus, with a distinct pinned state for touch", async () => {
+  const out = renderHtml(english(await sample()))
+  expect(out).toContain(".def:hover::details-content")
+  expect(out).toContain(".def:focus-within::details-content")
+  expect(out).toContain(".def[open]>summary{background:var(--accent)")
 })

@@ -62,7 +62,7 @@ export const identityMoves = (
           .map((e) => {
             const index = p.episodes.indexOf(e)
             return html`<article>
-            <p>${e.id} · ${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? e.task, l))}${pattern.counterEpisodeIds.includes(e.id) ? html` · ${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].against)}` : ""}</p>
+            <p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? e.task, l))}${pattern.counterEpisodeIds.includes(e.id) ? html` · ${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].against)}` : ""}</p>
             ${quote ? html`<ol>${e.turns.map((t) => html`<li>${t.turn}. ${quote(t.quote)}</li>`)}</ol>` : ""}
           </article>`
           })}

@@ -41,8 +41,8 @@ describe("report views", () => {
     expect(html).toMatch(/id="report-overview"[^>]*checked/)
     expect(html).toContain('for="report-detail"')
     expect(html).toContain('for="report-overview"')
-    expect(html).toContain("Who they are")
-    expect(html).toContain("認識這個人")
+    expect(html).toContain("How you collaborate")
+    expect(html).toContain("你的協作方式")
     expect(identity).toContain('class="identity-moves"')
     // the copy states the selection rule; it does not claim the strongest or most consistent
     expect(identity).toContain("medium or high confidence")

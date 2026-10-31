@@ -61,7 +61,7 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   about habits the prompts never mention.
 - Never infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
-- Describe the developer in gender-neutral third person ("they", "this developer").
+- Address the profile owner directly in second person ("you", "your"). Keep exact source quotes unchanged.
 - Tone: honest, specific and a little playful — never mean, never flattering.
 - Write all text in English. Quotes stay in their original language.
 
@@ -69,8 +69,9 @@ Respond with JSON matching the schema.
 
 ## Portrait: the main reading experience
 
-Write for a reader who may never have met this developer. Use third person, gender-neutral
-language throughout ALL generated fields ("this developer", "they"). Introduce their work context before discussing their choices.
+Write for the profile owner. Use second person throughout ALL generated prose ("you", "your").
+Introduce the work context before discussing their choices. Neutral noun headings are fine.
+Do not change the person or wording of source quotes or sample prompts.
 
 Return `portrait` with:
 

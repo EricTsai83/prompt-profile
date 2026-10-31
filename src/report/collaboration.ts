@@ -29,7 +29,7 @@ export const structuredMoves = (
         ${selected.map(
           (
             e,
-          ) => html`<article><h4>${e.id} · ${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[p.episodes.indexOf(e)]?.task ?? e.task, l))}</h4>
+          ) => html`<article><h4>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[p.episodes.indexOf(e)]?.task ?? e.task, l))}</h4>
           ${quote ? html`<ol>${e.turns.map((t) => html`<li>${t.turn}. ${quote(t.quote)}</li>`)}</ol>` : ""}
         </article>`,
         )}

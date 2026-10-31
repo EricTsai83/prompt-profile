@@ -98,3 +98,32 @@ Accepted; removed that row while retaining the English examples. Production bili
 messages remain unchanged. This documentation-only correction did not require another review
 pass. No other functional blockers were reported. The reviewer did not rerun tests, inspect
 all regenerated outputs or evaluate real LLM writing quality. Owner acceptance remains open.
+
+## Owner wording and interaction update — 2026-10-31
+
+The owner now requires second-person descriptions throughout the generated profile: “you”
+in English and “你” in Traditional Chinese. This supersedes the earlier third-person writing
+choice above. Neutral noun headings remain natural; exact quotes and suggested sample prompts
+keep their own voice. For example, “They ask for checks before accepting a change” becomes
+“You ask for checks before accepting a change”, with the same evidence qualification.
+Analysis version 24 applies this to future generation. Existing stored prose is not rewritten
+by rendering; the owner's requested local report received a separate editorial revision with
+all source quotes, statistics, coverage and evidence origins checked unchanged.
+
+Episode identifiers remain internal anchor targets. Reader-facing headings and cross-links use
+the episode task title, so filtered selections never suggest a missing numbered first example.
+Definitions now open on hover and keyboard focus. Native disclosure remains available for touch
+and pinning, with a filled accent state when pinned. Essential evidence remains visible.
+Broader optional interaction design is tracked in [plan 34](../../../plans/34-report-interactions.md).
+
+Regression tests were observed failing before fixes for scope-hash auditing, visible episode
+identifiers, and tooltip interaction styles. Typecheck, lint, formatting and 88 test files / 813
+tests passed after the fixes. A live headless Chrome check at 390px verified closed-by-default,
+hover, keyboard focus and click-to-pin behavior; its dark-mode tooltip screenshot was inspected.
+This verifies interaction behavior, not owner aesthetic acceptance. The scope hash is exempted
+only at its exact metadata path and only when it is 64 lowercase hexadecimal characters; the
+same string in prose and malformed identity values remain subject to privacy checks.
+
+The follow-up local-data smoke run also exited 0 (4 files, 4 tests). The final local artifact
+was checked for absence of visible episode IDs, the restored scope hash, second-person
+narrative and hover styles. Its original analysis archive was retained separately.

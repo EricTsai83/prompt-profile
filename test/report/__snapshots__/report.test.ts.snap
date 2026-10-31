@@ -358,11 +358,15 @@ html:root .hero:has(.role-avatar) .identity-signatures{grid-row:auto}
 .def>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--border);color:var(--muted);font:italic 600 11px/1 var(--font-body);user-select:none}
 .def>summary::-webkit-details-marker{display:none}
 .def>summary:hover,.def[open]>summary{color:var(--fg);border-color:var(--muted)}
+.def[open]>summary{background:var(--accent);color:var(--card);border-color:var(--accent)}
+.def:hover::details-content,.def:focus-within::details-content{content-visibility:visible;display:block}
+.def:not([open])>.def-body{display:none}
+.def:hover>.def-body,.def:focus-within>.def-body{display:block}
 .def>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .def-body{position:absolute;z-index:30;left:0;top:calc(100% + 6px);width:max-content;max-width:min(420px,86vw);padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--fg);font-size:var(--text-xs);font-weight:400;letter-spacing:0;line-height:1.55;text-align:left;white-space:normal;box-shadow:0 6px 18px var(--shadow)}
 .def-body p{margin:0}.def-body p+p{margin-top:6px}
 .hero .def-body,.report-facts .def-body{position:static;width:auto;margin-top:6px;box-shadow:none}
-@media print{.def>summary{display:none}.def::details-content{content-visibility:visible;display:block}.def-body{position:static;width:auto;max-width:none;padding:4px 0 0;border:0;box-shadow:none;color:var(--muted)}}
+@media print{.def>summary{display:none}.def::details-content{content-visibility:visible;display:block}.def:not([open])>.def-body{display:block}.def-body{position:static;width:auto;max-width:none;padding:4px 0 0;border:0;box-shadow:none;color:var(--muted)}}
 
 .identity-moves{margin:var(--space-8) 0}.identity-moves>.note{margin-top:var(--space-2);max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
 .identity-moves>ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
@@ -535,7 +539,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 </style>
       </head>
       <body>
-        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="Who they are" checked />
+        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="How you collaborate" checked />
         <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="Facts &amp; evidence" />
         <input
                     type="radio"
@@ -563,11 +567,11 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           </header>
 
           <nav class="view-nav" aria-label="Report views">
-            <label for="report-overview"><span data-l="en" lang="en">Who they are</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這個人</span></label>
+            <label for="report-overview"><span data-l="en" lang="en">How you collaborate</span><span data-l="zh-TW" lang="zh-Hant-TW">你的協作方式</span></label>
             <label for="report-detail"><span data-l="en" lang="en">Facts &amp; evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">事實與證據</span></label>
           </nav>
           <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="Who they are">
+          <section id="overview" class="report-view report-view-overview" aria-label="How you collaborate">
           <section class="hero">
 
             <div class="copy">
@@ -604,17 +608,17 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           </section>
 
 
-          <header class="view-heading"><h2><span data-l="en" lang="en">Meet the collaborator</span><span data-l="zh-TW" lang="zh-Hant-TW">認識這位協作者</span></h2><p><span data-l="en" lang="en">An introduction built from selected observations with medium or high confidence. Quotes are the person’s own prompts. Every measurement, source and unknown is on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">以中或高信心的精選觀察介紹這個人。引述都是本人寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。</span></p></header>
+          <header class="view-heading"><h2><span data-l="en" lang="en">Your collaboration portrait</span><span data-l="zh-TW" lang="zh-Hant-TW">你的協作側寫</span></h2><p><span data-l="en" lang="en">An introduction built from selected observations with medium or high confidence. Quotes are your own prompts. Every measurement, source and unknown is on the Facts &amp; evidence page.</span><span data-l="zh-TW" lang="zh-Hant-TW">以中或高信心的精選觀察介紹你的協作方式。引述都是你寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。</span></p></header>
           <section class="identity-moves">
-      <div class="def-head"><h2><span data-l="en" lang="en">Featured observations, in their own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與本人原話</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。</span></p><p><span data-l="en" lang="en">Selected conversations illustrate the sequence and another context when available. The facts view contains the complete selected episode record.</span><span data-l="zh-TW" lang="zh-Hant-TW">這裡挑選對話呈現動作順序，有其他情境時也一併列出。完整的片段紀錄在事實與證據頁。</span></p></div></details></div>
+      <div class="def-head"><h2><span data-l="en" lang="en">Featured observations, in your own words</span><span data-l="zh-TW" lang="zh-Hant-TW">精選觀察與你的原話</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Only the user’s prompts are recorded: the assistant’s replies are not shown, and a result appears only when the user wrote it.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄只有使用者寫下的提示：看不到 AI 的回覆，只有使用者自己寫出結果時才會顯示結果。</span></p><p><span data-l="en" lang="en">Selected conversations illustrate the sequence and another context when available. The facts view contains the complete selected episode record.</span><span data-l="zh-TW" lang="zh-Hant-TW">這裡挑選對話呈現動作順序，有其他情境時也一併列出。完整的片段紀錄在事實與證據頁。</span></p></div></details></div>
       <ol><li>
         <h3><span data-l="en" lang="en">Adds scope and corrections after the first request instead of restating the whole task</span><span data-l="zh-TW" lang="zh-Hant-TW">提出第一個需求後，再補上範圍與修正，而不是重寫整個任務</span></h3>
         <p><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span></p>
         <article>
-            <p>E1 · <span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></p>
+            <p><span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></p>
             <ol><li>1. don&#39;t write code yet, break the plan into small steps</li><li>2. same for the SVG export</li><li>5. no, keep the old API</li></ol>
           </article><article>
-            <p>E2 · <span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span></p>
+            <p><span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span></p>
             <ol><li>3. &lt;script&gt;alert(&#39;x&#39;)&lt;/script&gt; 這段為什麼會被執行？</li><li>4. 改完跑一次測試確認</li><li>6. 好了，這樣可以了</li></ol>
           </article>
       </li></ol>
@@ -640,7 +644,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     <b><span data-l="en" lang="en">86 chars</span><span data-l="zh-TW" lang="zh-Hant-TW">86 字</span></b><span class="sig-label"><span data-l="en" lang="en">typical prompt</span><span data-l="zh-TW" lang="zh-Hant-TW">典型 prompt 長度</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Median length of a cleaned prompt in characters: half of the prompts are shorter. Pasted code and injected content are removed before counting.</span><span data-l="zh-TW" lang="zh-Hant-TW">清理後提示長度（字元數）的中位數：有一半的提示比它短。計算前會先移除貼上的程式碼與自動注入的內容。</span></p></div></details></span>
   </div>
             <div class="sig">
-    <b><span data-l="en" lang="en">41 of 196</span><span data-l="zh-TW" lang="zh-Hant-TW">196 段中 41 段</span></b><span class="sig-label"><span data-l="en" lang="en">conversations where they redirected the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">有後續互動的對話中，曾改變 AI 的做法</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Analysed conversations with follow-up prompts in which at least one prompt overrides or changes the AI’s approach. Repairs of broken results are counted separately.</span><span data-l="zh-TW" lang="zh-Hant-TW">在分析過、且有後續提示的對話中，至少有一則提示推翻或改變了 AI 的做法。要求修正壞掉的結果另外計算。</span></p><p><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p></div></details></span>
+    <b><span data-l="en" lang="en">41 of 196</span><span data-l="zh-TW" lang="zh-Hant-TW">196 段中 41 段</span></b><span class="sig-label"><span data-l="en" lang="en">conversations where you redirected the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">有後續互動的對話中，曾改變 AI 的做法</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Analysed conversations with follow-up prompts in which at least one prompt overrides or changes the AI’s approach. Repairs of broken results are counted separately.</span><span data-l="zh-TW" lang="zh-Hant-TW">在分析過、且有後續提示的對話中，至少有一則提示推翻或改變了 AI 的做法。要求修正壞掉的結果另外計算。</span></p><p><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p></div></details></span>
   </div>
             <div class="sig">
     <b>6.3</b><span class="sig-label"><span data-l="en" lang="en">prompts per session</span><span data-l="zh-TW" lang="zh-Hant-TW">每個 session 的 prompt 數</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">All cleaned prompts in the range divided by the conversations (sessions) they belong to.</span><span data-l="zh-TW" lang="zh-Hant-TW">範圍內所有清理後的提示數，除以它們所屬的對話（session）數。</span></p></div></details></span>
@@ -648,7 +652,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           </section>
 
           <div class="overview-charts">
-    <article class="panel"><div class="def-head"><h2><span data-l="en" lang="en">Which tools appear in conversations?</span><span data-l="zh-TW" lang="zh-Hant-TW">對話中出現哪些工具？</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">A session is one recorded conversation. Tool records describe agent activity, not the person’s ability. Categories overlap; percentages need not add to 100%.</span><span data-l="zh-TW" lang="zh-Hant-TW">一個 session 是一段對話紀錄。工具紀錄呈現 AI 助手的活動，不代表使用者的能力。類別可重疊，百分比不必合計為 100%。</span></p><p><span data-l="en" lang="en">Source: local tool records. 180 of 312 sessions have metadata. Each value shows the percentage and sessions using that tool / covered sessions. Uncovered sessions are unknown.</span><span data-l="zh-TW" lang="zh-Hant-TW">來源：本機工具紀錄。共 312 段對話，其中 180 段有工具紀錄。每項列出比例，以及使用該工具的對話數／有紀錄的對話數。其餘對話的使用情況未知。</span></p></div></details></div>
+    <article class="panel"><div class="def-head"><h2><span data-l="en" lang="en">Which tools appear in conversations?</span><span data-l="zh-TW" lang="zh-Hant-TW">對話中出現哪些工具？</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">A session is one recorded conversation. Tool records describe agent activity, not your ability. Categories overlap; percentages need not add to 100%.</span><span data-l="zh-TW" lang="zh-Hant-TW">一個 session 是一段對話紀錄。工具紀錄呈現 AI 助手的活動，不代表使用者的能力。類別可重疊，百分比不必合計為 100%。</span></p><p><span data-l="en" lang="en">Source: local tool records. 180 of 312 sessions have metadata. Each value shows the percentage and sessions using that tool / covered sessions. Uncovered sessions are unknown.</span><span data-l="zh-TW" lang="zh-Hant-TW">來源：本機工具紀錄。共 312 段對話，其中 180 段有工具紀錄。每項列出比例，以及使用該工具的對話數／有紀錄的對話數。其餘對話的使用情況未知。</span></p></div></details></div>
       <ul class="overview-bars"><li>
   <span class="overview-bar-name"><span data-l="en" lang="en">Ships pull requests</span><span data-l="zh-TW" lang="zh-Hant-TW">發 pull request</span></span>
   <span class="overview-bar-track" aria-hidden="true"><i style="width:27%"></i></span>
@@ -2910,7 +2914,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
 </section>
 
           <section class="steering">
-    <div class="def-head"><h2><span data-l="en" lang="en">How they steer the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">如何引導 AI</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p><p><span data-l="en" lang="en">The analysing model labels follow-up prompts by meaning, and every label is checked against the prompt text: a judgement, not an exact count. 3 labels were rejected.</span><span data-l="zh-TW" lang="zh-Hant-TW">由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。有 3 個標記未通過比對。</span></p></div></details></div>
+    <div class="def-head"><h2><span data-l="en" lang="en">How you steer the AI</span><span data-l="zh-TW" lang="zh-Hant-TW">如何引導 AI</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">196 of the 280 analysed conversations have follow-up prompts. The other 84 were a single request, with nothing to steer.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析過的 280 段對話中，有 196 段有後續提示；其餘 84 段只有一個請求，無從引導。</span></p><p><span data-l="en" lang="en">The analysing model labels follow-up prompts by meaning, and every label is checked against the prompt text: a judgement, not an exact count. 3 labels were rejected.</span><span data-l="zh-TW" lang="zh-Hant-TW">由分析模型依語意標記後續提示，每個標記都會再比對原文：這是判斷，不是精確計數。有 3 個標記未通過比對。</span></p></div></details></div>
     <div class="steering-kind">
       <div class="def-head"><h3><span data-l="en" lang="en">Redirected the AI’s approach</span><span data-l="zh-TW" lang="zh-Hant-TW">改變 AI 的做法</span> <small><span data-l="en" lang="en">41 conversations · 58 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">41 段對話 · 58 則提示</span></small></h3><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Overrode or changed the AI’s plan or decision and pointed it elsewhere.</span><span data-l="zh-TW" lang="zh-Hant-TW">推翻或改變 AI 的計畫或決定，帶它走另一個方向。</span></p></div></details></div>
       <blockquote><span data-l="en" lang="en">no, keep the old API</span><span data-l="zh-TW" lang="zh-Hant-TW">no, keep the old API</span></blockquote><blockquote><span data-l="en" lang="en">forget jotai, let&#39;s stay with zustand</span><span data-l="zh-TW" lang="zh-Hant-TW">forget jotai, let&#39;s stay with zustand</span></blockquote>
@@ -2928,12 +2932,12 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           <ul class="episode-patterns">
             <li>
                 <p><span data-l="en" lang="en">Adds scope and corrections after the first request instead of restating the whole task</span><span data-l="zh-TW" lang="zh-Hant-TW">提出第一個需求後，再補上範圍與修正，而不是重寫整個任務</span></p>
-                <p class="note"><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span> · <span data-l="en" lang="en">Episodes</span><span data-l="zh-TW" lang="zh-Hant-TW">片段</span>: <a href="#episode-E1">E1</a>, <a href="#episode-E3">E3</a> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span>: <a href="#episode-E2">E2</a></p>
+                <p class="note"><span data-l="en" lang="en">In 2 conversations across 2 analysed periods</span><span data-l="zh-TW" lang="zh-Hant-TW">出現在 2 段對話、2 個分析時段</span> · <span data-l="en" lang="en">Episodes</span><span data-l="zh-TW" lang="zh-Hant-TW">片段</span>: <a href="#episode-E1"><span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></a>, <a href="#episode-E3"><span data-l="en" lang="en">Comparing two state libraries</span><span data-l="zh-TW" lang="zh-Hant-TW">比較兩個狀態管理套件</span></a> · <span data-l="en" lang="en">Went the other way</span><span data-l="zh-TW" lang="zh-Hant-TW">其他情境的做法</span>: <a href="#episode-E2"><span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span></a></p>
               </li>
           </ul>
     <ol class="episode-list">
           <li class="episode" id="episode-E1">
-              <h3><span class="episode-id">E1</span> <span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></h3>
+              <h3><span data-l="en" lang="en">Planning a canvas export feature</span><span data-l="zh-TW" lang="zh-Hant-TW">規劃畫布匯出功能</span></h3>
               <p class="episode-meta"><span data-l="en" lang="en">New feature · Conversation 1 · 9 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">新功能 · 第 1 段對話 · 共 9 則提示</span></p>
               <ol class="episode-turns">
 
@@ -2951,7 +2955,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </ol>
               <p class="episode-ending"><span data-l="en" lang="en">Result not visible in the record.</span><span data-l="zh-TW" lang="zh-Hant-TW">紀錄中看不到結果。</span></p>
             </li><li class="episode" id="episode-E2">
-              <h3><span class="episode-id">E2</span> <span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span></h3>
+              <h3><span data-l="en" lang="en">Debugging an unexpected script execution</span><span data-l="zh-TW" lang="zh-Hant-TW">排查一段意外執行的 script</span></h3>
               <p class="episode-meta"><span data-l="en" lang="en">Fixing a problem · Conversation 2 · 6 prompts · continues in another analysed part</span><span data-l="zh-TW" lang="zh-Hant-TW">修正問題 · 第 2 段對話 · 共 6 則提示 · 這段對話也出現在其他分析區段</span></p>
               <ol class="episode-turns">
     <li class="turn-gap"><span data-l="en" lang="en">2 earlier prompts not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過前面 2 則提示</span></li>
@@ -2969,7 +2973,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
   </ol>
               <p class="episode-ending"><span data-l="en" lang="en">The user reported the result in prompt 6.</span><span data-l="zh-TW" lang="zh-Hant-TW">使用者在第 6 則提示中回報結果。</span></p>
             </li><li class="episode" id="episode-E3">
-              <h3><span class="episode-id">E3</span> <span data-l="en" lang="en">Comparing two state libraries</span><span data-l="zh-TW" lang="zh-Hant-TW">比較兩個狀態管理套件</span></h3>
+              <h3><span data-l="en" lang="en">Comparing two state libraries</span><span data-l="zh-TW" lang="zh-Hant-TW">比較兩個狀態管理套件</span></h3>
               <p class="episode-meta"><span data-l="en" lang="en">Exploring · Conversation 3 · 7 prompts</span><span data-l="zh-TW" lang="zh-Hant-TW">探索研究 · 第 3 段對話 · 共 7 則提示</span></p>
               <ol class="episode-turns">
     <li class="turn-gap"><span data-l="en" lang="en">1 earlier prompt not shown</span><span data-l="zh-TW" lang="zh-Hant-TW">略過前面 1 則提示</span></li>

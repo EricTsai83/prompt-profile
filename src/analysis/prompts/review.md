@@ -34,13 +34,13 @@ User-only requests do not show assistant actions or completed outcomes. For exam
 
 - Source: "Check the contract tests before handing it back."
   Unsupported: "The tests passed" or "Backend tasks end with explicit checks."
-  Bounded: "They ask for contract checks before handoff."
+  Bounded: "Request contract checks before handoff."
 - Source: "Keep the existing response fields."
   Unsupported: "Existing interfaces stay untouched."
-  Bounded: "They require the response fields to stay unchanged."
+  Bounded: "Require the response fields to stay unchanged."
 - Source: repeated instructions in several tasks, with no stated harm.
   Unsupported: "The cost of clarity" or "Repeating instructions wastes time."
-  Bounded: "They repeat the working constraints across tasks."
+  Bounded: "Repeat the working constraints across tasks."
   Omit the improvement when there is no observed cost. Merely adding a constraint in a later
   turn does not show that the agent acted before it arrived. "The agent works from the opener"
   is an invented assistant action unless a user turn explicitly reports it. Return no
@@ -76,3 +76,5 @@ observation, never an asserted outcome or promised benefit. Keep just one concre
 suggestion. Return experiment null if it cannot be grounded. Never add unsupported task
 requirements to rewrite.after; preserve its original language. Respect clear short follow-ups
 and contradictory contexts, and permit zero improvements.
+
+Address the profile owner in second person (you/your) in all generated descriptive prose. Preserve exact quotes and sample-prompt voice.
