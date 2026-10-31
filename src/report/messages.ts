@@ -567,6 +567,20 @@ export const PORTRAIT_MESSAGES = {
   },
 } as const
 
+/** The measured share of conversations behind each way of working (`axisBalance`). */
+export const BALANCE_MESSAGES = {
+  en: {
+    title: "How often each way shows",
+    note: "Of the analysed conversations that show either way on an axis, the share that shows each. Counted from verified prompts; a conversation can show both ways. A measurement of these conversations, not a personality score.",
+    conversations: (n: number) => `${n} ${n === 1 ? "conversation" : "conversations"}`,
+  },
+  "zh-TW": {
+    title: "各種做法出現的比例",
+    note: "在某個面向上展現任一種做法的已分析對話中，各種做法所占的比例。依已驗證的提示計算，同一段對話可能兩種都有。這是對這些對話的量測，不是人格分數。",
+    conversations: (n: number) => `${n} 段對話`,
+  },
+} as const
+
 /** Navigation and chart labels for the report's two reading views. */
 export const VIEW_MESSAGES = {
   en: {

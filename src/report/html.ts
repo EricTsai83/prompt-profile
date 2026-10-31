@@ -41,6 +41,7 @@ import {
 import { workflowCharts, viewStyle } from "./overview.ts"
 import { BASE_STYLE, languageStyle } from "./page-style.ts"
 import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
+import { axisBalanceSection, balanceStyle } from "./balance.ts"
 import { steeringSection, steeringStyle } from "./steering.ts"
 import { techniquesSection, techniqueStyle } from "./techniques.ts"
 import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
@@ -119,6 +120,7 @@ export const renderHtml = (
   // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
   const coaching = v.coaching && !limited
   const story = portraitStory(profile, loc, v, scrub)
+  const balance = axisBalanceSection(profile, loc)
   const preferences = preferenceEvidence(profile, loc, v, scrub)
   const episodes = episodesSection(profile, loc, v, scrub, (t, l) =>
     v.dates ? formatDate(t, tz, MESSAGES[l].locale) : formatMonth(t, tz, MESSAGES[l].locale),
@@ -189,7 +191,7 @@ export const renderHtml = (
         />
         <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${viewMessages(loc.langs[0]!, profile.voice).brand(options.name ?? null)}</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(generationStyle)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${balance ? raw(balanceStyle) : ""}${raw(BASE_STYLE)}${raw(generationStyle)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(definitionStyle)}${raw(disclosureStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
 .experiment-print-copy{display:none}
 @media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
@@ -260,7 +262,7 @@ export const renderHtml = (
 
           <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewNote)}</p></header>
           ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
-          ${story ?? ""}
+          ${story ?? ""}${balance ?? ""}
           ${
             v.funFacts && profile.funFacts.length > 0
               ? html`<section>
