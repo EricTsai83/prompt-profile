@@ -18,6 +18,8 @@ export const structuredMoves = (
 ): Raw | null => {
   const moves = p.collaboration?.moves
   if (!moves?.length) return null
+  // each conversation illustrates one habit here; the facts view lists every episode
+  const shown = new Set<string>()
   return html`<section class="identity-moves structured-moves">
     <h2>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].moveTitle)}</h2>
     <p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].habitIntro)}</p>
@@ -25,7 +27,9 @@ export const structuredMoves = (
       const supporting = p.episodes.filter((e) => m.episodeIds.includes(e.id))
       const selected = supporting
         .filter((e, index) => supporting.findIndex((x) => x.session === e.session) === index)
+        .filter((e) => !shown.has(e.session))
         .slice(0, 2)
+      for (const e of selected) shown.add(e.session)
       return html`<li>
         <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.name ?? m.name, l))}</h3>
         <p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.description ?? m.description, l))}</p>

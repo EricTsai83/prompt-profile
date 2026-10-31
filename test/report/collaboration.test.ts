@@ -126,3 +126,32 @@ it("folds understanding signals seen in one conversation behind their own disclo
   expect(folded).not.toContain("RECURRING_SIGNAL")
   expect(section).toContain("RECURRING_SIGNAL")
 })
+
+it("shows each example conversation under one habit only on the identity view", async () => {
+  const base = await Effect.runPromise(
+    decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+  )
+  const move = (name: string, episodeIds: string[]) => ({
+    name,
+    description: `${name} description`,
+    episodeIds,
+    benefit: null,
+    cost: null,
+    support: { sessions: 2, weeks: 2 },
+  })
+  const out = renderHtml({
+    ...base,
+    languages: ["en"] as const,
+    translations: {},
+    collaboration: {
+      moves: [move("First habit", ["E1", "E2"]), move("Second habit", ["E1", "E3"])],
+      signals: [],
+      rejected: { moves: 0, signals: 0, effects: 0 },
+    },
+  })
+  const section = /<section class="identity-moves structured-moves">.*?<\/section>/s.exec(out)![0]
+  const task = base.episodes[0]!.task
+  expect(section.split(task).length - 1).toBe(1)
+  // the second habit still gets the example nobody showed yet
+  expect(section).toContain(base.episodes[2]!.task)
+})
