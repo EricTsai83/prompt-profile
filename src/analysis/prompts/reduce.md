@@ -195,9 +195,18 @@ with an assumption.
 
 Return `collaboration` with `moves` and `signals` (empty arrays when not observed).
 
-- `moves`: 0–3 memorable action sequences. Each has an original short `name`, a bounded
+- `moves`: 0–6 distinct, evidence-led habits in how the user works with AI. Use freely named
+  observations, not four fixed preference axes or a required checklist. Search across context
+  sharing, explanations, option comparison, decision boundaries, progress review, verification,
+  redirection and recovery when the input supports them. A habit can be a recurring choice;
+  it need not be a multi-step sequence. Do not invent an order between actions. Omit overlapping
+  restatements and leave the list empty when recurrence is unsupported.
+  Each has an original short `name`, a bounded
   `description`, and `episodeIds` from two or more different conversations. Every supporting
-  episode must contain two or more ordered user turns. Context comes from those episodes;
+  episode must contain two or more ordered user turns to preserve context, but only the
+  quoted user choice supports the habit. Explain when or in what task it occurs in the
+  description, including contextual alternatives. Duplicate source templates count once.
+  Do not infer a global preference from a request in one task. Context comes from those episodes;
   never manufacture assistant replies or a successful ending. `benefit` and `cost` are null
   unless the user explicitly reports that effect in a supporting episode's user_reported
   ending. If supplied, each has `claim` and exact `evidence` from that ending. Attribute it to

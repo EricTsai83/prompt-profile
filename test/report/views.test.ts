@@ -49,7 +49,7 @@ describe("report views", () => {
     expect(identity).not.toMatch(/most consistent|best-supported|最一致|證據最充分/)
     expect(identity).toContain("Adds scope and corrections after the first request")
     expect(identity).not.toContain("Type purist")
-    expect(identity).toContain('class="preference-map panel"')
+    expect(identity).not.toContain('class="preference-map panel"')
     expect(identity).toContain("The work starts before the code")
     expect(identity).toContain("Before editing, outline the steps")
     expect(identity).toContain("Latest prompt: 03:12 AM.")

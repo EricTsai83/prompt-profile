@@ -20,8 +20,7 @@ html:root .grid>.panel,html:root .overview-charts>.panel{margin:0}
 html:root section>h2,html:root .section-head h2{margin:var(--space-12) 0 var(--space-4);line-height:1.3}
 html:root .panel-head{margin-bottom:var(--space-4)}
 html:root .overview-bars{margin-top:var(--space-4);gap:var(--space-3)}
-html:root .overview-charts .note,html:root .preference-map>.note{margin-top:var(--space-3)}
-html:root .preference-map{margin:var(--space-8) 0}
+html:root .overview-charts .note{margin-top:var(--space-3)}
 html:root .preference-rows{gap:var(--space-6) var(--space-8);margin-top:var(--space-6)}
 html:root .portrait{max-width:none;margin:var(--space-8) 0 var(--space-12)}
 html:root .portrait-intro,html:root .portrait-chapter{max-width:var(--reading)}
@@ -91,9 +90,7 @@ html:root .grid>.panel{break-inside:avoid}
 html:root .overview-charts{margin-bottom:4mm}
 html:root .overview-charts .overview-bars{margin-top:3mm;gap:2mm}
 html:root .overview-charts .note{margin-top:2mm;line-height:1.4}
-html:root .preference-map{margin:4mm 0}
 html:root .preference-rows{margin-top:3mm;gap:3mm 5mm}
-html:root .preference-rail{margin:12px 8px 8px}
 html:root .measured{grid-template-columns:repeat(3,minmax(0,1fr))}
 html:root .measured .panel{padding:3mm}
 html:root .measured .donut{gap:8px;flex-wrap:wrap}

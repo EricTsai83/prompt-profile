@@ -1,3 +1,4 @@
+import { fakeTranslation } from "../fixtures/fake-translation.ts"
 import { expect, it } from "@effect/vitest"
 import { Effect } from "effect"
 import { readFileSync } from "node:fs"
@@ -188,7 +189,10 @@ it.effect("preserves authored bilingual claim strength through the translation b
     for (const item of cases) {
       const profile = { ...sample, headline: item.after }
       const fake = makeFakeLlmRunner({
-        respond: () => ({ ...translationInput(profile), headline: item.afterZhTW }),
+        respond: () => ({
+          ...fakeTranslation(translationInput(profile)),
+          headline: item.afterZhTW,
+        }),
       })
       const result = yield* addTranslations(profile, ["en", "zh-TW"]).pipe(
         Effect.provideService(LlmRunner, fake),

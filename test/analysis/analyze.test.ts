@@ -1,3 +1,4 @@
+import { fakeTranslation } from "../fixtures/fake-translation.ts"
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect, Fiber, Layer, Schema } from "effect"
 import { TestClock } from "effect/testing"
@@ -129,7 +130,7 @@ describe("analyze", () => {
       const fake = makeFakeLlmRunner({
         respond: (input) => {
           if (input.schemaName === "LlmTranslation") {
-            return JSON.parse(input.prompt.split("\n\nprofile:\n")[1]!)
+            return fakeTranslation(JSON.parse(input.prompt.split("\n\nprofile:\n")[1]!))
           }
           const response = respond(input) as {
             traits: Array<{ evidence: Array<{ promptId: string; quote: string }> }>
@@ -186,7 +187,7 @@ describe("analyze", () => {
       })
       const p = yield* run(fake, makeMemoryCache(), { ...options, languages: ["zh-TW", "en"] })
       expect(p.portrait?.introduction).toBe("They request checks.")
-      expect(p.translations["zh-TW"]?.portrait?.introduction).toBe("They request checks.")
+      expect(p.translations["zh-TW"]?.portrait?.introduction).toBe("譯 They request checks.")
       const translation = fake.log.find((c) => c.schema === "LlmTranslation")!
       expect(translation.prompt).not.toContain("The tests passed.")
       expect(p.portrait?.axes[0]?.sides.map((s) => s.pole)).toEqual(["first", "second"])
@@ -360,7 +361,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "26",
+        analysisVersion: "27",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -492,7 +493,7 @@ describe("analyze", () => {
       x === null
         ? null
         : typeof x === "string"
-          ? `ZH ${x}`
+          ? `譯 ${x}`
           : Array.isArray(x)
             ? x.map(tr)
             : Object.fromEntries(
@@ -510,8 +511,8 @@ describe("analyze", () => {
       })
       expect(profile.languages).toEqual(["zh-TW", "en"])
       const zh = profile.translations["zh-TW"]!
-      expect(zh.headline).toBe(`ZH ${profile.headline}`)
-      expect(zh.traits.map((t) => t.name)).toEqual(profile.traits.map((t) => `ZH ${t.name}`))
+      expect(zh.headline).toBe(`譯 ${profile.headline}`)
+      expect(zh.traits.map((t) => t.name)).toEqual(profile.traits.map((t) => `譯 ${t.name}`))
       expect(zh.dimensions.map((d) => d.key)).toEqual(profile.dimensions.map((d) => d.key))
       const call = fake.log.find((c) => c.schema === "LlmTranslation")!
       expect(call.prompt).toContain("language: zh-TW")
@@ -890,8 +891,8 @@ describe("interaction episodes", () => {
     if (input.schemaName === "LlmTranslation") {
       const profile = JSON.parse(/\nprofile:\n(.*)$/s.exec(input.prompt)![1]!)
       return {
-        ...profile,
-        episodes: profile.episodes.map((e: { task: string }) => ({ task: `zh ${e.task}` })),
+        ...fakeTranslation(profile),
+        episodes: profile.episodes.map((e: { task: string }) => ({ task: `譯 ${e.task}` })),
       }
     }
     const draft = respond!(input) as Record<string, unknown>
@@ -996,7 +997,7 @@ describe("interaction episodes", () => {
           taskTypes: ["build"],
         },
       ])
-      expect(profile.translations["zh-TW"]!.episodes[0]).toEqual({ task: "zh Adding an export" })
+      expect(profile.translations["zh-TW"]!.episodes[0]).toEqual({ task: "譯 Adding an export" })
       // the reduce step sees turn numbers, never the rejected conversation
       const reduce = fake.log.find((c) => c.schema === "LlmProfileDraft")!.prompt
       expect(reduce).toContain('"turn":3,"role":"correct"')

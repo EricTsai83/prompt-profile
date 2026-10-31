@@ -40,10 +40,27 @@ export const verifyCollaboration = (
   }
   const moves = proposed.moves.flatMap((m) => {
     const supporting = episodes.filter((e) => m.episodeIds.includes(e.id))
+    const independent = independentSessions(
+      supporting.flatMap((episode) => {
+        const first = episode.turns[0]
+        return first
+          ? [
+              {
+                promptId: first.promptId,
+                quote: JSON.stringify(
+                  episode.turns.map((turn) => texts.get(turn.promptId) ?? turn.quote),
+                ),
+              },
+            ]
+          : []
+      }),
+      origins,
+    )
     if (
       !m.name.trim() ||
       !m.episodeIds.every((id) => supporting.some((e) => e.id === id)) ||
       new Set(supporting.map((e) => e.session)).size < 2 ||
+      independent < 2 ||
       supporting.some((e) => e.turns.length < 2)
     ) {
       rejected.moves++
@@ -54,7 +71,7 @@ export const verifyCollaboration = (
         ...m,
         episodeIds: supporting.map((e) => e.id),
         support: {
-          sessions: new Set(supporting.map((e) => e.session)).size,
+          sessions: independent,
           weeks: spread(supporting.flatMap((e) => e.turns)).weeks,
         },
         benefit: effect(m.benefit, supporting),

@@ -38,7 +38,7 @@ describe("portrait report", () => {
     expect(out.indexOf("Setting a course")).toBeLessThan(out.indexOf('<section id="detail"'))
     expect(out.indexOf("Setting a course")).toBeGreaterThan(out.indexOf('<section id="overview"'))
     expect(out).toContain("UNIQUE_PRIVATE_QUOTE")
-    expect(out).toContain("Observed collaboration preferences")
+    expect(out).not.toContain('class="preference-map panel"')
     expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })).not.toContain(
       "UNIQUE_PRIVATE_QUOTE",
     )
@@ -218,17 +218,19 @@ describe("portrait report", () => {
 
     it("shows both ways of working, each in its context, without calling either a counterexample", async () => {
       const out = renderHtml(await withAxes())
-      const map = overview(out)
-      expect(map).toContain("Step by step</b> · when learning a new library")
-      expect(map).toContain("Whole task</b> · batches of small repairs")
-      expect(map).toContain('class="preference-rail both"')
+      expect(out).not.toContain('class="preference-map')
+      const facts = out.slice(out.indexOf('class="preference-evidence"'))
+      expect(facts).toContain("Step by step · when learning a new library")
+      expect(facts).toContain("Whole task · batches of small repairs")
+      expect(facts).toContain("Both, depending on the context")
       expect(out).not.toMatch(/[Cc]ontrary evidence|[Cc]ounter-?evidence|Mixed \/ insufficient/)
     })
 
     it("does not call a way seen in one conversation characteristic", async () => {
       const out = renderHtml(await withAxes())
       expect(overview(out)).not.toContain("a migration")
-      expect(overview(out)).toContain("Not seen in two or more conversations yet")
+      expect(out).not.toContain("Not seen in two or more conversations yet")
+      expect(overview(out)).not.toContain("<h3>Decision ownership</h3>")
       // the facts page still lists it, as seen once, with its quote
       const facts = out.slice(out.indexOf('class="preference-evidence"'))
       expect(facts).toContain("Direct · a migration · seen in one conversation only")
@@ -236,4 +238,34 @@ describe("portrait report", () => {
       expect(facts).toContain("QUOTE_6")
     })
   })
+})
+
+it("omits the preference section when no way has recurring evidence", async () => {
+  const base = await sample()
+  for (const portrait of [null, { introduction: "", chapters: [], axes: [] }]) {
+    const output = renderHtml({ ...base, portrait })
+    expect(output.includes('class="preference-map panel"')).toBe(false)
+  }
+})
+
+it("renders the bilingual gallery portrait in Chinese while preserving original quotes", async () => {
+  const base = await sample()
+  const portrait = JSON.parse(readFileSync("test/fixtures/portrait.sample.json", "utf8"))
+  const translated = JSON.parse(readFileSync("test/fixtures/portrait.sample.zh-TW.json", "utf8"))
+  const output = renderHtml({
+    ...base,
+    portrait,
+    translations: {
+      ...base.translations,
+      "zh-TW": { ...base.translations["zh-TW"]!, portrait: translated },
+    },
+  })
+  expect(output).toContain('lang="zh-Hant-TW">如何與 AI 共事</span>')
+  expect(output).not.toContain("一個人如何與 AI 共事")
+  expect(output).toContain(`lang="zh-Hant-TW">${translated.introduction}</span>`)
+  for (const chapter of translated.chapters) {
+    expect(output).toContain(`lang="zh-Hant-TW">${chapter.title}</span>`)
+    expect(output).toContain(`lang="zh-Hant-TW">${chapter.body}</span>`)
+  }
+  for (const chapter of portrait.chapters) expect(output).toContain(chapter.evidence[0].quote)
 })

@@ -66,8 +66,12 @@ reviewed claims with invalid citations will still be rejected. Return portrait: 
 supported portrait cannot be written. Do not keep an unverified introduction after dropping
 its chapters. Do not introduce new unsupported assertions while correcting the draft.
 
-Review structured `collaboration` too. Moves require ordered episodes across independent
-conversations. Reported effects must be supported by a cited user_reported ending and an
+Review structured `collaboration` too. Moves are freely named habits of working with AI,
+not a fixed four-axis classification. Keep at most six distinct supported habits. Each needs
+a recurring user choice and its task context across independent conversations, with exact
+evidence in ordered episodes. A habit need not describe an action sequence: never invent an
+order or assistant behavior. Copied source templates do not establish recurrence.
+Omit overlapping restatements and unsupported categories. Reported effects must be supported by a cited user_reported ending and an
 explicit user account of that effect; otherwise set them to null. A request, a planned review
 or a generic abandonment is not evidence of a benefit or cost. Correct signal basis before
 accepting it: tool questions and autonomous agent activity are not user understanding. Do not

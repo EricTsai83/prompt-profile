@@ -12,7 +12,15 @@ const p = await Effect.runPromise(
   decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
 )
 const portrait = JSON.parse(readFileSync("test/fixtures/portrait.sample.json", "utf8"))
-const profile = { ...p, portrait }
+const portraitZh = JSON.parse(readFileSync("test/fixtures/portrait.sample.zh-TW.json", "utf8"))
+const profile = {
+  ...p,
+  portrait,
+  translations: {
+    ...p.translations,
+    "zh-TW": { ...p.translations["zh-TW"]!, portrait: portraitZh },
+  },
+}
 
 // Local edge-case captures use only fictional data and are never public examples.
 mkdirSync("tmp/template-edges", { recursive: true })

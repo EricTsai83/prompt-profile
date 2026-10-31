@@ -17,7 +17,8 @@ export const structuredMoves = (
   if (!moves?.length) return null
   return html`<section class="identity-moves structured-moves">
     <h2>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].moveTitle)}</h2>
-    <ol>${moves.slice(0, 3).map((m, i) => {
+    <p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].habitIntro)}</p>
+    <ul>${moves.map((m, i) => {
       const supporting = p.episodes.filter((e) => m.episodeIds.includes(e.id))
       const selected = supporting
         .filter((e, index) => supporting.findIndex((x) => x.session === e.session) === index)
@@ -30,13 +31,13 @@ export const structuredMoves = (
           (
             e,
           ) => html`<article><h4>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[p.episodes.indexOf(e)]?.task ?? e.task, l))}</h4>
-          ${quote ? html`<ol>${e.turns.map((t) => html`<li>${t.turn}. ${quote(t.quote)}</li>`)}</ol>` : ""}
+          ${quote ? html`<ul>${e.turns.map((t) => html`<li>${quote(t.quote)}</li>`)}</ul>` : ""}
         </article>`,
         )}
         ${(["benefit", "cost"] as const).map((key) => (m[key] ? html`<p><b>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l][key])}</b>: ${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.[key]?.claim ?? m[key]!.claim, l))}</p>` : ""))}
         <p class="note">${loc.text((_m, _c, l) => (m.benefit || m.cost ? COLLABORATION_MESSAGES[l].effectNote : COLLABORATION_MESSAGES[l].effectsUnknown))}</p>
       </li>`
-    })}</ol>
+    })}</ul>
   </section>`
 }
 

@@ -120,3 +120,44 @@ it("keeps attributed effects only with verified user-reported ending evidence", 
   )!
   expect(out.moves[0]?.benefit?.evidence).toEqual([quote("e")])
 })
+
+it("does not count copied requests across conversations as independent habits", () => {
+  const copied = episodes.map((e) => ({
+    ...e,
+    turns: e.turns.map((t, i) => ({ ...t, quote: i === 0 ? "Same request" : "Same follow-up" })),
+  }))
+  const copyTexts = new Map(
+    copied.flatMap((e) => e.turns.map((t) => [t.promptId, t.quote] as const)),
+  )
+  const result = verifyCollaboration(
+    { moves: [move], signals: [] },
+    copied,
+    copyTexts,
+    origins,
+    counts(),
+  )!
+  expect(result.moves).toEqual([])
+  expect(result.rejected.moves).toBe(1)
+})
+
+it("keeps a contextual recurring choice without requiring an action-sequence label", () => {
+  const result = verifyCollaboration(
+    {
+      moves: [
+        {
+          ...move,
+          name: "Ask AI to compare trade-offs",
+          description:
+            "When reviewing patches, requests alternative approaches and their trade-offs.",
+        },
+      ],
+      signals: [],
+    },
+    episodes,
+    texts,
+    origins,
+    counts(),
+  )!
+  expect(result.moves[0]?.name).toBe("Ask AI to compare trade-offs")
+  expect(result.moves[0]?.support.sessions).toBe(2)
+})

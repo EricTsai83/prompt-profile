@@ -92,9 +92,9 @@ These version numbers are independent. Bump them whenever the corresponding thin
 | Version | Location | Now | When to bump |
 |---|---|---|---|
 | `Profile.schemaVersion` | `domain/Profile.ts` | 20 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 26 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 27 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 5 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 20, others 26 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 26, others 32 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `EXECUTION_VERSION` | `domain/Execution.ts` | 1 | Execution records and summaries change |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
@@ -102,16 +102,14 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
 in the change that finishes it; it stays in git history. Plans 01–27 are done
-and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
+and deleted. Plan 34 is also complete; its [interaction and owner-feedback record](../docs/ux/report-redesign/explanation-iteration.md#optional-interactions--2026-10-31) remains available. To read a completed plan: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
 
 Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 `plans/27-<name>.md` and run the acceptance criteria when done."
 
-| # | Plan | Output | Depends on | Status |
-|---|---|---|---|---|
-| 34 | [Report interactions](34-report-interactions.md) | Clear, accessible optional interactions with distinct open/closed states | Existing offline report | Planned |
+No open plans.
 
 ## Shared rules for every plan
 

@@ -110,3 +110,32 @@ it("keeps long card identity text above the footer in every product card", async
     for (const box of textBoxes) expect(box.top + box.height).toBeLessThanOrEqual(510)
   }
 })
+
+it("presents featured observations and grouped quotes without step numbering", async () => {
+  const base = await Effect.runPromise(sample())
+  for (const collaboration of [
+    null,
+    {
+      moves: [
+        {
+          name: "Review with checks",
+          description: "Requests checks.",
+          episodeIds: base.episodes.map((e) => e.id),
+          benefit: null,
+          cost: null,
+          support: { sessions: 2, weeks: 1 },
+        },
+      ],
+      signals: [],
+      rejected: { moves: 0, signals: 0, effects: 0 },
+    },
+  ]) {
+    const output = renderHtml({ ...base, collaboration })
+    const moves = output.split('class="identity-moves')[1]!.split("</section>")[0]!
+    expect(moves.includes("<ol>")).toBe(false)
+    expect(moves.includes("<ul>")).toBe(true)
+    expect(/<li>\d+\. /.test(moves)).toBe(false)
+    for (const episode of base.episodes.slice(0, 2))
+      for (const turn of episode.turns) expect(moves.includes(`<li>${turn.turn}. `)).toBe(false)
+  }
+})

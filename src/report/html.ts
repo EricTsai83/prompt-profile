@@ -12,7 +12,7 @@ import { documentLayoutStyle } from "./document-layout.ts"
 import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
 import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
 import { viewMessages } from "./messages.ts"
-import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
+import { workflowCharts, viewStyle } from "./overview.ts"
 import { DateTime } from "effect"
 import type { DimensionKey, Evidence, Language, Profile, Trait } from "../domain/Profile.ts"
 import {
@@ -41,7 +41,7 @@ import { makeScrub, visibilityOf, type Scrub, type Visibility } from "./visibili
 import { usageSection, usageStyle } from "./usage.ts"
 import { episodesSection, episodesStyle } from "./episodes.ts"
 import { steeringSection, steeringStyle } from "./steering.ts"
-import { defined, definition, definitionStyle, defText } from "./definition.ts"
+import { defined, definition, definitionStyle, disclosureStyle, defText } from "./definition.ts"
 import { STEERING_MESSAGES } from "./messages.ts"
 
 const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
@@ -712,7 +712,7 @@ export const renderHtml = (
         <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${viewMessages(loc.langs[0]!, profile.voice).brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(generationStyle)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
-        ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
+        ${raw(definitionStyle)}${raw(disclosureStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
 .experiment-print-copy{display:none}
 @media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
 </style>
@@ -782,7 +782,6 @@ export const renderHtml = (
 
           <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewNote)}</p></header>
           ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
-          ${preferenceMap(profile, loc, scrub)}
           ${story ?? ""}
           ${
             v.funFacts && profile.funFacts.length > 0

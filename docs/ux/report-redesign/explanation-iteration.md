@@ -114,7 +114,7 @@ Episode identifiers remain internal anchor targets. Reader-facing headings and c
 the episode task title, so filtered selections never suggest a missing numbered first example.
 Definitions now open on hover and keyboard focus. Native disclosure remains available for touch
 and pinning, with a filled accent state when pinned. Essential evidence remains visible.
-Broader optional interaction design is tracked in [plan 34](../../../plans/34-report-interactions.md).
+Optional interaction design and owner feedback are recorded in the [interaction record](#optional-interactions--2026-10-31).
 
 Regression tests were observed failing before fixes for scope-hash auditing, visible episode
 identifiers, and tooltip interaction styles. Typecheck, lint, formatting and 88 test files / 813
@@ -173,3 +173,80 @@ schema 8, and v0.1.5 used schema 14, before stored narration settings existed. T
 the development-only third-person compatibility path described above. Current files accept
 only first or second person; released files without a stored voice keep their original prose
 and do not acquire a narration label. Intermediate development schemas are unsupported.
+
+## Optional interactions — 2026-10-31
+
+Reader questions and existing sources determine the controls:
+
+| Reader question                        | Existing content                               | Interaction                                                                                   |
+| -------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| What does this number mean?            | Renderer definitions, sources and denominators | Labeled native definition disclosure; hover/focus previews and tap/Enter pins it              |
+| What supports this observation?        | Stored quotes and preference evidence          | Native disclosures remain open initially, with text controls and distinct open/closed markers |
+| What other suggestions can I consider? | Remaining stored improvements                  | Existing optional alternatives disclosure, with the same state treatment                      |
+
+Previously definitions appeared only as a small `i`. They now show “About” /
+“說明”, following the selected report language, with a larger target. Pinned definitions
+use document flow so touch readers can scroll through them. Essential observations and evidence
+remain visible initially. Print exposes native disclosure content even when the reader closed it.
+No new animation is added; existing reduced-motion rules remain in force.
+
+This is a render-only change for stored profiles; no analysis, pipeline or Profile schema changes.
+All look versions advance (Classic 21, others 27). Run `scripts/template-gallery.ts`, then
+`scripts/interactions-qa.mjs` with Playwright Core available to reproduce synthetic interaction
+checks. Browser automation establishes control behavior, not reader comprehension. Owner
+feedback and the resulting revisions are recorded below.
+
+### Owner feedback and revisions
+
+The owner found the filled, bordered disclosure controls too much like clickable cards.
+Controls now use text, native disclosure markers and an underlined open state. The definition
+entry is the shorter bilingual “About” / “說明”, without a button border or filled background.
+Keyboard, touch, focus and print behavior remain available.
+
+The owner also found skipped turn numbers confusing. Featured observations and grouped
+excerpts now use unordered lists without manually prefixed turn numbers. Explicit turn
+metadata remains on the factual episode record.
+
+Preference rails looked like scores and unexplained missing dots looked like missing data.
+The overview now uses text descriptions instead. Unsupported dimensions and wholly empty
+preference sections are omitted. The heading is “How you work with AI” /
+“你習慣怎麼和 AI 一起做事”, with visible text explaining what requests the current dimensions
+describe and the two-conversation evidence threshold. Factual evidence retains single examples.
+These changes do not lower the evidence threshold or infer new preferences. Current look
+versions are Classic 24 and other looks 30.
+
+The owner asked whether observation should extend beyond four fixed dimensions. Existing
+free-form observations, signature moves and episode patterns already support a broader account.
+Further analysis changes should distinguish open-ended habits from fixed categories, retain
+independent evidence and explain that they apply to future analysis rather than rewritten
+stored profiles. The owner selected open-ended habits; the implementation record below supersedes this pending decision.
+
+### Open-ended habits — owner direction
+
+The owner chose evidence-led habits without a fixed four-category limit. Map, reduce and
+review prompts now look beyond those axes, using context sharing, explanation requests,
+comparison, decision boundaries, checkpoints, verification, redirection and recovery as search
+aids rather than required slots. Existing `collaboration.moves` stores up to six distinct habits
+proposed by the model. A recurring choice need not be phrased as a sequence; supporting episodes
+still retain ordered turns for context. Each description must state its supported task context.
+
+The first view uses these freely named habits and their existing episode evidence. It displays
+all stored habits rather than truncating them to three; the hero still selects three for a
+quick scan. The fixed-axis overview is removed. The facts view retains the old axis evidence
+with single examples labeled as such, so historical evidence remains accessible. Legacy reports
+continue through the existing pattern/trait fallback; rendering does not invent new habits.
+Stored source prose and the Profile format are unchanged.
+
+Verification rejects habits supported only by one conversation, unknown episode references,
+or duplicated source sequences across conversations. Independence is computed from complete
+source prompts where available. This checks recurrence and provenance, not whether a quote
+semantically entails a claim; the review prompt remains responsible for that distinction.
+
+ANALYSIS_VERSION advances to 27, invalidating earlier analysis caches; Classic is 25 and other
+looks 31. Tests establish red before the duplicate-source and fifth-habit fixes. Automated
+synthetic checks do not establish that a real model will reliably find every valid habit.
+No paid model run or reanalysis of personal history was performed for this change.
+
+The owner's interaction feedback above has been incorporated. Plan 34's interaction acceptance
+is complete with bilingual, dark/light, mobile/desktop synthetic checks and the owner-led
+revisions. Further aesthetic feedback can still lead to iteration.

@@ -62,7 +62,12 @@ export const preferenceEvidence = (
   scrub: Scrub,
 ): Raw | null => {
   const portrait = p.portrait
-  if (!portrait || portrait.chapters.length === 0) return null
+  if (
+    !portrait ||
+    portrait.chapters.length === 0 ||
+    !portrait.axes.some((axis) => axis.sides.length > 0)
+  )
+    return null
   const code = roleCode(portrait.axes)
   return html`<section class="preference-evidence">
     ${defined(
@@ -88,11 +93,12 @@ export const preferenceEvidence = (
         : ""
     }
     ${portrait.axes.map((axis, a) => {
+      if (axis.sides.length === 0) return html``
       const state = axisState(axis)
       const translated = (l: Language) => p.translations[l]?.portrait?.axes[a]
       return html`<div class="portrait-axis">
       <b>${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].axes[axis.key][0])}</b>
-      <span>${loc.text((_m, _c, l) => (state === "none" ? PORTRAIT_MESSAGES[l].notObserved : state === "both" ? PORTRAIT_MESSAGES[l].both : PORTRAIT_MESSAGES[l].axes[axis.key][state === "first" ? 1 : 2]))}</span>
+      ${state === "none" ? "" : html`<span>${loc.text((_m, _c, l) => (state === "both" ? PORTRAIT_MESSAGES[l].both : PORTRAIT_MESSAGES[l].axes[axis.key][state === "first" ? 1 : 2]))}</span>`}
       ${axis.explanation ? html`<p>${loc.text((_m, _c, l) => scrub(translated(l)?.explanation ?? axis.explanation, l))}</p>` : ""}
       ${axis.coverage ? html`<p class="note">${loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].choiceCoverage(axis.coverage!.citedSessions, axis.coverage!.analysedSessions, axis.coverage!.periods))}</p>` : ""}
       ${axis.sides.map(

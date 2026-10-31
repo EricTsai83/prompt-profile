@@ -61,3 +61,26 @@ it("separates requested practices from ability and keeps structured moves tied t
   expect(JSON.stringify(translationInput(p))).not.toContain("PRIVATE_SIGNAL_QUOTE")
   expect(translationInput(p).collaboration?.moves[0]?.name).toBe("Compare then check")
 })
+
+it("shows open-ended habits beyond three, without a fixed-axis overview", async () => {
+  const base = await Effect.runPromise(
+    decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+  )
+  const moves = Array.from({ length: 5 }, (_, i) => ({
+    name: `Supported habit ${i}`,
+    description: `A contextual request ${i}`,
+    episodeIds: base.episodes.map((e) => e.id),
+    benefit: null,
+    cost: null,
+    support: { sessions: 2, weeks: 1 },
+  }))
+  const output = renderHtml({
+    ...base,
+    collaboration: { moves, signals: [], rejected: { moves: 0, signals: 0, effects: 0 } },
+  })
+  const identity = output.split('<section id="overview"')[1]!.split('<section id="detail"')[0]!
+  expect(identity.includes("Supported habit 4")).toBe(true)
+  expect(identity.includes('class="preference-map')).toBe(false)
+  expect(identity.includes("How you work with AI")).toBe(true)
+  expect(identity.includes("你習慣怎麼和 AI 一起做事")).toBe(true)
+})

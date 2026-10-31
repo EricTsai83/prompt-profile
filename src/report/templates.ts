@@ -49,7 +49,7 @@ export const identityMoves = (
           loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].selectedMoves),
         ),
       )}
-      <ol>${p.patterns.slice(0, 3).map(
+      <ul>${p.patterns.slice(0, 3).map(
         (pattern, i) => html`<li>
         <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.patterns[i]?.claim ?? pattern.claim, l))}</h3>
         <p>${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].spread(pattern.support.sessions, pattern.support.weeks))}</p>
@@ -63,11 +63,11 @@ export const identityMoves = (
             const index = p.episodes.indexOf(e)
             return html`<article>
             <p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? e.task, l))}${pattern.counterEpisodeIds.includes(e.id) ? html` · ${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].against)}` : ""}</p>
-            ${quote ? html`<ol>${e.turns.map((t) => html`<li>${t.turn}. ${quote(t.quote)}</li>`)}</ol>` : ""}
+            ${quote ? html`<ul>${e.turns.map((t) => html`<li>${quote(t.quote)}</li>`)}</ul>` : ""}
           </article>`
           })}
       </li>`,
-      )}</ol>
+      )}</ul>
     </section>`
   }
   const selected = signatureTraits(p)
@@ -83,13 +83,13 @@ export const identityMoves = (
     ${
       selected.length === 0
         ? ""
-        : html`<ol>${selected.map(
+        : html`<ul>${selected.map(
             (i) => html`<li>
         <h3>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h3>
         ${describe ? html`<p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>` : ""}
         ${quote ? html`<blockquote>${quote(p.traits[i]!.evidence[0]!.quote)}</blockquote>` : ""}
       </li>`,
-          )}</ol>`
+          )}</ul>`
     }
   </section>`
 }
@@ -103,10 +103,10 @@ const D = "[data-composition=document]"
  */
 export const variantStyle = `
 .identity-moves{margin:var(--space-8) 0}.identity-moves>.note{margin-top:var(--space-2);max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
-.identity-moves>ol{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
-.identity-moves>ol>li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
-.identity-moves>ol>li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
-.identity-moves article{margin-top:var(--space-4)}.identity-moves article ol{list-style:none;display:block;margin:8px 0;padding-left:20px}.identity-moves article li{padding:4px 0;border:0;font-size:var(--text-sm);line-height:1.7}
+.identity-moves>ul{list-style:none;margin:var(--space-6) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-6)}
+.identity-moves>ul>li{border-top:2px solid var(--accent);padding-top:var(--space-4)}.identity-moves h3{font-size:var(--text-lg)}
+.identity-moves>ul>li>p{margin-top:var(--space-2);color:var(--muted);font-size:var(--text-md)}.identity-moves blockquote{margin-top:var(--space-4);font-size:var(--text-md);line-height:1.7}
+.identity-moves article{margin-top:var(--space-4)}.identity-moves article ul{list-style:disc;display:block;margin:8px 0;padding-left:20px}.identity-moves article li{padding:4px 0;border:0;font-size:var(--text-sm);line-height:1.7}
 html${D} .identity-signatures{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:28px 0 8px}
 .identity-signatures article{border-top:2px solid var(--accent);padding:18px 0}.identity-signatures h2{font-size:var(--text-base);line-height:1.5}.identity-signatures p{font-size:var(--text-sm);line-height:1.8;color:var(--muted);margin-top:8px}
 ${D} .hero{background:var(--card);color:var(--fg);overflow:visible}
@@ -118,7 +118,6 @@ ${D} .hero .report-facts{border-top:1px solid var(--border);padding-top:var(--sp
 ${D} .hero .report-facts dt{color:var(--muted);font-size:10px}
 ${D} .view-heading h2{font-size:var(--text-xl)}
 ${D} .view-heading p{font-size:var(--text-sm)}
-:where(${D}) .preference-row:has(.unclear) .preference-rail,:where(${D}) .preference-row:has(.unclear) .preference-ends{display:none}
 [data-hero=split] .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px}html[data-signatures=stacked] .identity-signatures{display:grid!important;grid-template-columns:1fr;gap:0;margin:0}html[data-signatures=stacked] .identity-signatures article{padding:12px 0;border-top:1px solid var(--border)}html[data-signatures=stacked] .identity-signatures article:first-child{border-top:0}html[data-signatures=stacked] .identity-signatures p{margin-top:4px}
 [data-hero=editorial] .hero{background:transparent}html[data-signatures=ledger] .identity-signatures{grid-template-columns:1fr;gap:0;max-width:var(--column)}html[data-signatures=ledger] .identity-signatures article{display:grid;grid-template-columns:200px 1fr;gap:24px;border-top:1px solid var(--border);padding:16px 0}html[data-signatures=ledger] .identity-signatures p{margin:0}[data-story-width=reading] .portrait-intro,[data-story-width=reading] .portrait-chapter{max-width:var(--column)}[data-story-width=reading] .portrait-intro{font-family:var(--prose-font);font-size:var(--prose-intro)}[data-story-width=reading] .portrait-chapter{border-top:1px solid var(--border);padding-top:28px}
 :where(${D}) .axis-side{border-left:2px solid var(--border);padding-left:16px}

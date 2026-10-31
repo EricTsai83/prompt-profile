@@ -559,10 +559,8 @@ export const MESSAGES: Record<Language, Messages> = { en, "zh-TW": zhTW }
 export const PORTRAIT_MESSAGES = {
   en: {
     title: "A portrait of collaboration",
-    preferences: "Observed collaboration preferences",
-    note: "Preferences observed in these conversations, not a psychological assessment or an ability score. Both ways of working on a line can be characteristic, each in its own kind of task or project.",
+    note: "Preferences observed in these conversations, not a psychological assessment or an ability score. Both ways of working can be characteristic, each in its own kind of task or project.",
     supporting: "Supporting patterns, activity and practical suggestions",
-    notObserved: "Not seen in two or more conversations yet",
     both: "Both, depending on the context",
     seenIn: (n: number) => `in ${n} ${n === 1 ? "conversation" : "conversations"}`,
     seenOnce: "seen in one conversation only, not counted as characteristic yet",
@@ -578,7 +576,7 @@ export const PORTRAIT_MESSAGES = {
     friction: "Possible coordination friction",
     catalogNote:
       "This is a description of the role catalog, not an additional finding about you. Contexts and friction are possibilities to discuss, not observed outcomes.",
-    rule: "A way of working counts as characteristic once distinct verified excerpts show it in two or more conversations. Copied excerpts count once; conversation length adds no weight. A complete role is named only when every line has exactly one characteristic way.",
+    rule: "A way of working counts as characteristic once distinct verified excerpts show it in two or more conversations. Copied excerpts count once; conversation length adds no weight. A complete role is named only when every dimension has exactly one characteristic way.",
     axes: {
       framing: ["Starting point", "Define first", "Explore first"],
       pacing: ["Pace", "Step by step", "Whole task"],
@@ -587,11 +585,9 @@ export const PORTRAIT_MESSAGES = {
     },
   },
   "zh-TW": {
-    title: "一個人如何與 AI 共事",
-    preferences: "對話中展現的協作偏好",
-    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分。同一條線的兩種做法都可能是你的特色，各自出現在不同的任務或專案中。",
+    title: "如何與 AI 共事",
+    note: "這些偏好來自觀察到的對話，並非心理測驗或能力評分。兩種做法都可能是你的特色，各自出現在不同的任務或專案中。",
     supporting: "更多行為證據、使用紀錄與實用建議",
-    notObserved: "尚未在兩段以上的對話中看到",
     both: "兩種都有，視情境而定",
     seenIn: (n: number) => `出現在 ${n} 段對話`,
     seenOnce: "只在一段對話中看到，尚不算特色",
@@ -607,7 +603,7 @@ export const PORTRAIT_MESSAGES = {
     friction: "可能需要協調的地方",
     catalogNote:
       "這是角色目錄的描述，不是對你的額外判斷。適用情境與協調提醒是可討論的可能性，不代表已觀察到的結果。",
-    rule: "一種做法要在兩段以上的對話中有不同的已驗證引述，才算特色。重複引述只計一次，對話長度不會增加權重。只有每一條線都剛好只有一種特色做法時，才會給出完整的角色名稱。",
+    rule: "一種做法要在兩段以上的對話中有不同的已驗證引述，才算特色。重複引述只計一次，對話長度不會增加權重。只有每個面向都剛好只有一種特色做法時，才會給出完整的角色名稱。",
     axes: {
       framing: ["起手方式", "先定義", "先探索"],
       pacing: ["推進節奏", "分步推進", "整包交付"],
@@ -995,7 +991,7 @@ export const STEERING_MESSAGES = {
 /** What each measurement means, shown folded behind an ⓘ (`definition.ts`). */
 export const DEFINITION_MESSAGES = {
   en: {
-    label: "What this means",
+    label: "About",
     dataPeriod:
       "The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.",
     analyzed:
@@ -1029,7 +1025,7 @@ export const DEFINITION_MESSAGES = {
       "Short summaries written by the analysing model, each backed by verified quotes; without a verified quote a dimension shows insufficient evidence.",
   },
   "zh-TW": {
-    label: "這是什麼意思",
+    label: "說明",
     dataPeriod:
       "所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。",
     analyzed:
@@ -1159,7 +1155,9 @@ export const COLLABORATION_MESSAGES = {
     none: "Not observed in this evidence",
     requested: "Requested practice",
     reported: "User-reported practice",
-    moveTitle: "Signature moves",
+    moveTitle: "How you work with AI",
+    habitIntro:
+      "Habits found in your requests to AI, each supported by at least two independent conversations. The examples show the task context; these are not fixed personality categories.",
     effectsUnknown: "No supported benefit or cost claim here.",
     benefit: "User-reported benefit",
     cost: "User-reported cost",
@@ -1180,7 +1178,9 @@ export const COLLABORATION_MESSAGES = {
     none: "這份證據中尚未觀察到",
     requested: "要求採用的做法",
     reported: "使用者回報的做法",
-    moveTitle: "代表性招式",
+    moveTitle: "你習慣怎麼和 AI 一起做事",
+    habitIntro:
+      "從你向 AI 提出的要求中找出協作習慣，每項至少有兩段獨立對話支持。例子會呈現當時的任務情境，不把你歸入固定的人格類型。",
     effectsUnknown: "這裡沒有足夠證據支持效益或代價的判斷。",
     benefit: "使用者回報的效益",
     cost: "使用者回報的代價",

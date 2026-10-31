@@ -29,7 +29,8 @@ const definitionOf = (html: string, text: string) => {
 describe("measurement definitions", () => {
   it("are folded behind an ⓘ: closed by default, with a label for screen readers", async () => {
     const out = renderHtml(english(await sample()))
-    expect(out).toContain('<details class="def"><summary aria-label="What this means">')
+    expect(out).toContain('<details class="def"><summary>')
+    expect(out).toContain('<span class="def-label">About</span>')
     expect(out).not.toContain('<details class="def" open')
   })
 
@@ -81,7 +82,7 @@ describe("measurement definitions", () => {
 
   it("are written in every report language", async () => {
     const out = renderHtml({ ...(await sample()), languages: ["zh-TW"] })
-    expect(out).toContain('<summary aria-label="這是什麼意思">')
+    expect(out).toContain('<span class="def-label">說明</span>')
     expect(definitionOf(out, "語言")).toContain("依文字判斷")
   })
 
@@ -97,5 +98,15 @@ it("exposes definitions on hover and keyboard focus, with a distinct pinned stat
   const out = renderHtml(english(await sample()))
   expect(out).toContain(".def:hover::details-content")
   expect(out).toContain(".def:focus-within::details-content")
-  expect(out).toContain(".def[open]>summary{background:var(--accent)")
+  expect(out).toContain(".def[open]>summary{color:var(--accent);text-decoration:underline}")
+})
+
+it("uses text disclosures without filled panels or control borders", async () => {
+  const out = renderHtml(english(await sample()))
+  expect(out).toContain(
+    "details:not(.def)>summary{cursor:pointer;min-height:44px;padding:8px 0;border:0;border-radius:0;background:none",
+  )
+  expect(out).toContain(
+    "details[open]:not(.def)>summary{color:var(--accent);text-decoration:underline}",
+  )
 })

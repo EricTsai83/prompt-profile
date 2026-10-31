@@ -108,7 +108,17 @@ steer; "what's wrong with this test?" is a question. Label each prompt at most o
 label the first prompt of a conversation. Return an empty list when there are none. Keep the same conversations' quotes in the
 observations too when they support a claim.
 
-Also look for these original collaboration preferences, without treating either pole as better:
+Look for open-ended habits in how the user works with AI. Let the actual requests determine
+the observation names; do not force each person into a fixed taxonomy. Useful search
+directions include providing context or examples, requesting explanations, comparing options,
+setting decision boundaries, reviewing progress, verifying results, correcting drift and
+recovering from mistakes. These are search aids, not required categories or a checklist to
+fill. Record only supported choices, exact quotes and task context. Distinguish requests from
+outcomes and a single event from recurrence. Keep habits outside the four axes below in the
+existing observations and episodes; do not discard them for lacking an axis.
+
+Also collect these legacy collaboration dimensions for the factual evidence record, without
+treating either pole as better:
 
 - framing: defining outcomes first versus exploring the problem through dialogue;
 - pacing: confirming incremental steps versus handing over a whole task;
