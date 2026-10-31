@@ -15,9 +15,19 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-/** Current format plus direct decoding of published schemas: 8 (v0.1.1–v0.1.4), 14 (v0.1.5).
- * Unreleased intermediate formats are intentionally unsupported; additive fields use defaults. */
 export const PROFILE_SCHEMA_VERSION = 20 as const
+
+/**
+ * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,
+ * 8 (v0.1.1–v0.1.4) and 14 (v0.1.5). A released format decodes as the current one because
+ * every field added since is optional or has a default. Unreleased intermediate formats are
+ * intentionally unsupported.
+ */
+export const READABLE_SCHEMA_VERSIONS: ReadonlySet<unknown> = new Set([
+  8,
+  14,
+  PROFILE_SCHEMA_VERSION,
+])
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -372,7 +382,7 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (found !== PROFILE_SCHEMA_VERSION && ![8, 14].includes(found as number)) {
+    if (!READABLE_SCHEMA_VERSIONS.has(found)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
     const current =

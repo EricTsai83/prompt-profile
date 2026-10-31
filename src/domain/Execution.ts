@@ -101,22 +101,6 @@ export interface ExecutionRecord {
   readonly summary: ExecutionSummary
 }
 
-export type ExecutionEvent =
-  | { readonly type: "started"; readonly executionId: string; readonly atMs: number }
-  | {
-      readonly type: "stage"
-      readonly stage: ExecutionStage
-      readonly completed: number
-      readonly total: number | null
-    }
-  | { readonly type: "attempt"; readonly attempt: ExecutionAttempt }
-  | { readonly type: "cache-hit"; readonly stage: "map" | "merge" }
-  | {
-      readonly type: "finished"
-      readonly outcome: ExecutionOutcome
-      readonly summary: ExecutionSummary
-    }
-
 const state = (
   calls: number,
   unknown: number,
