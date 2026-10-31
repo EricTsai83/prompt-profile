@@ -4,6 +4,43 @@ exports[`LLM schemas > LlmChunkAnalysis produces a subset-compliant JSON Schema 
 {
   "additionalProperties": false,
   "properties": {
+    "axisSignals": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "enum": [
+              "framing",
+              "pacing",
+              "control",
+              "closure",
+            ],
+            "type": "string",
+          },
+          "pole": {
+            "enum": [
+              "first",
+              "second",
+            ],
+            "type": "string",
+          },
+          "promptId": {
+            "type": "string",
+          },
+          "quote": {
+            "type": "string",
+          },
+        },
+        "required": [
+          "promptId",
+          "axis",
+          "pole",
+          "quote",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "episodes": {
       "items": {
         "additionalProperties": false,
@@ -170,6 +207,7 @@ exports[`LLM schemas > LlmChunkAnalysis produces a subset-compliant JSON Schema 
     "observations",
     "episodes",
     "interventions",
+    "axisSignals",
   ],
   "type": "object",
 }

@@ -1,3 +1,5 @@
+import { Schema } from "effect"
+
 /** Original collaboration preferences, not a psychological assessment or ability score. */
 export const INTERACTION_AXES = [
   { key: "framing", codes: ["F", "E"] },
@@ -7,7 +9,8 @@ export const INTERACTION_AXES = [
 ] as const
 export const AXIS_KEYS = ["framing", "pacing", "control", "closure"] as const
 export type AxisKey = (typeof AXIS_KEYS)[number]
-export type Pole = "first" | "second"
+export const POLES = ["first", "second"] as const
+export type Pole = (typeof POLES)[number]
 
 /**
  * A way of working counts as characteristic once it shows in this many conversations. Both
@@ -74,3 +77,24 @@ export const ROLE_NAMES: Readonly<Record<string, string>> = {
   EBLC: "Research Orchestrator",
   EBLR: "Open Explorer",
 }
+
+const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
+
+/**
+ * How often each way of working shows, measured on the analysed chunks: per axis, the distinct
+ * conversations with a verified prompt for each pole. A conversation may count for both poles.
+ * A share of conversations, not a personality score.
+ */
+export const AxisBalance = Schema.Struct({
+  axes: Schema.Array(
+    Schema.Struct({ key: Schema.Literals(AXIS_KEYS), first: Count, second: Count }),
+  ),
+  /** Conversations with a prompt in the analysed chunks (a sample of the history). */
+  conversations: Count,
+  /** Labels on an unknown prompt, misquotes and repeated labels of one prompt and axis. */
+  rejected: Count,
+})
+export type AxisBalance = typeof AxisBalance.Type
+
+/** Fewest conversations behind an axis before the report shows its percentages. */
+export const MIN_BALANCE_CONVERSATIONS = 3

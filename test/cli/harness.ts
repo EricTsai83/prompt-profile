@@ -50,6 +50,7 @@ export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
       ],
       episodes: [],
       interventions: [],
+      axisSignals: [],
     }
   }
   const obs = JSON.parse(/observations:\n(.*)\n\nstats:/s.exec(prompt)![1]!) as Array<{

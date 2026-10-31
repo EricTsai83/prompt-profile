@@ -35,7 +35,13 @@ const label = (id: string, kind: "steer" | "repair", quote: string) => ({
 })
 const outcome = (interventions: ChunkObservations["interventions"]) => ({
   chunk,
-  observations: { chunkId: chunk.id, observations: [], episodes: [], interventions },
+  observations: {
+    chunkId: chunk.id,
+    observations: [],
+    episodes: [],
+    interventions,
+    axisSignals: [],
+  },
 })
 
 describe("measureSteering", () => {

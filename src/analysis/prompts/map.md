@@ -129,6 +129,16 @@ treating either pole as better:
   (the project, the kind of task or the situation). Short prompts alone prove none of these.
   Agent tool use alone does not prove the user requested or understood that technique.
 
+Also return `axisSignals`: every prompt in this batch that clearly shows one of those ways of
+working, with its `promptId`, the `axis` (`framing`, `pacing`, `control` or `closure`), the
+`pole` (`first` = define / stepwise / personally direct / predefined criteria; `second` =
+explore / whole task / delegate decisions / iterative refinement) and a verbatim `quote`
+showing it (same rules as evidence). The application counts these labels per conversation to
+show how often each way shows, so label every clear prompt, not only representative ones, and
+never invent labels to balance the poles. Label a prompt at most once per axis; a prompt may
+show ways on several axes. Leave out prompts that show no way clearly: short acknowledgements,
+pure questions and bare follow-ups such as "continue". Return an empty list when none do.
+
 ## Claim calibration
 
 A quotation can be authentic but irrelevant to a claim. Cite only text that supports the

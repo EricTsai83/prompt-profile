@@ -15,7 +15,7 @@ it.effect(
       const out = join(h.root, "my report")
       const original = JSON.stringify({
         ...JSON.parse(readFileSync(fixture("profile.sample.json"), "utf8")),
-        schemaVersion: 21,
+        schemaVersion: 22,
       })
       writeFileSync(file, original)
       const result = yield* h.run([

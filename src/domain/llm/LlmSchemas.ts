@@ -1,5 +1,5 @@
 import { SIGNAL_BASES, UNDERSTANDING_KINDS } from "../Collaboration.ts"
-import { AXIS_KEYS } from "../Interaction.ts"
+import { AXIS_KEYS, POLES } from "../Interaction.ts"
 import { Effect, Schema } from "effect"
 import type { ChunkObservations } from "../ChunkObservations.ts"
 import { ENDINGS, TASK_TYPES, TURN_ROLES } from "../Episode.ts"
@@ -65,6 +65,15 @@ export const LlmChunkAnalysis = Schema.Struct({
     Schema.Struct({
       promptId: Schema.String,
       kind: Schema.Literals(INTERVENTION_KINDS),
+      quote: Schema.String,
+    }),
+  ),
+  /** Prompts that clearly show one way of working on one of the four axes. */
+  axisSignals: Schema.Array(
+    Schema.Struct({
+      promptId: Schema.String,
+      axis: Schema.Literals(AXIS_KEYS),
+      pole: Schema.Literals(POLES),
       quote: Schema.String,
     }),
   ),
@@ -229,6 +238,10 @@ export const fromLlmChunkObservations = (
     "interventions" in llm
       ? llm.interventions.map((i) => ({ ...i, quote: truncateQuote(i.quote) }))
       : [],
+  axisSignals:
+    "axisSignals" in llm
+      ? llm.axisSignals.map((a) => ({ ...a, quote: truncateQuote(a.quote) }))
+      : [],
 })
 
 export interface ProfileExtras {
@@ -306,6 +319,7 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
   patterns: [],
   // measured by the analysis from the map step's verified labels
   steering: null,
+  axisBalance: null,
   previous: null,
   // the CLI fills it from local logs; the analysis never sees usage
   usage: null,

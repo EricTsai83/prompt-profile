@@ -24,7 +24,7 @@ const parts: CacheKeyParts = {
 const entry = {
   ...parts,
   producedBy: "m",
-  value: { chunkId: "chunk-1", observations: [], episodes: [], interventions: [] },
+  value: { chunkId: "chunk-1", observations: [], episodes: [], interventions: [], axisSignals: [] },
 }
 
 describe("file cache", () => {

@@ -16,6 +16,7 @@ import { selectChunks, type AnalyzeOptions } from "./plan.ts"
 import { Progress } from "./progress.ts"
 import { draftProfile, evidenceOriginsOf, reduceInput, verifyProfile } from "./reduce.ts"
 import { measureSteering } from "./steering.ts"
+import { measureAxisBalance } from "./axes.ts"
 import { addTranslations } from "./translate.ts"
 import { verifyObservations, type EvidenceCounts } from "./verify.ts"
 
@@ -57,6 +58,7 @@ export const analyze = (input: {
 
     // ---- steering and episodes, per conversation ------------------------------------------
     const steering = measureSteering(analyzed)
+    const axisBalance = measureAxisBalance(analyzed)
     const episodeCounts = emptyEpisodeCounts()
     const episodes = selectEpisodes(
       analyzed.map((o) => verifyEpisodes(o.observations.episodes, o.chunk, episodeCounts)),
@@ -98,6 +100,7 @@ export const analyze = (input: {
       episodes,
       episodeCounts,
       steering,
+      axisBalance,
     })
     yield* progress.onVerified(counts.kept, counts.dropped)
 

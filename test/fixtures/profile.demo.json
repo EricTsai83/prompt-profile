@@ -243,7 +243,7 @@
       }
     ]
   },
-  "schemaVersion": 20,
+  "schemaVersion": 21,
   "languages": [
     "zh-TW",
     "en"
@@ -702,6 +702,7 @@
   ],
   "patterns": [],
   "steering": null,
+  "axisBalance": null,
   "usage": null,
   "stats": {
     "window": {

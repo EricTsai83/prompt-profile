@@ -11,6 +11,7 @@ import {
   type Profile,
   type Stats,
   type Steering,
+  type AxisBalance,
 } from "../domain/index.ts"
 import {
   LlmRunner,
@@ -161,6 +162,7 @@ export const verifyProfile = (input: {
   readonly episodes: ReadonlyArray<SelectedEpisode>
   readonly episodeCounts: EpisodeCounts
   readonly steering: Steering
+  readonly axisBalance: AxisBalance
 }): { readonly profile: Profile; readonly counts: EvidenceCounts } => {
   const { drafts, options, outcomes, analyzed, episodes } = input
   const draft = drafts.reviewed
@@ -261,6 +263,7 @@ export const verifyProfile = (input: {
       episodes: episodes.map(toProfileEpisode),
       patterns,
       steering: input.steering,
+      axisBalance: input.axisBalance,
       coverage: {
         ...profile.coverage,
         narrativeRejected: narrativeRejected ? 1 : 0,

@@ -78,6 +78,7 @@ describe("verify", () => {
         chunkId: "c",
         episodes: [],
         interventions: [],
+        axisSignals: [],
         observations: [
           {
             dimension: "work_style",

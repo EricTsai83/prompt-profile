@@ -4,7 +4,7 @@ import { EvidenceOrigin } from "./EvidenceOrigin.ts"
 import { HistoryComparison } from "./History.ts"
 import { NarrativePlan } from "./Narrative.ts"
 import { Collaboration, CollaborationText } from "./Collaboration.ts"
-import { AXIS_KEYS } from "./Interaction.ts"
+import { AXIS_KEYS, AxisBalance } from "./Interaction.ts"
 import { Effect, Schema } from "effect"
 import { Episode, EpisodeCoverage, Pattern } from "./Episode.ts"
 import { MAX_QUOTE_LENGTH } from "./quote.ts"
@@ -15,7 +15,7 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-export const PROFILE_SCHEMA_VERSION = 20 as const
+export const PROFILE_SCHEMA_VERSION = 21 as const
 
 /**
  * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,
@@ -295,6 +295,8 @@ const ProfileFields = Schema.Struct({
   /** Steering and repairs per conversation; null before version 13 (the report then shows
    * the rule-based `stats.correctionRate`). */
   steering: Schema.NullOr(Steering).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
+  /** How often each way of working shows, per conversation; null before version 21. */
+  axisBalance: Schema.NullOr(AxisBalance).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   /** Generation accounting; null means no saved measurement (before version 20). */
   generation: Schema.NullOr(GenerationMetadata).pipe(
     Schema.withDecodingDefaultKey(Effect.succeed(null)),
