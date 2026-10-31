@@ -4,7 +4,7 @@
 analysis options change the profile, the report and the card? It is a developer evaluation tool.
 It does not change any production default.
 
-Each experiment runs the production analysis on hand-written fictional personas
+By default, each experiment runs the production analysis on hand-written fictional personas
 (`test/eval/personas/`). It then renders every result with the production renderer and writes
 an offline comparison page.
 
@@ -165,13 +165,63 @@ To expand an experiment, add personas or repetitions first. That separates model
 one unusual output. Add explicit-model variants one at a time, and treat the findings as local
 evidence for a future default-model decision.
 
-## Not yet available
+## Local history snapshots
 
-A frozen snapshot of your own local history, as an experiment input, is planned (plan 22,
-§2). Until then, experiments use only the fictional personas.
+To compare models on your own history, copy the starter config and replace `personas` with
+`["local-history"]`. Set `shared.timezone` explicitly if desired (otherwise the system time
+zone is used), then run:
+
+```bash
+pnpm eval:compare --config experiments/local.json --local-history --dry-run
+pnpm eval:compare --config experiments/local.json --local-history --budget 40
+```
+
+`--local-history` requires an explicit config. It reads both supported local sources through
+the production adapters once, captures the current time, and cleans, redacts and truncates
+records once. Every variant and repetition uses that same prepared input, with cache disabled.
+The dry run reads and prepares history but writes no snapshot and sends no prompts.
+
+A real run writes `input-snapshot.json` before launching any LLM work. It contains the prepared
+prompts, statistics, pipeline version, fixed time, timezone, preprocessing counts and per-source
+bad-line/unreadable-file counts. No raw history is saved. The manifest and each case record
+hashes linking them to this snapshot; the input hash covers prepared input and preparation
+metadata, while the prepared hash covers prompt ids and text. Different sampling options still
+record their own selected chunks. Source changes during the matrix cannot change its input.
+
+The snapshot uses the same private atomic writes as other experiment artifacts: new folders
+0700 and files 0600. Keep configs and outputs containing personal information out of git;
+the default `eval-output/` destination is ignored. Redaction cannot remove every personal detail.
+`--from` rebuilds reports from saved profiles without rereading history or calling an LLM;
+restarting analysis from a saved snapshot is not currently offered.
+
+Local history has no authored persona rubric. Its quality result records heuristic measurements
+with permissive thresholds, so a passing gate does not establish quality. Use `review.md` to
+check claims against exact evidence and compare fidelity, specificity, contradictions,
+usefulness, translations, report readability and card fit. Record reasons and case ids before
+choosing a preferred variant.
+
+## Calibration fixtures
 
 Role calibration uses `experiments/role-calibration.json`: two repetitions of one fictional
 contextual collaborator, one engine, both languages, eight expected calls. See the
 [authored rubric and measured limitations](ux/model-comparison/collaboration-roles.md).
 The additional `heavy-questions` and `sparse-boundaries` personas check that usage and prompt
 length do not become expertise judgments; their semantic expectations require manual review.
+
+## Real comparison — 2026-10-29
+
+`experiments/starter.json` on the fictional `curious-learner` persona: Claude Code 2.1.312 and
+codex-cli 0.165.0, each with its default model, two repetitions, English and Traditional Chinese.
+Outcome `passed` (exit 0), 20 of 40 attempts, no retries or failures. Claude reported
+`claude-opus-5-5`. Codex reported no model, and the page shows "not reported". Claude cases
+took 83–86 s; Codex cases took 127–138 s with about three times the input tokens. Every report
+and every en/zh-TW card rendered.
+
+Structured decisions differed between the engines: 5 traits and 54 verified quotes for Claude,
+3 traits and 43 quotes for Codex. They also differed within each engine: the closure and control
+axes were unresolved in one of the two repetitions, and the improvement counts varied. No
+complete role was assigned in any case. These are observations on one persona, not a ranking.
+
+The comparison page was inspected in headless Chromium at desktop and 390 px widths:
+selectors, links, embedded reports, cards and stacked layout all worked, with no horizontal
+overflow, external request or console error. Output stays in ignored `eval-output/`.

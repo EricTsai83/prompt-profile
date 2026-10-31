@@ -100,7 +100,7 @@ These version numbers are independent. Bump them whenever the corresponding thin
 ## Open plans
 
 `plans/` holds only unfinished plans. A finished plan is deleted, together with its row here,
-in the change that finishes it; it stays in git history. Plans 01–21 and 23–27 are done
+in the change that finishes it; it stays in git history. Plans 01–27 are done
 and deleted. To read one: `git log --oneline -- 'plans/<file>'`, then
 `git show <commit>^:plans/<file>` on the commit that deleted it (`git log --diff-filter=D
 --name-only -- plans/` lists every deleted plan).
@@ -110,7 +110,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
 | 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | Planned; source review complete |
 | 34 | [Report interactions](34-report-interactions.md) | Clear, accessible optional interactions with distinct open/closed states | Existing offline report | Planned |
 
@@ -132,15 +131,15 @@ features have shipped. Each remaining plan can be executed separately; explicit 
 define its handoff. Plan 20 is complete; its usage, owner amendments and limitations are in the
 [collaboration guide](../docs/collaboration-experience.md). Plan 21 is closed by owner decision
 (see the [closeout](../docs/ux/report-redesign/output-roles.md#owner-closeout--2026-10-29)),
-and plan 22 remains the experiment tooling owner.
+and the completed [experiment tool](../docs/experiments.md) owns model comparisons.
 
 ### Recommended execution batches
 
 1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); the completed library and evidence foundation are available. A dedicated sharing workflow was removed by owner decision (see below).
 2. **Support recurring reflection:** project/context retrospectives are implemented
    ([usage and limits](../docs/context-retrospectives.md)); comparable-window history is reused.
-3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
-   from the completed fictional collaboration calibration. Owner use can refine priorities.
+3. **Evaluate with local snapshots:** the completed [experiment tool](../docs/experiments.md)
+   supports private local-history snapshots alongside fictional calibration. Owner use can refine priorities.
 4. **Explain each execution:** plan 33 extends the command lifecycle and run accounting using
    reviewed Deepsec patterns. Deliver summaries and recovery before the optional cost threshold.
 

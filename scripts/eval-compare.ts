@@ -10,14 +10,17 @@
  * call an LLM. Each run writes a new private folder and never overwrites an earlier one.
  */
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
-import { Effect, Exit, Path } from "effect"
+import { DateTime, Effect, Exit, FileSystem, Path } from "effect"
 import { defaultTeardown } from "effect/Runtime"
 import { execFileSync } from "node:child_process"
 import { randomBytes } from "node:crypto"
 import { readdirSync, readFileSync } from "node:fs"
-import { homedir } from "node:os"
+import { homedir, userInfo } from "node:os"
 import { join } from "node:path"
 import { parseArgs } from "node:util"
+import { makeAdapters, readSources } from "../src/adapters/registry.ts"
+import { writePrivateFile } from "../src/platform/files.ts"
+import { prepareHistory } from "./experiment/history.ts"
 import { sha256 } from "../src/analysis/hash.ts"
 import { ANALYSIS_VERSION } from "../src/analysis/version.ts"
 import { PROFILE_SCHEMA_VERSION } from "../src/domain/Profile.ts"
@@ -93,6 +96,7 @@ const program = Effect.gen(function* () {
     try: () =>
       parseArgs({
         options: {
+          "local-history": { type: "boolean", default: false },
           config: { type: "string" },
           "dry-run": { type: "boolean", default: false },
           budget: { type: "string", default: "60" },
@@ -111,8 +115,15 @@ const program = Effect.gen(function* () {
 
   // ---- rebuild from saved artifacts: zero LLM calls ----------------------------------
   if (values.from !== undefined) {
-    if (values.config !== undefined || values.engines !== undefined || values["dry-run"])
-      throw new UsageError("--from cannot be combined with --config, --engines or --dry-run")
+    if (
+      values.config !== undefined ||
+      values.engines !== undefined ||
+      values["dry-run"] ||
+      values["local-history"]
+    )
+      throw new UsageError(
+        "--from cannot be combined with --config, --engines, --dry-run or --local-history",
+      )
     const root = values.from
     const looks = values.looks === undefined ? undefined : parseLooks(values.looks)
     const manifest = yield* readManifest(root)
@@ -129,6 +140,8 @@ const program = Effect.gen(function* () {
 
   // ---- configuration ------------------------------------------------------------------
   if (values.looks !== undefined) throw new UsageError("--looks is only used with --from")
+  if (values["local-history"] && values.config === undefined)
+    throw new UsageError('--local-history requires --config with personas ["local-history"]')
   const personas = readdirSync(PERSONA_ROOT).toSorted()
   let raw: unknown
   if (values.config !== undefined) {
@@ -145,26 +158,47 @@ const program = Effect.gen(function* () {
     raw = legacyConfig((values.engines ?? "claude,codex").split(","), repeats, personas)
   }
   const budget = parseBudget(values.budget)
-  const parsed = parseConfig(raw, personas)
+  const parsed = parseConfig(raw, values["local-history"] ? ["local-history"] : personas)
   if (!parsed.ok) {
     console.error("Invalid experiment configuration:")
     for (const e of parsed.errors) console.error(`  - ${e}`)
     return EXIT_INVALID_CONFIG
   }
   const { config } = parsed
-  const prepared = new Map(
-    config.personas.map((name) => [
-      name,
-      preparePersona(
-        name,
-        {
-          raw: readFileSync(join(PERSONA_ROOT, name, "prompts.json"), "utf8"),
-          rubric: JSON.parse(readFileSync(join(PERSONA_ROOT, name, "rubric.json"), "utf8")),
-        },
-        config.timezone,
-      ),
-    ]),
-  )
+  const sources = values["local-history"]
+    ? yield* readSources(yield* makeAdapters({ home: homedir(), env: process.env }))
+    : null
+  const snapshot =
+    sources === null
+      ? null
+      : prepareHistory(
+          sources.flatMap((s) => s.records),
+          {
+            now: DateTime.makeUnsafe(new Date()),
+            timezone: config.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+            username: userInfo().username,
+          },
+          sources.map((s) => ({
+            source: s.adapter.id,
+            badLines: s.diagnostics.badLines,
+            unreadableFiles: s.diagnostics.unreadableFiles,
+          })),
+        )
+  const prepared = snapshot
+    ? new Map([["local-history", snapshot.prepared]])
+    : new Map(
+        config.personas.map((name) => [
+          name,
+          preparePersona(
+            name,
+            {
+              raw: readFileSync(join(PERSONA_ROOT, name, "prompts.json"), "utf8"),
+              rubric: JSON.parse(readFileSync(join(PERSONA_ROOT, name, "rubric.json"), "utf8")),
+            },
+            config.timezone,
+          ),
+        ]),
+      )
   if (values["dry-run"]) {
     for (const line of dryRunLines(config, prepared, budget)) console.log(line)
     return 0
@@ -173,6 +207,15 @@ const program = Effect.gen(function* () {
   // ---- run ----------------------------------------------------------------------------
   const id = experimentId(new Date(), randomBytes(2).toString("hex"))
   const root = yield* createExperimentDir(values.out, id)
+  if (snapshot !== null) {
+    const fs = yield* FileSystem.FileSystem
+    yield* writePrivateFile(
+      fs,
+      path,
+      path.join(root, "input-snapshot.json"),
+      JSON.stringify(snapshot, null, 2),
+    )
+  }
   console.log(`Experiment ${id}: ${root}`)
   const manifest = yield* runExperiment(
     {
