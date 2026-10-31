@@ -80,3 +80,32 @@ it.effect(
       expect(h.fakes.reduce((n, f) => n + f.calls(), 0)).toBe(calls)
     }),
 )
+
+it.effect(
+  "a stalled execution save cannot hang the analysis, even when its cleanup stalls too",
+  () =>
+    Effect.gen(function* () {
+      // The first summary (written when the execution starts) succeeds; every later summary
+      // write never finishes, and neither does removing its temp file.
+      let summaries = 0
+      const stalls = (file: string) => /summary\.json\.[^/]+\.tmp$/u.test(file)
+      const h = makeHarness({
+        fileSystem: (fs) => ({
+          ...fs,
+          writeFileString: (file, data, options) =>
+            stalls(file) && summaries++ > 0
+              ? Effect.never
+              : fs.writeFileString(file, data, options),
+          remove: (file, options) => (stalls(file) ? Effect.never : fs.remove(file, options)),
+        }),
+      })
+      const out = join(h.root, "output")
+      const started = Date.now()
+      const result = yield* h.run(["--yes", "--since", "all", "--out", out])
+      // each checkpoint gives up after 5 s of wall time instead of waiting forever
+      expect(Date.now() - started).toBeLessThan(20_000)
+      expect(result.code).not.toBe(0)
+      expect(result.stderr).toContain(join(out, "executions"))
+    }),
+  30_000,
+)

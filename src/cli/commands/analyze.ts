@@ -44,7 +44,7 @@ import {
   reportContents,
 } from "../../report/index.ts"
 import { writeAnalysisReport, previousProfile } from "../library.ts"
-import { Clock, DateTime, Effect, Exit, FileSystem, Path, Semaphore } from "effect"
+import { Clock, DateTime, Effect, Exit, Fiber, FileSystem, Path, Semaphore } from "effect"
 import { Prompt } from "effect/cli"
 import {
   analyze,
@@ -388,8 +388,10 @@ export const runMain = (options: MainOptions) =>
     })
     accounting.setLimits({ maxCalls, maxCostUsd })
     accounting.setEngine(base.id, options.model ?? null)
-    // One save at a time, each bounded by wall time: virtual (test) time and the model's
-    // retry clock must not decide when local file I/O has taken too long.
+    // Saves run one at a time, each in its own detached fiber. A checkpoint waits for its save
+    // at most 5 s of wall time (virtual test time and the model's retry clock must not decide
+    // when local file I/O took too long) and never interrupts it: a stalled save keeps running
+    // in the background and later saves queue behind it.
     const saves = yield* Semaphore.make(1)
     const timedOut = Effect.callback<never, FileError>((resume) => {
       const timer = setTimeout(
@@ -405,7 +407,8 @@ export const runMain = (options: MainOptions) =>
     })
     const checkpoint = Effect.gen(function* () {
       const snapshot = accounting.record(yield* Clock.currentTimeMillis)
-      yield* saves.withPermits(1)(saveExecution(outDir, snapshot)).pipe(Effect.raceFirst(timedOut))
+      const save = yield* Effect.forkDetach(saves.withPermits(1)(saveExecution(outDir, snapshot)))
+      yield* Fiber.join(save).pipe(Effect.raceFirst(timedOut))
     }).pipe(
       Effect.provideService(FileSystem.FileSystem, yield* FileSystem.FileSystem),
       Effect.provideService(Path.Path, path),

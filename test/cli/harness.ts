@@ -1,5 +1,14 @@
 import { NodeServices } from "@effect/platform-node"
-import { Effect, Exit as EffectExit, Layer, Option, Queue, Terminal, type Cause } from "effect"
+import {
+  Effect,
+  Exit as EffectExit,
+  FileSystem,
+  Layer,
+  Option,
+  Queue,
+  Terminal,
+  type Cause,
+} from "effect"
 import { TestClock, TestConsole } from "effect/testing"
 import { mkdtempSync, readFileSync } from "node:fs"
 import { tmpdir } from "node:os"
@@ -85,6 +94,8 @@ export interface HarnessOptions {
   readonly cjkFontsFail?: boolean
   /** Keys typed at a prompt (with `env.isTTY`); input ends after them. */
   readonly keys?: ReadonlyArray<string>
+  /** Wrap the real file system, e.g. to make some writes stall. */
+  readonly fileSystem?: (fs: FileSystem.FileSystem) => FileSystem.FileSystem
 }
 
 /** A terminal that "types" `keys`, then ends its input. */
@@ -154,10 +165,26 @@ export const makeHarness = (options: HarnessOptions = {}) => {
     }),
     Layer.succeed(Opener, { open: (f) => Effect.sync(() => (opened.push(f), true)) }),
     TestConsole.layer,
-  ).pipe(Layer.provideMerge(NodeServices.layer), (services) =>
-    options.keys
-      ? Layer.merge(services, Layer.succeed(Terminal.Terminal, scriptedTerminal(options.keys)))
-      : services,
+  ).pipe(
+    Layer.provideMerge(NodeServices.layer),
+    (services) =>
+      options.keys
+        ? Layer.merge(services, Layer.succeed(Terminal.Terminal, scriptedTerminal(options.keys)))
+        : services,
+    (services) => {
+      const wrap = options.fileSystem
+      return wrap
+        ? Layer.merge(
+            services,
+            Layer.effect(
+              FileSystem.FileSystem,
+              Effect.gen(function* () {
+                return wrap(yield* FileSystem.FileSystem)
+              }),
+            ),
+          ).pipe(Layer.provide(NodeServices.layer))
+        : services
+    },
   )
 
   /** Run the CLI; returns exit code and captured output. */
