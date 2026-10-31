@@ -114,7 +114,7 @@ export const messages = {
   translating: (language: string) => `● Translating into ${language}…`,
   translated: (language: string) => `  Translated into ${language}`,
   translationFailed: (language: string) =>
-    `⚠ Translation into ${language} failed; the report is written without it`,
+    `⚠ Translation into ${language} is incomplete or unavailable after two attempts; ${language} will not be included`,
   writing: "● Writing report files…",
   historySkipped: (reasons: string) =>
     `  Historical change comparison omitted: ${reasons}. Completed reports are still retained.`,

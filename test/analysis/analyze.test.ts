@@ -361,7 +361,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "27",
+        analysisVersion: "28",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")

@@ -63,7 +63,8 @@ for extraction and macOS setup.
 
 Reports support English and Traditional Chinese; quotes stay in their original language.
 The default is English, or both languages on a Chinese system locale. Each extra language
-uses one translation call. To export a PDF, use your browser's Print → Save as PDF.
+normally uses one translation call, with one retry for an incomplete or failed translation.
+A Chinese-only request stops if translation still fails; it does not substitute an English report. To export a PDF, use your browser's Print → Save as PDF.
 
 Observations cite verified prompt quotes, but quote matching and model review do not prove an
 interpretation is correct. Small histories may show “Early observations” instead of a role.

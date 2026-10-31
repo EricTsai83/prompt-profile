@@ -57,7 +57,17 @@ as the report.
 
 Languages: without `--lang`, a Chinese system locale gives a Traditional Chinese report with an
 English switch (`zh-TW,en`); any other locale gives English. The profile is written in English,
-reviewed once against its source evidence, and then translated, one extra CLI call per extra language; quotes stay as you wrote them.
+reviewed once against its source evidence, and then translated, normally one extra CLI call per
+extra language; quotes stay as you wrote them. Translation checks cover matching fields and
+counts, nonempty text, and clearly English prose in Chinese narrative fields. A failed or
+incomplete translation gets one retry of the complete object, subject to the existing call and
+cost limits. These sanity checks cannot establish translation accuracy or detect every wrong-language
+fragment; technical names and short labels can remain unchanged.
+
+If only Chinese was requested and both attempts fail, the command exits with an error and writes
+no new report. With `--lang zh-TW,en`, English remains available and the command warns that Chinese
+was omitted. The printed rerun command reuses cached chunk analysis, but drafting, review and
+translation require new calls.
 
 Each analysis includes one evidence-review call after drafting the profile. It checks for
 omitted contextual preferences and unsupported outcome or cost claims before translation.
@@ -130,14 +140,15 @@ The terminal says so after the run; a longer `--since` range or more history add
 verification, translations, writing files); there is no time estimate. When a run stops early, the error says
 what was saved and prints the exact command to run again:
 
-| What happened                                                         | What is saved                                           | What a re-run does                                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Ctrl-C, rate limit, timeout, malformed output, too many failed chunks | Finished chunk results in the analysis cache; no report | Reuses cached chunks and merges; drafting, evidence review and translations run again |
-| `--max-calls` reached                                                 | Same; cached results do not use the budget again        | Same; raise `--max-calls` if it stops again                                           |
-| The final profile step failed                                         | Chunk results                                           | Repeats drafting, evidence review and translation calls                               |
-| An intermediate merge failed (large histories)                        | Chunk results and finished merges                       | Repeats the unfinished merges, then drafting, evidence review and translations        |
-| A translation failed                                                  | The report, without that language                       | The printed command adds it (final profile + evidence review + translation)           |
-| A card was not created (e.g. the Chinese font download failed)        | The report and `profile.json`                           | `prompt-profile render <profile.json>` retries the cards, no analysis                 |
+| What happened                                                         | What is saved                                                 | What a re-run does                                                                    |
+| --------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Ctrl-C, rate limit, timeout, malformed output, too many failed chunks | Finished chunk results in the analysis cache; no report       | Reuses cached chunks and merges; drafting, evidence review and translations run again |
+| `--max-calls` reached                                                 | Same; cached results do not use the budget again              | Same; raise `--max-calls` if it stops again                                           |
+| The final profile step failed                                         | Chunk results                                                 | Repeats drafting, evidence review and translation calls                               |
+| An intermediate merge failed (large histories)                        | Chunk results and finished merges                             | Repeats the unfinished merges, then drafting, evidence review and translations        |
+| A translation failed after its retry, with English also requested     | The English report, with a warning about the missing language | The printed command retries analysis using cached chunks                              |
+| Chinese-only translation failed after its retry                       | Cached analysis chunks; no new report                         | Rerun the printed command; English is never substituted automatically                 |
+| A card was not created (e.g. the Chinese font download failed)        | The report and `profile.json`                                 | `prompt-profile render <profile.json>` retries the cards, no analysis                 |
 
 The re-run command keeps your flags and leaves out `--no-cache`, so it reads the cache. When
 prompt-profile was started with npx, the printed commands start with `npx prompt-profile@<version>`

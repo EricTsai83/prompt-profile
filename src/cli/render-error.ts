@@ -124,6 +124,10 @@ const RENDERERS: Renderers = {
     code: EXIT.error,
     message: `${CLI_NAME[e.runner]} did not answer within ${Math.round(e.afterMs / 60000)} minutes.\n${recovery(rerun)}`,
   }),
+  TranslationFailed: (e, rerun) => ({
+    code: EXIT.error,
+    message: `Translation into ${e.language} remained incomplete or invalid after two attempts. No English-only report was substituted.\n${recovery(rerun)}`,
+  }),
   InvalidOutput: (e, rerun) => ({
     code: EXIT.error,
     message: `${CLI_NAME[e.runner]} returned malformed output (after retries); --engine switches the CLI.\n${recovery(rerun)}`,

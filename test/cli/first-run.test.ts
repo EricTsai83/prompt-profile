@@ -267,7 +267,14 @@ describe("during and after a run", () => {
         stderrTail: "",
       })
       // 2 chunks + final profile + evidence review, then the translation fails
-      const h = makeHarness({ fake: { failures: new Map([[5, failed]]) } })
+      const h = makeHarness({
+        fake: {
+          failures: new Map([
+            [5, failed],
+            [6, failed],
+          ]),
+        },
+      })
       const out = join(h.root, "out")
       const r = yield* h.run(["--yes", "--since", "all", "--out", out, "--lang", "zh-TW,en"])
       expect(r.code).toBe(0)
@@ -478,3 +485,31 @@ describe("rendered errors", () => {
     expect(renderError(e).message).toContain("run the same command again")
   })
 })
+
+it.effect("does not write an English report when a Chinese-only translation fails twice", () =>
+  Effect.gen(function* () {
+    const failure = new ProcessFailed({
+      runner: "claude-code",
+      exitCode: 1,
+      detail: "synthetic",
+      stderrTail: "",
+    })
+    const h = makeHarness({
+      fake: {
+        failures: new Map([
+          [5, failure],
+          [6, failure],
+        ]),
+      },
+    })
+    const out = join(h.root, "out")
+    const result = yield* h.run(["--yes", "--since", "all", "--out", out, "--lang", "zh-TW"])
+    expect(result.code).toBe(1)
+    expect(result.stderr).toContain(
+      "Translation into zh-TW remained incomplete or invalid after two attempts",
+    )
+    expect(result.stderr).toContain("No English-only report was substituted")
+    expect(existsSync(reportPath(out, "index.html"))).toBe(false)
+    expect(existsSync(reportPath(out, "profile.json"))).toBe(false)
+  }),
+)

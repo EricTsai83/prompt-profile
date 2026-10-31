@@ -40,3 +40,8 @@ observations/contexts, preserving array order, null effects and null collaborati
 an effect, strengthen a requested practice into an achievement, or translate source evidence.
 
 Translate experiment.when and experiment.observe alongside the suggestion; preserve null absence. Do not translate rewrites or source quotes. Keep proposed observations distinct from observed results.
+
+Before returning, check every nonempty source field has nonempty translated text, including
+the portrait introduction, every chapter title/body, collaboration descriptions and contexts.
+For zh-TW, do not leave English narrative paragraphs untranslated. Preserve technical names,
+commands and numbers within the translated prose. Return the complete object, not a patch.

@@ -16,4 +16,9 @@ export class AnalysisFailed extends Data.TaggedError("AnalysisFailed")<{
   readonly cause?: LlmError | undefined
 }> {}
 
-export type AnalyzeError = AnalysisFailed | LlmError
+/** No requested output language survived bounded translation attempts. */
+export class TranslationFailed extends Data.TaggedError("TranslationFailed")<{
+  readonly language: string
+}> {}
+
+export type AnalyzeError = AnalysisFailed | TranslationFailed | LlmError

@@ -17,7 +17,7 @@ export interface ProgressShape {
   readonly onVerified: (kept: number, dropped: number) => Effect.Effect<void>
   /** Before each translation call. */
   readonly onTranslateStart: (language: string) => Effect.Effect<void>
-  /** After each translation call; `ok` false means the language was dropped. */
+  /** After the bounded attempts for a language; false means no valid translation survived. */
   readonly onTranslated: (language: string, ok: boolean) => Effect.Effect<void>
 }
 
