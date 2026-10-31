@@ -72,7 +72,8 @@ Important differences to preserve:
 
 A–E are the first useful delivery. F follows reliable measurement, rather than blocking it.
 This plan owns operational telemetry and command UX. Plan 22 keeps experiment comparisons;
-plan 29 keeps sharing; plans 27–31 keep profile content and user follow-up features.
+Profile content and user follow-up features remain outside this plan; sharing orchestration
+was removed by owner decision (see the plan index).
 
 ## A. Define execution contracts
 

@@ -111,8 +111,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 29 | [Shareable identity export workflow](29-shareable-identity-export.md) | Local review and privacy-consistent sharing artifacts | Plan 25; reuse exclusions and output audit | Planned; follow purpose split |
-| 30 | [Reader annotations and disagreement](30-reader-annotations-and-disagreement.md) | Separate user annotations with stable provenance | Plan 20 B; plan 25; library integration uses plan 20 A | Planned; after evidence identifiers are stable |
 | 31 | [Context and project retrospectives](31-context-and-project-retrospectives.md) | Bounded project/context selection and retrospectives | Plan 20 B/C; history comparison also requires plan 20 A/E | Planned; evidence foundation first |
 | 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | Planned; source review complete |
 
@@ -129,7 +127,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 ## What is left, in order
 
-The product exploration continues through plans 24–31. These are planned tasks, not claims that
+The remaining product exploration is listed below. These are planned tasks, not claims that
 features have shipped. Each remaining plan can be executed separately; explicit dependencies and acceptance criteria
 define its handoff. Plan 20 is complete; its usage, owner amendments and limitations are in the
 [collaboration guide](../docs/collaboration-experience.md). Plan 21 is closed by owner decision
@@ -138,9 +136,9 @@ and plan 22 remains the experiment tooling owner.
 
 ### Recommended execution batches
 
-1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); next is plan 29 (sharing). The completed library and evidence foundation are available.
-2. **Support recurring reflection:** plan 30 (annotations) and plan 31 (project/context
-   retrospectives). Comparable-window history is implemented; scoped selection remains future work.
+1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); the completed library and evidence foundation are available. A dedicated sharing workflow was removed by owner decision (see below).
+2. **Support recurring reflection:** plan 31 (project/context retrospectives).
+   Comparable-window history is implemented; scoped selection remains future work.
 3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
    from the completed fictional collaboration calibration. Owner use can refine priorities.
 4. **Explain each execution:** plan 33 extends the command lifecycle and run accounting using
@@ -161,6 +159,19 @@ Plan 28 (reviewed collaboration preference export) was removed by owner decision
 2026-10-31, rather than completed. Collaboration suggestions and prompt rewrites belong in
 the report; do not add acceptance/rejection, preference export or configuration installation
 workflows. See the [report scope decision](../docs/collaboration-experiments.md#owner-scope-decision--2026-10-31).
+
+Plan 29 (shareable identity export workflow) was removed by owner decision on
+2026-10-31, rather than completed. Users can adapt the existing HTML report with AI;
+a dedicated selection, preview and export workflow does not currently justify its complexity.
+Do not reintroduce that workflow without an explicit owner request. Existing rendering,
+exclusions and output audit remain available.
+
+Plan 30 (reader annotations and disagreement) was removed by owner decision on
+2026-10-31, rather than completed. The product should quickly turn local prompt history into
+an evidence-backed report; users can use AI to edit its content themselves. Do not add a
+dedicated annotation editor, persistent feedback artifacts or cross-analysis comment tracking
+without an explicit owner request. Focus on the accuracy, evidence and clarity of the generated
+report.
 
 Plan 32 (external reader research) was removed by owner decision on 2026-10-29, rather than
 completed. Its protocol and fictional rehearsal were discarded. Do not reintroduce participant

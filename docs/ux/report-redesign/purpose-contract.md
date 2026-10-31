@@ -126,4 +126,5 @@ contract and output-roles.md retain the decisions and evidence.
 Final automated validation: the browser QA suite exited 0 with 77 cases and no failures;
 repository typecheck, lint, format check and tests exited 0 (59 test files, 644 tests).
 No completed unfamiliar-reader or translation-quality study is claimed. External participant research was removed by owner decision; further iteration uses owner feedback.
-Character assets remain in plan 20 D, and export orchestration in plan 29.
+Character assets were owned by plan 20 D. Dedicated sharing/export orchestration was
+removed by owner decision on 2026-10-31; see the [plan index](../../../plans/README.md).
