@@ -129,8 +129,15 @@ export const Support = Schema.Struct({ sessions: Count, weeks: Count })
 export type Support = typeof Support.Type
 
 /**
+ * Fewest analysed conversations a project needs to be stored with its trait counts: fewer make
+ * jumpy percentages (one conversation of 11 moves a share by 9 points), and small working
+ * folders can carry names the person would not publish.
+ */
+export const MIN_PROJECT_CONVERSATIONS = 20
+
+/**
  * How many analysed conversations show a trait, from the labelling pass: overall and per
- * project. A count over a sample of the history, not the whole history.
+ * project with at least MIN_PROJECT_CONVERSATIONS. A count over a sample of the history.
  */
 export const TraitFrequency = Schema.Struct({
   sessions: Count,

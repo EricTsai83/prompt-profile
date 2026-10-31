@@ -1,5 +1,5 @@
 import { Effect, Ref } from "effect"
-import { LlmTraitLabels, type TraitFrequency } from "../domain/index.ts"
+import { LlmTraitLabels, MIN_PROJECT_CONVERSATIONS, type TraitFrequency } from "../domain/index.ts"
 import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/index.ts"
 import type { Chunk } from "./chunk.ts"
 import { FATAL } from "./errors.ts"
@@ -39,11 +39,13 @@ const nameKey = (name: string) => name.trim().toLowerCase()
  * How many analysed conversations show each trait, overall and per project, from the labels of
  * every chunk that was labelled. A label must cite a prompt of its chunk with a verbatim quote
  * and name a listed trait. The denominator is the conversations of the labelled chunks, so a
- * trait no label names is measured as zero.
+ * trait no label names is measured as zero. Only projects with `minProjectSessions` analysed
+ * conversations are kept.
  */
 export const measureTraitFrequency = (
   outcomes: ReadonlyArray<LabelOutcome>,
   traits: ReadonlyArray<string>,
+  minProjectSessions: number = MIN_PROJECT_CONVERSATIONS,
 ): TraitMeasurement => {
   const index = new Map(traits.map((t, i) => [nameKey(t), i]))
   const analysed = new Set<string>()
@@ -82,11 +84,14 @@ export const measureTraitFrequency = (
         : {
             sessions: shown[i]!.size,
             analysedSessions: analysed.size,
-            byProject: [...analysedByProject].map(([project, sessions]) => ({
-              project,
-              sessions: shownByProject[i]!.get(project)?.size ?? 0,
-              analysedSessions: sessions.size,
-            })),
+            // projects with few conversations are not stored at all
+            byProject: [...analysedByProject]
+              .filter(([, sessions]) => sessions.size >= minProjectSessions)
+              .map(([project, sessions]) => ({
+                project,
+                sessions: shownByProject[i]!.get(project)?.size ?? 0,
+                analysedSessions: sessions.size,
+              })),
           },
     ),
     chunksLabelled: labelled,

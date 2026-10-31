@@ -6,6 +6,7 @@ import { withCallBudget } from "../../src/llm/budget.ts"
 import { makeFakeLlmRunner } from "../../src/llm/fake.ts"
 import { LlmRunner } from "../../src/llm/LlmRunner.ts"
 import type { SafePrompt } from "../../src/domain/SafePrompt.ts"
+import { MIN_PROJECT_CONVERSATIONS } from "../../src/domain/Profile.ts"
 
 const prompt = (
   session: string,
@@ -54,6 +55,8 @@ describe("measureTraitFrequency", () => {
         },
       ],
       traits,
+      // every project is kept here; the default threshold is tested below
+      1,
     )
     expect(result.frequencies[0]).toEqual({
       sessions: 2,
@@ -67,6 +70,22 @@ describe("measureTraitFrequency", () => {
     // labelled chunks with no label for a trait: measured as zero, not unknown
     expect(result.frequencies[2]).toMatchObject({ sessions: 0, analysedSessions: 4 })
     expect(result.rejected).toBe(0)
+  })
+
+  it("keeps only projects with enough analysed conversations, so small folders stay out", () => {
+    const result = measureTraitFrequency(
+      [{ chunk, labels: [label("a:1", "Best-practice skeptic", "really the best practice")] }],
+      traits,
+    )
+    // four conversations in two projects: below MIN_PROJECT_CONVERSATIONS, none is stored
+    expect(MIN_PROJECT_CONVERSATIONS).toBe(20)
+    expect(result.frequencies[0]).toMatchObject({ sessions: 1, analysedSessions: 4, byProject: [] })
+    const two = measureTraitFrequency(
+      [{ chunk, labels: [label("a:1", "Best-practice skeptic", "really the best practice")] }],
+      traits,
+      2,
+    )
+    expect(two.frequencies[0]!.byProject.map((b) => b.project)).toEqual(["invoices", "canvas"])
   })
 
   it("rejects misquotes, unknown prompts and unknown traits, and counts them", () => {
