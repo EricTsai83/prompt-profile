@@ -297,7 +297,6 @@ const classicTree = (
   const k = schemeOf(theme)
   const card = theme.card
   const showGraphic = !hide.includes("graphic")
-  const model = profile.engine.model
   return h(
     "div",
     {
@@ -350,16 +349,7 @@ const classicTree = (
         ),
         h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
           metricRow(profile, theme, hide, lang, k.muted, showUsage),
-          cardFooter(
-            profile,
-            theme,
-            hide,
-            lang,
-            k.muted,
-            showUsage,
-            exactDates,
-            model ? CARD_MESSAGES[lang].measuredBy(model) : null,
-          ),
+          cardFooter(profile, theme, hide, lang, k.muted, showUsage, exactDates),
         ]),
       ]),
     ],

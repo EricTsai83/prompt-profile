@@ -576,8 +576,6 @@ export const RADAR_MESSAGES = {
     byProject: "By project",
     byProjectNote:
       "The same traits, counted within each project's analysed conversations. Only projects with 20 or more analysed conversations are listed: with fewer, one conversation moves a share too much.",
-    measuredBy: (model: string) =>
-      `Measured by ${model}; another model may label the same prompts differently.`,
     conversations: (n: number) => `${n} ${n === 1 ? "conversation" : "conversations"}`,
   },
   "zh-TW": {
@@ -587,7 +585,6 @@ export const RADAR_MESSAGES = {
     byProject: "各專案",
     byProjectNote:
       "同一組特質，分別在每個專案已分析的對話中計算。只列出已分析對話 20 段以上的專案：對話太少時，一段對話就會讓比例變動太多。",
-    measuredBy: (model: string) => `由 ${model} 量測；換一個模型，同樣的提示可能被判讀得不一樣。`,
     conversations: (n: number) => `${n} 段對話`,
   },
 } as const
@@ -823,7 +820,6 @@ export const CARD_MESSAGES = {
     periodUnknown: "period unavailable",
     partial: "Partial pricing",
     incomplete: "Incomplete logs",
-    measuredBy: (model: string) => `measured by ${model}`,
     notMeasured: "Not measured",
     attribution: "Made with prompt-profile",
   },
@@ -842,7 +838,6 @@ export const CARD_MESSAGES = {
     periodUnknown: "期間不明",
     partial: "部分用量未計價",
     incomplete: "紀錄不完整",
-    measuredBy: (model: string) => `${model} 量測`,
     notMeasured: "未量測",
     attribution: "由 prompt-profile 產生",
   },

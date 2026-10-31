@@ -2,7 +2,6 @@ import { MIN_BALANCE_CONVERSATIONS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { BALANCE_MESSAGES, PORTRAIT_MESSAGES } from "./messages.ts"
-import { measuredBy } from "./radar.ts"
 
 /**
  * One scale per axis: the share of conversations that show each way of working. Axes with
@@ -18,7 +17,7 @@ export const axisBalanceSection = (p: Profile, loc: Loc): Raw | null => {
   if (axes.length === 0) return null
   return html`<section class="axis-balance">
     <h2>${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].title)}</h2>
-    <p class="note">${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].note)}${measuredBy(p, loc)}</p>
+    <p class="note">${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].note)}</p>
     ${axes.map((a) => {
       const total = a.first + a.second
       const first = Math.round((a.first / total) * 100)

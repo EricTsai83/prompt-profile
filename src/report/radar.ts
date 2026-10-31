@@ -62,12 +62,6 @@ const radarSvg = (
   </svg>`
 }
 
-/** " Measured by <model>…" after a note, when the profile names its model. */
-export const measuredBy = (p: Profile, loc: Loc): Raw | string =>
-  p.engine.model
-    ? html` ${loc.text((_m, _c, l) => RADAR_MESSAGES[l].measuredBy(p.engine.model!))}`
-    : ""
-
 /**
  * How often each trait shows, as a radar: one axis per measured trait, 0% at the center and
  * 100% at the edge. Each trait is a share of the analysed conversations on its own, so several
@@ -94,7 +88,7 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
     })
   return html`<section class="trait-radar">
     <h2>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].title)}</h2>
-    <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}${measuredBy(p, loc)}</p>
+    <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}</p>
     <div class="radar-main">${radarSvg(
       overall,
       (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${overall[i]}%`),

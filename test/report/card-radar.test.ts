@@ -85,9 +85,9 @@ describe("classic card radar", () => {
     expect(grid.match(/data-radar="spoke"/g)).toHaveLength(3)
   })
 
-  it("names the measuring model and renders a 1200×630 PNG", async () => {
+  it("leaves the model to the report's engine line and renders a 1200×630 PNG", async () => {
     const p = await measured([27, 31, 12, 17, 14])
-    expect(texts(cardTree(p)).join(" ")).toContain(`measured by ${p.engine.model}`)
+    expect(texts(cardTree(p)).join(" ")).not.toContain(p.engine.model!)
     const png = await Effect.runPromise(renderCard(p, embeddedFonts()))
     expect(Array.from(png.slice(1, 4))).toEqual([0x50, 0x4e, 0x47])
   })

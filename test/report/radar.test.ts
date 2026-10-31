@@ -60,8 +60,9 @@ describe("trait radar", () => {
     expect(radar).toContain(p.traits[0]!.name)
     expect(radar).toContain(p.translations["zh-TW"]!.traits[0]!.name)
     expect(radar).toContain("not an ability score")
-    expect(radar).toContain(`Measured by ${p.engine.model}`)
-    expect(radar).toContain(`由 ${p.engine.model} 量測`)
+    // the model is named once, on the engine line, not on each chart
+    expect(radar).not.toContain(p.engine.model!)
+    expect(renderHtml(p)).toContain(`Engine: Claude Code (${p.engine.model})`)
   })
 
   it("adds one small radar per project with enough conversations, on the same axes", async () => {
