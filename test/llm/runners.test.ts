@@ -109,6 +109,16 @@ describe("ClaudeCodeRunner", () => {
     }).pipe(Effect.provide(fake.layer))
   })
 
+  it.effect("turns prompt caching off for the one-off analysis calls", () => {
+    const fake = withSpawner(() => ({ exitCode: 0, stdout: fixture("claude-output.success.json") }))
+    return Effect.gen(function* () {
+      const runner = yield* makeClaudeCodeRunner({})
+      yield* runner.generate(input)
+      // each chunk is sent once: a cache write would be paid for and never read
+      expect(fake.records[0]!.env?.["DISABLE_PROMPT_CACHING"]).toBe("1")
+    }).pipe(Effect.provide(fake.layer))
+  })
+
   it.effect("timeout kills the child process and removes the workdir", () => {
     const fake = withSpawner(() => "hang")
     return Effect.gen(function* () {

@@ -7,6 +7,8 @@ export interface SpawnRecord {
   readonly command: string
   readonly args: ReadonlyArray<string>
   readonly cwd: string | undefined
+  /** Variables added to the inherited environment. */
+  readonly env: Readonly<Record<string, string | undefined>> | undefined
   stdin: string
   killed: boolean
 }
@@ -42,6 +44,7 @@ export const makeFakeSpawner = (respond: Respond) => {
         command: command.command,
         args: command.args,
         cwd: command.options.cwd,
+        env: command.options.env,
         stdin: yield* collectStdin(command),
         killed: false,
       }

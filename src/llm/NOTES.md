@@ -37,6 +37,14 @@ Command: see `claudeArgs` in `claude.ts`. Prompt is sent on stdin (never in argv
 7. `--no-session-persistence`: verified no new content in `~/.claude/projects/` or
    `~/.claude/history.jsonl` (smoke test greps for a per-run nonce).
 
+8. **Prompt caching is off** (`DISABLE_PROMPT_CACHING=1` in the child's environment,
+   `CLAUDE_ENV` in `claude.ts`). Checked on 2.1.316 with tiny Haiku calls: by default a
+   subscription writes the whole request to a 1-hour cache (`cache_creation.ephemeral_1h_input_tokens`);
+   `CLAUDE_CODE_PROMPT_CACHE_TTL=5m` switches to 5-minute writes; `DISABLE_PROMPT_CACHING=1`
+   reports everything as `input_tokens` with no cache write. Each analysis input is sent once, so
+   a 22-chunk run wrote 820k cache tokens and read back 115k: the writes (about 2× the input rate)
+   were waste.
+
 ## Codex (`codex exec`)
 
 Command: see `codexArgs` in `codex.ts`. System text + prompt on stdin (no system flag).
@@ -50,6 +58,8 @@ Command: see `codexArgs` in `codex.ts`. System text + prompt on stdin (no system
 2. **Usage / model**: with `--json`, the `turn.completed` event has
    `usage.{input_tokens, cached_input_tokens, output_tokens, reasoning_output_tokens}`.
    **The model name is not reported** → `model` is the `--model` we passed, else `null`.
+   Only cache reads (`cached_input_tokens`) are reported, never cache writes, and `codex exec`
+   offers no cache setting (checked on 0.166.0), so Codex caching is left as it is.
    Unknown model with a ChatGPT login: `status: 400`, "The 'x' model is not supported when using
    Codex with a ChatGPT account."
 3. `~/.codex/AGENTS.md` (global) is loaded by Codex; same mitigation as Claude (#3).

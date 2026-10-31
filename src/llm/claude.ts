@@ -69,6 +69,14 @@ export const claudeArgs = (
   ...(options.effort ? ["--effort", options.effort] : []),
 ]
 
+/**
+ * Environment for every analysis call. Prompt caching is off: on a subscription Claude Code
+ * writes each request to a 1-hour cache, billed at about twice the input rate, but each chunk,
+ * merge, draft and review input is sent once, so the cache is written and never read (measured:
+ * 820k tokens written, 115k read in a 22-chunk run). Uncached input costs about half as much.
+ */
+export const CLAUDE_ENV: Readonly<Record<string, string>> = { DISABLE_PROMPT_CACHING: "1" }
+
 /** Lenient view of `claude -p --output-format json` (only the fields we use). */
 const ClaudeOutput = Schema.Struct({
   is_error: Schema.optional(Schema.Boolean),
@@ -145,6 +153,7 @@ export const makeClaudeCodeRunner = (
           args: claudeArgs({ system: input.system, jsonSchema: input.schema.jsonSchema }, options),
           cwd,
           stdin,
+          env: CLAUDE_ENV,
         })
         const parsed = Option.getOrUndefined(
           Schema.decodeUnknownOption(ClaudeOutput)(tryParseJson(proc.stdout.trim())),

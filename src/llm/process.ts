@@ -10,6 +10,8 @@ export interface ProcessSpec {
   readonly args: ReadonlyArray<string>
   readonly cwd: string
   readonly stdin: string
+  /** Variables added to the inherited environment. */
+  readonly env?: Readonly<Record<string, string>> | undefined
 }
 
 export interface ProcessOutput {
@@ -37,6 +39,7 @@ export const runProcess = (
     const command = ChildProcess.make(spec.command, [...spec.args], {
       cwd: spec.cwd,
       extendEnv: true,
+      ...(spec.env ? { env: spec.env } : {}),
       stdin: Stream.make(new TextEncoder().encode(spec.stdin)),
       forceKillAfter: "3 seconds",
     })
