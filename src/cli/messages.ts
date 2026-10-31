@@ -30,6 +30,8 @@ export const messages = {
   reading: "● Reading data",
   sourceLine: (name: string, prompts: number, sessions: number) =>
     `  ${name.padEnd(12)} ${n(prompts).padStart(7)} prompts · ${n(sessions)} sessions`,
+  contextSelected: (selected: number, excluded: number, missing: number) =>
+    `● Project scope: ${selected} selected, ${excluded} other-project records excluded, ${missing} missing project metadata (within the time window)`,
   cleaning: "● Cleaning and redacting (on this computer)",
   excludedLine: (count: number, rules: string) => `  Skipped ${n(count)} noisy prompts (${rules})`,
   redactedLine: (count: number, detail: string) =>

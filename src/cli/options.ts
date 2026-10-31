@@ -124,6 +124,7 @@ export interface RunFlags {
   /** How prompt-profile was started (`launcherOf`); default `prompt-profile`. */
   readonly launcher?: string | undefined
   readonly since: string
+  readonly project?: string | undefined
   /** As typed: `claude` / `codex`. */
   readonly engine?: string | undefined
   readonly model?: string | undefined
@@ -167,6 +168,7 @@ export const rerunCommand = (f: RunFlags): string =>
   [
     f.launcher ?? "prompt-profile",
     ...flag("--since", f.since),
+    ...flag("--project", f.project),
     ...flag("--engine", f.engine),
     ...flag("--model", f.model),
     ...flag("--effort", f.effort),

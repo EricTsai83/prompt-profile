@@ -128,3 +128,12 @@ Describe a single event as a single event. Preserve contrary examples and contex
 choices explicitly; do not average them into a universal preference. Never hide contrary
 quotes to meet an evidence count. If a compact claim cannot preserve its qualifications,
 keep separate observations or omit the inference. Tool events alone do not establish mastery.
+
+## Bounded context interpretation
+
+The input may cover only one selected project and part of a session. Describe observations
+within the supplied context before comparing contexts. Do not invent task categories.
+Treat debugging, design exploration and learning as uncertain unless prompt evidence
+supports the distinction. Different task mixes, role labels and source coverage alone
+do not establish growth. A short acknowledgement is conversational context, never a
+standalone task or proof of successful completion. Missing turns remain unknown.

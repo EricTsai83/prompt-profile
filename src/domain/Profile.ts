@@ -21,10 +21,10 @@ import { Usage } from "./Usage.ts"
  * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
  * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
  * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
- * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. 17: optional collaboration experiments. Versions 2–16
+ * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. 17: optional collaboration experiments. 18: scoped context provenance. Versions 2–17
  * are migrated on decode.
  */
-export const PROFILE_SCHEMA_VERSION = 17 as const
+export const PROFILE_SCHEMA_VERSION = 18 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -253,6 +253,14 @@ export const Translation = Schema.Struct({
 export type Translation = typeof Translation.Type
 
 const ProfileFields = Schema.Struct({
+  context: Schema.optionalKey(
+    Schema.Struct({
+      identity: Schema.String,
+      selected: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+      excluded: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+      missing: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+    }),
+  ),
   narrative: Schema.optionalKey(Schema.NullOr(NarrativePlan)),
   historyComparison: Schema.optionalKey(Schema.NullOr(HistoryComparison)),
   evidenceOrigins: Schema.optionalKey(Schema.Array(EvidenceOrigin)),
@@ -367,7 +375,7 @@ export const decodeProfile = (
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
     if (
       found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].includes(found as number)
+      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].includes(found as number)
     ) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }

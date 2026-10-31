@@ -123,3 +123,22 @@ it("does not label a later data window as the earlier comparison", async () => {
   expect(reversed.comparison).toBeNull()
   expect(reversed.reasons).toContain("nonchronological-windows")
 })
+
+it("compares repeated reviews only within the same context, including legacy unscoped reports", async () => {
+  const [current, previous] = await pair()
+  const context = { identity: "one", selected: 3, excluded: 2, missing: 1 }
+  expect(compareHistory({ ...current, context }, previous, version, version).reasons).toContain(
+    "different-context",
+  )
+  expect(
+    compareHistory({ ...current, context }, { ...previous, context }, version, version).comparison,
+  ).not.toBeNull()
+  expect(
+    compareHistory(
+      { ...current, context },
+      { ...previous, context: { ...context, identity: "renamed" } },
+      version,
+      version,
+    ).comparison,
+  ).toBeNull()
+})

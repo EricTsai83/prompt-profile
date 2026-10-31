@@ -91,9 +91,9 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 17 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 22 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
-| `PIPELINE_VERSION` | `pipeline/version.ts` | 4 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 18 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 23 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `PIPELINE_VERSION` | `pipeline/version.ts` | 5 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 18, others 24 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
@@ -111,7 +111,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
 | 22 | [Profile experiment comparison](22-profile-experiment-comparison.md) | Repeatable local experiments comparing engines, models and analysis options, with rendered outputs, structured differences and provenance | `scripts/eval.ts`; coordinates with plans 20 and 21 | Tool implemented and run against real CLIs ([usage](../docs/experiments.md)); local-history snapshots pending |
-| 31 | [Context and project retrospectives](31-context-and-project-retrospectives.md) | Bounded project/context selection and retrospectives | Plan 20 B/C; history comparison also requires plan 20 A/E | Planned; evidence foundation first |
 | 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | Planned; source review complete |
 
 ## Shared rules for every plan
@@ -137,8 +136,8 @@ and plan 22 remains the experiment tooling owner.
 ### Recommended execution batches
 
 1. **Make reports useful after reading:** plan 27 is complete ([usage](../docs/collaboration-experiments.md)); the completed library and evidence foundation are available. A dedicated sharing workflow was removed by owner decision (see below).
-2. **Support recurring reflection:** plan 31 (project/context retrospectives).
-   Comparable-window history is implemented; scoped selection remains future work.
+2. **Support recurring reflection:** project/context retrospectives are implemented
+   ([usage and limits](../docs/context-retrospectives.md)); comparable-window history is reused.
 3. **Evaluate with local snapshots:** plan 22's optional local-history snapshots remain separate
    from the completed fictional collaboration calibration. Owner use can refine priorities.
 4. **Explain each execution:** plan 33 extends the command lifecycle and run accounting using
@@ -150,7 +149,7 @@ and plan 22 remains the experiment tooling owner.
   duplicate episode pipeline. The completed collaboration foundation owns roles; the calibration record provides authored cases.
 - The completed plan 25 established the [identity/factual content contract](../docs/ux/report-redesign/purpose-contract.md); the durable report design records guide visual iteration. Both use one production renderer and the existing looks.
 - Completed plan 27 delivers [optional report experiments](../docs/collaboration-experiments.md).
-- The completed library and comparison foundation owns history and longitudinal comparability; plan 31 adds scoped contexts only.
+- The completed library and comparison foundation owns history and longitudinal comparability; the completed [context retrospectives](../docs/context-retrospectives.md) add scoped selection only.
 - The owner is the current reader. Iterate together through owner use and feedback, supported
   by fictional cases and automated checks. External participants and reader studies are not
   prerequisites; automated checks do not establish human comprehension.

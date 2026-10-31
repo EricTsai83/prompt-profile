@@ -680,6 +680,13 @@ export const renderHtml = (
                     ${loc.text((m) =>
                       [
                         m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
+                        profile.context
+                          ? m.contextCoverage(
+                              profile.context.selected,
+                              profile.context.excluded,
+                              profile.context.missing,
+                            )
+                          : null,
                         c.sampled ? m.sampled(c.chunksAnalyzed, c.chunksTotal) : null,
                         c.chunksFailed > 0 ? m.chunksSkipped(c.chunksFailed) : null,
                       ]

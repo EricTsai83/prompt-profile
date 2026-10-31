@@ -1,3 +1,4 @@
+import type { Profile } from "../../domain/Profile.ts"
 import type { AvatarChoice } from "../../report/avatar.ts"
 import { variantName } from "../../report/looks.ts"
 import { writeAnalysisReport, previousProfile } from "../library.ts"
@@ -63,7 +64,7 @@ export interface MainOptions extends Omit<RunFlags, "engine"> {
 }
 
 /** `--dry-run`: the chunks that would be sent, plus plan.json. Never calls an LLM. */
-const writeDryRun = (p: AnalysisPlan, outDir: string) =>
+const writeDryRun = (p: AnalysisPlan, outDir: string, context?: Profile["context"]) =>
   Effect.gen(function* () {
     const path = yield* Path.Path
     for (const [i, c] of p.chunks.entries()) {
@@ -73,6 +74,7 @@ const writeDryRun = (p: AnalysisPlan, outDir: string) =>
       )
     }
     const summary = {
+      ...(context ? { context } : {}),
       chunksTotal: p.chunksTotal,
       chunksSelected: p.chunks.length,
       sampled: p.sampled,
@@ -236,9 +238,14 @@ export const runMain = (options: MainOptions) =>
     yield* out.line("")
 
     const collected = yield* readSources
-    const { prompts, stats, window } = yield* runPipelineStep(collected, options.since)
+    const { prompts, stats, window, context } = yield* runPipelineStep(
+      collected,
+      options.since,
+      options.project,
+    )
 
     const analyzeOptions: AnalyzeOptions = {
+      contextIdentity: context?.identity,
       timezone: env.timezone,
       full: options.full,
       noCache: !options.cache,
@@ -269,7 +276,7 @@ export const runMain = (options: MainOptions) =>
         maxCalls,
         dryRun: true,
       })
-      yield* writeDryRun(p, outDir)
+      yield* writeDryRun(p, outDir, context)
       yield* out.line(t.dryRun(outDir, p.chunks.length, p.charsToSend))
       return
     }
@@ -303,14 +310,18 @@ export const runMain = (options: MainOptions) =>
     }
 
     yield* out.status(t.analysing(0, p.chunks.length, 0))
-    const profile = yield* analyze({ prompts, stats, options: analyzeOptions }).pipe(
+    const analyzed = yield* analyze({ prompts, stats, options: analyzeOptions }).pipe(
       Effect.provideService(LlmRunner, runner),
       Effect.provideService(Progress, makeProgress(out, t, p.chunks.length)),
       Effect.onInterrupt(() => out.error(`\n${t.interrupted(rerunCommand(flags))}`)),
     )
 
+    const profile = { ...analyzed, ...(context ? { context } : {}) }
+
     // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
-    const usage = summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
+    const usage = context
+      ? null
+      : summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
     // The report in this folder before this run, if any: "since your last report".
     const previousReport = yield* previousProfile(outDir)
     const priorIndex = yield* libraryIo(outDir, () => scanLibrary(outDir))

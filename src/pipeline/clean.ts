@@ -171,20 +171,29 @@ export interface CleanResult {
 }
 
 /** Input must be sorted by time (see filter.ts) for the consecutive-duplicate rule. */
-export const cleanRecords = (records: ReadonlyArray<PromptRecord>): CleanResult => {
+export const cleanRecords = (
+  records: ReadonlyArray<PromptRecord>,
+  preserveFollowups = false,
+): CleanResult => {
   const excluded: Counts = {}
   const previous = new Map<string, string>()
   const prompts: Array<CleanedPrompt> = []
+  const contextualSessions = new Set<string>()
   let codeBlocksCollapsed = 0
   for (const record of records) {
     const sessionKey = `${record.source}:${record.sessionId}`
     const prev = previous.get(sessionKey)
     previous.set(sessionKey, record.text)
     const rule = CLEAN_RULES.find((r) => r.test(record.text, prev))
-    if (rule && !(rule.name === "too-short" && record.hasImage)) {
+    const followup =
+      preserveFollowups &&
+      contextualSessions.has(sessionKey) &&
+      ACK_SET.has(stripPunctuation(record.text))
+    if (rule && !followup && !(rule.name === "too-short" && record.hasImage)) {
       increment(excluded, rule.name)
       continue
     }
+    if (!rule) contextualSessions.add(sessionKey)
     const collapsed = collapseCode(record.text.trim())
     codeBlocksCollapsed += collapsed.blocks
     prompts.push({ record, text: collapsed.text })

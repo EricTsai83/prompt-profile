@@ -44,6 +44,7 @@ export const compareHistory = (
   previousVersion: ComparisonVersions,
 ): { readonly comparison: HistoryComparison | null; readonly reasons: ReadonlyArray<string> } => {
   const reasons: Array<string> = []
+  if (current.context?.identity !== previous.context?.identity) reasons.push("different-context")
   const a = current.stats.window,
     b = previous.stats.window
   if (!a.since || !b.since) reasons.push("unbounded-window")

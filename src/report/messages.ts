@@ -11,6 +11,7 @@ export interface Messages {
   readonly period: (from: string, to: string) => string
   readonly dataPeriod: string
   readonly generated: string
+  readonly contextCoverage: (selected: number, excluded: number, missing: number) => string
   readonly analyzed: string
   readonly leftOut: (parts: string) => string
   readonly months: (n: number) => string
@@ -152,6 +153,8 @@ const en: Messages = {
   period: (from, to) => `${from} – ${to}`,
   dataPeriod: "Data period",
   generated: "Generated",
+  contextCoverage: (selected, excluded, missing) =>
+    `Project retrospective: ${selected} records selected; ${excluded} from other projects and ${missing} without project metadata excluded within this window. Read observations within this context; task differences alone do not establish growth. Usage totals are unavailable for this scope.`,
   analyzed: "Analyzed",
   leftOut: (parts) => `Left out: ${parts}`,
   months: (n) => plural(n, "month", "months"),
@@ -361,6 +364,8 @@ const zhTW: Messages = {
   period: (from, to) => `${from} – ${to}`,
   dataPeriod: "資料區間",
   generated: "產生時間",
+  contextCoverage: (selected, excluded, missing) =>
+    `專案回顧：此期間選取 ${selected} 筆提示，排除其他專案 ${excluded} 筆、缺少專案資訊 ${missing} 筆。請先閱讀此情境內的觀察；任務差異本身不能證明成長。此範圍沒有用量總計。`,
   analyzed: "分析內容",
   leftOut: (parts) => `未列入：${parts}`,
   months: (n) => `${n} 個月`,

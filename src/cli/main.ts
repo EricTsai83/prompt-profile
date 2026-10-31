@@ -190,6 +190,12 @@ export const command = Command.make(
   "prompt-profile",
   {
     since,
+    project: Flag.String("project").pipe(
+      Flag.withDescription(
+        "One project: label:NAME or path:/absolute/path; ambiguous labels are rejected",
+      ),
+      Flag.optional,
+    ),
     engine: Flag.Literals("engine", ["claude", "codex"]).pipe(
       Flag.withDescription("Which CLI analyses your prompts (default: auto, Claude Code first)"),
       Flag.optional,
@@ -243,6 +249,7 @@ export const command = Command.make(
   (f) => {
     const options: MainOptions = {
       since: f.since,
+      project: optional(f.project),
       engine: ((e) => (e === undefined ? undefined : e === "claude" ? "claude-code" : "codex"))(
         optional(f.engine),
       ) as RunnerId | undefined,

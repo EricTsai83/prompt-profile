@@ -11,6 +11,7 @@ import { ANALYSIS_VERSION } from "./version.ts"
 export const DEFAULT_CONCURRENCY = 3
 
 export interface AnalyzeOptions {
+  readonly contextIdentity?: string | undefined
   readonly timezone: string
   /** `--full`: no chunk limit. */
   readonly full: boolean
@@ -57,7 +58,7 @@ export const keyParts = (
   options: AnalyzeOptions,
 ): CacheKeyParts => ({
   kind,
-  inputId,
+  inputId: options.contextIdentity ? `${options.contextIdentity}:${inputId}` : inputId,
   analysisVersion: ANALYSIS_VERSION,
   pipelineVersion: PIPELINE_VERSION,
   runner,

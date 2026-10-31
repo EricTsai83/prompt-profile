@@ -1,3 +1,4 @@
+import { selectContext } from "../pipeline/context.ts"
 import { Clock, DateTime, Effect, FileSystem, Path } from "effect"
 import { makeAdapters, readSources as readAdapters } from "../adapters/registry.ts"
 import { decodeProfile, type Profile } from "../domain/Profile.ts"
@@ -16,7 +17,7 @@ import type { SourceUsageInput } from "../pipeline/usage.ts"
 import { writePrivateFile } from "../platform/files.ts"
 import { resolveCacheDir } from "../platform/paths.ts"
 import { writeReport, type RenderOptions } from "../report/index.ts"
-import { FileError, NoData, OutputCheckBlocked } from "./errors.ts"
+import { FileError, InvalidArgument, NoData, OutputCheckBlocked } from "./errors.ts"
 import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
 import { FontSource, Output } from "./services.ts"
@@ -124,20 +125,45 @@ export const readSources = Effect.gen(function* () {
 })
 
 /** filter → clean → redact → truncate, plus stats; prints what was excluded and redacted. */
-export const runPipelineStep = (collected: Collected, since: string) =>
+export const runPipelineStep = (collected: Collected, since: string, project?: string) =>
   Effect.gen(function* () {
     const env = yield* Environment
     const out = yield* Output
     const now = DateTime.makeUnsafe(yield* Clock.currentTimeMillis)
     const sinceDate = yield* parseSince(since, now)
-    const result = processRecords(collected.records, {
+    const inWindow = collected.records.filter(
+      (r) =>
+        (sinceDate === null || DateTime.isGreaterThanOrEqualTo(r.timestamp, sinceDate)) &&
+        DateTime.isLessThanOrEqualTo(r.timestamp, now),
+    )
+    const selection =
+      project === undefined
+        ? null
+        : yield* Effect.try({
+            try: () => selectContext(inWindow, project),
+            catch: () =>
+              new InvalidArgument({
+                flag: "--project (use a unique label or exact absolute path)",
+                value: project,
+              }),
+          })
+    const result = processRecords(selection?.records ?? collected.records, {
+      preserveFollowups: selection !== null,
       since: sinceDate,
       now,
       timezone: env.timezone,
       username: env.username,
-      slashCommands: collected.slashCommands,
-      events: collected.events,
+      slashCommands: selection ? {} : collected.slashCommands,
+      events: selection ? [] : collected.events,
     })
+    if (selection)
+      yield* out.line(
+        t.contextSelected(
+          selection.coverage.selected,
+          selection.coverage.excluded,
+          selection.coverage.missing,
+        ),
+      )
     const excluded = { ...result.report.filterExcluded, ...result.report.cleanExcluded }
     yield* out.line(t.cleaning)
     yield* out.line(
@@ -164,7 +190,11 @@ export const runPipelineStep = (collected: Collected, since: string) =>
         claudeRoot: resolveClaudeRoot(env.env, env.home, path),
         agentsRoot: path.join(env.home, ".agents"),
         projectDirs: [
-          ...new Set(collected.records.flatMap((r) => (r.project === null ? [] : [r.project]))),
+          ...new Set(
+            (selection?.records ?? collected.records).flatMap((r) =>
+              r.project === null ? [] : [r.project],
+            ),
+          ),
         ],
         names: techniques.details.skills.map((x) => x.name),
         listed: collected.skillDescriptions,
@@ -173,10 +203,11 @@ export const runPipelineStep = (collected: Collected, since: string) =>
       return {
         ...result,
         window,
+        context: selection?.coverage,
         stats: { ...result.stats, techniques: withSkillCatalog(techniques, catalog) },
       }
     }
-    return { ...result, window }
+    return { ...result, window, context: selection?.coverage }
   })
 
 /** `--out` relative to the working directory. */

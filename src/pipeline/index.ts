@@ -10,6 +10,7 @@ import type { TechniqueEvent } from "../domain/Techniques.ts"
 import { computeStats } from "./stats.ts"
 
 export interface PipelineOptions {
+  readonly preserveFollowups?: boolean
   readonly since: DateTime.Utc | null
   /** Injected (never read the clock here) so tests are deterministic. */
   readonly now: DateTime.Utc
@@ -49,7 +50,7 @@ export const processRecords = (
     until: options.now,
     ...(options.delegationPatterns ? { delegationPatterns: options.delegationPatterns } : {}),
   })
-  const cleaned = cleanRecords(filtered.records)
+  const cleaned = cleanRecords(filtered.records, options.preserveFollowups)
   const redactions: Counts = {}
   const projectNames = new Map<string, string | null>()
   for (const r of filtered.records) {
