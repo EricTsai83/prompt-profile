@@ -174,8 +174,19 @@ const renderCommand = Command.make(
     ),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
 
-const historyCommand = Command.make("history", { out, verbose }, (f) =>
-  handle(runHistory(f.out), f),
+const historyCommand = Command.make(
+  "history",
+  {
+    out,
+    verbose,
+    executions: Flag.Boolean("executions").pipe(
+      Flag.withDescription(
+        "List execution records, including failures without a report; makes no model calls",
+      ),
+      Flag.withDefault(false),
+    ),
+  },
+  (f) => handle(runHistory(f.out, f.executions), f),
 ).pipe(Command.withDescription("Rebuild the local report library index without analysis"))
 
 const cacheClearCommand = Command.make("clear", { verbose }, (f) =>
@@ -214,6 +225,12 @@ export const command = Command.make(
     effort: Flag.String("effort").pipe(
       Flag.withDescription(
         "Reasoning effort passed to claude / codex: low, medium, high, xhigh or max (default: the CLI's)",
+      ),
+      Flag.optional,
+    ),
+    maxCostUsd: Flag.String("max-cost-usd").pipe(
+      Flag.withDescription(
+        "Local measured-cost stop threshold in USD (Claude Code only); in-flight work may overshoot; not a billing cap",
       ),
       Flag.optional,
     ),
@@ -264,6 +281,7 @@ export const command = Command.make(
       model: optional(f.model),
       effort: optional(f.effort),
       maxCalls: optional(f.maxCalls),
+      maxCostUsd: optional(f.maxCostUsd),
       out: f.out,
       full: f.full,
       cache: f.cache,

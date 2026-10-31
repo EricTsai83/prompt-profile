@@ -75,13 +75,15 @@ These are observations about your prompts, not a psychological assessment or an 
 prompt-profile --since 6m            # 1m / 3m (default) / 6m / 1y / all
 prompt-profile --engine codex        # default: auto, Claude Code first
 prompt-profile --model <name>        # choose the analysis model
-prompt-profile --max-calls 40        # cap CLI calls, not tokens or money
+prompt-profile --max-calls 40        # cap CLI calls, including retries
+prompt-profile --engine claude --max-cost-usd 1.50  # local stop threshold; may overshoot
 prompt-profile --lang zh-TW,en       # first language is the default
 prompt-profile --voice first         # I/我; second (you/你) is the default
 prompt-profile --out <dir>           # choose the output folder
 
 prompt-profile render profile.json --look prism  # change the look without LLM calls
 prompt-profile cache clear                      # delete analysis cache entries
+prompt-profile history --executions             # list saved execution records (free)
 ```
 
 Seven looks are available: classic (default), signal, afterhours, studio, prism, slate and folio.
@@ -91,6 +93,11 @@ measured summary, or `--avatar` to choose its illustration.
 See the [user guide](https://github.com/EricTsai83/prompt-profile/blob/main/docs/user-guide.md)
 for all documented options, language behavior, history and recovery. If a run stops, follow the
 printed retry command: completed chunks and merges are cached; later steps may use quota again.
+
+Each analysis saves calls, retries, cache reuse, token coverage and cost provenance, including
+failed executions. The report shows generation usage separately from historical activity.
+See [execution accounting](docs/execution-accounting.md) for recovery, unknown measurements
+and cost-threshold limits.
 
 ## Sharing and privacy
 

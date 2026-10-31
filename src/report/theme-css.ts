@@ -67,3 +67,13 @@ export const displayStyle = (theme: Theme): string =>
 /** `<html>` attributes: the look (compatibility and debugging only) and its layout choices. */
 export const themeAttributes = ({ id, layout }: Theme): string =>
   `data-look="${id}" data-composition="${layout.composition}" data-hero="${layout.hero}" data-signatures="${layout.signatures}" data-story-width="${layout.storyWidth}"`
+
+/** Operational facts use rows so long model names do not become narrow columns. */
+export const generationStyle = `
+.generation-facts{margin:var(--space-4) 0}
+.generation-facts>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--border);break-inside:avoid}
+.generation-facts dt{color:var(--muted);font-size:var(--text-sm)}
+.generation-facts dd{margin:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.generation-facts dd p{margin:0 0 var(--space-1)}
+@media(max-width:600px){.generation-facts>div{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}}
+`

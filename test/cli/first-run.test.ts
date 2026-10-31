@@ -233,7 +233,7 @@ describe("during and after a run", () => {
       const at = phases.map((p) => r.stdout.indexOf(p))
       expect(at.every((i) => i >= 0)).toBe(true)
       expect(at).toEqual([...at].toSorted((a, b) => a - b))
-      expect(r.stdout).not.toMatch(/remaining|ETA|minutes? left|about \d+ (s|min)/i)
+      expect(r.stdout).not.toMatch(/remaining|\bETA\b|minutes? left|about \d+ (s|min)/i)
     }),
   )
 

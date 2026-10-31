@@ -134,6 +134,7 @@ export interface RunFlags {
   readonly out: string
   readonly full: boolean
   readonly yes: boolean
+  readonly maxCostUsd?: string | undefined
   readonly maxCalls?: string | undefined
   readonly lang?: string | undefined
   readonly avatar?: AvatarChoice | undefined
@@ -186,6 +187,7 @@ export const rerunCommand = (f: RunFlags): string =>
     ...flag("--check", f.check, "mask"),
     ...flag("--allow", f.allow),
     ...flag("--max-calls", f.maxCalls),
+    ...flag("--max-cost-usd", f.maxCostUsd),
     ...(f.yes ? ["--yes"] : []),
   ].join(" ")
 

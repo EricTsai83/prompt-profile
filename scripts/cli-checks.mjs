@@ -10,18 +10,44 @@ import { join } from "node:path"
 export const checkCli = ({ repo, root, version, cli }) => {
   assert.equal(cli(["--version"]).trim(), `prompt-profile v${version}`)
   assert.match(cli(["--help"]), /--max-calls/)
+  assert.match(cli(["--help"]), /--max-cost-usd/)
   const input = join(root, "sample profile.json")
   const output = join(root, "rendered report")
   // English only: a zh-TW card would download the CJK font, which this check must not need.
   const sample = JSON.parse(readFileSync(join(repo, "test", "fixtures", "profile.sample.json")))
-  writeFileSync(input, JSON.stringify({ ...sample, languages: ["en"], translations: {} }), {
-    mode: 0o600,
-  })
+  const execution = JSON.parse(
+    readFileSync(join(repo, "test", "fixtures", "execution.partial.json")),
+  )
+  const generation = {
+    executionId: execution.id,
+    outcome: execution.outcome,
+    languages: [{ language: "en", available: true }],
+    models: execution.attempts.map((a) => ({
+      engine: a.engine,
+      model: a.model,
+      source: a.modelSource,
+    })),
+    summary: execution.summary,
+  }
+  writeFileSync(
+    input,
+    JSON.stringify({ ...sample, generation, languages: ["en"], translations: {} }),
+    {
+      mode: 0o600,
+    },
+  )
   cli(["render", input, "--out", output], {
     env: { ...process.env, XDG_CACHE_HOME: join(root, "cache") },
   })
   const html = readFileSync(join(output, "report.html"), "utf8")
   assert.match(html, /Content-Security-Policy/)
+  assert.match(html, /Report generation/)
+  assert.ok(html.includes(generation.executionId))
+  assert.deepEqual(
+    JSON.parse(readFileSync(join(output, "profile.json"), "utf8")).generation,
+    generation,
+  )
+  assert.match(cli(["history", "--executions", "--out", output]), /Execution records/)
   const png = readFileSync(join(output, "card.png"))
   assert.equal(png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a")
   assert.equal(png.readUInt32BE(16), 1200)

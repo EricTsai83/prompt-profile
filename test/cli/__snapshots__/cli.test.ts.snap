@@ -20,10 +20,12 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   No hard limit: add --max-calls <n> to stop after n CLI calls.
   Free first: --dry-run writes what would be sent without calling any LLM; \`prompt-profile stats\` shows statistics.
 
+Execution: <execution> · model: CLI default (unverified)
 ● Analysing ░░░░░░░░░░░░ 0/2 chunks
-● Analysing ██████░░░░░░ 1/2 chunks
-● Analysing ████████████ 2/2 chunks
+● Analysing ██████░░░░░░ 1/2 chunks · elapsed 0 ms
+● Analysing ████████████ 2/2 chunks · elapsed 0 ms
 ● Writing the profile…
+Reviewing the draft against source evidence…
 ● Verifying evidence: kept 8 / 8
 ● Writing report files…
 
@@ -35,7 +37,13 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   Contains  8 quotes · 4 project names · exact dates · 1 improvement · 3 fun facts · plans, usage and API list-price equivalent
   Check  no secrets or personal data found
   Before sharing, skim the quotes yourself: the check is rule-based.
-  To leave parts out: prompt-profile render <tmp>/out/reports/<run>/profile.json --exclude personal"
+  To leave parts out: prompt-profile render <tmp>/out/reports/<run>/profile.json --exclude personal
+Execution outcome: succeeded · command elapsed: 0 ms · generation elapsed: 0 ms
+Generation models: claude-code/fake-model (reported)
+Model calls: 4 · retries: 0 · local cache hits: 0
+Tokens: 0 measured (unavailable; 4 attempts incomplete). Input 0, output 0, cache read 0, cache write 5m 0, 1h 0, unknown duration 0. Reasoning is included in output.
+Generation cost: USD 0.000000 measured subtotal (unavailable; 0 reported, 0 estimated, 4 unknown). This is not a subscription bill.
+Execution metadata: <tmp>/out/executions/<execution>/summary.json"
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `

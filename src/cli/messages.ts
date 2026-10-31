@@ -1,3 +1,4 @@
+import type { ExecutionRecord } from "../domain/Execution.ts"
 import type { Finding } from "../pipeline/audit.ts"
 import type { ReportContents } from "../report/visibility.ts"
 
@@ -26,6 +27,31 @@ const bar = (done: number, total: number): string => {
 
 /** Every line the CLI prints (errors are in render-error.ts). */
 export const messages = {
+  progressElapsed: (ms: number) => ` · elapsed ${Math.max(0, ms)} ms`,
+  reviewing: "Reviewing the draft against source evidence…",
+  executionDetails: (r: ExecutionRecord) =>
+    ["map", "merge", "draft", "review", "translation"].map((stage) => {
+      const calls = r.attempts.filter((a) => a.stage === stage)
+      return `${stage}: ${calls.length} attempts, ${calls.filter((a) => a.outcome === "failed").length} failed, ${calls.filter((a) => a.outcome === "cancelled").length} cancelled`
+    }),
+  executionsListed: (skipped: number) =>
+    `Execution records (no model calls; unfinished checkpoints have unknown process status). Invalid records skipped: ${skipped}`,
+  executionHistory: (id: string, outcome: string, file: string) => `${id} · ${outcome} · ${file}`,
+
+  costThreshold: (usd: number) =>
+    `Local cost stop threshold: USD ${usd}. Unknown cost stops further work; concurrent in-flight calls may overshoot. Not a provider billing cap.`,
+  executionStarted: (id: string, model: string | null) =>
+    `Execution: ${id} · model: ${model === null ? "CLI default (unverified)" : `${model} (requested; unverified)`}`,
+  executionSaveFailed: (file: string) =>
+    `Could not save execution summary: ${file}. The original failure is preserved; the last checkpoint may be incomplete.`,
+  executionSummary: (r: ExecutionRecord, file: string) => [
+    `Execution outcome: ${r.outcome} · command elapsed: ${r.finishedAtMs === null ? "unknown" : Math.max(0, r.finishedAtMs - r.startedAtMs)} ms · generation elapsed: ${r.summary.wallDurationMs} ms`,
+    `Generation models: ${[...new Set(r.attempts.map((a) => `${a.engine}/${a.model ?? "unknown"} (${a.modelSource ?? "unknown"})`))].join("; ") || "no calls"}`,
+    `Model calls: ${r.summary.calls} · retries: ${r.summary.retries} · local cache hits: ${r.summary.localCacheHits}`,
+    `Tokens: ${r.summary.tokens.total} measured (${r.summary.tokens.state}; ${r.summary.tokens.unknownAttempts} attempts incomplete). Input ${r.summary.tokens.subtotal.input}, output ${r.summary.tokens.subtotal.output}, cache read ${r.summary.tokens.subtotal.cacheRead}, cache write 5m ${r.summary.tokens.subtotal.cacheWrite5m}, 1h ${r.summary.tokens.subtotal.cacheWrite1h}, unknown duration ${r.summary.tokens.subtotal.cacheWriteUnknown}. Reasoning is included in output.`,
+    `Generation cost: USD ${r.summary.cost.usd.toFixed(6)} measured subtotal (${r.summary.cost.state}; ${r.summary.cost.reportedAttempts} reported, ${r.summary.cost.estimatedAttempts} estimated, ${r.summary.cost.unknownAttempts} unknown). This is not a subscription bill.`,
+    `Execution metadata: ${file}`,
+  ],
   header: (v: string) => `◆ prompt-profile v${v}`,
   reading: "● Reading data",
   sourceLine: (name: string, prompts: number, sessions: number) =>

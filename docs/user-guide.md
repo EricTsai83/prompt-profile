@@ -200,3 +200,13 @@ prompt-profile has no telemetry. The report makes no network requests and its fo
 the package. The one exception is the Chinese share card: on first use it downloads Noto Sans TC
 (about 11 MB, from a pinned GitHub commit), checks its SHA-256 and caches it; no prompt data is
 sent. The borrowed CLI manages its own network requests and provider data retention.
+
+## Execution summaries and cost stops
+
+Each analysis now saves a private execution record, including failures without a report.
+Use `prompt-profile history --executions --out <directory>` to find its JSON path.
+`--max-calls` caps admitted CLI invocations, including retries. Claude Code also supports
+`--max-cost-usd <amount>` as a local measured-cost stop threshold; concurrent work may overshoot,
+and unknown cost stops further work. Codex rejects this monetary setting before model calls.
+See [execution accounting and recovery](execution-accounting.md) for the versioned record,
+coverage states, free operations, privacy exclusions and restart behavior.

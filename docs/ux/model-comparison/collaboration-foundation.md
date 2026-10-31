@@ -2,7 +2,7 @@
 
 Phase C adds structured signature moves, scoped understanding signals and source coverage.
 The core format is profile schema 15; analysis version 20 invalidates prior map/merge cache
-entries. Versions 2–14 migrate without inventing moves or understanding evidence. Older
+entries. Released schemas 8 and 14 remain readable without inventing moves or understanding evidence. Older
 reports say this was not assessed; missing evidence is not lack of competence.
 
 ## Mechanical guarantees

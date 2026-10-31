@@ -346,7 +346,7 @@ context. Original comparison profiles retain version-25 prose so the failure rem
 Limits: the experiment snapshot currently carries prompts and basic pipeline statistics, not
 all production CLI enrichment (historical usage, workflow events and skill catalogs). This run
 does not validate those report sections. There is no within-case progress or attempt checkpoint
-in the experiment CLI; durable case summaries appear after completion. Plan 33 owns the shared
-execution accounting and progress foundation. Local-history quality thresholds remain permissive;
+in the experiment CLI; durable case summaries appear after completion. The completed [execution accounting](execution-accounting.md) provides the shared
+accounting and progress foundation. Local-history quality thresholds remain permissive;
 a passing execution/rubric is not semantic acceptance. Owner judgement is still needed for
 portrait fidelity, helpful suggestions and unavailable visual context.

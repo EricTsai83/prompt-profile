@@ -69,6 +69,7 @@ export interface CheckResult {
 /** Fields that hold codes, ids or dates, never displayed free text. */
 const MACHINE_KEYS: ReadonlySet<string> = new Set([
   "schemaVersion",
+  "executionId",
   "voice",
   "languages",
   "promptId",

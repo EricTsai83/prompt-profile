@@ -189,6 +189,13 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .sigs{grid-template-columns:repeat(2,1fr)}.rewrite{grid-template-columns:1fr}.g-2,.g-3,.g-2r{grid-template-columns:1fr}
 .dim-name{min-width:0;flex-basis:100%}.dimension>summary,.dimension.static{flex-wrap:wrap;gap:6px 12px}
 }
+
+.generation-facts{margin:var(--space-4) 0}
+.generation-facts>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--border);break-inside:avoid}
+.generation-facts dt{color:var(--muted);font-size:var(--text-sm)}
+.generation-facts dd{margin:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.generation-facts dd p{margin:0 0 var(--space-1)}
+@media(max-width:600px){.generation-facts>div{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}}
 .understanding{margin:36px 0}.understanding h2{font-size:var(--text-xl)}.understanding article{border-top:1px solid var(--border);padding:16px 0}.understanding h3{font-size:var(--text-base);margin-bottom:8px}.understanding p{line-height:1.8}.understanding .note,.structured-moves .note{font-size:var(--text-sm);color:var(--muted)}.understanding blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);overflow-wrap:anywhere;line-height:1.8}.history-comparison{margin:36px 0}.history-comparison h2{font-size:var(--text-xl)}.history-comparison article{padding:20px 0;border-top:1px solid var(--border)}.history-comparison h3{font-size:var(--text-lg);margin-bottom:12px}.history-comparison h4{margin-top:20px}.history-comparison p{line-height:1.8}.history-comparison blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);line-height:1.8;overflow-wrap:anywhere}.quote-source{display:block;margin-top:8px;font-size:var(--text-xs);color:var(--muted)}
 html:root .hero .role-avatar img{display:block;width:100%;height:auto}
 html:root .hero:has(.role-avatar)>.report-facts{grid-column:1/-1;grid-row:2;margin:0;padding-top:16px;border-top:1px solid var(--border)}
@@ -3852,6 +3859,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
             </div>
           </article>
   </section>
+          <section class="panel"><h2><span data-l="en" lang="en">Report generation</span><span data-l="zh-TW" lang="zh-Hant-TW">報告產生用量</span></h2><p><span data-l="en" lang="en">Generation metadata is unavailable for this older report.</span><span data-l="zh-TW" lang="zh-Hant-TW">這份舊報告沒有保存產生時的用量紀錄。</span></p></section>
 
           <section class="about">
                   <h2><span data-l="en" lang="en">How this was measured</span><span data-l="zh-TW" lang="zh-Hant-TW">這份報告怎麼量的</span></h2>

@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "id": "00000000-0000-0000-0000-000000000001",
+  "operation": "analyze",
+  "engine": "codex",
+  "requestedModel": "gpt-example",
+  "startedAtMs": 1000,
+  "accountingFinishedAtMs": 1800,
+  "finishedAtMs": 2000,
+  "outcome": "partial",
+  "stopReason": null,
+  "limits": {
+    "maxCalls": null,
+    "maxCostUsd": null
+  },
+  "reportId": null,
+  "analysis": "partial",
+  "languages": [
+    {
+      "language": "en",
+      "available": true
+    },
+    {
+      "language": "zh-TW",
+      "available": true
+    }
+  ],
+  "artifacts": [],
+  "attempts": [
+    {
+      "id": 1,
+      "callId": 1,
+      "stage": "map",
+      "engine": "codex",
+      "model": "gpt-example",
+      "modelSource": "requested",
+      "startedAtMs": 1000,
+      "finishedAtMs": 1500,
+      "outcome": "succeeded",
+      "tokens": {
+        "input": 100,
+        "output": 50,
+        "cacheRead": 40,
+        "cacheWrite5m": 0,
+        "cacheWrite1h": 0,
+        "cacheWriteUnknown": 0,
+        "reasoning": 10
+      },
+      "cost": {
+        "provenance": "estimated",
+        "usd": 0.001,
+        "pricingVersion": "fictional",
+        "tier": "standard"
+      }
+    },
+    {
+      "id": 2,
+      "callId": 2,
+      "stage": "review",
+      "engine": "claude-code",
+      "model": "fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-fictional-long-model-",
+      "modelSource": "reported",
+      "startedAtMs": 1100,
+      "finishedAtMs": 1700,
+      "outcome": "failed",
+      "tokens": null,
+      "cost": null
+    }
+  ],
+  "summary": {
+    "stages": {
+      "map": {
+        "calls": 1,
+        "failed": 0,
+        "cancelled": 0
+      },
+      "merge": {
+        "calls": 0,
+        "failed": 0,
+        "cancelled": 0
+      },
+      "draft": {
+        "calls": 0,
+        "failed": 0,
+        "cancelled": 0
+      },
+      "review": {
+        "calls": 1,
+        "failed": 1,
+        "cancelled": 0
+      },
+      "translation": {
+        "calls": 0,
+        "failed": 0,
+        "cancelled": 0
+      }
+    },
+    "calls": 2,
+    "retries": 0,
+    "running": 0,
+    "cancelled": 0,
+    "failed": 1,
+    "localCacheHits": 3,
+    "wallDurationMs": 800,
+    "callDurationMs": 1100,
+    "tokens": {
+      "state": "partial",
+      "subtotal": {
+        "input": 100,
+        "output": 50,
+        "cacheRead": 40,
+        "cacheWrite5m": 0,
+        "cacheWrite1h": 0,
+        "cacheWriteUnknown": 0,
+        "reasoning": 10
+      },
+      "total": 190,
+      "unknownAttempts": 1
+    },
+    "cost": {
+      "state": "partial",
+      "usd": 0.001,
+      "unknownAttempts": 1,
+      "reportedAttempts": 0,
+      "estimatedAttempts": 1
+    }
+  }
+}

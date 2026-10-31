@@ -1,3 +1,4 @@
+import { generationSection } from "./generation.ts"
 import { NARRATION_MESSAGES } from "./messages.ts"
 import { EXPERIMENT_MESSAGES } from "./messages.ts"
 import { avatarFor, avatarPortrait, avatarStyle } from "./avatar.ts"
@@ -30,7 +31,7 @@ import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { html, raw, type Raw } from "./html-template.ts"
 import { DEFAULT_RENDER_OPTIONS, excludedParts, type RenderOptions } from "./looks.ts"
 import { lookOf, type Theme } from "./theme.ts"
-import { displayStyle, themeAttributes, themeCss } from "./theme-css.ts"
+import { displayStyle, generationStyle, themeAttributes, themeCss } from "./theme-css.ts"
 import { MESSAGES, type Messages } from "./messages.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
 import { triggeredSignals } from "./signals.ts"
@@ -710,7 +711,7 @@ export const renderHtml = (
         />
         <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${viewMessages(loc.langs[0]!, profile.voice).brand(options.name ?? null)}</title>
         <style>
-          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
+          ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(generationStyle)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
 .experiment-print-copy{display:none}
 @media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
@@ -1097,6 +1098,7 @@ export const renderHtml = (
           }
 
           ${usage ?? ""}
+          ${generationSection(profile, loc, v) ?? ""}
 
           <section class="about">
                   <h2>${loc.text((m) => m.howMeasured)}</h2>

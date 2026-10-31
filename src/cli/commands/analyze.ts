@@ -1,3 +1,9 @@
+import { costOf, PRICING_VERSION } from "../../pipeline/pricing.ts"
+import { TOKEN_KINDS, ZERO_TOKENS } from "../../domain/Usage.ts"
+import { withCostStop } from "../../llm/cost-budget.ts"
+import { generationOf } from "../../domain/Execution.ts"
+import { makeExecutionAccounting } from "../../llm/accounting.ts"
+import { createExecution, saveExecution } from "../../platform/executions.ts"
 import { DEFAULT_VOICE, type Voice } from "../../domain/Voice.ts"
 import type { Profile } from "../../domain/Profile.ts"
 import type { AvatarChoice } from "../../report/avatar.ts"
@@ -8,7 +14,7 @@ import { scanLibrary } from "../../platform/library.ts"
 import { PIPELINE_VERSION } from "../../pipeline/version.ts"
 import { libraryIo } from "../library.ts"
 import { snapshotOf } from "../../domain/Progress.ts"
-import { DateTime, Effect, Path } from "effect"
+import { Clock, DateTime, Effect, Exit, Path } from "effect"
 import { Prompt } from "effect/cli"
 import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../analysis/index.ts"
 import { Progress, type ProgressShape } from "../../analysis/progress.ts"
@@ -43,6 +49,7 @@ import { readSources, resolveOut, runPipelineStep, writeFileOrFail } from "../st
 /** The main command: read → pipeline → (confirm) → analyse → report. */
 
 export interface MainOptions extends Omit<RunFlags, "engine"> {
+  readonly maxCostUsd?: string | undefined
   readonly maxCalls?: string | undefined
   readonly since: string
   readonly engine: RunnerId | undefined
@@ -118,7 +125,12 @@ const withDetectedPlans = (
   })
 
 /** Progress bar on the status line; timings only with --verbose. */
-const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressShape => {
+const makeProgress = (
+  out: OutputShape,
+  t: Messages,
+  total: number,
+  startedAtMs: number,
+): ProgressShape => {
   let done = 0
   let cached = 0
   return {
@@ -128,10 +140,14 @@ const makeProgress = (out: OutputShape, t: Messages, total: number): ProgressSha
         done++
         if (info.fromCache) cached++
         if (info.durationMs !== null) yield* out.debug(t.chunkTiming(info.index, info.durationMs))
-        yield* out.status(t.analysing(done, total, cached))
+        yield* out.status(
+          t.analysing(done, total, cached) +
+            t.progressElapsed((yield* Clock.currentTimeMillis) - startedAtMs),
+        )
       }),
     onMergeStart: (groups) => out.line(t.merging(groups)),
     onReduceStart: out.line(t.reducing),
+    onReviewStart: out.line(t.reviewing),
     onReduceDone: (ms) => out.debug(t.chunkTiming(total, ms)),
     onVerified: (kept, dropped) => out.line(t.verified(kept, kept + dropped)),
     onTranslateStart: (language) => out.line(t.translating(language)),
@@ -225,6 +241,14 @@ export const runMain = (options: MainOptions) =>
     ) {
       return yield* new InvalidArgument({ flag: "--max-calls", value: options.maxCalls! })
     }
+    const maxCostUsd = options.maxCostUsd === undefined ? null : Number(options.maxCostUsd)
+    if (
+      maxCostUsd !== null &&
+      (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(options.maxCostUsd!) ||
+        !Number.isFinite(maxCostUsd) ||
+        maxCostUsd <= 0)
+    )
+      return yield* new InvalidArgument({ flag: "--max-cost-usd", value: options.maxCostUsd! })
     const effort = yield* parseEffort(options.effort)
     const renderOptions = yield* parseRenderOptions(
       options.look ?? "classic",
@@ -292,8 +316,10 @@ export const runMain = (options: MainOptions) =>
     // Pick the engine (no prompt is sent to check login).
     const statuses = yield* provider.detect
     const status = yield* chooseRunner(statuses, options.engine ?? null)
+    if (maxCostUsd !== null && status.id !== "claude-code")
+      return yield* new InvalidArgument({ flag: "--max-cost-usd", value: options.maxCostUsd! })
     const base = yield* provider.make(status.id, { model: options.model, effort })
-    const runner = withRetry(maxCalls === null ? base : withCallBudget(base, maxCalls))
+    const runner = base
 
     const p = yield* plan({ prompts, options: analyzeOptions, runner: runner.id })
     yield* preflight({
@@ -306,6 +332,7 @@ export const runMain = (options: MainOptions) =>
       dryRun: false,
     })
 
+    if (maxCostUsd !== null) yield* out.line(t.costThreshold(maxCostUsd))
     if (!options.yes) {
       if (!env.isTTY) return yield* new NeedsConfirmation()
       const ok = yield* Prompt.run(Prompt.Confirm({ message: t.confirm, initial: true })).pipe(
@@ -317,77 +344,201 @@ export const runMain = (options: MainOptions) =>
       }
     }
 
-    yield* out.status(t.analysing(0, p.chunks.length, 0))
-    const analyzed = yield* analyze({ prompts, stats, options: analyzeOptions }).pipe(
-      Effect.provideService(LlmRunner, runner),
-      Effect.provideService(Progress, makeProgress(out, t, p.chunks.length)),
-      Effect.onInterrupt(() => out.error(`\n${t.interrupted(rerunCommand(flags))}`)),
+    const startedAtMs = yield* Clock.currentTimeMillis
+    const execution = yield* libraryIo(outDir, () => createExecution(outDir, startedAtMs))
+    const accounting = makeExecutionAccounting(execution.id, startedAtMs, (measurement) => {
+      if (
+        !measurement.tier ||
+        !measurement.tokens ||
+        TOKEN_KINDS.some((k) => k !== "reasoning" && measurement.tokens?.[k] === undefined)
+      )
+        return null
+      const usd = costOf(
+        measurement.model,
+        { ...ZERO_TOKENS, ...measurement.tokens },
+        measurement.tier,
+      )
+      return usd === null
+        ? null
+        : { usd, provenance: "estimated", pricingVersion: PRICING_VERSION, tier: measurement.tier }
+    })
+    accounting.setLimits({ maxCalls, maxCostUsd })
+    accounting.setEngine(base.id, options.model ?? null)
+    let saveQueue = Promise.resolve()
+    const checkpoint = Effect.gen(function* () {
+      const snapshot = accounting.record(yield* Clock.currentTimeMillis)
+      yield* libraryIo(execution.file, () => {
+        const next = saveQueue.then(() => saveExecution(outDir, snapshot))
+        saveQueue = next.catch(() => {})
+        return new Promise<void>((resolve, reject) => {
+          // Bound actual filesystem I/O independently of the model/retry clock.
+          const timer = setTimeout(() => reject(new Error("Execution checkpoint timed out")), 5000)
+          next.then(
+            () => {
+              clearTimeout(timer)
+              resolve()
+            },
+            (error) => {
+              clearTimeout(timer)
+              reject(error)
+            },
+          )
+        })
+      })
+    })
+    accounting.setCheckpoint(checkpoint.pipe(Effect.orDie))
+    const measured =
+      maxCostUsd === null
+        ? accounting.attempts(base)
+        : withCostStop(accounting.attempts(base), maxCostUsd)
+    const accountedRunner = accounting.logical(
+      withRetry(maxCalls === null ? measured : withCallBudget(measured, maxCalls)),
     )
-
-    const profile = { ...analyzed, ...(context ? { context } : {}) }
-
-    // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
-    const usage = context
-      ? null
-      : summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
-    // The report in this folder before this run, if any: "since your last report".
-    const previousReport = yield* previousProfile(outDir)
-    const priorIndex = yield* libraryIo(outDir, () => scanLibrary(outDir))
-    const priorManifest = priorIndex.runs.find((r) => r.id === priorIndex.latest)
-    const compared = previousReport
-      ? compareHistory(
-          profile,
-          previousReport,
-          { schema: profile.schemaVersion, pipeline: PIPELINE_VERSION },
-          {
-            schema: priorManifest?.schemaVersion ?? 0,
-            pipeline: priorManifest?.pipelineVersion ?? "unknown",
-          },
-        )
-      : { comparison: null, reasons: [] }
-    const previous =
-      previousReport && compared.comparison?.toolComparable ? snapshotOf(previousReport) : null
-    if (compared.reasons.length) yield* out.debug(t.historySkipped(compared.reasons.join(", ")))
-    yield* out.line(t.writing)
-    const files = yield* writeAnalysisReport(
-      { ...profile, previous, historyComparison: compared.comparison, usage },
-      outDir,
-      renderOptions,
-      {
-        mode: options.check ?? "mask",
-        allow,
+    const progress = makeProgress(out, t, p.chunks.length, startedAtMs)
+    const trackedProgress: ProgressShape = {
+      ...progress,
+      onMergeCacheHit: Effect.sync(() => accounting.cacheHit()),
+      onChunkDone: (info) => {
+        if (info.fromCache) accounting.cacheHit()
+        return progress.onChunkDone(info)
       },
-    )
-    const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
-    yield* out.line("")
-    yield* out.line(t.done)
-    yield* out.line(t.reportLine(files.html, opened))
-    for (const card of files.cards)
-      yield* out.line(
-        card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
+    }
+    yield* out.line(t.executionStarted(execution.id, options.model ?? null))
+    yield* Effect.gen(function* () {
+      yield* out.status(t.analysing(0, p.chunks.length, 0))
+      const analyzed = yield* analyze({ prompts, stats, options: analyzeOptions }).pipe(
+        Effect.provideService(LlmRunner, accountedRunner),
+        Effect.provideService(Progress, trackedProgress),
+        Effect.onInterrupt(() => out.error(`\n${t.interrupted(rerunCommand(flags))}`)),
       )
-    if (files.cards.some((c) => c.file === null))
-      yield* out.line(
-        t.cardRetry(
-          renderRetryCommand(
-            files.profileJson,
-            path.join(path.dirname(files.profileJson), "variants", variantName(renderOptions)),
-            flags,
+
+      const incomplete =
+        analyzed.coverage.chunksFailed > 0 || languages.some((l) => !analyzed.languages.includes(l))
+      accounting.update({
+        analysis: analyzed.coverage.chunksFailed > 0 ? "partial" : "complete",
+        languages: languages.map((language) => ({
+          language,
+          available: analyzed.languages.includes(language),
+        })),
+      })
+
+      accounting.seal(yield* Clock.currentTimeMillis)
+      yield* checkpoint
+      const profile = {
+        ...analyzed,
+        generation: generationOf({
+          ...accounting.record(yield* Clock.currentTimeMillis),
+          outcome: incomplete ? "partial" : "succeeded",
+        }),
+        ...(context ? { context } : {}),
+      }
+
+      // Usage, plan and API list-price equivalent: local logs only, never sent to the LLM.
+      const usage = context
+        ? null
+        : summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
+      // The report in this folder before this run, if any: "since your last report".
+      const previousReport = yield* previousProfile(outDir)
+      const priorIndex = yield* libraryIo(outDir, () => scanLibrary(outDir))
+      const priorManifest = priorIndex.runs.find((r) => r.id === priorIndex.latest)
+      const compared = previousReport
+        ? compareHistory(
+            profile,
+            previousReport,
+            { schema: profile.schemaVersion, pipeline: PIPELINE_VERSION },
+            {
+              schema: priorManifest?.schemaVersion ?? 0,
+              pipeline: priorManifest?.pipelineVersion ?? "unknown",
+            },
+          )
+        : { comparison: null, reasons: [] }
+      const previous =
+        previousReport && compared.comparison?.toolComparable ? snapshotOf(previousReport) : null
+      if (compared.reasons.length) yield* out.debug(t.historySkipped(compared.reasons.join(", ")))
+      yield* out.line(t.writing)
+      const files = yield* writeAnalysisReport(
+        { ...profile, previous, historyComparison: compared.comparison, usage },
+        outDir,
+        renderOptions,
+        {
+          mode: options.check ?? "mask",
+          allow,
+        },
+      )
+      accounting.update({
+        reportId: path.basename(path.dirname(files.profileJson)),
+        artifacts: [
+          { kind: "profile", path: files.profileJson, available: true },
+          { kind: "html", path: files.html, available: true },
+          ...files.cards.map((c) => ({
+            kind: "card" as const,
+            path: c.file ?? c.language,
+            available: c.file !== null,
+          })),
+        ],
+      })
+      accounting.finish(
+        incomplete || files.cards.some((c) => c.file === null) ? "partial" : "succeeded",
+      )
+      const opened = env.isTTY ? yield* (yield* Opener).open(files.html) : false
+      yield* out.line("")
+      yield* out.line(t.done)
+      yield* out.line(t.reportLine(files.html, opened))
+      for (const card of files.cards)
+        yield* out.line(
+          card.file ? t.cardLine(card.file) : t.cardSkipped(card.language, card.error ?? "?"),
+        )
+      if (files.cards.some((c) => c.file === null))
+        yield* out.line(
+          t.cardRetry(
+            renderRetryCommand(
+              files.profileJson,
+              path.join(path.dirname(files.profileJson), "variants", variantName(renderOptions)),
+              flags,
+            ),
           ),
-        ),
-      )
-    yield* out.line(t.dataLine(files.profileJson))
-    yield* out.line(t.libraryLine(files.libraryHome))
-    for (const line of summaryLines(
-      reportContents(files.profile, renderOptions),
-      files.findings,
-      files.profileJson,
-    ))
-      yield* out.line(line)
-    if (profile.coverage.chunksFailed > 0)
-      yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))
-    if (isLimitedEvidence(profile)) yield* out.line(t.limitedEvidence)
-    const missing = languages.filter((l) => !profile.languages.includes(l))
-    if (missing.length > 0)
-      yield* out.line(t.missingLanguages(missing.join(", "), rerunCommand(flags)))
+        )
+      yield* out.line(t.dataLine(files.profileJson))
+      yield* out.line(t.libraryLine(files.libraryHome))
+      for (const line of summaryLines(
+        reportContents(files.profile, renderOptions),
+        files.findings,
+        files.profileJson,
+      ))
+        yield* out.line(line)
+      if (profile.coverage.chunksFailed > 0)
+        yield* out.line(t.skippedChunks(profile.coverage.chunksFailed))
+      if (isLimitedEvidence(profile)) yield* out.line(t.limitedEvidence)
+      const missing = languages.filter((l) => !profile.languages.includes(l))
+      if (missing.length > 0)
+        yield* out.line(t.missingLanguages(missing.join(", "), rerunCommand(flags)))
+    }).pipe(
+      Effect.onExit((exit) =>
+        Effect.gen(function* () {
+          if (Exit.isFailure(exit)) {
+            const failure = exit.cause.reasons.find((r) => r._tag === "Fail")
+            accounting.stop(
+              failure?._tag === "Fail" &&
+                typeof failure.error === "object" &&
+                failure.error !== null &&
+                "_tag" in failure.error
+                ? String(failure.error._tag)
+                : "interrupted-or-defect",
+            )
+            accounting.finish(
+              exit.cause.reasons.some((r) => r._tag === "Interrupt") ? "interrupted" : "failed",
+            )
+          }
+          const record = accounting.record(yield* Clock.currentTimeMillis)
+          const saved = yield* Effect.result(checkpoint)
+          if (saved._tag === "Failure") yield* out.error(t.executionSaveFailed(execution.file))
+          for (const line of t.executionSummary(record, execution.file)) yield* out.line(line)
+          for (const line of t.executionDetails(record)) yield* out.debug(line)
+          if (Exit.isFailure(exit) || saved._tag === "Failure")
+            yield* out.line(t.rerun(rerunCommand(flags)))
+          if (Exit.isSuccess(exit) && saved._tag === "Failure")
+            return yield* Effect.fail(saved.failure)
+        }),
+      ),
+    )
   })

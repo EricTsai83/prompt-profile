@@ -11,6 +11,7 @@ import { fixture, makeHarness, ok, reportPath } from "./harness.ts"
 const scrub = (s: string, root: string) =>
   s
     .replaceAll(root, "<tmp>")
+    .replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gu, "<execution>")
     .replace(/\d{8}T\d{6}Z-[a-f0-9]{32}/gu, "<run>")
     .replaceAll(fixture(""), "<fixtures>/")
     .replaceAll(`v${VERSION}`, "v<version>")
