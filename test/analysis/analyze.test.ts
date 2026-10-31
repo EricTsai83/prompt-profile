@@ -359,7 +359,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "30",
+        analysisVersion: "31",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -852,6 +852,65 @@ it.effect("keeps the model's own role name for a verified profile without a sing
     const profile = yield* run(fake)
     expect(profile.coverage.evidenceDropped).toBe(0)
     expect(profile.archetype.name).toBe("Midnight Plan Runner")
+  }),
+)
+
+it.effect("keeps the role when one quote among many is fabricated, dropping only that item", () =>
+  Effect.gen(function* () {
+    const fake = makeFakeLlmRunner({
+      respond: (input) => {
+        const value = respond(input) as Record<string, unknown> & {
+          improvements: Array<{ title: string }>
+        }
+        return input.schemaName === "LlmProfileDraft"
+          ? {
+              ...value,
+              archetype: { name: "Midnight Plan Runner", description: "Writes every day." },
+              // keep the real improvement; the made-up trait stays as the one bad quote
+              improvements: value.improvements.slice(0, 1),
+            }
+          : value
+      },
+    })
+    const profile = yield* run(fake)
+    expect(profile.coverage.evidenceDropped).toBe(1)
+    expect(profile.traits.some((t) => t.name === "made up")).toBe(false)
+    expect(profile.headline).toBe("A steady developer")
+    expect(profile.archetype.name).toBe("Midnight Plan Runner")
+  }),
+)
+
+it.effect.each([
+  { why: "a generic label", name: "Developer" },
+  { why: "too many words", name: "The Very Late Night Numbered Plan Runner" },
+])("replaces a role name that is $why with the leading trait's name", ({ name }) =>
+  Effect.gen(function* () {
+    const fake = makeFakeLlmRunner({
+      respond: (input) => {
+        const value = respond(input) as Record<string, unknown> & {
+          traits: Array<{ name: string }>
+        }
+        return input.schemaName === "LlmProfileDraft"
+          ? {
+              ...value,
+              archetype: { name, description: "Writes every day." },
+              traits: value.traits.filter((t) => t.name === "steady"),
+              improvements: [],
+            }
+          : value
+      },
+    })
+    const profile = yield* run(fake)
+    expect(profile.archetype.name).toBe("steady")
+  }),
+)
+
+it.effect("gives the draft step the measured share of each way of working", () =>
+  Effect.gen(function* () {
+    const fake = makeFakeLlmRunner({ respond })
+    yield* run(fake)
+    const draft = fake.log.find((c) => c.schema === "LlmProfileDraft")!
+    expect(draft.prompt).toMatch(/\n\naxisBalance:\n\{"axes":\[/)
   }),
 )
 

@@ -83,7 +83,7 @@ export const analyze = (input: {
     // ---- reduce, then keep only what the evidence supports --------------------------------
     yield* progress.onReduceStart
     const drafts = yield* draftProfile(
-      reduceInput({ analyzed, observations, episodes, stats: input.stats }),
+      reduceInput({ analyzed, observations, episodes, stats: input.stats, axisBalance }),
       options,
       stageError("reduce-failed", failed, chunks.length),
     )

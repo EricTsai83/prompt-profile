@@ -90,6 +90,7 @@ export const reduceInput = (input: {
   readonly observations: ReadonlyArray<Observation>
   readonly episodes: ReadonlyArray<SelectedEpisode>
   readonly stats: Stats
+  readonly axisBalance?: AxisBalance
 }): string => {
   const citedIds = new Set([
     ...input.observations.flatMap((o) => o.evidence.map((e) => e.promptId)),
@@ -104,7 +105,7 @@ export const reduceInput = (input: {
       time: p.timestamp.toString(),
     }))
   const contextSources = sourceContext(prompts, citedIds)
-  return `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(input.episodes))}\n\nobservations:\n${observationsText(input.observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
+  return `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}${input.axisBalance ? `\n\naxisBalance:\n${JSON.stringify(input.axisBalance)}` : ""}\n\nepisodes:\n${JSON.stringify(episodesForReduce(input.episodes))}\n\nobservations:\n${observationsText(input.observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
 }
 
 export interface Drafts {
@@ -149,6 +150,39 @@ const sessionKey = (p: { readonly source: string; readonly sessionId: string }) 
  * Turn the reviewed draft into the profile, keeping only what its evidence supports. Global
  * summaries have no direct citations: they are conservatively reset when anything was rejected.
  */
+/** Share of cited evidence that may fail verification before the summaries are withheld. */
+export const MAX_DROPPED_SHARE = 0.2
+
+/** Longest role name, in words (English, before translation). */
+export const MAX_ROLE_NAME_WORDS = 5
+
+/** Role names that say nothing about the person: one of these words, with "The" at most. */
+export const GENERIC_ROLE_WORDS: ReadonlyArray<string> = [
+  "developer",
+  "engineer",
+  "programmer",
+  "coder",
+  "collaborator",
+  "user",
+  "builder",
+  "maker",
+  "professional",
+]
+
+/** A role name is kept when it has 1–MAX_ROLE_NAME_WORDS words and is not a generic label. */
+export const validRoleName = (name: string): boolean => {
+  const words = name
+    .trim()
+    .split(/\s+/)
+    .filter((w) => w !== "")
+  if (words.length === 0 || words.length > MAX_ROLE_NAME_WORDS) return false
+  const meaningful = words.filter((w) => !/^the$/i.test(w))
+  return !(
+    meaningful.length === 1 &&
+    GENERIC_ROLE_WORDS.includes(meaningful[0]!.toLowerCase().replace(/[^a-z]/g, ""))
+  )
+}
+
 export const verifyProfile = (input: {
   readonly drafts: Drafts
   readonly runnerId: RunnerId
@@ -235,9 +269,11 @@ export const verifyProfile = (input: {
   const traits = verifyTraits(profile.traits, texts, counts, originOf(outcomes))
   const dimensions = verifyDimensions(profile.dimensions, texts, counts)
   const improvements = verifyImprovements(profile.improvements.slice(0, 2), texts, counts)
+  // A fabricated quote drops its own item; only a large share of them, a rejected narrative
+  // or nothing supported at all makes the summaries (headline, role, portrait) unsafe.
   const summariesUnsafe =
     narrativeRejected ||
-    counts.dropped > 0 ||
+    counts.dropped > MAX_DROPPED_SHARE * (counts.kept + counts.dropped) ||
     !(portrait || traits.length || improvements.length || dimensions.some((d) => d.evidence.length))
   return {
     counts,
@@ -250,9 +286,9 @@ export const verifyProfile = (input: {
         : {
             ...profile.archetype,
             // the model's synthesized name; the stable names only fill an empty answer
-            name:
-              profile.archetype.name.trim() ||
-              (code ? ROLE_NAMES[code]! : "Collaboration Portrait"),
+            name: validRoleName(profile.archetype.name)
+              ? profile.archetype.name.trim()
+              : (traits[0]?.name ?? (code ? ROLE_NAMES[code]! : "Collaboration Portrait")),
           },
       traits,
       collaboration,
