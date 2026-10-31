@@ -1,6 +1,6 @@
 import { DateTime, Order } from "effect"
 import { createHash } from "node:crypto"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
+import type { PromptRecord } from "../domain/index.ts"
 import { increment, type Counts } from "./counts.ts"
 
 /** Long text repeated across this many distinct sessions is treated as machine-generated. */

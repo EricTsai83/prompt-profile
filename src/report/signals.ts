@@ -1,4 +1,4 @@
-import type { Stats } from "../domain/Stats.ts"
+import type { Stats } from "../domain/index.ts"
 
 /**
  * Deterministic prompting signals (plan 16): a number from `stats` and a threshold. Only

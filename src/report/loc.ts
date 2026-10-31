@@ -1,4 +1,4 @@
-import type { Language, Profile } from "../domain/Profile.ts"
+import type { Language, Profile } from "../domain/index.ts"
 import { contentIn, type Content } from "./content.ts"
 import { escapeHtml, html, raw, type Raw } from "./html-template.ts"
 import { MESSAGES, type Messages } from "./messages.ts"

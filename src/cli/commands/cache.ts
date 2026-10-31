@@ -1,5 +1,5 @@
 import { Effect } from "effect"
-import { AnalysisCache } from "../../analysis/cache.ts"
+import { AnalysisCache } from "../../analysis/index.ts"
 import { messages } from "../messages.ts"
 import { Output } from "../services.ts"
 

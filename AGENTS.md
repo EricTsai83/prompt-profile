@@ -10,28 +10,36 @@ Product decisions, architecture and the development plan: [`plans/README.md`](./
 
 ```
 src/
-  bin.ts          the entry point; just calls cli/main.ts
+  bin.ts          the entry point; just calls cli/
   standalone.ts   entry of the Bun binaries: registers embedded assets, then runs bin.ts
+  version.ts      the package version
   cli/            effect/cli commands and UX: main.ts (flags), commands/ (one flow per command),
-                  steps.ts (steps shared by commands), options.ts (flag parsing),
-                  messages.ts (every printed line), render-error.ts
+                  steps.ts (steps shared by commands), library.ts (report publication),
+                  options.ts (flag parsing), messages.ts (every printed line), render-error.ts
   domain/         schemas and pure functions (PromptRecord, Stats, Profile…); imports no other folder
   adapters/       read each source's local data → PromptRecord (common/, claude-code/, codex/, registry.ts)
-  pipeline/       filter → clean → redact → truncate, plus stats
+  pipeline/       process.ts: filter → clean → redact → truncate, plus stats and the output check
   llm/            LlmRunner interface + claude / codex / fake runners + detect.ts (NOTES.md: CLI behaviour)
-  analysis/       chunk → map → verify → merge → reduce, the cache and prompts/*.md
-  report/         Profile → HTML report + PNG card (messages.ts: every text; theme.ts: every look's
-                  colors, type, spacing, layout choices and card layout)
-  platform/       environment (Environment service), private file writes, cache folder
+  analysis/       analyze.ts runs chunk → map → verify → merge → reduce → translate; the cache and
+                  prompts/*.md
+  report/         Profile → HTML report + PNG card: html.ts assembles the sections (activity.ts,
+                  traits.ts, coaching.ts, …); messages.ts: every text; theme.ts: every look's
+                  colors, type, spacing, layout choices and card layout
+  platform/       environment (Environment service), private file writes, cache folder, report
+                  library and execution records
 test/
   <module>/       unit tests per src/ module
+  architecture/   the module rules below, checked on every src/ import
   fixtures/       hand-written fake data (never real personal data)
   smoke/          real local data / real CLIs; skipped when missing
 ```
 
-Dependencies: `cli → analysis → llm → domain`; `cli → pipeline / adapters / report → domain`.
-`domain/` depends on nothing else; `analysis/` only on the `LlmRunner` interface; `report/` only
-consumes `Profile`.
+Every `src/` folder is a module and its `index.ts` is its interface: other modules import only
+that file (tests may import a module's internals). Dependencies: `cli → analysis → llm → domain`;
+`analysis → pipeline / platform`; `cli → pipeline / adapters / report / platform → domain`;
+`report → platform`. `domain/` depends on nothing else; `analysis/` only on the `LlmRunner`
+interface; `report/` only consumes `Profile`; source adapters share code only through
+`adapters/common/`. `test/architecture/boundaries.test.ts` enforces these rules.
 
 ## Commands
 

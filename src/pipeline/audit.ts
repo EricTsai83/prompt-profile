@@ -1,4 +1,4 @@
-import { MAX_QUOTE_LENGTH, type Profile } from "../domain/Profile.ts"
+import { MAX_QUOTE_LENGTH, type Profile } from "../domain/index.ts"
 import { makeRules, type RedactRule } from "./redact.ts"
 
 /**
@@ -34,7 +34,6 @@ export const PERSONAL_RULES = [
   "phone",
 ] as const
 
-export type SecretRule = (typeof SECRET_RULES)[number]
 export type PersonalRule = (typeof PERSONAL_RULES)[number]
 
 export const CHECK_MODES = ["mask", "warn", "strict"] as const

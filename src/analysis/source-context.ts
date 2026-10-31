@@ -1,5 +1,4 @@
-import type { SafePrompt } from "../domain/SafePrompt.ts"
-import { truncateQuote } from "../domain/llm/LlmSchemas.ts"
+import { type SafePrompt, truncateQuote } from "../domain/index.ts"
 
 /** Additional source context is bounded independently of the merged observations. */
 export const SOURCE_CONTEXT_LIMIT = 20_000

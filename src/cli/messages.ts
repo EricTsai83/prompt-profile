@@ -1,6 +1,6 @@
-import type { ExecutionRecord } from "../domain/Execution.ts"
-import type { Finding } from "../pipeline/audit.ts"
-import type { ReportContents } from "../report/visibility.ts"
+import type { ExecutionRecord } from "../domain/index.ts"
+import type { Finding } from "../pipeline/index.ts"
+import type { ReportContents } from "../report/index.ts"
 
 const n = (x: number) => x.toLocaleString("en")
 

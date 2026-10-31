@@ -1,5 +1,4 @@
-import { isAnalysisPrompt } from "../../domain/markers.ts"
-import type { Origin } from "../../domain/Source.ts"
+import { isAnalysisPrompt, type Origin } from "../../domain/index.ts"
 import type { ExcludeRule } from "../common/rules.ts"
 import type { SessionMeta } from "./schema.ts"
 

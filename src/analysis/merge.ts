@@ -1,4 +1,17 @@
-import type { Observation } from "../domain/ChunkObservations.ts"
+import { Effect, Option } from "effect"
+import {
+  fromLlmChunkObservations,
+  LlmChunkObservations,
+  type Observation,
+} from "../domain/index.ts"
+import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/index.ts"
+import { AnalysisCache } from "./cache.ts"
+import type { AnalyzeError } from "./errors.ts"
+import { sha256 } from "./hash.ts"
+import { DEFAULT_CONCURRENCY, keyParts, type AnalyzeOptions } from "./plan.ts"
+import { Progress } from "./progress.ts"
+import { loadPrompt } from "./prompts.ts"
+import { verifyObservations } from "./verify.ts"
 
 /** Observations above this many characters are merged in groups before the final reduce. */
 export const REDUCE_INPUT_LIMIT = 100_000
@@ -105,3 +118,71 @@ export const retainOmittedEvidence = (
   const retained = new Set(merged.flatMap((o) => o.evidence.map(key)))
   return [...merged, ...original.filter((o) => o.evidence.every((e) => !retained.has(key(e))))]
 }
+
+const OBSERVATIONS_SCHEMA = makeLlmSchema("LlmChunkObservations", LlmChunkObservations)
+
+/**
+ * The merge stage: while the observations are above the reduce input limit, merge them in
+ * groups (at most 3 rounds, stopping early when a round barely shrinks them). Merged
+ * observations are verified against `texts` on every path, cached or not: the cache stores
+ * raw LLM output.
+ */
+export const mergeObservations = (input: {
+  readonly observations: ReadonlyArray<Observation>
+  /** The text of every prompt, by prompt id. */
+  readonly texts: ReadonlyMap<string, string>
+  /** Caps the evidence of merged observations. */
+  readonly cap: (observations: ReadonlyArray<Observation>) => ReadonlyArray<Observation>
+  readonly options: AnalyzeOptions
+  readonly onError: (cause: LlmError) => AnalyzeError
+}): Effect.Effect<ReadonlyArray<Observation>, AnalyzeError, LlmRunner | AnalysisCache | Progress> =>
+  Effect.gen(function* () {
+    const runner = yield* LlmRunner
+    const cache = yield* AnalysisCache
+    const progress = yield* Progress
+    const { options, cap } = input
+    const limit = options.reduceInputLimit ?? REDUCE_INPUT_LIMIT
+    const merge = (group: ReadonlyArray<Observation>, budget: number) =>
+      Effect.gen(function* () {
+        const text = observationsText(group)
+        const parts = keyParts("merge", sha256(text, String(budget)), runner.id, options)
+        const cached = options.noCache ? Option.none() : yield* cache.get(parts)
+        if (Option.isSome(cached)) yield* progress.onMergeCacheHit ?? Effect.void
+        const value = Option.isSome(cached)
+          ? cached.value.value
+          : yield* runner
+              .generate({
+                stage: "merge",
+                system: `${loadPrompt("merge")}\n\nReturn at most ${budget} observations.`,
+                prompt: text,
+                schema: OBSERVATIONS_SCHEMA,
+              })
+              .pipe(
+                Effect.flatMap((result) => {
+                  const fresh = fromLlmChunkObservations(result.value, parts.inputId)
+                  return cache
+                    .set({ ...parts, producedBy: result.model, value: fresh })
+                    .pipe(Effect.as(fresh))
+                }),
+              )
+        const merged = verifyObservations(value, input.texts).observations
+        return retainOmittedEvidence(group, retainOmittedEvidence(merged, cap(merged)))
+      })
+
+    let observations = input.observations
+    for (let round = 0; round < 3; round++) {
+      const before = observationsText(observations).length
+      if (before <= limit) break
+      const groups = groupForMerge(observations, limit)
+      yield* progress.onMergeStart(groups.length)
+      const merged = yield* Effect.forEach(
+        groups,
+        (group) => merge(group, mergeBudget(group.length, before, limit)),
+        { concurrency: options.concurrency ?? DEFAULT_CONCURRENCY },
+      ).pipe(Effect.mapError(input.onError))
+      observations = merged.flat()
+      // another round would not get much smaller either
+      if (observationsText(observations).length > before * (1 - MIN_MERGE_SHRINK)) break
+    }
+    return observations
+  })

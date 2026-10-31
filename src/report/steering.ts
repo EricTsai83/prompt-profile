@@ -1,4 +1,4 @@
-import type { Language, Profile } from "../domain/Profile.ts"
+import type { Language, Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { STEERING_MESSAGES } from "./messages.ts"

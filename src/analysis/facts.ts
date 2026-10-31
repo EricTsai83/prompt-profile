@@ -1,4 +1,4 @@
-import type { Stats } from "../domain/Stats.ts"
+import type { Stats } from "../domain/index.ts"
 
 /** Measured history only: prompt activity cannot establish working hours or completed work. */
 export const factsFromStats = (

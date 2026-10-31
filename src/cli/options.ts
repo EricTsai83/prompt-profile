@@ -1,8 +1,7 @@
-import type { Voice } from "../domain/Voice.ts"
-import { AVATAR_CHOICES, type AvatarChoice } from "../report/avatar.ts"
-import { DateTime, Effect } from "effect"
-import { LANGUAGES, type Language } from "../domain/Profile.ts"
+import { type Voice, LANGUAGES, type Language, EFFORTS, type Effort } from "../domain/index.ts"
 import {
+  AVATAR_CHOICES,
+  type AvatarChoice,
   CARD_PARTS,
   EXCLUDE_GROUPS,
   REPORT_PARTS,
@@ -10,9 +9,9 @@ import {
   type LookId,
   type RenderOptions,
   type ReportPart,
-} from "../report/looks.ts"
-import { PERSONAL_RULES, type PersonalRule } from "../pipeline/audit.ts"
-import { EFFORTS, type Effort } from "../domain/Effort.ts"
+} from "../report/index.ts"
+import { DateTime, Effect } from "effect"
+import { PERSONAL_RULES, type PersonalRule } from "../pipeline/index.ts"
 import { InvalidArgument } from "./errors.ts"
 
 /** Interpreting flag values. */

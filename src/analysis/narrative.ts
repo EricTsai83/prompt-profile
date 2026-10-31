@@ -1,7 +1,10 @@
-import type { NarrativePlan } from "../domain/Narrative.ts"
-import type { Portrait } from "../domain/Profile.ts"
-import type { Episode, Pattern } from "../domain/Episode.ts"
-import { truncateQuote } from "../domain/llm/LlmSchemas.ts"
+import {
+  type NarrativePlan,
+  type Portrait,
+  type Episode,
+  type Pattern,
+  truncateQuote,
+} from "../domain/index.ts"
 import { verifyCompleteEvidence } from "./verify.ts"
 
 /** Validate an outline as a whole: rejected support cannot leave narrative transitions behind. */

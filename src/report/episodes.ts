@@ -1,6 +1,5 @@
 import type { DateTime } from "effect"
-import type { Episode } from "../domain/Episode.ts"
-import type { Language, Profile } from "../domain/Profile.ts"
+import type { Episode, Language, Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { EPISODE_MESSAGES } from "./messages.ts"

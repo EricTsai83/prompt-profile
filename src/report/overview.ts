@@ -1,5 +1,4 @@
-import type { Profile } from "../domain/Profile.ts"
-import { PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/Techniques.ts"
+import { type Profile, PROMPT_TECHNIQUES, TOOL_TECHNIQUES } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { viewMessages } from "./messages.ts"

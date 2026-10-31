@@ -7,8 +7,8 @@ import { makeClaudeCodeRunner } from "../../src/llm/claude.ts"
 import { makeCodexRunner } from "../../src/llm/codex.ts"
 import { classifyFailure, CLASSIFY_RULES, sanitizeStderr } from "../../src/llm/classify.ts"
 import { makeFakeLlmRunner, fakeHash } from "../../src/llm/fake.ts"
+import { ANALYSIS_MARKER } from "../../src/domain/markers.ts"
 import {
-  ANALYSIS_MARKER,
   InvalidOutput,
   makeLlmSchema,
   NotLoggedIn,

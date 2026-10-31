@@ -1,11 +1,11 @@
-import type { Stats } from "../domain/Stats.ts"
 import {
+  type Stats,
   TOOL_TECHNIQUES,
   type PromptTechnique,
   type SkillUse,
   type Techniques,
   type ToolTechnique,
-} from "../domain/Techniques.ts"
+} from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import type { Messages } from "./messages.ts"

@@ -1,90 +1,118 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, lstat, readdir, readFile } from "node:fs/promises"
-import { join } from "node:path"
+import { Effect, FileSystem, Path } from "effect"
 import {
   parseExecution,
   summarizeExecution,
   EXECUTION_VERSION,
   type ExecutionRecord,
-} from "../domain/Execution.ts"
-import { writeLibraryFile } from "./library.ts"
+} from "../domain/index.ts"
+import { FileError, isNotFound, toFileError, writePrivateFile } from "./files.ts"
 
 const ID = /^[0-9a-f-]{36}$/u
-const directory = async (root: string, create: boolean) => {
-  if (create) await mkdir(root, { recursive: true, mode: 0o700 })
-  const folder = join(root, "executions")
-  if (create)
-    await mkdir(folder, { mode: 0o700 }).catch((e: unknown) => {
-      if ((e as { code?: string }).code !== "EEXIST") throw e
-    })
-  const info = await lstat(folder)
-  if (!info.isDirectory() || info.isSymbolicLink()) throw new Error("Unsafe executions directory")
-  return folder
-}
-const recordDirectory = async (root: string, id: string) => {
-  if (!ID.test(id)) throw new Error("Invalid execution identity")
-  const folder = join(await directory(root, false), id)
-  const info = await lstat(folder)
-  if (!info.isDirectory() || info.isSymbolicLink()) throw new Error("Unsafe execution directory")
-  return folder
-}
-export const saveExecution = async (root: string, record: ExecutionRecord): Promise<void> => {
-  const folder = await recordDirectory(root, record.id)
-  await writeLibraryFile(join(folder, "summary.json"), `${JSON.stringify(record, null, 2)}\n`)
-}
-export const createExecution = async (root: string, startedAtMs = Date.now()) => {
-  const folder = await directory(root, true)
-  const id = randomUUID()
-  await mkdir(join(folder, id), { mode: 0o700 })
-  const initial: ExecutionRecord = {
-    version: EXECUTION_VERSION,
-    id,
-    operation: "analyze",
-    stopReason: null,
-    engine: null,
-    requestedModel: null,
-    limits: { maxCalls: null, maxCostUsd: null },
-    accountingFinishedAtMs: null,
-    startedAtMs,
-    finishedAtMs: null,
-    outcome: "running",
-    reportId: null,
-    analysis: "pending",
-    languages: [],
-    artifacts: [],
-    attempts: [],
-    summary: summarizeExecution([], 0, startedAtMs, startedAtMs),
-  }
-  await saveExecution(root, initial)
-  return { id, file: join(folder, id, "summary.json") }
-}
-/** Unfinished checkpoints cannot establish whether a process is still alive. Never mark them successful. */
-export const listExecutions = async (root: string) => {
-  const records: ExecutionRecord[] = []
-  let skipped = 0
-  let folder: string
-  try {
-    folder = await directory(root, false)
-  } catch (e) {
-    if ((e as { code?: string }).code === "ENOENT") return { records, skipped }
-    throw e
-  }
-  for (const id of await readdir(folder)) {
-    try {
-      const dir = await recordDirectory(root, id)
-      const file = join(dir, "summary.json")
-      const info = await lstat(file)
-      if (!info.isFile() || info.isSymbolicLink() || info.size > 10_000_000)
-        throw new Error("Unsafe execution record")
-      const record = parseExecution(JSON.parse(await readFile(file, "utf8")))
-      if (!record || record.id !== id) throw new Error("Invalid execution record")
-      records.push(record.outcome === "running" ? { ...record, outcome: "unknown" } : record)
-    } catch {
-      skipped++
+
+/** `<root>/executions`, never a symlink. */
+const directory = (root: string, create: boolean) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const folder = (yield* Path.Path).join(root, "executions")
+    if (create) {
+      yield* fs.makeDirectory(root, { recursive: true, mode: 0o700 })
+      yield* fs.makeDirectory(folder, { mode: 0o700 }).pipe(
+        Effect.catchIf(
+          (e) => e.reason._tag === "AlreadyExists",
+          () => Effect.void,
+        ),
+      )
     }
-  }
-  return {
-    records: records.toSorted((a, b) => b.startedAtMs - a.startedAtMs || a.id.localeCompare(b.id)),
-    skipped,
-  }
-}
+    if ((yield* fs.lstat(folder)).type !== "Directory")
+      return yield* new FileError({ path: folder, detail: "Unsafe executions directory" })
+    return folder
+  })
+
+const recordDirectory = (root: string, id: string) =>
+  Effect.gen(function* () {
+    if (!ID.test(id))
+      return yield* new FileError({ path: root, detail: "Invalid execution identity" })
+    const folder = (yield* Path.Path).join(yield* directory(root, false), id)
+    if ((yield* (yield* FileSystem.FileSystem).lstat(folder)).type !== "Directory")
+      return yield* new FileError({ path: folder, detail: "Unsafe execution directory" })
+    return folder
+  })
+
+/** Replace an execution's `summary.json` (written privately and atomically). */
+export const saveExecution = (root: string, record: ExecutionRecord) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const folder = yield* recordDirectory(root, record.id)
+    yield* writePrivateFile(
+      fs,
+      path,
+      path.join(folder, "summary.json"),
+      `${JSON.stringify(record, null, 2)}\n`,
+    )
+  }).pipe(Effect.mapError(toFileError(root)))
+
+/** Start a new execution record ("running") and return its identity and summary file. */
+export const createExecution = (root: string, startedAtMs: number) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const folder = yield* directory(root, true)
+    const id = randomUUID()
+    yield* fs.makeDirectory(path.join(folder, id), { mode: 0o700 })
+    const initial: ExecutionRecord = {
+      version: EXECUTION_VERSION,
+      id,
+      operation: "analyze",
+      stopReason: null,
+      engine: null,
+      requestedModel: null,
+      limits: { maxCalls: null, maxCostUsd: null },
+      accountingFinishedAtMs: null,
+      startedAtMs,
+      finishedAtMs: null,
+      outcome: "running",
+      reportId: null,
+      analysis: "pending",
+      languages: [],
+      artifacts: [],
+      attempts: [],
+      summary: summarizeExecution([], 0, startedAtMs, startedAtMs),
+    }
+    yield* saveExecution(root, initial)
+    return { id, file: path.join(folder, id, "summary.json") }
+  }).pipe(Effect.mapError(toFileError(root)))
+
+const readRecord = (root: string, id: string) =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const file = (yield* Path.Path).join(yield* recordDirectory(root, id), "summary.json")
+    const info = yield* fs.lstat(file)
+    if (info.type !== "File" || info.size > 10_000_000n) return null
+    const text = yield* fs.readFileString(file)
+    const record = parseExecution(yield* Effect.try(() => JSON.parse(text) as unknown))
+    return record && record.id === id ? record : null
+  }).pipe(Effect.orElseSucceed(() => null))
+
+/** Unfinished checkpoints cannot establish whether a process is still alive. Never mark them successful. */
+export const listExecutions = (root: string) =>
+  Effect.gen(function* () {
+    const records: ExecutionRecord[] = []
+    let skipped = 0
+    const folder = yield* directory(root, false).pipe(
+      Effect.catchIf(isNotFound, () => Effect.succeed(null)),
+    )
+    if (folder === null) return { records, skipped }
+    for (const id of yield* (yield* FileSystem.FileSystem).readDirectory(folder)) {
+      const record = yield* readRecord(root, id)
+      if (record === null) skipped++
+      else records.push(record.outcome === "running" ? { ...record, outcome: "unknown" } : record)
+    }
+    return {
+      records: records.toSorted(
+        (a, b) => b.startedAtMs - a.startedAtMs || a.id.localeCompare(b.id),
+      ),
+      skipped,
+    }
+  }).pipe(Effect.mapError(toFileError(root)))

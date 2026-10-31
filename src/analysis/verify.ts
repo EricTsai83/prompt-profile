@@ -1,5 +1,11 @@
-import type { ChunkObservations } from "../domain/ChunkObservations.ts"
-import type { Confidence, Dimension, Evidence, Improvement, Trait } from "../domain/Profile.ts"
+import type {
+  ChunkObservations,
+  Confidence,
+  Dimension,
+  Evidence,
+  Improvement,
+  Trait,
+} from "../domain/index.ts"
 import { escapeText, unescapeText } from "./chunk.ts"
 
 /**

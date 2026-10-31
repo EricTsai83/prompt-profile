@@ -1,5 +1,5 @@
 import { Effect, type FileSystem, Option, Schema } from "effect"
-import { planCode, UNKNOWN_PLAN, type PlanInfo } from "../../domain/Usage.ts"
+import { planCode, UNKNOWN_PLAN, type PlanInfo } from "../../domain/index.ts"
 
 /**
  * The ChatGPT plan Codex runs on, from `auth.json` (plan 23; undocumented format). Only the

@@ -1,15 +1,21 @@
-import type { AvatarChoice } from "../../report/avatar.ts"
-import { archivedSource, protectsAnalysisDirectory } from "../../platform/library.ts"
-import { libraryIo } from "../library.ts"
+import {
+  type AvatarChoice,
+  reportContents,
+  isDefaultRender,
+  variantName,
+  type LookId,
+} from "../../report/index.ts"
+import {
+  archivedSource,
+  Environment,
+  FileError,
+  protectsAnalysisDirectory,
+} from "../../platform/index.ts"
 import { Effect, FileSystem, Path } from "effect"
-import type { CheckMode } from "../../pipeline/audit.ts"
-import { decodeProfile } from "../../domain/Profile.ts"
-import { Environment } from "../../platform/Environment.ts"
-import { FileError } from "../errors.ts"
+import type { CheckMode } from "../../pipeline/index.ts"
+import { decodeProfile } from "../../domain/index.ts"
 import { messages, summaryLines } from "../messages.ts"
-import { reportContents } from "../../report/index.ts"
 import { Output } from "../services.ts"
-import { isDefaultRender, variantName, type LookId } from "../../report/looks.ts"
 import { parseAllow, parseRenderOptions } from "../options.ts"
 import { resolveOut, writeReportFiles } from "../steps.ts"
 
@@ -50,7 +56,7 @@ export const runRender = (options: {
       catch: () => new FileError({ path: input, detail: "not valid JSON" }),
     })
     const profile = yield* decodeProfile(json)
-    const archive = yield* libraryIo(input, () => archivedSource(input))
+    const archive = yield* archivedSource(input)
     const outDir = options.out
       ? yield* resolveOut(options.out)
       : archive
@@ -58,7 +64,7 @@ export const runRender = (options: {
         : isDefaultRender(renderOptions)
           ? path.dirname(input)
           : path.join(path.dirname(input), "variants", variantName(renderOptions))
-    if (yield* libraryIo(outDir, () => protectsAnalysisDirectory(outDir)))
+    if (yield* protectsAnalysisDirectory(outDir))
       return yield* new FileError({
         path: outDir,
         detail:

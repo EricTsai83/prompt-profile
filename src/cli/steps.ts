@@ -1,23 +1,29 @@
-import { selectContext } from "../pipeline/context.ts"
+import {
+  selectContext,
+  checkOutput,
+  type CheckMode,
+  processRecords,
+  type PipelineReport,
+  withSkillCatalog,
+  type SourceUsageInput,
+} from "../pipeline/index.ts"
 import { Clock, DateTime, Effect, FileSystem, Path } from "effect"
-import { makeAdapters, readSources as readAdapters } from "../adapters/registry.ts"
-import { decodeProfile, type Profile } from "../domain/Profile.ts"
-import { snapshotOf } from "../domain/Progress.ts"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
-import type { TechniqueEvent } from "../domain/Techniques.ts"
-import type { SkillOrigin } from "../domain/SourceAdapter.ts"
-import { checkOutput, type CheckMode } from "../pipeline/audit.ts"
-import { processRecords, type PipelineReport } from "../pipeline/index.ts"
-import { withSkillCatalog } from "../pipeline/techniques.ts"
-import { readSkillCatalog } from "../adapters/claude-code/skills.ts"
-import { resolveClaudeRoot } from "../adapters/claude-code/adapter.ts"
-import { Environment } from "../platform/Environment.ts"
-import { UNKNOWN_PLAN } from "../domain/Usage.ts"
-import type { SourceUsageInput } from "../pipeline/usage.ts"
-import { writePrivateFile } from "../platform/files.ts"
-import { resolveCacheDir } from "../platform/paths.ts"
+import {
+  makeAdapters,
+  readSources as readAdapters,
+  readSkillCatalog,
+  resolveClaudeRoot,
+} from "../adapters/index.ts"
+import {
+  type Profile,
+  type PromptRecord,
+  type TechniqueEvent,
+  type SkillOrigin,
+  UNKNOWN_PLAN,
+} from "../domain/index.ts"
+import { Environment, FileError, writePrivateFile, resolveCacheDir } from "../platform/index.ts"
 import { writeReport, type RenderOptions } from "../report/index.ts"
-import { FileError, InvalidArgument, NoData, OutputCheckBlocked } from "./errors.ts"
+import { InvalidArgument, NoData, OutputCheckBlocked } from "./errors.ts"
 import { messages as t } from "./messages.ts"
 import { parseSince } from "./options.ts"
 import { FontSource, Output } from "./services.ts"
@@ -263,20 +269,4 @@ export const writeReportFiles = (
       Effect.mapError((e) => new FileError({ path: outDir, detail: e.message })),
     )
     return { ...files, findings: result.findings, profile: result.profile }
-  })
-
-/** The key numbers of `<outDir>/profile.json`, if it exists and decodes; otherwise null. */
-export const previousSnapshot = (outDir: string) =>
-  Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem
-    const path = yield* Path.Path
-    const text = yield* fs
-      .readFileString(path.join(outDir, "profile.json"))
-      .pipe(Effect.orElseSucceed(() => null))
-    if (text === null) return null
-    return yield* Effect.try(() => JSON.parse(text) as unknown).pipe(
-      Effect.flatMap(decodeProfile),
-      Effect.map(snapshotOf),
-      Effect.orElseSucceed(() => null),
-    )
   })

@@ -1,4 +1,4 @@
-import { isAnalysisPrompt } from "../../domain/markers.ts"
+import { isAnalysisPrompt } from "../../domain/index.ts"
 import type { ExcludeRule } from "../common/rules.ts"
 import type { ClaudeLine } from "./schema.ts"
 

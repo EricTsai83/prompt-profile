@@ -1,4 +1,4 @@
-import type { AdapterDiagnostics } from "../../domain/SourceAdapter.ts"
+import type { AdapterDiagnostics } from "../../domain/index.ts"
 
 const sortedKeys = (counts: Record<string, number>): Record<string, number> =>
   Object.fromEntries(Object.entries(counts).toSorted(([a], [b]) => a.localeCompare(b)))

@@ -1,12 +1,12 @@
-import { VOICES, DEFAULT_VOICE } from "../domain/Voice.ts"
-import { AVATAR_CHOICES } from "../report/avatar.ts"
+import { VOICES, DEFAULT_VOICE } from "../domain/index.ts"
+import { AVATAR_CHOICES, LOOK_IDS } from "../report/index.ts"
 import { runHistory } from "./commands/history.ts"
 import { Effect, Option } from "effect"
 import { Argument, Command, Flag } from "effect/cli"
 import { CliError } from "effect/cli"
-import { fileCacheLayer } from "../analysis/cache.ts"
-import type { RunnerId } from "../llm/LlmRunner.ts"
-import { Environment } from "../platform/Environment.ts"
+import { fileCacheLayer } from "../analysis/index.ts"
+import type { RunnerId } from "../llm/index.ts"
+import { Environment } from "../platform/index.ts"
 import { VERSION } from "../version.ts"
 import { Exit } from "./errors.ts"
 import {
@@ -20,8 +20,7 @@ import { runFlags, runMain, type MainOptions } from "./commands/analyze.ts"
 import { runCacheClear } from "./commands/cache.ts"
 import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
-import { CHECK_MODES } from "../pipeline/audit.ts"
-import { LOOK_IDS } from "../report/looks.ts"
+import { CHECK_MODES } from "../pipeline/index.ts"
 import {
   DEFAULT_OUT,
   launcherOf,

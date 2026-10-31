@@ -1,10 +1,15 @@
 import { DateTime } from "effect"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
-import { ORIGINS, SOURCE_IDS } from "../domain/Source.ts"
-import { LONG_SESSION_PROMPTS, MAX_ACTIVITY_PROJECTS, type Stats } from "../domain/Stats.ts"
+import {
+  type PromptRecord,
+  ORIGINS,
+  SOURCE_IDS,
+  LONG_SESSION_PROMPTS,
+  MAX_ACTIVITY_PROJECTS,
+  type Stats,
+  type TechniqueEvent,
+} from "../domain/index.ts"
 import { openingKey } from "./filter.ts"
 import { techniquesOf } from "./techniques.ts"
-import type { TechniqueEvent } from "../domain/Techniques.ts"
 
 /** Corrections addressed to the AI (case-insensitive; matched anywhere in the prompt). */
 export const CORRECTION_PATTERNS: ReadonlyArray<RegExp> = [

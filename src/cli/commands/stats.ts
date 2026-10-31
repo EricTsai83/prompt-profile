@@ -1,5 +1,5 @@
 import { Effect, Path } from "effect"
-import { encodeStats, peakHour } from "../../domain/Stats.ts"
+import { encodeStats, peakHour } from "../../domain/index.ts"
 import { VERSION } from "../../version.ts"
 import { messages } from "../messages.ts"
 import { Output } from "../services.ts"

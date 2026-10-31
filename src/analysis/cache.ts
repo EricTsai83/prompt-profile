@@ -1,6 +1,6 @@
 import { Context, Data, Effect, FileSystem, Layer, Option, Path, Schema } from "effect"
-import { ChunkObservations } from "../domain/ChunkObservations.ts"
-import { writePrivateFile } from "../platform/files.ts"
+import { ChunkObservations } from "../domain/index.ts"
+import { writePrivateFile } from "../platform/index.ts"
 import { sha256 } from "./hash.ts"
 
 /** One sub-folder per kind. These hold prompt excerpts; the cache folder also holds fonts. */

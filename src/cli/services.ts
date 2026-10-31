@@ -1,11 +1,15 @@
-import type { CjkFonts } from "../report/index.ts"
-import { loadCjkFonts } from "../report/fonts.ts"
+import { type CjkFonts, loadCjkFonts } from "../report/index.ts"
 import { Console, Context, Effect, FileSystem, Layer, Path } from "effect"
 import { ChildProcess, ChildProcessSpawner } from "effect/process"
-import type { RunnerOptions } from "../llm/common.ts"
-import { detectAll, makeRunner, type RunnerStatus } from "../llm/detect.ts"
-import type { LlmRunnerShape, RunnerId } from "../llm/LlmRunner.ts"
-import { Environment } from "../platform/Environment.ts"
+import {
+  type RunnerOptions,
+  detectAll,
+  makeRunner,
+  type RunnerStatus,
+  type LlmRunnerShape,
+  type RunnerId,
+} from "../llm/index.ts"
+import { Environment } from "../platform/index.ts"
 
 // ---------------------------------------------------------------------------------------
 // LLM runners

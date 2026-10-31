@@ -6,8 +6,8 @@ import {
   type Language,
   type Profile,
   type Translation as TranslationType,
-} from "../domain/Profile.ts"
-import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
+} from "../domain/index.ts"
+import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/index.ts"
 import { TranslationFailed } from "./errors.ts"
 import { Progress } from "./progress.ts"
 

@@ -1,5 +1,4 @@
-import { axisState } from "../domain/Interaction.ts"
-import type { Language, Profile } from "../domain/Profile.ts"
+import { axisState, type Language, type Profile } from "../domain/index.ts"
 import { LIMITED_MESSAGES } from "./messages.ts"
 
 /**

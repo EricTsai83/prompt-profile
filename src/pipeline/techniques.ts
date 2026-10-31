@@ -1,6 +1,6 @@
 import { DateTime } from "effect"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
 import {
+  type PromptRecord,
   MAX_DETAILS,
   PROMPT_TECHNIQUES,
   TOOL_TECHNIQUES,
@@ -9,7 +9,7 @@ import {
   type TechniqueEvent,
   type Techniques,
   type ToolTechnique,
-} from "../domain/Techniques.ts"
+} from "../domain/index.ts"
 
 /**
  * Prompt-writing techniques as text heuristics (an extensible data list). They are approximate:

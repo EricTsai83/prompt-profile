@@ -1,7 +1,7 @@
 import { Context, Layer } from "effect"
 import { readlinkSync } from "node:fs"
 import { homedir, userInfo } from "node:os"
-import { isTimeZone } from "../domain/timezone.ts"
+import { isTimeZone } from "../domain/index.ts"
 
 /**
  * Everything environment-dependent, behind one service so tests can replace it.

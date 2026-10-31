@@ -3,7 +3,7 @@
  * the prompts, fonts and resvg wasm in the executable; register them by file name, then start
  * the same CLI as `bin.ts`.
  */
-import { registerAssets } from "./platform/assets.ts"
+import { registerAssets } from "./platform/index.ts"
 
 declare const Bun: { readonly embeddedFiles: ReadonlyArray<Blob & { readonly name: string }> }
 

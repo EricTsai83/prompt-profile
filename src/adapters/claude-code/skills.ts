@@ -1,7 +1,6 @@
 import { Effect, FileSystem, Path } from "effect"
-import type { SkillOrigin } from "../../domain/SourceAdapter.ts"
-
-export type { SkillOrigin }
+import type { SkillOrigin } from "../../domain/index.ts"
+import { clipDescription } from "../common/skills.ts"
 
 export interface SkillInfo {
   readonly description: string | null
@@ -30,11 +29,6 @@ export const BUILTIN_SKILLS: Readonly<Record<string, string>> = {
   "plugin-authoring": "Build or change a Claude Code plugin (mods, hooks, commands)",
 }
 
-const MAX_DESCRIPTION = 220
-
-export const clipDescription = (value: string): string =>
-  value.length > MAX_DESCRIPTION ? `${value.slice(0, MAX_DESCRIPTION - 1).trimEnd()}…` : value
-
 /** `- name: description` lines of a Claude Code skill listing. */
 export const parseSkillListing = (content: string): Array<[name: string, description: string]> =>
   [...content.matchAll(/^- ([\w.:@/-]{1,80}):\s*(\S.*)$/gm)].map((m) => [
@@ -60,9 +54,7 @@ export const frontMatterDescription = (text: string): string | null => {
   }
   value = value.replace(/^["']|["']$/g, "").trim()
   if (value === "") return null
-  return value.length > MAX_DESCRIPTION
-    ? `${value.slice(0, MAX_DESCRIPTION - 1).trimEnd()}…`
-    : value
+  return clipDescription(value)
 }
 
 /**

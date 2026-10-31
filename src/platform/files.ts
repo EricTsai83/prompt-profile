@@ -1,5 +1,20 @@
-import { Effect, type FileSystem, type Path } from "effect"
+import { Data, Effect, PlatformError, type FileSystem, type Path } from "effect"
 import { randomUUID } from "node:crypto"
+
+/** A local file operation failed; `detail` is shown to the user. */
+export class FileError extends Data.TaggedError("FileError")<{
+  readonly path: string
+  readonly detail: string
+}> {}
+
+/** Turn a low-level failure into a {@link FileError} about `path`; a `FileError` is kept. */
+export const toFileError =
+  (path: string) =>
+  (e: PlatformError.PlatformError | FileError): FileError =>
+    e._tag === "FileError" ? e : new FileError({ path, detail: e.message })
+
+export const isNotFound = (e: unknown): boolean =>
+  PlatformError.isPlatformError(e) && e.reason._tag === "NotFound"
 
 /**
  * Write `data` to `file` privately: missing folders are created 0700, the file is 0600.

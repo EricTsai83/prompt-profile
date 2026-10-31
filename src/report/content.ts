@@ -1,6 +1,11 @@
-import { roleCode, ROLE_NAMES } from "../domain/Interaction.ts"
+import {
+  roleCode,
+  ROLE_NAMES,
+  type DimensionKey,
+  type Language,
+  type Profile,
+} from "../domain/index.ts"
 import { ROLE_NAMES_ZH } from "./messages.ts"
-import type { DimensionKey, Language, Profile } from "../domain/Profile.ts"
 
 /** The generated text in one language: English is the base, others come from `translations`. */
 export interface Content {

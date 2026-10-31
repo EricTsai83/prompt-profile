@@ -1,38 +1,62 @@
-import { costOf, PRICING_VERSION } from "../../pipeline/pricing.ts"
-import { TOKEN_KINDS, ZERO_TOKENS } from "../../domain/Usage.ts"
-import { withCostStop } from "../../llm/cost-budget.ts"
-import { generationOf } from "../../domain/Execution.ts"
-import { makeExecutionAccounting } from "../../llm/accounting.ts"
-import { createExecution, saveExecution } from "../../platform/executions.ts"
-import { DEFAULT_VOICE, type Voice } from "../../domain/Voice.ts"
-import type { Profile } from "../../domain/Profile.ts"
-import type { AvatarChoice } from "../../report/avatar.ts"
-import { variantName } from "../../report/looks.ts"
+import {
+  costOf,
+  PRICING_VERSION,
+  PIPELINE_VERSION,
+  type CheckMode,
+  summarizeUsage,
+  type SourceUsageInput,
+} from "../../pipeline/index.ts"
+import {
+  TOKEN_KINDS,
+  ZERO_TOKENS,
+  generationOf,
+  DEFAULT_VOICE,
+  type Voice,
+  type Profile,
+  compareHistory,
+  snapshotOf,
+  type SafePrompt,
+  type Stats,
+} from "../../domain/index.ts"
+import {
+  withCostStop,
+  makeExecutionAccounting,
+  chooseRunner,
+  DISPLAY_NAMES,
+  LlmRunner,
+  type RunnerId,
+  withCallBudget,
+  withRetry,
+  type RunnerStatus,
+} from "../../llm/index.ts"
+import {
+  createExecution,
+  Environment,
+  FileError,
+  saveExecution,
+  scanLibrary,
+} from "../../platform/index.ts"
+import {
+  type AvatarChoice,
+  variantName,
+  type LookId,
+  isLimitedEvidence,
+  reportContents,
+} from "../../report/index.ts"
 import { writeAnalysisReport, previousProfile } from "../library.ts"
-import { compareHistory } from "../../domain/History.ts"
-import { scanLibrary } from "../../platform/library.ts"
-import { PIPELINE_VERSION } from "../../pipeline/version.ts"
-import { libraryIo } from "../library.ts"
-import { snapshotOf } from "../../domain/Progress.ts"
-import { Clock, DateTime, Effect, Exit, Path } from "effect"
+import { Clock, DateTime, Effect, Exit, FileSystem, Path, Semaphore } from "effect"
 import { Prompt } from "effect/cli"
-import { analyze, plan, type AnalysisPlan, type AnalyzeOptions } from "../../analysis/index.ts"
-import { Progress, type ProgressShape } from "../../analysis/progress.ts"
-import { chooseRunner } from "../../llm/detect.ts"
-import { DISPLAY_NAMES, LlmRunner, type RunnerId } from "../../llm/LlmRunner.ts"
-import { withCallBudget } from "../../llm/budget.ts"
-import { withRetry } from "../../llm/retry.ts"
-import { Environment } from "../../platform/Environment.ts"
-import type { CheckMode } from "../../pipeline/audit.ts"
-import type { LookId } from "../../report/looks.ts"
-import type { SafePrompt } from "../../domain/SafePrompt.ts"
-import type { Stats } from "../../domain/Stats.ts"
+import {
+  analyze,
+  plan,
+  type AnalysisPlan,
+  type AnalyzeOptions,
+  Progress,
+  type ProgressShape,
+} from "../../analysis/index.ts"
 import { VERSION } from "../../version.ts"
-import { summarizeUsage, type SourceUsageInput } from "../../pipeline/usage.ts"
-import type { RunnerStatus } from "../../llm/detect.ts"
 import { InvalidArgument, NeedsConfirmation } from "../errors.ts"
 import { messages, summaryLines, type Messages } from "../messages.ts"
-import { isLimitedEvidence, reportContents } from "../../report/index.ts"
 import {
   parseAllow,
   parseLanguages,
@@ -345,7 +369,7 @@ export const runMain = (options: MainOptions) =>
     }
 
     const startedAtMs = yield* Clock.currentTimeMillis
-    const execution = yield* libraryIo(outDir, () => createExecution(outDir, startedAtMs))
+    const execution = yield* createExecution(outDir, startedAtMs)
     const accounting = makeExecutionAccounting(execution.id, startedAtMs, (measurement) => {
       if (
         !measurement.tier ||
@@ -364,28 +388,28 @@ export const runMain = (options: MainOptions) =>
     })
     accounting.setLimits({ maxCalls, maxCostUsd })
     accounting.setEngine(base.id, options.model ?? null)
-    let saveQueue = Promise.resolve()
+    // One save at a time, each bounded by wall time: virtual (test) time and the model's
+    // retry clock must not decide when local file I/O has taken too long.
+    const saves = yield* Semaphore.make(1)
+    const timedOut = Effect.callback<never, FileError>((resume) => {
+      const timer = setTimeout(
+        () =>
+          resume(
+            Effect.fail(
+              new FileError({ path: execution.file, detail: "Execution checkpoint timed out" }),
+            ),
+          ),
+        5000,
+      )
+      return Effect.sync(() => clearTimeout(timer))
+    })
     const checkpoint = Effect.gen(function* () {
       const snapshot = accounting.record(yield* Clock.currentTimeMillis)
-      yield* libraryIo(execution.file, () => {
-        const next = saveQueue.then(() => saveExecution(outDir, snapshot))
-        saveQueue = next.catch(() => {})
-        return new Promise<void>((resolve, reject) => {
-          // Bound actual filesystem I/O independently of the model/retry clock.
-          const timer = setTimeout(() => reject(new Error("Execution checkpoint timed out")), 5000)
-          next.then(
-            () => {
-              clearTimeout(timer)
-              resolve()
-            },
-            (error) => {
-              clearTimeout(timer)
-              reject(error)
-            },
-          )
-        })
-      })
-    })
+      yield* saves.withPermits(1)(saveExecution(outDir, snapshot)).pipe(Effect.raceFirst(timedOut))
+    }).pipe(
+      Effect.provideService(FileSystem.FileSystem, yield* FileSystem.FileSystem),
+      Effect.provideService(Path.Path, path),
+    )
     accounting.setCheckpoint(checkpoint.pipe(Effect.orDie))
     const measured =
       maxCostUsd === null
@@ -439,7 +463,7 @@ export const runMain = (options: MainOptions) =>
         : summarizeUsage(withDetectedPlans(collected.usage, statuses), window)
       // The report in this folder before this run, if any: "since your last report".
       const previousReport = yield* previousProfile(outDir)
-      const priorIndex = yield* libraryIo(outDir, () => scanLibrary(outDir))
+      const priorIndex = yield* scanLibrary(outDir)
       const priorManifest = priorIndex.runs.find((r) => r.id === priorIndex.latest)
       const compared = previousReport
         ? compareHistory(

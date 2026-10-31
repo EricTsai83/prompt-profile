@@ -1,5 +1,4 @@
-import { RUN_ID, type LibraryIndex } from "../domain/Library.ts"
-import { ROLE_NAMES } from "../domain/Interaction.ts"
+import { RUN_ID, type LibraryIndex, ROLE_NAMES } from "../domain/index.ts"
 import { html } from "./html-template.ts"
 import { LIBRARY_MESSAGES, MESSAGES, ROLE_NAMES_ZH } from "./messages.ts"
 

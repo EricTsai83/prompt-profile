@@ -1,4 +1,4 @@
-import { readAsset } from "../platform/assets.ts"
+import { readAsset } from "../platform/index.ts"
 
 export type PromptName = "map" | "merge" | "reduce" | "review" | "translate"
 

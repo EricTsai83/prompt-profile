@@ -50,39 +50,47 @@ local data ──► adapters ──► pipeline ──────────�
 
 ```
 src/
-  bin.ts          # the single entry point (tsdown entry); only calls cli/main.ts
+  bin.ts          # the single entry point (tsdown entry); only calls cli/
   cli/            # effect/cli command definitions and UX (main.ts, commands/, steps.ts, options.ts, render-error.ts)
   domain/         # PromptRecord, Stats, Profile and other Schemas (depends on no other directory)
   adapters/
-    common/       # shared: SourceAdapter interface, JSONL streaming reader, dedup
+    common/       # shared by the sources: JSONL streaming reader, rules, skills, techniques
     claude-code/
     codex/
     registry.ts   # the list of all adapters; adding a source only touches this file
-  pipeline/       # filter.ts, clean.ts, redact.ts, stats.ts, techniques.ts, audit.ts (final output check)
+  pipeline/       # process.ts (filter → clean → redact), stats.ts, techniques.ts, audit.ts (final output check)
   llm/            # LlmRunner interface + claude / codex / fake implementations + detect.ts
-  analysis/       # chunk.ts, map.ts, reduce.ts, verify.ts, translate.ts, cache.ts, prompts/
-  report/         # html.ts, charts.ts, techniques.ts, card.ts, looks.ts, theme.ts, theme-css.ts, visibility.ts, messages.ts, fonts/
-  platform/       # Environment service, private file writes, cache folder
+  analysis/       # analyze.ts runs the stages: chunk.ts, map.ts, verify.ts, merge.ts, reduce.ts, translate.ts
+  report/         # html.ts assembles the sections (activity.ts, traits.ts, coaching.ts, …), card.ts, theme.ts, messages.ts
+  platform/       # Environment service, private file writes, cache folder, report library, execution records
 test/
+  architecture/   # the module rules below, checked on every import
   fixtures/       # fake data for each adapter (must not contain real personal data)
   smoke/          # reads real local data / calls the real CLIs; skipped automatically on CI
 ```
 
 ### Module boundaries (the key to long-term maintenance)
 
-Dependencies may only point to the right, never back:
+Every folder of `src/` is a module whose `index.ts` is its interface: other modules import only
+that file, and a module never imports its own `index.ts`. Dependencies may only point to the
+right, never back:
 
-```
-cli ──► analysis ──► llm ──► domain
-  │        │                   ▲
-  ├──► pipeline ───────────────┤
-  ├──► adapters ───────────────┤
-  └──► report ─────────────────┘
-```
+| Module | May import |
+|---|---|
+| `domain` | nothing |
+| `platform`, `llm`, `adapters`, `pipeline` | `domain` |
+| `report` | `domain`, `platform` |
+| `analysis` | `domain`, `llm`, `pipeline`, `platform` |
+| `cli` | every module |
 
 - `domain/` holds only Schemas and pure functions and imports no other directory.
-- `adapters/` does not know the LLM exists; `analysis/` depends only on the `LlmRunner` **interface** and does not know whether it is claude or codex.
+- `platform/` is the local machine: files, assets, environment, the report library.
+- `adapters/` does not know the LLM exists, and each source shares code with another only through
+  `adapters/common/`; `analysis/` depends only on the `LlmRunner` **interface** and does not know
+  whether it is claude or codex. It uses `pipeline/` only for the pipeline version in cache keys.
 - `report/` only consumes `Profile`, so the `render` subcommand can run without any analysis.
+- `test/architecture/boundaries.test.ts` enforces these rules; change its table and this section
+  together.
 - "Extensible lists" (adapters, runners, redaction rules, correction phrases, injected-content prefixes) are all **data** (arrays); adding an item does not require changing flow code.
 
 ### Version numbers
@@ -91,8 +99,8 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 20 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 28 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 20 | The `profile.json` format changes (`render` rejects versions it does not understand; the released versions it reads are listed in `READABLE_SCHEMA_VERSIONS`) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 28 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key; `test/analysis/version.test.ts` fails when a prompt changes without a bump) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 5 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 26, others 32 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `EXECUTION_VERSION` | `domain/Execution.ts` | 1 | Execution records and summaries change |

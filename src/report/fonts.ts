@@ -1,8 +1,7 @@
 import { Data, Effect, FileSystem, Path } from "effect"
 import { createHash } from "node:crypto"
-import type { Language } from "../domain/Profile.ts"
-import { readAsset } from "../platform/assets.ts"
-import { writePrivateFile } from "../platform/files.ts"
+import type { Language } from "../domain/index.ts"
+import { readAsset, writePrivateFile } from "../platform/index.ts"
 import { THEMES } from "./theme.ts"
 
 export interface FontData {

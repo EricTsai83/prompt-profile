@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto"
-import type { PromptRecord } from "../domain/PromptRecord.ts"
+import type { PromptRecord } from "../domain/index.ts"
 
 /** Local metadata selection. Raw paths never become report provenance. */
 export const selectContext = (records: ReadonlyArray<PromptRecord>, selector: string) => {

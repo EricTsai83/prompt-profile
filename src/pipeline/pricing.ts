@@ -1,4 +1,4 @@
-import type { ServiceTier, TokenCounts } from "../domain/Usage.ts"
+import type { ServiceTier, TokenCounts } from "../domain/index.ts"
 
 /**
  * Public API list prices, embedded so a report never downloads anything (plan 23). Bump

@@ -13,7 +13,7 @@ import {
   type RunnerId,
 } from "./LlmRunner.ts"
 import type { FileSystem, Path } from "effect"
-import { planCode, type PlanInfo } from "../domain/Usage.ts"
+import { planCode, type PlanInfo } from "../domain/index.ts"
 
 export interface RunnerStatus {
   readonly id: RunnerId

@@ -1,6 +1,5 @@
 import { DateTime } from "effect"
-import type { Profile } from "../domain/Profile.ts"
-import type { EvidenceOrigin } from "../domain/EvidenceOrigin.ts"
+import type { Profile, EvidenceOrigin } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { HISTORY_MESSAGES } from "./messages.ts"

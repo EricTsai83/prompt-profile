@@ -1,11 +1,11 @@
-import type { ChunkEpisode } from "../domain/ChunkObservations.ts"
 import {
+  type ChunkEpisode,
   TASK_TYPES,
   type Episode,
   type EpisodeCoverage,
   type EpisodeTurn,
   type Pattern,
-} from "../domain/Episode.ts"
+} from "../domain/index.ts"
 import type { Chunk } from "./chunk.ts"
 import { matchQuote } from "./verify.ts"
 

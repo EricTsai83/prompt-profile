@@ -1,5 +1,5 @@
 import { DateTime } from "effect"
-import type { Profile } from "../domain/Profile.ts"
+import type { Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { HISTORY_MESSAGES, PORTRAIT_MESSAGES } from "./messages.ts"

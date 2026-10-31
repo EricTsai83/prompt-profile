@@ -1,5 +1,4 @@
-import { INTERACTION_AXES } from "../domain/Interaction.ts"
-import type { Portrait } from "../domain/Profile.ts"
+import { INTERACTION_AXES, type Portrait } from "../domain/index.ts"
 import { verifyCompleteEvidence, type EvidenceCounts, type PromptOrigin } from "./verify.ts"
 
 /** Maximum independent conversation support: copied excerpts cannot multiply recurrence.

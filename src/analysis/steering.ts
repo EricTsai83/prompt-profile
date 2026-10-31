@@ -1,5 +1,4 @@
-import type { ChunkObservations } from "../domain/ChunkObservations.ts"
-import type { InterventionKind, Steering } from "../domain/Steering.ts"
+import type { ChunkObservations, InterventionKind, Steering } from "../domain/index.ts"
 import type { Chunk } from "./chunk.ts"
 import { matchQuote } from "./verify.ts"
 

@@ -1,4 +1,4 @@
-import { DEFAULT_VOICE, type Voice } from "../domain/Voice.ts"
+import { DEFAULT_VOICE, type Voice } from "../domain/index.ts"
 import { loadPrompt, type PromptName } from "./prompts.ts"
 
 const INSTRUCTIONS: Record<Voice, string> = {

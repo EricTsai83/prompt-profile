@@ -1,5 +1,5 @@
 import { structuredMoves } from "./collaboration.ts"
-import type { Profile } from "../domain/Profile.ts"
+import type { Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, viewMessages } from "./messages.ts"

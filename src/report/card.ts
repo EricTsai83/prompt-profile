@@ -3,8 +3,8 @@ import { Effect } from "effect"
 import { Resvg, initWasm } from "@resvg/resvg-wasm"
 import satori from "satori"
 import { createRequire } from "node:module"
-import { readAsset } from "../platform/assets.ts"
-import type { Profile } from "../domain/Profile.ts"
+import { readAsset } from "../platform/index.ts"
+import type { Profile, Language } from "../domain/index.ts"
 import type { FontData } from "./fonts.ts"
 import { clockSvg, graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
@@ -14,7 +14,6 @@ import { cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
 import { CARD_MESSAGES, MESSAGES } from "./messages.ts"
-import type { Language } from "../domain/Profile.ts"
 
 export const CARD_WIDTH = 1200
 export const CARD_HEIGHT = 630

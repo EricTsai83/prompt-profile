@@ -1,4 +1,4 @@
-import type { ToolTechnique } from "../../domain/Techniques.ts"
+import type { ToolTechnique } from "../../domain/index.ts"
 
 /**
  * Agent tool names → workflow techniques (an extensible data list). Only the tool name is

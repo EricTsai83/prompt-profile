@@ -1,14 +1,8 @@
-import type { CacheClearFailed } from "../analysis/cache.ts"
-import type { AnalyzeError } from "../analysis/errors.ts"
-import type { InvalidProfile, UnsupportedProfileVersion } from "../domain/Profile.ts"
-import type { LlmError } from "../llm/LlmRunner.ts"
-import type {
-  FileError,
-  InvalidArgument,
-  NeedsConfirmation,
-  NoData,
-  OutputCheckBlocked,
-} from "./errors.ts"
+import type { CacheClearFailed, AnalyzeError } from "../analysis/index.ts"
+import type { InvalidProfile, UnsupportedProfileVersion } from "../domain/index.ts"
+import type { LlmError } from "../llm/index.ts"
+import type { FileError } from "../platform/index.ts"
+import type { InvalidArgument, NeedsConfirmation, NoData, OutputCheckBlocked } from "./errors.ts"
 import { findingGroups, messages as t } from "./messages.ts"
 
 export type AppError =

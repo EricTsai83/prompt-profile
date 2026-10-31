@@ -1,5 +1,5 @@
 import { Data } from "effect"
-import type { LlmError } from "../llm/LlmRunner.ts"
+import type { LlmError } from "../llm/index.ts"
 
 /** Analysis could not produce a profile (other than a fatal LlmError). */
 export class AnalysisFailed extends Data.TaggedError("AnalysisFailed")<{
@@ -22,3 +22,19 @@ export class TranslationFailed extends Data.TaggedError("TranslationFailed")<{
 }> {}
 
 export type AnalyzeError = AnalysisFailed | TranslationFailed | LlmError
+
+/** LLM errors that will not succeed on a retry: stop everything immediately. */
+export const FATAL: ReadonlySet<LlmError["_tag"]> = new Set([
+  "NotInstalled",
+  "NotLoggedIn",
+  "Interrupted",
+  "CallBudgetExceeded",
+  "CostBudgetExceeded",
+  "AccountingUnavailable",
+])
+
+/** Fatal errors stop everything as-is; anything else means the `reason` stage failed. */
+export const stageError =
+  (reason: "merge-failed" | "reduce-failed", chunksFailed: number, chunksTotal: number) =>
+  (cause: LlmError): AnalyzeError =>
+    FATAL.has(cause._tag) ? cause : new AnalysisFailed({ reason, chunksFailed, chunksTotal, cause })

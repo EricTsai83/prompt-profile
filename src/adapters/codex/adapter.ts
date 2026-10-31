@@ -1,14 +1,21 @@
 import { DateTime, Effect, FileSystem, Option, Path, Schema, Stream } from "effect"
-import type { PromptRecord } from "../../domain/PromptRecord.ts"
-import type { SourceAdapter, SourceRead } from "../../domain/SourceAdapter.ts"
-import { isAnalysisPrompt } from "../../domain/markers.ts"
+import {
+  type PromptRecord,
+  type SourceAdapter,
+  type SourceRead,
+  isAnalysisPrompt,
+  type TechniqueEvent,
+  type ToolTechnique,
+  type SkillOrigin,
+  type ServiceTier,
+  type TokenCounts,
+  type UsageEvent,
+} from "../../domain/index.ts"
 import { DiagnosticsCollector, jsonlCallbacks } from "../common/diagnostics.ts"
 import { findFiles } from "../common/fs.ts"
 import { readJsonl } from "../common/jsonl.ts"
 import { techniqueOfTool } from "../common/techniques.ts"
-import type { TechniqueEvent, ToolTechnique } from "../../domain/Techniques.ts"
-import type { SkillOrigin } from "../../domain/SourceAdapter.ts"
-import { clipDescription } from "../claude-code/skills.ts"
+import { clipDescription } from "../common/skills.ts"
 
 /** `- name: description (file: …/SKILL.md)` lines of the skills section Codex adds. */
 export const parseCodexSkillListing = (
@@ -56,7 +63,6 @@ import {
   UserMessage,
   type CodexTokenUsage,
 } from "./schema.ts"
-import type { ServiceTier, TokenCounts, UsageEvent } from "../../domain/Usage.ts"
 import { readCodexPlan } from "./plan.ts"
 
 const SOURCE = "codex" as const

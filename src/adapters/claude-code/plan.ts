@@ -1,5 +1,5 @@
 import { Effect, type FileSystem } from "effect"
-import { planCode, UNKNOWN_PLAN, type PlanInfo } from "../../domain/Usage.ts"
+import { planCode, UNKNOWN_PLAN, type PlanInfo } from "../../domain/index.ts"
 
 /**
  * An undocumented hint about the Claude plan from Claude Code's config file (plan 23): only

@@ -1,294 +1,336 @@
-import { randomUUID, createHash } from "node:crypto"
-import {
-  mkdir,
-  lstat,
-  realpath,
-  readdir,
-  readFile,
-  writeFile,
-  chmod,
-  rename,
-  rm,
-} from "node:fs/promises"
-import { join, dirname, basename } from "node:path"
+import { createHash, randomUUID } from "node:crypto"
+import { Effect, FileSystem, Path, type PlatformError } from "effect"
 import {
   libraryIndex,
   parseRunManifest,
   RUN_ID,
   type LibraryIndex,
   type RunManifest,
-} from "../domain/Library.ts"
+} from "../domain/index.ts"
+import { FileError, isNotFound, toFileError, writePrivateFile } from "./files.ts"
 
-const missing = (e: unknown) => (e as { code?: string }).code === "ENOENT"
+type Io<A> = Effect.Effect<
+  A,
+  PlatformError.PlatformError | FileError,
+  FileSystem.FileSystem | Path.Path
+>
+
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
 
-/** Existing folders retain their permissions. Never traverse a library-owned symlink. */
-const reportsDirectory = async (root: string, create: boolean): Promise<string> => {
-  const directory = join(root, "reports")
-  if (create) await mkdir(root, { recursive: true, mode: 0o700 })
-  try {
-    const info = await lstat(directory)
-    if (!info.isDirectory() || info.isSymbolicLink())
-      throw new Error("The reports path must be a regular directory")
-  } catch (e) {
-    if (!missing(e) || !create) throw e
-    await mkdir(directory, { mode: 0o700 }).catch((error: unknown) => {
-      if ((error as { code?: string }).code !== "EEXIST") throw error
-    })
-    const info = await lstat(directory)
-    if (!info.isDirectory() || info.isSymbolicLink())
-      throw new Error("Unsafe reports path", { cause: e })
-  }
-  return directory
-}
+const write = (file: string, data: string | Uint8Array) =>
+  Effect.gen(function* () {
+    yield* writePrivateFile(yield* FileSystem.FileSystem, yield* Path.Path, file, data)
+  })
 
-export const writeLibraryFile = async (file: string, data: string | Uint8Array): Promise<void> => {
-  const temporary = `${file}.${randomUUID()}.tmp`
-  try {
-    await writeFile(temporary, data, { mode: 0o600, flag: "wx" })
-    await chmod(temporary, 0o600)
-    await rename(temporary, file)
-  } finally {
-    await rm(temporary, { force: true })
-  }
-}
+/** `null` when nothing exists at `file`. Never follows a symlink. */
+const lstatOrNull = (file: string) =>
+  Effect.gen(function* () {
+    return yield* (yield* FileSystem.FileSystem)
+      .lstat(file)
+      .pipe(Effect.catchIf(isNotFound, () => Effect.succeed(null)))
+  })
+
+/** A regular file, not a symlink. */
+const regular = (file: string) =>
+  Effect.map(lstatOrNull(file), (info) => info !== null && info.type === "File")
+
+/** Existing folders retain their permissions. Never traverse a library-owned symlink. */
+const reportsDirectory = (root: string, create: boolean): Io<string> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const directory = (yield* Path.Path).join(root, "reports")
+    if (create) {
+      yield* fs.makeDirectory(root, { recursive: true, mode: 0o700 })
+      yield* fs.makeDirectory(directory, { mode: 0o700 }).pipe(
+        Effect.catchIf(
+          (e) => e.reason._tag === "AlreadyExists",
+          () => Effect.void,
+        ),
+      )
+    }
+    if ((yield* fs.lstat(directory)).type !== "Directory")
+      return yield* new FileError({
+        path: directory,
+        detail: "The reports path must be a regular directory",
+      })
+    return directory
+  })
 
 export interface RunStage {
   readonly id: string
   readonly directory: string
 }
-export const createRunStage = async (root: string): Promise<RunStage> => {
-  const reports = await reportsDirectory(root, true)
-  const stamp = new Date()
-    .toISOString()
-    .replace(/[-:]/gu, "")
-    .replace(/\.\d{3}Z$/u, "Z")
-  const id = `${stamp}-${randomUUID().replaceAll("-", "")}`
-  const directory = join(reports, `.pending-${id}`)
-  await mkdir(directory, { mode: 0o700 })
-  return { id, directory }
-}
 
-const regular = async (path: string) => {
-  const info = await lstat(path)
-  return info.isFile() && !info.isSymbolicLink()
-}
+const createStage = (root: string): Io<RunStage> =>
+  Effect.gen(function* () {
+    const reports = yield* reportsDirectory(root, true)
+    const stamp = new Date()
+      .toISOString()
+      .replace(/[-:]/gu, "")
+      .replace(/\.\d{3}Z$/u, "Z")
+    const id = `${stamp}-${randomUUID().replaceAll("-", "")}`
+    const directory = (yield* Path.Path).join(reports, `.pending-${id}`)
+    yield* (yield* FileSystem.FileSystem).makeDirectory(directory, { mode: 0o700 })
+    return { id, directory }
+  })
+
+/** A completed run's manifest, or `null` when the folder is not a valid completed run. */
+const readRun = (reports: string, name: string): Io<RunManifest | null> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const directory = path.join(reports, name)
+    if ((yield* fs.lstat(directory)).type !== "Directory") return null
+    const manifestPath = path.join(directory, "run.json")
+    const info = yield* fs.lstat(manifestPath)
+    if (info.type !== "File" || info.size > 64_000n) return null
+    const text = yield* fs.readFileString(manifestPath)
+    const run = parseRunManifest(yield* Effect.try(() => JSON.parse(text) as unknown))
+    if (
+      !run ||
+      run.id !== name ||
+      !(yield* regular(path.join(directory, "profile.json"))) ||
+      !(yield* regular(path.join(directory, "report.html")))
+    )
+      return null
+    return run
+  }).pipe(Effect.orElseSucceed(() => null))
+
+const scan = (root: string): Io<LibraryIndex> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const reports = yield* reportsDirectory(root, false).pipe(
+      Effect.catchIf(isNotFound, () => Effect.succeed(null)),
+    )
+    if (reports === null) return libraryIndex([])
+    const runs: Array<RunManifest> = []
+    let skipped = 0
+    for (const name of yield* fs.readDirectory(reports)) {
+      if (name.startsWith(".pending-")) continue
+      const run = RUN_ID.test(name) ? yield* readRun(reports, name) : null
+      if (run) runs.push(run)
+      else skipped++
+    }
+    return libraryIndex(runs, skipped)
+  })
+
+const repair = (root: string, render: (index: LibraryIndex) => string): Io<LibraryIndex> =>
+  Effect.gen(function* () {
+    const path = yield* Path.Path
+    yield* reportsDirectory(root, true)
+    for (let attempt = 0; attempt < 32; attempt++) {
+      const index = yield* scan(root)
+      yield* write(path.join(root, "library.json"), json(index))
+      yield* write(path.join(root, "index.html"), render(index))
+      const current = yield* scan(root)
+      if (json(current) === json(index)) return current
+    }
+    return yield* new FileError({
+      path: root,
+      detail:
+        "Reports kept arriving while rebuilding the library; run history again to repair its index",
+    })
+  })
+
+const publish = (
+  root: string,
+  stage: RunStage,
+  manifest: RunManifest,
+  render: (index: LibraryIndex) => string,
+): Io<{ readonly directory: string; readonly index: LibraryIndex }> =>
+  Effect.gen(function* () {
+    const fs = yield* FileSystem.FileSystem
+    const path = yield* Path.Path
+    const reports = yield* reportsDirectory(root, true)
+    const invalid = (detail: string) => new FileError({ path: stage.directory, detail })
+    if (
+      !RUN_ID.test(stage.id) ||
+      manifest.id !== stage.id ||
+      path.dirname(stage.directory) !== reports ||
+      !path.basename(stage.directory).startsWith(".pending-") ||
+      !RUN_ID.test(path.basename(stage.directory).slice(9)) ||
+      !parseRunManifest(manifest)
+    )
+      return yield* invalid("Invalid report publication metadata")
+    if (
+      !(yield* regular(path.join(stage.directory, "profile.json"))) ||
+      !(yield* regular(path.join(stage.directory, "report.html")))
+    )
+      return yield* invalid("A report must finish its profile and HTML before publication")
+    yield* write(path.join(stage.directory, "run.json"), json(manifest))
+    const directory = path.join(reports, stage.id)
+    if ((yield* lstatOrNull(directory)) !== null)
+      return yield* invalid("A report with this id already exists")
+    yield* fs.rename(stage.directory, directory)
+    const index = yield* repair(root, render).pipe(
+      Effect.mapError(
+        () =>
+          new FileError({
+            path: directory,
+            detail: `Completed report retained at ${directory}; library index repair failed`,
+          }),
+      ),
+    )
+    return { directory, index }
+  })
+
+/** Every public operation fails only with a {@link FileError} about `path`. */
+const io = <A>(path: string, effect: Io<A>) => effect.pipe(Effect.mapError(toFileError(path)))
+
+/** Stage a new run: a private `.pending-<id>` folder inside `<root>/reports`. */
+export const createRunStage = (root: string) => io(root, createStage(root))
 
 /** The index is disposable; immutable completion manifests are the source of truth. */
-export const scanLibrary = async (root: string): Promise<LibraryIndex> => {
-  let reports: string
-  try {
-    reports = await reportsDirectory(root, false)
-  } catch (e) {
-    if (missing(e)) return libraryIndex([])
-    throw e
-  }
-  const runs: Array<RunManifest> = []
-  let skipped = 0
-  for (const name of await readdir(reports)) {
-    if (name.startsWith(".pending-")) continue
-    if (!RUN_ID.test(name)) {
-      skipped++
-      continue
-    }
-    try {
-      const directory = join(reports, name)
-      const info = await lstat(directory)
-      if (!info.isDirectory() || info.isSymbolicLink()) {
-        skipped++
-        continue
-      }
-      const manifestPath = join(directory, "run.json")
-      const stat = await lstat(manifestPath)
-      if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 64_000) {
-        skipped++
-        continue
-      }
-      const run = parseRunManifest(JSON.parse(await readFile(manifestPath, "utf8")))
-      if (
-        !run ||
-        run.id !== name ||
-        !(await regular(join(directory, "profile.json"))) ||
-        !(await regular(join(directory, "report.html")))
-      ) {
-        skipped++
-        continue
-      }
-      runs.push(run)
-    } catch {
-      skipped++
-    }
-  }
-  return libraryIndex(runs, skipped)
-}
+export const scanLibrary = (root: string) => io(root, scan(root))
 
 /**
  * Concurrent writers rescan after publishing. A writer that overwrote a newer index sees
  * its additional completion manifests and republishes the union before returning success.
  * A crash can leave a stale index, but cannot remove a completed run; repair is analysis-free.
  */
-export const repairLibrary = async (
-  root: string,
-  render: (index: LibraryIndex) => string,
-): Promise<LibraryIndex> => {
-  await reportsDirectory(root, true)
-  for (let attempt = 0; attempt < 32; attempt++) {
-    const index = await scanLibrary(root)
-    await writeLibraryFile(join(root, "library.json"), json(index))
-    await writeLibraryFile(join(root, "index.html"), render(index))
-    const current = await scanLibrary(root)
-    if (json(current) === json(index)) return current
-  }
-  throw new Error(
-    "Reports kept arriving while rebuilding the library; run history again to repair its index",
-  )
-}
+export const repairLibrary = (root: string, render: (index: LibraryIndex) => string) =>
+  io(root, repair(root, render))
 
-export const publishRun = async (
+/** Publish a finished stage (its profile and HTML written) as an immutable completed run. */
+export const publishRun = (
   root: string,
   stage: RunStage,
   manifest: RunManifest,
   render: (index: LibraryIndex) => string,
-): Promise<{ readonly directory: string; readonly index: LibraryIndex }> => {
-  const reports = await reportsDirectory(root, true)
-  if (
-    !RUN_ID.test(stage.id) ||
-    manifest.id !== stage.id ||
-    dirname(stage.directory) !== reports ||
-    !basename(stage.directory).startsWith(".pending-") ||
-    !RUN_ID.test(basename(stage.directory).slice(9)) ||
-    !parseRunManifest(manifest)
-  )
-    throw new Error("Invalid report publication metadata")
-  if (
-    !(await regular(join(stage.directory, "profile.json"))) ||
-    !(await regular(join(stage.directory, "report.html")))
-  )
-    throw new Error("A report must finish its profile and HTML before publication")
-  await writeLibraryFile(join(stage.directory, "run.json"), json(manifest))
-  const directory = join(reports, stage.id)
-  try {
-    await lstat(directory)
-    throw new Error("A report with this id already exists")
-  } catch (e) {
-    if (!missing(e)) throw e
-  }
-  await rename(stage.directory, directory)
-  try {
-    const index = await repairLibrary(root, render)
-    return { directory, index }
-  } catch (e) {
-    throw new Error(`Completed report retained at ${directory}; library index repair failed`, {
-      cause: e,
-    })
-  }
-}
+) => io(root, publish(root, stage, manifest, render))
 
-/** Preserve legacy artifacts without changing or deleting any root-level original. */
-export const preserveLegacy = async (
+/** Remove a stage that will not be published. */
+export const discardRunStage = (stage: RunStage) =>
+  Effect.gen(function* () {
+    yield* (yield* FileSystem.FileSystem).remove(stage.directory, { recursive: true, force: true })
+  }).pipe(Effect.ignore)
+
+/**
+ * Archive the root-level artifacts of the single-report layout as a completed run, without
+ * changing or deleting any original. Returns the run folder, or `null` with nothing to archive.
+ */
+export const preserveLegacy = (
   root: string,
   base: RunManifest,
   fallbackHtml: string,
   render: (index: LibraryIndex) => string,
-): Promise<string | null> => {
-  const file = join(root, "profile.json")
-  try {
-    if (!(await regular(file))) return null
-  } catch (e) {
-    if (missing(e)) return null
-    throw e
-  }
-  const data = await readFile(file)
-  const fingerprint = createHash("sha256").update(data).digest("hex")
-  if (base.legacyFingerprint && base.legacyFingerprint !== fingerprint)
-    throw new Error("Legacy profile changed while preserving it; originals retained")
-  const id = `legacy-${fingerprint.slice(0, 32)}`
-  if ((await scanLibrary(root)).runs.some((r) => r.id === id)) return join(root, "reports", id)
-  const temporary = await createRunStage(root)
-  const stage = { ...temporary, id }
-  const copyFile = async (from: string, to: string): Promise<boolean> => {
-    try {
-      if (!(await regular(from))) return false
-      await writeLibraryFile(to, await readFile(from))
-      return true
-    } catch (e) {
-      if (missing(e)) return false
-      throw e
-    }
-  }
-  const copyTree = async (from: string, to: string, depth = 0): Promise<void> => {
-    if (depth > 16)
-      throw new Error("Legacy variants exceed the supported nesting depth; originals retained")
-    let info
-    try {
-      info = await lstat(from)
-    } catch (e) {
-      if (missing(e)) return
-      throw e
-    }
-    if (!info.isDirectory() || info.isSymbolicLink()) return
-    await mkdir(to, { mode: 0o700 })
-    for (const name of await readdir(from)) {
-      const child = await lstat(join(from, name))
-      if (child.isSymbolicLink()) continue
-      if (child.isDirectory()) await copyTree(join(from, name), join(to, name), depth + 1)
-      else if (child.isFile()) await copyFile(join(from, name), join(to, name))
-    }
-  }
-  try {
-    await writeLibraryFile(join(stage.directory, "profile.json"), data)
-    if (!(await copyFile(join(root, "report.html"), join(stage.directory, "report.html"))))
-      await writeLibraryFile(join(stage.directory, "report.html"), fallbackHtml)
-    const cards = []
-    for (const c of base.cards) {
-      const name = c.language === base.languages[0] ? "card.png" : `card.${c.language}.png`
-      const copied = await copyFile(join(root, name), join(stage.directory, name))
-      cards.push({
-        language: c.language,
-        file: copied ? name : null,
-        error: copied ? null : "Legacy card unavailable",
-      })
-    }
-    await copyFile(join(root, "render.json"), join(stage.directory, "render.json"))
-    await copyTree(join(root, "variants"), join(stage.directory, "variants"))
-    await publishRun(root, stage, { ...base, id, cards, legacyFingerprint: fingerprint }, render)
-    return join(root, "reports", id)
-  } catch (e) {
-    if ((await scanLibrary(root)).runs.some((r) => r.id === id)) return join(root, "reports", id)
-    throw e
-  } finally {
-    await rm(stage.directory, { recursive: true, force: true })
-  }
-}
+) =>
+  io(
+    root,
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem
+      const path = yield* Path.Path
+      const file = path.join(root, "profile.json")
+      if (!(yield* regular(file))) return null
+      const data = yield* fs.readFile(file)
+      const fingerprint = createHash("sha256").update(data).digest("hex")
+      if (base.legacyFingerprint && base.legacyFingerprint !== fingerprint)
+        return yield* new FileError({
+          path: file,
+          detail: "Legacy profile changed while preserving it; originals retained",
+        })
+      const id = `legacy-${fingerprint.slice(0, 32)}`
+      const archived = path.join(root, "reports", id)
+      const isArchived = Effect.map(scan(root), (index) => index.runs.some((r) => r.id === id))
+      if (yield* isArchived) return archived
+
+      const stage = { ...(yield* createStage(root)), id }
+      const copyFile = (from: string, to: string) =>
+        Effect.gen(function* () {
+          if (!(yield* regular(from))) return false
+          const bytes = yield* fs
+            .readFile(from)
+            .pipe(Effect.catchIf(isNotFound, () => Effect.succeed(null)))
+          if (bytes === null) return false
+          yield* write(to, bytes)
+          return true
+        })
+      const copyTree = (from: string, to: string, depth = 0): Io<void> =>
+        Effect.gen(function* () {
+          if (depth > 16)
+            return yield* new FileError({
+              path: from,
+              detail: "Legacy variants exceed the supported nesting depth; originals retained",
+            })
+          if ((yield* lstatOrNull(from))?.type !== "Directory") return
+          yield* fs.makeDirectory(to, { mode: 0o700 })
+          for (const name of yield* fs.readDirectory(from)) {
+            const child = yield* fs.lstat(path.join(from, name))
+            if (child.type === "Directory")
+              yield* copyTree(path.join(from, name), path.join(to, name), depth + 1)
+            else if (child.type === "File")
+              yield* copyFile(path.join(from, name), path.join(to, name))
+          }
+        })
+
+      return yield* Effect.gen(function* () {
+        yield* write(path.join(stage.directory, "profile.json"), data)
+        if (
+          !(yield* copyFile(
+            path.join(root, "report.html"),
+            path.join(stage.directory, "report.html"),
+          ))
+        )
+          yield* write(path.join(stage.directory, "report.html"), fallbackHtml)
+        const cards = []
+        for (const c of base.cards) {
+          const name = c.language === base.languages[0] ? "card.png" : `card.${c.language}.png`
+          const copied = yield* copyFile(path.join(root, name), path.join(stage.directory, name))
+          cards.push({
+            language: c.language,
+            file: copied ? name : null,
+            error: copied ? null : "Legacy card unavailable",
+          })
+        }
+        yield* copyFile(path.join(root, "render.json"), path.join(stage.directory, "render.json"))
+        yield* copyTree(path.join(root, "variants"), path.join(stage.directory, "variants"))
+        yield* publish(root, stage, { ...base, id, cards, legacyFingerprint: fingerprint }, render)
+        return archived
+      }).pipe(
+        // a concurrent writer may have archived the same profile first
+        Effect.catch((e) =>
+          Effect.flatMap(isArchived, (done) => (done ? Effect.succeed(archived) : Effect.fail(e))),
+        ),
+        Effect.ensuring(discardRunStage(stage)),
+      )
+    }),
+  )
+
+const runFolder = (path: Path.Path, directory: string) =>
+  RUN_ID.test(path.basename(directory)) && path.basename(path.dirname(directory)) === "reports"
 
 /** Locate a canonical archive source, including a preserved root-level legacy profile. */
-export const archivedSource = async (input: string): Promise<string | null> => {
-  input = await realpath(input)
-  let directory = dirname(input)
-  for (;;) {
-    if (RUN_ID.test(basename(directory)) && basename(dirname(directory)) === "reports")
-      return join(directory, "profile.json")
-    const parent = dirname(directory)
-    if (parent === directory) break
-    directory = parent
-  }
-  if (basename(input) !== "profile.json") return null
-  const root = dirname(input)
-  const index = await scanLibrary(root)
-  if (!index.runs.length) return null
-  const fingerprint = createHash("sha256")
-    .update(await readFile(input))
-    .digest("hex")
-  const run = index.runs.find((r) => r.legacyFingerprint === fingerprint)
-  return run ? join(root, "reports", run.id, "profile.json") : null
-}
+export const archivedSource = (input: string) =>
+  io(
+    input,
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem
+      const path = yield* Path.Path
+      const real = yield* fs.realPath(input)
+      for (let directory = path.dirname(real); ; directory = path.dirname(directory)) {
+        if (runFolder(path, directory)) return path.join(directory, "profile.json")
+        if (path.dirname(directory) === directory) break
+      }
+      if (path.basename(real) !== "profile.json") return null
+      const root = path.dirname(real)
+      const index = yield* scan(root)
+      if (!index.runs.length) return null
+      const fingerprint = createHash("sha256")
+        .update(yield* fs.readFile(real))
+        .digest("hex")
+      const run = index.runs.find((r) => r.legacyFingerprint === fingerprint)
+      return run ? path.join(root, "reports", run.id, "profile.json") : null
+    }),
+  )
 
-export const protectsAnalysisDirectory = async (directory: string): Promise<boolean> => {
-  try {
-    directory = await realpath(directory)
-  } catch (e) {
-    if (missing(e)) return false
-    throw e
-  }
-  return RUN_ID.test(basename(directory)) && basename(dirname(directory)) === "reports"
-}
+/** Whether `directory` is (an alias of) a completed run folder, which must stay immutable. */
+export const protectsAnalysisDirectory = (directory: string) =>
+  io(
+    directory,
+    Effect.gen(function* () {
+      const real = yield* (yield* FileSystem.FileSystem)
+        .realPath(directory)
+        .pipe(Effect.catchIf(isNotFound, () => Effect.succeed(null)))
+      return real !== null && runFolder(yield* Path.Path, real)
+    }),
+  )

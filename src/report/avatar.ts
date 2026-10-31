@@ -1,5 +1,4 @@
-import { roleCode } from "../domain/Interaction.ts"
-import type { Profile } from "../domain/Profile.ts"
+import { roleCode, type Profile } from "../domain/index.ts"
 /** Original abstract collaboration symbols, with no face, body or inferred human likeness. */
 export const AVATAR_ART_VERSION = 1
 export const AVATAR_STUDIES = ["planner", "explorer", "coordinator", "verifier", "neutral"] as const

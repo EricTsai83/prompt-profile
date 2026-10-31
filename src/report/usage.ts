@@ -1,5 +1,11 @@
-import type { Language, Profile } from "../domain/Profile.ts"
-import { TOKEN_KINDS, totalTokens, type SourceUsage, type UsageBucket } from "../domain/Usage.ts"
+import {
+  type Language,
+  type Profile,
+  TOKEN_KINDS,
+  totalTokens,
+  type SourceUsage,
+  type UsageBucket,
+} from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { MESSAGES, USAGE_MESSAGES } from "./messages.ts"

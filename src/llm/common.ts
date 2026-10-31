@@ -1,16 +1,11 @@
 import { Duration, Effect, FileSystem, Schema } from "effect"
 import type { Scope } from "effect"
-import {
-  ANALYSIS_MARKER,
-  InvalidOutput,
-  Timeout,
-  type LlmSchema,
-  type RunnerId,
-} from "./LlmRunner.ts"
+import { ANALYSIS_MARKER } from "../domain/index.ts"
+import { InvalidOutput, Timeout, type LlmSchema, type RunnerId } from "./LlmRunner.ts"
 
 export const DEFAULT_TIMEOUT: Duration.Input = "5 minutes"
 
-import type { Effort } from "../domain/Effort.ts"
+import type { Effort } from "../domain/index.ts"
 
 export interface RunnerOptions {
   readonly model?: string | undefined

@@ -1,5 +1,5 @@
 import { DateTime } from "effect"
-import type { SafePrompt } from "../domain/SafePrompt.ts"
+import type { SafePrompt } from "../domain/index.ts"
 import { sha256 } from "./hash.ts"
 
 export const MAX_CHUNK_CHARS = 40_000

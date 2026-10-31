@@ -1,6 +1,12 @@
 import { sourceLabel } from "./evidence-origin.ts"
-import { axisState, INTERACTION_AXES, MIN_SIDE_SESSIONS, roleCode } from "../domain/Interaction.ts"
-import type { Language, Profile } from "../domain/Profile.ts"
+import {
+  axisState,
+  INTERACTION_AXES,
+  MIN_SIDE_SESSIONS,
+  roleCode,
+  type Language,
+  type Profile,
+} from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, viewMessages } from "./messages.ts"

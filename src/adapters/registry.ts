@@ -1,5 +1,5 @@
 import { Effect, type FileSystem, Path } from "effect"
-import type { SourceAdapter, SourceRead } from "../domain/SourceAdapter.ts"
+import type { SourceAdapter, SourceRead } from "../domain/index.ts"
 import {
   makeClaudeCodeAdapter,
   resolveClaudeConfigFile,

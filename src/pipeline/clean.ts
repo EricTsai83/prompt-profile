@@ -1,4 +1,4 @@
-import type { PromptRecord } from "../domain/PromptRecord.ts"
+import type { PromptRecord } from "../domain/index.ts"
 import { increment, type Counts } from "./counts.ts"
 
 export const MIN_LENGTH = 3

@@ -1,6 +1,5 @@
 import { sourceLabel } from "./evidence-origin.ts"
-import { UNDERSTANDING_KINDS } from "../domain/Collaboration.ts"
-import type { Profile } from "../domain/Profile.ts"
+import { UNDERSTANDING_KINDS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { COLLABORATION_MESSAGES, EPISODE_MESSAGES } from "./messages.ts"

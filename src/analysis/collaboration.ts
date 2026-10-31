@@ -1,7 +1,10 @@
-import type { Collaboration, ReportedEffect } from "../domain/Collaboration.ts"
-import type { Episode } from "../domain/Episode.ts"
-import type { LlmCollaboration } from "../domain/llm/LlmSchemas.ts"
-import type { Evidence } from "../domain/Profile.ts"
+import type {
+  Collaboration,
+  ReportedEffect,
+  Episode,
+  LlmCollaboration,
+  Evidence,
+} from "../domain/index.ts"
 import { independentSessions } from "./portrait.ts"
 import { verifyCompleteEvidence, type EvidenceCounts, type PromptOrigin } from "./verify.ts"
 

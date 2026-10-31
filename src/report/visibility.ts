@@ -1,4 +1,4 @@
-import type { Language, Profile } from "../domain/Profile.ts"
+import type { Language, Profile } from "../domain/index.ts"
 import { excludedParts, type RenderOptions, type ReportPart } from "./looks.ts"
 import { MESSAGES } from "./messages.ts"
 import { limitedView } from "./evidence.ts"
