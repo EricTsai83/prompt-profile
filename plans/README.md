@@ -120,6 +120,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 | Plan | Topic |
 | ---- | ----- |
 | [35](./35-measured-support.md) | Measured support for traits and habits: implemented, awaiting a real run |
+| [36](./36-ability-scores.md) | AI collaboration ability scores on the radar, replacing trait frequency |
 
 ## Shared rules for every plan
 
