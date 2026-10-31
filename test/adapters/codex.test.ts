@@ -41,7 +41,15 @@ describe("Codex filter rules", () => {
     expect(firstMatch(SESSION_RULES, { source: { subagent: "review" } })?.name).toBe(
       "subagent-session",
     )
-    expect(firstMatch(SESSION_RULES, { source: "exec" })).toBeUndefined()
+    expect(firstMatch(SESSION_RULES, { source: "vscode" })).toBeUndefined()
+  })
+
+  it("excludes sessions Codex ran in exec mode for another program, keeps apps a person types in", () => {
+    expect(firstMatch(SESSION_RULES, { originator: "codex_exec", source: "exec" })?.name).toBe(
+      "exec-session",
+    )
+    expect(firstMatch(SESSION_RULES, { source: "exec" })?.name).toBe("exec-session")
+    expect(firstMatch(SESSION_RULES, { originator: "T3 Code", source: "exec" })).toBeUndefined()
   })
 
   it.each([
@@ -69,6 +77,8 @@ describe("Codex adapter (fixture)", () => {
       expect(texts).toContain("still broken, try again")
       expect(texts).toContain("history-only prompt from a deleted session")
       expect(texts).not.toContain("Review the diff for bugs")
+      // an exec session another program started
+      expect(texts).not.toContain("Summarize the changes in this PR")
       expect(records.find((r) => r.text === "看一下這張截圖")?.hasImage).toBe(true)
       expect(records.find((r) => r.text.startsWith("legacy"))?.id).toMatch(/:2$/)
       expect(records.find((r) => r.text.startsWith("history-only"))?.timestamp).toBe(

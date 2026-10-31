@@ -5,13 +5,13 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
 
 ● Reading data
   Claude Code        9 prompts · 3 sessions
-  Codex              7 prompts · 5 sessions
+  Codex              6 prompts · 4 sessions
 ● Cleaning and redacting (on this computer)
   Skipped 0 noisy prompts (-)
   Redacted 1 sensitive items (PATH 1)
 ● Range: all time · 2026-05-29 → 2026-09-05
-  In range: Claude Code 9 · Codex 7 prompts
-  16 prompts in 8 sessions after cleaning → 16 selected in 2 chunks
+  In range: Claude Code 9 · Codex 6 prompts
+  15 prompts in 7 sessions after cleaning → 15 selected in 2 chunks
   No sampling: every chunk is analysed
   Read, cleaned and redacted on this computer; the report and analysis cache are written only here.
 ● Sent off this computer: the selected, redacted prompts go through your logged-in Claude Code CLI (claude -p) to its model service
@@ -34,7 +34,7 @@ Reviewing the draft against source evidence…
   Card   <tmp>/out/reports/<run>/card.png
   Data   <tmp>/out/reports/<run>/profile.json
   Library <tmp>/out/index.html
-  Contains  8 quotes · 4 project names · exact dates · 1 improvement · 3 fun facts · plans, usage and API list-price equivalent
+  Contains  8 quotes · 3 project names · exact dates · 1 improvement · 3 fun facts · plans, usage and API list-price equivalent
   Check  no secrets or personal data found
   Before sharing, skim the quotes yourself: the check is rule-based.
   To leave parts out: prompt-profile render <tmp>/out/reports/<run>/profile.json --exclude personal

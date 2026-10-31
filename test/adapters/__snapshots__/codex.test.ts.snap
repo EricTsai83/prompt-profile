@@ -6,6 +6,7 @@ exports[`Codex adapter (fixture) > parses the fixture directory > diagnostics 1`
   "excluded": {
     "analysis-marker": 2,
     "duplicate-message": 1,
+    "exec-session": 1,
     "injected-content": 2,
     "subagent-session": 1,
   },
@@ -52,18 +53,6 @@ exports[`Codex adapter (fixture) > parses the fixture directory > records 1`] = 
     "source": "codex",
     "text": "still broken, try again",
     "timestamp": "2026-09-03T15:05:00.000Z",
-  },
-  {
-    "client": "codex_exec",
-    "gitBranch": "main",
-    "hasImage": false,
-    "id": "codex:33333333-3333-4333-8333-333333333333:1",
-    "origin": "exec",
-    "project": "/home/dev/bot",
-    "sessionId": "33333333-3333-4333-8333-333333333333",
-    "source": "codex",
-    "text": "Summarize the changes in this PR",
-    "timestamp": "2026-09-03T17:00:00.000Z",
   },
   {
     "client": "T3 Code",

@@ -21,6 +21,13 @@ export const SESSION_RULES: ReadonlyArray<ExcludeRule<SessionMeta>> = [
     name: "subagent-session",
     test: (m) => typeof m.source === "object" && m.source !== null && "subagent" in m.source,
   },
+  {
+    // `codex exec` started by another program (an agent delegating, a script, a review
+    // skill): the prompt is that program's, not the person's. Apps a person types in may
+    // run exec mode too; they set their own originator and are kept.
+    name: "exec-session",
+    test: (m) => codexOrigin(m) === "exec",
+  },
 ]
 
 export interface CodexCandidate {

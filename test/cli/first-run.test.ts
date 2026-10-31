@@ -115,10 +115,10 @@ describe("before confirmation", () => {
         expect(calls(h)).toBe(0)
         // time window and per-source coverage of the range
         expect(r.stdout).toMatch(/Range: all time · \d{4}-\d\d-\d\d → 2026-09-0\d/)
-        expect(r.stdout).toMatch(/In range: Claude Code 9 · Codex 7/)
+        expect(r.stdout).toMatch(/In range: Claude Code 9 · Codex 6/)
         // cleaned versus selected prompt counts, and sampling
         expect(r.stdout).toMatch(
-          /16 prompts in 8 sessions after cleaning → 16 selected in 2 chunks/,
+          /15 prompts in 7 sessions after cleaning → 15 selected in 2 chunks/,
         )
         expect(r.stdout).toContain("No sampling: every chunk is analysed")
         // local versus remote, quota and API keys
@@ -196,7 +196,7 @@ describe("--dry-run", () => {
       const r = yield* h.run(["--dry-run", "--out", out, "--since", "all"])
       expect(r.code).toBe(0)
       expect(h.fakes).toHaveLength(0)
-      expect(r.stdout).toMatch(/16 prompts in 8 sessions after cleaning → 16 selected in 2 chunks/)
+      expect(r.stdout).toMatch(/15 prompts in 7 sessions after cleaning → 15 selected in 2 chunks/)
       expect(r.stdout).toContain("No LLM was called")
       expect(r.stdout).toContain(`${out}/chunks/`)
       expect(r.stdout).toMatch(/redacted prompt text/)
