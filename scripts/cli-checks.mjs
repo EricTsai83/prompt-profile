@@ -27,7 +27,12 @@ export const checkCli = ({ repo, root, version, cli }) => {
       model: a.model,
       source: a.modelSource,
     })),
-    summary: execution.summary,
+    // The fixture is a version 1 record without the `label` stage; a profile's generation
+    // carries every stage, so a missing one would come back filled in.
+    summary: {
+      ...execution.summary,
+      stages: { label: { calls: 0, failed: 0, cancelled: 0 }, ...execution.summary.stages },
+    },
   }
   writeFileSync(
     input,
