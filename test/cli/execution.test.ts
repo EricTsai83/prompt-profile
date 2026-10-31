@@ -109,3 +109,14 @@ it.effect(
     }),
   30_000,
 )
+
+it("lists every execution stage in the verbose call summary, including the trait labels", async () => {
+  const { messages } = await import("../../src/cli/messages.ts")
+  const { EXECUTION_STAGES } = await import("../../src/domain/Execution.ts")
+  const attempt = (stage: string) => ({ stage, outcome: "succeeded" })
+  const lines = messages.executionDetails({
+    attempts: [attempt("map"), attempt("label"), attempt("label")],
+  } as never)
+  expect(lines.map((l) => l.split(":")[0])).toEqual([...EXECUTION_STAGES])
+  expect(lines).toContain("label: 2 attempts, 0 failed, 0 cancelled")
+})

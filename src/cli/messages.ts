@@ -1,4 +1,4 @@
-import type { ExecutionRecord } from "../domain/index.ts"
+import { EXECUTION_STAGES, type ExecutionRecord } from "../domain/index.ts"
 import type { Finding } from "../pipeline/index.ts"
 import type { ReportContents } from "../report/index.ts"
 
@@ -39,7 +39,7 @@ export const messages = {
   progressElapsed: (ms: number) => ` · elapsed ${Math.max(0, ms)} ms`,
   reviewing: "Reviewing the draft against source evidence…",
   executionDetails: (r: ExecutionRecord) =>
-    ["map", "merge", "draft", "review", "translation"].map((stage) => {
+    EXECUTION_STAGES.map((stage) => {
       const calls = r.attempts.filter((a) => a.stage === stage)
       return `${stage}: ${calls.length} attempts, ${calls.filter((a) => a.outcome === "failed").length} failed, ${calls.filter((a) => a.outcome === "cancelled").length} cancelled`
     }),
