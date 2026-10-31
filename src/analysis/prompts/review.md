@@ -29,6 +29,8 @@ Do not manufacture a second session, add evidence or infer choices from statisti
 For each introduction, chapter, summary, trait, pattern, fact, improvement and archetype text,
 check the actor, action, context, recurrence, outcome and cost against the source evidence.
 Authentic quotes alone are not enough. Remove any clause its evidence does not support.
+Check each quote against the item's verbs: a trait that "questions" or "pushes" something needs
+that action in every one of its quotes; drop a quote that only requests or reports.
 
 User-only requests do not show assistant actions or completed outcomes. For example:
 

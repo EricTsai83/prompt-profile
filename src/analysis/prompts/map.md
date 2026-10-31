@@ -120,10 +120,24 @@ existing observations and episodes; do not discard them for lacking an axis.
 Also collect these legacy collaboration dimensions for the factual evidence record, without
 treating either pole as better:
 
-- framing: defining outcomes first versus exploring the problem through dialogue;
-- pacing: confirming incremental steps versus handing over a whole task;
-- control: choosing the approach personally versus authorizing the agent to choose;
+- framing: defining outcomes first versus exploring the problem through dialogue.
+  `first`: "Goal: the export passes these three checks", "Requirement: dates in ISO format".
+  `second`: "Let's talk through a few options first", "What would you suggest here?".
+  Not framing: a bare "why?" or a question about how code works (that is learning, not
+  exploring the task), or a long brief that only lists files.
+- pacing: confirming incremental steps versus handing over a whole task.
+  `first`: "Do step 1 only and show me", "Describe the migration before running anything".
+  `second`: "Fix all forty of these", "Run the whole plan and commit when done".
+  Not pacing: asking for a test run or a review (that is closure) or a single small fix.
+- control: choosing the approach personally versus authorizing the agent to choose.
+  `first`: "Use zustand, not a new context", "Don't touch IndexedDB".
+  `second`: "Go with your recommendation", "You decide the structure; no need to ask me".
+  Not control: approving a result ("looks good") or permission to run commands without
+  asking (that is pacing), unless it hands over a design decision.
 - closure: checking predefined criteria versus refining after seeing a result.
+  `first`: "Done when CI is green and the CSV matches the sample", "Run the acceptance test".
+  `second`: "Move it two pixels left", "Fade out a bit slower".
+  Not closure: a first request for a feature, or a bug report without a fix to check.
   A person may work one way in one project or kind of task and the other way elsewhere: both
   are characteristic of them, not a contradiction. Record each way with the context it shows in
   (the project, the kind of task or the situation). Short prompts alone prove none of these.

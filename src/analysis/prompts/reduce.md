@@ -18,7 +18,8 @@ Keep it short: the report is read at a glance, and charts show the numbers.
 - `dimensions`: exactly five, one per key — `work_style`, `communication`, `tech_profile`,
   `interests`, `growth` — each with a short `title` (2–4 words), a `summary` of 1–2 sentences
   and evidence.
-- `traits`: 3–6 of the most distinctive traits, each with a `name` of 1–4 words, a one-sentence
+- `traits`: 4–6 of the most distinctive traits (3 only when the observations support no more),
+  each with a `name` of 1–4 words, a one-sentence
   `description`, `confidence` and at least 2 pieces of evidence.
 - `funFacts`: 3–5 fun facts, each at most 15 words.
 - `patterns`: 0–4 habits that recur across the `episodes`, each with a one-sentence `claim`
@@ -28,7 +29,8 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   correct, redirect or check), never the assistant's replies or an outcome the episode's
   `ending` does not show; an `unknown` ending means the result is not visible. Return an empty
   list when no habit recurs in two sessions.
-- `improvements`: 0–2 concrete ways this person's prompts could work better, built mainly from
+- `improvements`: 1–2 concrete ways this person's prompts could work better (0 only when no
+  `prompting` observation shows a gap), built mainly from
   the `prompting` observations (other observations may support them). Each has a `title` (2–6
   words, an action such as "State the expected result first"), a one-sentence `pattern` (what
   they do), a one-sentence `impact` (what it visibly costs in these prompts, such as the
@@ -67,6 +69,11 @@ user-reported misunderstandings without assuming the initial request lacked info
   partly contradictory.
 - Evidence must be copied **exactly** from the input observations (same `promptId`, same
   `quote`). Never create new quotes.
+- Write times in `funFacts` the way a person says them in their own time zone ("at 3 a.m.",
+  "at 04:59"), never with a time zone identifier such as "Asia/Taipei".
+- Every verb a trait or dimension uses for the person ("questions", "pushes", "rejects") must
+  be visible in each of its quotes; a quote that only asks for something cannot support a
+  claim that the person challenges it. Drop the quote or soften the verb.
 - `funFacts` may only use numbers that appear in `stats` (e.g. `latestTime`,
   `longestStreakDays`, `hourHistogram`, `languageMix`, `correctionRate`). Never make numbers up.
   Ratios in `stats` are 0–1; present them as percentages. `weekdayHistogram` and `activityGrid`
