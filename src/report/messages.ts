@@ -530,7 +530,7 @@ export const PORTRAIT_MESSAGES = {
     friction: "Possible coordination friction",
     catalogNote:
       "This is a description of the role catalog, not an additional finding about you. Contexts and friction are possibilities to discuss, not observed outcomes.",
-    rule: "A way of working counts as characteristic once distinct verified excerpts show it in two or more conversations. Copied excerpts count once; conversation length adds no weight. A complete role is named only when every dimension has exactly one characteristic way.",
+    rule: "A way of working counts as characteristic once distinct verified excerpts show it in two or more conversations. Copied excerpts count once; conversation length adds no weight. The role name sums up every way of working, including switching between them by context; it is not decided axis by axis.",
     axes: {
       framing: ["Starting point", "Define first", "Explore first"],
       pacing: ["Pace", "Step by step", "Whole task"],
@@ -557,7 +557,7 @@ export const PORTRAIT_MESSAGES = {
     friction: "可能需要協調的地方",
     catalogNote:
       "這是角色目錄的描述，不是對你的額外判斷。適用情境與協調提醒是可討論的可能性，不代表已觀察到的結果。",
-    rule: "一種做法要在兩段以上的對話中有不同的已驗證引述，才算特色。重複引述只計一次，對話長度不會增加權重。只有每個面向都剛好只有一種特色做法時，才會給出完整的角色名稱。",
+    rule: "一種做法要在兩段以上的對話中有不同的已驗證引述，才算特色。重複引述只計一次，對話長度不會增加權重。角色名稱概括所有的做法，包括依情境切換的方式，不是逐一面向決定的。",
     axes: {
       framing: ["起手方式", "先定義", "先探索"],
       pacing: ["推進節奏", "分步推進", "整包交付"],

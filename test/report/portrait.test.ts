@@ -79,6 +79,32 @@ describe("portrait report", () => {
     expect(out).toContain("Personal description.")
   })
 
+  it("explains that the role name sums up every way of working, not one per axis", async () => {
+    const base = await sample()
+    const p = {
+      ...base,
+      portrait: {
+        introduction: "Intro.",
+        chapters: [{ title: "Chapter", body: "Body.", evidence: [] }],
+        axes: (["framing", "pacing", "control", "closure"] as const).map((key) => ({
+          key,
+          explanation: "Observed.",
+          sides: (["first", "second"] as const).map((pole) => ({
+            pole,
+            context: "reviews",
+            sessions: 2,
+            evidence: [],
+          })),
+        })),
+      },
+    }
+    const out = renderHtml(p)
+    expect(out).not.toContain("A complete role is named only")
+    expect(out).not.toContain("才會給出完整的角色名稱")
+    expect(out).toContain("The role name sums up")
+    expect(out).toContain("角色名稱概括")
+  })
+
   it("still names a released profile's stored role in every language and preserves the source", async () => {
     const base = await sample()
     const keys = ["framing", "pacing", "control", "closure"] as const
