@@ -76,7 +76,7 @@ These are observations about your prompts, not a psychological assessment or an 
 prompt-profile --since 6m            # 1m / 2m (default) / 3m / 6m / 1y / all
 prompt-profile --engine codex        # default: auto, Claude Code first
 prompt-profile --model <name>        # choose the analysis model
-prompt-profile --max-calls 40        # cap CLI calls, including retries
+prompt-profile --max-calls 60        # cap CLI calls, including retries
 prompt-profile --engine claude --max-cost-usd 1.50  # local stop threshold; may overshoot
 prompt-profile --lang zh-TW,en       # first language is the default
 prompt-profile --voice first         # I/我; second (you/你) is the default
@@ -99,6 +99,69 @@ Each analysis saves calls, retries, cache reuse, token coverage and cost provena
 failed executions. The report shows generation usage separately from historical activity.
 See [execution accounting](docs/execution-accounting.md) for recovery, unknown measurements
 and cost-threshold limits.
+
+## How much a run uses
+
+A run reads everything locally, then analyses a **sample** of the selected history: about
+20–26 chunks of redacted prompts (roughly 700k characters) once the history is larger than
+that. Time, tokens and cost therefore stop growing with history size; `--full` analyses every
+chunk and scales with the history instead. `--dry-run` prints your own estimate for free.
+
+### Measured runs
+
+One real history, default settings (last 2 months, sampled, report in Traditional Chinese
+and English), measured on 2026-11-01 with both engines on the same input:
+
+| Input              |                                                                       |
+| ------------------ | --------------------------------------------------------------------- |
+| History in range   | 4,374 prompts in 613 conversations (Claude Code and Codex)            |
+| Analysed (sampled) | 1,499 prompts in 252 conversations: 21 of 68 chunks, ~665k characters |
+
+|                           | Claude Code                        | Codex                          |
+| ------------------------- | ---------------------------------- | ------------------------------ |
+| Model                     | `claude-opus-5-5` (default effort) | `gpt-6.1-sol` (default effort) |
+| CLI calls                 | 48 (no retries)                    | 48 (no retries)                |
+| Wall time                 | 25 min                             | 20.5 min                       |
+| Tokens in / out           | 1.46M / 0.38M                      | 1.73M / 0.29M                  |
+| API list-price equivalent | **US$13.8** (reported by the CLI)  | **≈ US$6.1** (estimated¹)      |
+
+¹ Codex does not report which model answered, so prompt-profile leaves its cost unpriced; the
+estimate applies `gpt-6.1-sol` list prices to the measured tokens and leaves out cache writes,
+which the Codex log does not report.
+
+With a subscription these calls use your plan's quota; the dollar figures are what the same
+tokens would cost on the API, not a bill. Another model, `--effort` level or history mix will
+change them.
+
+Where the calls go (both engines):
+
+| Stage          | Calls                | What it does                                             | Share of cost (Claude / Codex) |
+| -------------- | -------------------- | -------------------------------------------------------- | ------------------------------ |
+| map            | 1 per chunk          | reads the redacted prompts and writes cited observations | 52% / 57%                      |
+| merge          | 0–3                  | condenses observations when there are too many           | 10% / 9%                       |
+| draft + review | 2                    | writes the profile, then checks it against the evidence  | 13% / 10%                      |
+| label          | 1 per chunk          | counts how often each trait shows (the trait radar)      | 24% / 24%                      |
+| translation    | 1 per extra language | translates the generated text                            | 1% / 1%                        |
+
+### Scale reference
+
+Base call estimates for the same history at different `--since` ranges (from `--dry-run`, so
+merges and retries come on top):
+
+| Range              | Prompts after cleaning | Conversations | Chunks analysed / total | Base calls |
+| ------------------ | ---------------------- | ------------- | ----------------------- | ---------- |
+| 2 days             | 392                    | 55            | 10 / 10 (no sampling)   | 23         |
+| 1 week             | 1,278                  | 195           | 16 / 34                 | 35         |
+| 2 weeks            | 1,690                  | 241           | 18 / 40                 | 39         |
+| 1 month            | 3,132                  | 448           | 23 / 60                 | 49         |
+| 2 months (default) | 4,038                  | 611           | 21 / 68                 | 45         |
+| 6 months           | 7,605                  | 1,629         | 26 / 111                | 55         |
+| All (7 months)     | 7,884                  | 1,686         | 25 / 115                | 53         |
+
+As a rule of thumb, a sampled run costs about two calls per analysed chunk plus a handful, and
+time and cost follow the number of analysed chunks: a history of a few hundred prompts takes
+about half of the measured run above, and anything past ~1,300 prompts costs about the same.
+`--full` on the 6-month history would analyse 111 chunks, about five times the measured run.
 
 ## Sharing and privacy
 

@@ -6,7 +6,7 @@ be published. Completed reports retain a compact `generation` snapshot in `profi
 The HTML factual view shows this under **Report generation**; cards omit it.
 
 ```bash
-prompt-profile --yes --max-calls 40
+prompt-profile --yes --max-calls 60
 prompt-profile --engine claude --max-cost-usd 1.50
 prompt-profile history --executions --out prompt-profile-report
 ```

@@ -29,7 +29,7 @@ prompt-profile --engine codex  # which CLI analyses your prompts (default: auto,
 prompt-profile --model <name>  # model passed to claude / codex
 prompt-profile --effort medium # reasoning effort: low / medium / high / xhigh / max (default: the CLI's)
 prompt-profile --out <dir>     # output folder
-prompt-profile --max-calls 40  # cap CLI invocations, including merges and retries
+prompt-profile --max-calls 60  # cap CLI invocations, including merges and retries
 prompt-profile --full          # no sampling, analyse everything (slower, uses more quota)
 prompt-profile --no-cache      # do not read the analysis cache
 prompt-profile --yes           # skip the confirmation (required in non-interactive sessions)
