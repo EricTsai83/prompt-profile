@@ -28,6 +28,8 @@ const measured = async (): Promise<Profile> => {
     ["PROJECT_ALPHA", a, 120],
     ["PROJECT_BETA", b, 80],
     ["PROJECT_TINY", 1, 3],
+    // stored by a report from before the threshold: still too few to draw
+    ["PROJECT_SMALL", 5, 12],
   ]
   const values = [
     frequency(100, projects(70, 30)),
@@ -58,6 +60,8 @@ describe("trait radar", () => {
     expect(radar).toContain(p.traits[0]!.name)
     expect(radar).toContain(p.translations["zh-TW"]!.traits[0]!.name)
     expect(radar).toContain("not an ability score")
+    expect(radar).toContain(`Measured by ${p.engine.model}`)
+    expect(radar).toContain(`由 ${p.engine.model} 量測`)
   })
 
   it("adds one small radar per project with enough conversations, on the same axes", async () => {
@@ -67,6 +71,8 @@ describe("trait radar", () => {
     expect(projects).toContain("PROJECT_ALPHA")
     expect(projects).toContain("PROJECT_BETA")
     expect(projects).not.toContain("PROJECT_TINY")
+    expect(projects).not.toContain("PROJECT_SMALL")
+    expect(projects).toContain("20 or more analysed conversations")
     // --exclude projects hides the project radars with their names
     const hidden = renderHtml(p, { look: "classic", cardHide: [], exclude: ["projects"] })
     expect(section(hidden, "trait-radar")).not.toBe("")

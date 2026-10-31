@@ -1,4 +1,4 @@
-import type { Profile, TraitFrequency } from "../domain/index.ts"
+import { MIN_PROJECT_CONVERSATIONS, type Profile, type TraitFrequency } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { RADAR_MESSAGES } from "./messages.ts"
@@ -6,8 +6,6 @@ import type { Scrub, Visibility } from "./visibility.ts"
 
 /** Fewest measured traits a radar needs; fewer stay in the trait list only. */
 export const MIN_RADAR_TRAITS = 3
-/** Fewest analysed conversations a project needs for its own radar. */
-export const MIN_PROJECT_SESSIONS = 5
 /** Most project radars shown, busiest first. */
 export const MAX_PROJECT_RADARS = 3
 
@@ -64,6 +62,12 @@ const radarSvg = (
   </svg>`
 }
 
+/** " Measured by <model>…" after a note, when the profile names its model. */
+export const measuredBy = (p: Profile, loc: Loc): Raw | string =>
+  p.engine.model
+    ? html` ${loc.text((_m, _c, l) => RADAR_MESSAGES[l].measuredBy(p.engine.model!))}`
+    : ""
+
 /**
  * How often each trait shows, as a radar: one axis per measured trait, 0% at the center and
  * 100% at the edge. Each trait is a share of the analysed conversations on its own, so several
@@ -78,7 +82,7 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
   const overall = traits.map((t) => share(t.frequency.sessions, t.frequency.analysedSessions))
   const projects = v.projects
     ? (traits[0]!.frequency.byProject ?? [])
-        .filter((pr) => pr.analysedSessions >= MIN_PROJECT_SESSIONS)
+        .filter((pr) => pr.analysedSessions >= MIN_PROJECT_CONVERSATIONS)
         .toSorted((a, b) => b.analysedSessions - a.analysedSessions)
         .slice(0, MAX_PROJECT_RADARS)
         .map((pr) => pr.project)
@@ -90,7 +94,7 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
     })
   return html`<section class="trait-radar">
     <h2>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].title)}</h2>
-    <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}</p>
+    <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}${measuredBy(p, loc)}</p>
     <div class="radar-main">${radarSvg(
       overall,
       (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${overall[i]}%`),

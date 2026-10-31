@@ -41,6 +41,7 @@ describe("axis balance scale", () => {
     expect(out).toContain('style="width:75%"')
     expect(out).toContain("先定義 75%")
     expect(out).toContain("12 conversations")
+    expect(out).toContain(`Measured by ${p.engine.model}`)
     // pacing: an even split is shown as such
     expect(out).toContain("Step by step 50%")
     // control and closure have too few conversations to show a share

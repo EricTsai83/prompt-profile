@@ -575,7 +575,9 @@ export const RADAR_MESSAGES = {
     of: (sessions: number, of: number) => `${sessions} of ${of} conversations`,
     byProject: "By project",
     byProjectNote:
-      "The same traits, counted within each project's analysed conversations. Projects with few conversations are left out.",
+      "The same traits, counted within each project's analysed conversations. Only projects with 20 or more analysed conversations are listed: with fewer, one conversation moves a share too much.",
+    measuredBy: (model: string) =>
+      `Measured by ${model}; another model may label the same prompts differently.`,
     conversations: (n: number) => `${n} ${n === 1 ? "conversation" : "conversations"}`,
   },
   "zh-TW": {
@@ -583,7 +585,9 @@ export const RADAR_MESSAGES = {
     note: "每根軸是一個特質，中心是 0%、外圈是 100%：在已分析的對話中，有多少比例展現這個特質，依已驗證的提示計算。每個特質各自計算，所以可以同時有好幾個達到 100%。這是對這些對話的量測，不是能力分數。",
     of: (sessions: number, of: number) => `${of} 段對話中的 ${sessions} 段`,
     byProject: "各專案",
-    byProjectNote: "同一組特質，分別在每個專案已分析的對話中計算。對話太少的專案不列出。",
+    byProjectNote:
+      "同一組特質，分別在每個專案已分析的對話中計算。只列出已分析對話 20 段以上的專案：對話太少時，一段對話就會讓比例變動太多。",
+    measuredBy: (model: string) => `由 ${model} 量測；換一個模型，同樣的提示可能被判讀得不一樣。`,
     conversations: (n: number) => `${n} 段對話`,
   },
 } as const
