@@ -4,7 +4,12 @@
  */
 import { DateTime } from "effect"
 import { sha256 } from "../../src/analysis/hash.ts"
-import { selectChunks, translationCalls, type AnalyzeOptions } from "../../src/analysis/plan.ts"
+import {
+  labelCalls,
+  selectChunks,
+  translationCalls,
+  type AnalyzeOptions,
+} from "../../src/analysis/plan.ts"
 import type { SafePrompt } from "../../src/domain/SafePrompt.ts"
 import type { Stats } from "../../src/domain/Stats.ts"
 import { processRecords } from "../../src/pipeline/index.ts"
@@ -70,7 +75,8 @@ export interface Selection {
   readonly selectedPromptIds: ReadonlyArray<string>
   readonly chunksTotal: number
   readonly sampled: boolean
-  /** Map calls + reduce + one per non-English language; merges and retries come on top. */
+  /** Map calls + reduce + a trait label call per chunk + one per non-English language; merges
+   * and retries come on top. */
   readonly minimumCalls: number
 }
 
@@ -82,7 +88,10 @@ export const selection = (persona: PreparedPersona, variant: Variant): Selection
     selectedPromptIds: chunks.flatMap((c) => c.prompts.map((p) => p.id)),
     chunksTotal: all.length,
     sampled,
-    minimumCalls: chunks.length === 0 ? 0 : chunks.length + 2 + translationCalls(options),
+    minimumCalls:
+      chunks.length === 0
+        ? 0
+        : chunks.length + 2 + labelCalls(chunks.length) + translationCalls(options),
   }
 }
 

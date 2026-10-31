@@ -80,6 +80,14 @@ export const LlmChunkAnalysis = Schema.Struct({
 })
 export type LlmChunkAnalysis = typeof LlmChunkAnalysis.Type
 
+/** What the labelling pass returns for one chunk: each prompt that shows a listed trait. */
+export const LlmTraitLabels = Schema.Struct({
+  labels: Schema.Array(
+    Schema.Struct({ promptId: Schema.String, trait: Schema.String, quote: Schema.String }),
+  ),
+})
+export type LlmTraitLabels = typeof LlmTraitLabels.Type
+
 const LlmPortrait = Schema.Struct({
   introduction: Schema.String,
   chapters: Schema.Array(
@@ -303,6 +311,7 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     confidence: t.confidence,
     evidence: t.evidence.map(toEvidence),
     support: null,
+    frequency: null,
   })),
   funFacts: draft.funFacts,
   improvements: draft.improvements.map((i) => ({

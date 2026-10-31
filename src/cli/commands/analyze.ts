@@ -174,6 +174,8 @@ const makeProgress = (
     onReviewStart: out.line(t.reviewing),
     onReduceDone: (ms) => out.debug(t.chunkTiming(total, ms)),
     onVerified: (kept, dropped) => out.line(t.verified(kept, kept + dropped)),
+    onLabelStart: (chunks) => out.line(t.labelling(chunks)),
+    onLabelled: (labelled, sent) => out.line(t.labelled(labelled, sent)),
     onTranslateStart: (language) => out.line(t.translating(language)),
     onTranslated: (language, ok) =>
       out.line(ok ? t.translated(language) : t.translationFailed(language)),
@@ -248,7 +250,9 @@ const preflight = (input: {
         ? t.noRunnerLine
         : t.remoteLine(DISPLAY_NAMES[input.runner], RUNNER_COMMANDS[input.runner], input.dryRun),
     )
-    yield* out.line(t.quotaLine(p.llmCalls, p.mapCalls, p.cacheHits, p.translationCalls))
+    yield* out.line(
+      t.quotaLine(p.llmCalls, p.mapCalls, p.cacheHits, p.labelCalls, p.translationCalls),
+    )
     yield* out.line(t.callEstimateNote)
     yield* out.line(input.maxCalls === null ? t.noCallBudget : t.callBudget(input.maxCalls))
     if (!input.dryRun) yield* out.line(t.freeRoute)

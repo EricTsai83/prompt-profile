@@ -24,6 +24,7 @@ export const fixture = (name: string) => new URL(`../fixtures/${name}`, import.m
 
 /** Fake LLM: quotes the first prompt of each chunk; builds a profile from observations. */
 export const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
+  if (schemaName === "LlmTraitLabels") return { labels: [] }
   if (schemaName === "LlmTranslation") {
     // Prefix every string except dimension keys.
     const tr = (x: unknown): unknown =>

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 21,
+  "schemaVersion": 22,
   "generation": null,
   "languages": [
     "en",
@@ -111,7 +111,8 @@
       "support": {
         "sessions": 4,
         "weeks": 3
-      }
+      },
+      "frequency": null
     },
     {
       "name": "Straight talker",
@@ -130,7 +131,8 @@
       "support": {
         "sessions": 2,
         "weeks": 2
-      }
+      },
+      "frequency": null
     },
     {
       "name": "Type purist",
@@ -145,7 +147,8 @@
       "support": {
         "sessions": 1,
         "weeks": 1
-      }
+      },
+      "frequency": null
     }
   ],
   "funFacts": [

@@ -15,7 +15,7 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-export const PROFILE_SCHEMA_VERSION = 21 as const
+export const PROFILE_SCHEMA_VERSION = 22 as const
 
 /**
  * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,
@@ -128,6 +128,19 @@ export type Dimension = typeof Dimension.Type
 export const Support = Schema.Struct({ sessions: Count, weeks: Count })
 export type Support = typeof Support.Type
 
+/**
+ * How many analysed conversations show a trait, from the labelling pass: overall and per
+ * project. A count over a sample of the history, not the whole history.
+ */
+export const TraitFrequency = Schema.Struct({
+  sessions: Count,
+  analysedSessions: Count,
+  byProject: Schema.Array(
+    Schema.Struct({ project: Schema.String, sessions: Count, analysedSessions: Count }),
+  ),
+})
+export type TraitFrequency = typeof TraitFrequency.Type
+
 export const Trait = Schema.Struct({
   name: Schema.String,
   description: Schema.String,
@@ -135,6 +148,10 @@ export const Trait = Schema.Struct({
   evidence: Schema.Array(Evidence),
   /** Filled by verification; null in profiles before schema version 5. */
   support: Schema.NullOr(Support).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
+  /** Measured by the labelling pass; null when not measured (and before schema version 22). */
+  frequency: Schema.NullOr(TraitFrequency).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
 })
 export type Trait = typeof Trait.Type
 
@@ -174,6 +191,10 @@ export const Coverage = Schema.Struct({
   /** Interaction episodes found, rejected and selected; null before schema version 11. */
   episodes: Schema.NullOr(EpisodeCoverage).pipe(
     Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
+  /** The trait labelling pass: chunks labelled and failed, and labels rejected. */
+  traitLabels: Schema.optionalKey(
+    Schema.Struct({ chunksLabelled: Count, chunksFailed: Count, rejected: Count }),
   ),
 })
 export type Coverage = typeof Coverage.Type

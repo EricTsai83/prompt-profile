@@ -11,7 +11,7 @@ const PROMPTS = "src/analysis/prompts"
  * After editing a prompt, bump `ANALYSIS_VERSION` and record the new hash under the new version.
  */
 const PROMPTS_OF_VERSION: Readonly<Record<string, string>> = {
-  "31": "97d5f319627c2463b5035ceef4613996eda6da2fce3f5a06fadbe35b385708d6",
+  "32": "c30c801e4ddedd8cfd247c8b053412f397429ad04989b84baea6d6ee045d2331",
 }
 
 it("an analysis prompt change bumps ANALYSIS_VERSION", () => {

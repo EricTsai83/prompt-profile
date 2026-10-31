@@ -140,7 +140,7 @@ export interface PromptOrigin {
  * spread is unknown and confidence is capped at low. Fewer than 3 traits is reported as-is.
  */
 export const verifyTraits = (
-  traits: ReadonlyArray<Omit<Trait, "support">>,
+  traits: ReadonlyArray<Omit<Trait, "support" | "frequency">>,
   texts: ReadonlyMap<string, string>,
   counts: EvidenceCounts,
   origins?: ReadonlyMap<string, PromptOrigin>,
@@ -163,7 +163,8 @@ export const verifyTraits = (
           ? "medium"
           : "low"
     const stated = prompts.size < 2 ? DOWNGRADE[t.confidence] : t.confidence
-    return [{ ...t, evidence, confidence: lower(stated, allowed), support }]
+    // frequency comes from the labelling pass, after verification
+    return [{ ...t, evidence, confidence: lower(stated, allowed), support, frequency: null }]
   })
 
 /**

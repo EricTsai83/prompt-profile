@@ -198,7 +198,10 @@ describe("runExperiment", () => {
     const root = tmp()
     return Effect.gen(function* () {
       const fiber = yield* Effect.forkChild(run(config, fake.deps, 500, root))
-      for (let i = 0; i < 200 && fake.calls() < 7; i++) yield* Effect.sleep("5 millis")
+      // the first case's calls, then the second case's first (hanging) call
+      const first = selection(prepareAll(config).get("curious-learner")!, config.variants[0]!)
+      const started = first.minimumCalls + 1
+      for (let i = 0; i < 200 && fake.calls() < started; i++) yield* Effect.sleep("5 millis")
       yield* Fiber.interrupt(fiber)
       const saved: Manifest = json(join(root, "manifest.json"))
       expect(saved.outcome).toBe("interrupted")

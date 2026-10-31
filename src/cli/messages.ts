@@ -89,11 +89,12 @@ export const messages = {
     `● ${dryRun ? "A real run sends off this computer" : "Sent off this computer"}: the selected, redacted prompts go through your logged-in ${name} CLI (${command}) to its model service`,
   noRunnerLine:
     "● No logged-in Claude Code or Codex found: a real run needs one (the dry run does not)",
-  quotaLine: (calls: number, map: number, cached: number, translations: number) =>
+  quotaLine: (calls: number, map: number, cached: number, labels: number, translations: number) =>
     `  No API key: uses your subscription quota, base estimate ${count(calls, "call", "calls")} (${[
       `${count(map, "chunk", "chunks")}${cached > 0 ? `, ${n(cached)} more cached` : ""}`,
       "1 final profile",
       "1 evidence review",
+      ...(labels > 0 ? [count(labels, "trait label", "trait labels")] : []),
       ...(translations > 0 ? [count(translations, "translation", "translations")] : []),
     ].join(" + ")})`,
   callEstimateNote: "  Intermediate merges and retries (up to 2 per call) can add calls.",
@@ -111,6 +112,12 @@ export const messages = {
   merging: (groups: number) => `● Many observations: merging in ${groups} groups first…`,
   reducing: "● Writing the profile…",
   verified: (kept: number, total: number) => `● Verifying evidence: kept ${kept} / ${total}`,
+  labelling: (chunks: number) =>
+    `● Measuring how often each trait shows (${count(chunks, "chunk", "chunks")})…`,
+  labelled: (labelled: number, total: number) =>
+    labelled === total
+      ? `  Traits measured on all ${n(total)} chunks`
+      : `  Traits measured on ${n(labelled)} of ${n(total)} chunks; the rest stayed unlabelled`,
   translating: (language: string) => `● Translating into ${language}…`,
   translated: (language: string) => `  Translated into ${language}`,
   translationFailed: (language: string) =>

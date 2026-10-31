@@ -34,8 +34,11 @@ export interface AnalysisPlan {
   readonly chunks: ReadonlyArray<Chunk>
   readonly sampled: boolean
   readonly cacheHits: number
-  /** Base estimate: uncached map calls + final reduce + evidence review + translations; merges and retries are additional. */
+  /** Base estimate: uncached map calls + final reduce + evidence review + trait labels +
+   * translations; merges and retries are additional. */
   readonly llmCalls: number
+  /** Of `llmCalls`: one trait labelling call per chunk. */
+  readonly labelCalls: number
   /** Of `llmCalls`: one per uncached chunk. */
   readonly mapCalls: number
   /** Of `llmCalls`: one per non-English report language. */
@@ -45,6 +48,9 @@ export interface AnalysisPlan {
   readonly promptsAnalyzed: number
   readonly sessionsAnalyzed: number
 }
+
+/** One trait labelling call per analysed chunk (never cached: the traits change per run). */
+export const labelCalls = (chunks: number): number => chunks
 
 /** One translation call per distinct non-English language. */
 export const translationCalls = (options: AnalyzeOptions): number =>
@@ -98,8 +104,12 @@ export const plan = (input: {
       chunks,
       sampled,
       cacheHits,
-      llmCalls: chunks.length - cacheHits + (chunks.length > 0 ? 2 + translations : 0),
+      llmCalls:
+        chunks.length -
+        cacheHits +
+        (chunks.length > 0 ? 2 + labelCalls(chunks.length) + translations : 0),
       mapCalls: chunks.length - cacheHits,
+      labelCalls: chunks.length > 0 ? labelCalls(chunks.length) : 0,
       translationCalls: translations,
       charsToSend,
       promptsAnalyzed: prompts.length,

@@ -1,6 +1,6 @@
 import { readAsset } from "../platform/index.ts"
 
-export type PromptName = "map" | "merge" | "reduce" | "review" | "translate"
+export type PromptName = "map" | "merge" | "reduce" | "review" | "label" | "translate"
 
 const cache = new Map<PromptName, string>()
 

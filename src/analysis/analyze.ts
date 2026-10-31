@@ -4,7 +4,7 @@ import { LlmRunner } from "../llm/index.ts"
 import type { AnalysisCache } from "./cache.ts"
 import { emptyEpisodeCounts, selectEpisodes, verifyEpisodes } from "./episodes.ts"
 import { AnalysisFailed, stageError, type AnalyzeError } from "./errors.ts"
-import { mapChunks } from "./map.ts"
+import { mapChunks, type AnalyzedChunk } from "./map.ts"
 import {
   capEvidence,
   mergeObservations,
@@ -17,6 +17,7 @@ import { Progress } from "./progress.ts"
 import { draftProfile, evidenceOriginsOf, reduceInput, verifyProfile } from "./reduce.ts"
 import { measureSteering } from "./steering.ts"
 import { measureAxisBalance } from "./axes.ts"
+import { labelTraits, measureTraitFrequency } from "./label.ts"
 import { addTranslations } from "./translate.ts"
 import { verifyObservations, type EvidenceCounts } from "./verify.ts"
 
@@ -104,9 +105,49 @@ export const analyze = (input: {
     })
     yield* progress.onVerified(counts.kept, counts.dropped)
 
+    // ---- how often each verified trait shows: label every analysed chunk ------------------
+    const measured = yield* measureTraits(profile, analyzed, options)
+
     // ---- translate (verified text only) ---------------------------------------------------
     return yield* addTranslations(
-      { ...profile, evidenceOrigins: evidenceOriginsOf(profile, analyzed) },
+      { ...measured, evidenceOrigins: evidenceOriginsOf(measured, analyzed) },
       options.languages ?? ["en"],
     )
+  })
+
+/**
+ * Label every analysed chunk against the verified traits and store each trait's measured
+ * frequency. Nothing to label (no traits) leaves the profile unchanged.
+ */
+const measureTraits = (
+  profile: Profile,
+  analyzed: ReadonlyArray<AnalyzedChunk>,
+  options: AnalyzeOptions,
+) =>
+  Effect.gen(function* () {
+    if (profile.traits.length === 0) return profile
+    const progress = yield* Progress
+    yield* progress.onLabelStart?.(analyzed.length) ?? Effect.void
+    const outcomes = yield* labelTraits(
+      analyzed.map((o) => o.chunk),
+      profile.traits,
+      options,
+    )
+    const m = measureTraitFrequency(
+      outcomes,
+      profile.traits.map((t) => t.name),
+    )
+    yield* progress.onLabelled?.(m.chunksLabelled, outcomes.length) ?? Effect.void
+    return {
+      ...profile,
+      traits: profile.traits.map((t, i) => ({ ...t, frequency: m.frequencies[i] ?? null })),
+      coverage: {
+        ...profile.coverage,
+        traitLabels: {
+          chunksLabelled: m.chunksLabelled,
+          chunksFailed: m.chunksFailed,
+          rejected: m.rejected,
+        },
+      },
+    }
   })

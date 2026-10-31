@@ -23,6 +23,11 @@ const options: AnalyzeOptions = {
 const respond: FakeOptions["respond"] = ({ prompt, schemaName }) => {
   // merge step: pass observations through
   if (schemaName === "LlmChunkObservations") return { observations: JSON.parse(prompt) }
+  // labelling pass: the first prompt of each chunk shows the "steady" trait
+  if (schemaName === "LlmTraitLabels") {
+    const m = /<prompt id="([^"]+)"[^>]*>\n(.{0,30})/.exec(prompt)!
+    return { labels: [{ promptId: m[1], trait: "steady", quote: m[2] }] }
+  }
   if (schemaName === "LlmChunkAnalysis") {
     const m = /<prompt id="([^"]+)"[^>]*>\n(.{0,30})/.exec(prompt)!
     return {
@@ -315,7 +320,8 @@ describe("analyze", () => {
           ),
         ),
       )
-      const sent = JSON.parse(/\n\nstats:\n(.*)$/s.exec(fake.log.at(-1)!.prompt)![1]!)
+      const draft = fake.log.findLast((c) => c.schema === "LlmProfileDraft")!
+      const sent = JSON.parse(/\n\nstats:\n(.*)$/s.exec(draft.prompt)![1]!)
       expect(sent.weekdayHistogram).toEqual({
         Monday: 1,
         Tuesday: 2,
@@ -359,7 +365,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "31",
+        analysisVersion: "32",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -392,13 +398,15 @@ describe("analyze", () => {
       const second = makeFakeLlmRunner({ respond })
       const profile = yield* run(second, cache)
       expect(second.log.filter((c) => c.schema === "LlmChunkAnalysis")).toHaveLength(0)
-      expect(second.calls()).toBe(2) // draft and evidence review
+      // draft and evidence review, then labelling each chunk against the new traits
+      expect(second.log.filter((c) => c.schema !== "LlmTraitLabels")).toHaveLength(2)
       expect(profile.coverage.chunksFromCache).toBe(chunkCalls)
       expect(profile.engine.modelsUsed).toEqual(["fake-model"])
       // --no-cache skips reads
       const third = makeFakeLlmRunner({ respond })
       yield* run(third, cache, { ...options, noCache: true })
-      expect(third.calls()).toBe(chunkCalls + 2)
+      // every chunk again, draft and review, and a label call per chunk
+      expect(third.calls()).toBe(chunkCalls * 2 + 2)
     }),
   )
 
@@ -545,7 +553,9 @@ describe("analyze", () => {
         options: { ...options, languages: ["zh-TW", "en"] },
         runner: "claude-code",
       }).pipe(Effect.provideService(AnalysisCache, makeMemoryCache()))
-      expect(p.llmCalls).toBe(p.chunks.length + 3)
+      // map + label per chunk, draft, review, one translation
+      expect(p.llmCalls).toBe(p.chunks.length * 2 + 3)
+      expect(p.labelCalls).toBe(p.chunks.length)
     }),
   )
 
@@ -556,13 +566,14 @@ describe("analyze", () => {
         Effect.provideService(AnalysisCache, cache),
       )
       expect(before.cacheHits).toBe(0)
-      expect(before.llmCalls).toBe(before.chunks.length + 2)
+      expect(before.llmCalls).toBe(before.chunks.length * 2 + 2)
       yield* run(makeFakeLlmRunner({ respond }), cache)
       const after = yield* plan({ prompts, options, runner: "claude-code" }).pipe(
         Effect.provideService(AnalysisCache, cache),
       )
       expect(after.cacheHits).toBe(after.chunks.length)
-      expect(after.llmCalls).toBe(2)
+      // the trait labels are never cached
+      expect(after.llmCalls).toBe(2 + after.chunks.length)
       expect(after.charsToSend).toBe(0)
     }),
   )
@@ -914,6 +925,28 @@ it.effect("gives the draft step the measured share of each way of working", () =
   }),
 )
 
+it.effect("measures how often each verified trait shows by labelling every analysed chunk", () =>
+  Effect.gen(function* () {
+    const fake = makeFakeLlmRunner({ respond })
+    const profile = yield* run(fake)
+    const labelCalls = fake.log.filter((c) => c.schema === "LlmTraitLabels")
+    expect(labelCalls).toHaveLength(profile.coverage.chunksAnalyzed)
+    expect(labelCalls[0]!.system).toContain('"name":"steady"')
+    const steady = profile.traits.find((t) => t.name === "steady")!
+    // every chunk labels its first prompt, each in its own conversation
+    expect(steady.frequency).toMatchObject({
+      sessions: profile.coverage.chunksAnalyzed,
+      analysedSessions: profile.coverage.sessionsAnalyzed,
+    })
+    expect(profile.traits.find((t) => t.name === "single source")!.frequency?.sessions).toBe(0)
+    expect(profile.coverage.traitLabels).toEqual({
+      chunksLabelled: profile.coverage.chunksAnalyzed,
+      chunksFailed: 0,
+      rejected: 0,
+    })
+  }),
+)
+
 describe("interaction episodes", () => {
   /** Hand-written sessions of three prompts each, one session per day. */
   const steps = [
@@ -1149,8 +1182,9 @@ it.effect(
       const second = yield* run(secondRunner, cache, { ...options, voice: "second" })
       expect(first.voice).toBe("first")
       expect(second.voice).toBe("second")
-      expect(secondRunner.calls()).toBe(2)
-      expect(secondRunner.log.every((c) => c.system.includes("Narration voice: second"))).toBe(true)
+      const narrated = secondRunner.log.filter((c) => c.schema !== "LlmTraitLabels")
+      expect(narrated).toHaveLength(2)
+      expect(narrated.every((c) => c.system.includes("Narration voice: second"))).toBe(true)
       expect(second.stats).toEqual(first.stats)
       expect(second.traits.flatMap((t) => t.evidence)).toEqual(
         first.traits.flatMap((t) => t.evidence),

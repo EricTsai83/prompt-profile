@@ -1,4 +1,4 @@
-import { Schema } from "effect"
+import { Effect, Schema } from "effect"
 import {
   addTokens,
   totalTokens,
@@ -9,8 +9,10 @@ import {
 } from "./Usage.ts"
 
 /** Generation accounting is separate from the historical activity in Profile.usage. */
-export const EXECUTION_VERSION = 1
-export const EXECUTION_STAGES = ["map", "merge", "draft", "review", "translation"] as const
+/** 2 added the `label` stage; version 1 records are still read. */
+export const EXECUTION_VERSION = 2
+export const READABLE_EXECUTION_VERSIONS = [1, EXECUTION_VERSION] as const
+export const EXECUTION_STAGES = ["map", "merge", "draft", "review", "label", "translation"] as const
 export type ExecutionStage = (typeof EXECUTION_STAGES)[number]
 export type MeasurementState = "known-zero" | "complete" | "partial" | "unavailable"
 export type ExecutionOutcome =
@@ -78,7 +80,7 @@ export interface ExecutionSummary {
 }
 
 export interface ExecutionRecord {
-  readonly version: typeof EXECUTION_VERSION
+  readonly version: (typeof READABLE_EXECUTION_VERSIONS)[number]
   readonly id: string
   readonly accountingFinishedAtMs: number | null
   readonly engine: "claude-code" | "codex" | null
@@ -205,16 +207,15 @@ const Outcome = Schema.Literals([
 const Tokens = Schema.Struct(
   Object.fromEntries(TOKEN_KINDS.map((k) => [k, Count])) as Record<keyof TokenCounts, typeof Count>,
 )
+/** Summaries written before a stage existed have no entry for it. */
+const StageCounts = Schema.Struct({ calls: Count, failed: Count, cancelled: Count }).pipe(
+  Schema.withDecodingDefaultKey(Effect.succeed({ calls: 0, failed: 0, cancelled: 0 })),
+)
 export const ExecutionSummarySchema = Schema.Struct({
   stages: Schema.Struct(
-    Object.fromEntries(
-      EXECUTION_STAGES.map((stage) => [
-        stage,
-        Schema.Struct({ calls: Count, failed: Count, cancelled: Count }),
-      ]),
-    ) as Record<
+    Object.fromEntries(EXECUTION_STAGES.map((stage) => [stage, StageCounts])) as unknown as Record<
       ExecutionStage,
-      Schema.Struct<{ calls: typeof Count; failed: typeof Count; cancelled: typeof Count }>
+      typeof StageCounts
     >,
   ),
   calls: Count,
@@ -270,7 +271,7 @@ const AttemptSchema = Schema.Struct({
   ),
 })
 const RecordSchema = Schema.Struct({
-  version: Schema.Literal(EXECUTION_VERSION),
+  version: Schema.Literals(READABLE_EXECUTION_VERSIONS),
   id: Schema.String.check(Schema.isPattern(/^[0-9a-f-]{36}$/u)),
   operation: Schema.Literal("analyze"),
   accountingFinishedAtMs: Schema.NullOr(Amount),

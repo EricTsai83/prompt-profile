@@ -23,7 +23,7 @@ describe("verboseDetail", () => {
 describe("profile format recovery", () => {
   it("guides a newer format toward an update and a free render retry", () => {
     const result = renderError(
-      new UnsupportedProfileVersion({ found: 22, supported: 21 }),
+      new UnsupportedProfileVersion({ found: 23, supported: 22 }),
       undefined,
       {
         latestRenderCommand:

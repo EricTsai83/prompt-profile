@@ -71,7 +71,8 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const firstCalls = h.fakes[0]!.calls()
       yield* h.run(["--yes", "--since", "all"])
       expect(firstCalls).toBeGreaterThan(1)
-      expect(h.fakes[1]!.calls()).toBe(2)
+      // draft and review; the trait labels are not cached
+      expect(h.fakes[1]!.log.filter((c) => c.schema !== "LlmTraitLabels")).toHaveLength(2)
     }),
   )
 
@@ -99,9 +100,9 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const out = join(h.root, "dry")
       expect((yield* h.run(["--dry-run", "--out", out, "--since", "all"])).code).toBe(0)
       const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
-      // everything is cached for codex: only the final reduce call is left
+      // everything is cached for codex: draft, review and a trait label per chunk are left
       expect(plan.cacheHits).toBe(plan.chunksSelected)
-      expect(plan.llmCalls).toBe(2)
+      expect(plan.llmCalls).toBe(2 + plan.chunksSelected)
       expect(h.fakes).toHaveLength(1)
     }),
   )
