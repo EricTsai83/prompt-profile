@@ -119,7 +119,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | Plan | Topic |
 | ---- | ----- |
-| [35](./35-measured-support.md) | Measured support for traits and habits, instead of counting the cited quotes |
+| [35](./35-measured-support.md) | Measured support for traits and habits: implemented, awaiting a real run |
 
 ## Shared rules for every plan
 
