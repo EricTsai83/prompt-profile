@@ -8,6 +8,9 @@ const paper = "#f5efe2"
 const jade = "#659b91"
 const warm = "#dfb06d"
 const rose = "#ce8977"
+
+/** The symbols' palette, for drawings that sit beside them (the card's badge and radar). */
+export const AVATAR_PALETTE = { ink, paper, jade, warm, rose } as const
 const outline = `stroke="${ink}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"`
 
 /** One abstract composition per action, with geometric arrangements rather than accessories. */

@@ -7,7 +7,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { decodeProfile } from "../../src/domain/Profile.ts"
 import { cardTree, clip, renderCard } from "../../src/report/card.ts"
-import { clockSvg, svgDataUrl } from "../../src/report/graphic.ts"
+import { svgDataUrl } from "../../src/report/graphic.ts"
 import { lookOf } from "../../src/report/theme.ts"
 import { embeddedFonts } from "../../src/report/fonts.ts"
 import { escapeHtml, html, raw } from "../../src/report/html-template.ts"
@@ -109,21 +109,19 @@ describe("card", () => {
     }),
   )
 
-  it.effect(
-    "the default card wears classic colors and a neutral symbol, with a chart opt-out fallback",
-    () =>
-      Effect.gen(function* () {
-        const profile = yield* sample()
-        const tree = JSON.stringify(cardTree(profile))
-        const { bg, card, fg, accent } = lookOf("classic").color.dark
-        // Full bleed like the looks: the hero's color edge to edge, no page around it
-        expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
-        expect(tree).not.toContain(bg)
-        expect(tree).toContain(svgDataUrl(avatarSvg("neutral").svg))
-        expect(
-          JSON.stringify(cardTree(profile, { look: "classic", cardHide: [], avatar: "none" })),
-        ).toContain(svgDataUrl(clockSvg(profile.stats.hourHistogram, accent).svg))
-      }),
+  it.effect("the default card wears classic colors and the neutral symbol as a badge", () =>
+    Effect.gen(function* () {
+      const profile = yield* sample()
+      const tree = JSON.stringify(cardTree(profile))
+      const { bg, card, fg } = lookOf("classic").color.dark
+      // Full bleed like the looks: the hero's color edge to edge, no page around it
+      expect(cardTree(profile).props.style).toMatchObject({ backgroundColor: card, color: fg })
+      expect(tree).not.toContain(bg)
+      expect(tree).toContain(svgDataUrl(avatarSvg("neutral").svg))
+      expect(
+        JSON.stringify(cardTree(profile, { look: "classic", cardHide: [], avatar: "none" })),
+      ).not.toContain(svgDataUrl(avatarSvg("neutral").svg))
+    }),
   )
 
   it.effect("never contains prompt quotes", () =>

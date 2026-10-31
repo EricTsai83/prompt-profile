@@ -819,6 +819,8 @@ export const CARD_MESSAGES = {
     periodUnknown: "period unavailable",
     partial: "Partial pricing",
     incomplete: "Incomplete logs",
+    measuredBy: (model: string) => `measured by ${model}`,
+    notMeasured: "Not measured",
     attribution: "Made with prompt-profile",
   },
   "zh-TW": {
@@ -836,6 +838,8 @@ export const CARD_MESSAGES = {
     periodUnknown: "期間不明",
     partial: "部分用量未計價",
     incomplete: "紀錄不完整",
+    measuredBy: (model: string) => `${model} 量測`,
+    notMeasured: "未量測",
     attribution: "由 prompt-profile 產生",
   },
 } as const
@@ -1263,6 +1267,14 @@ export const AVATAR_MESSAGES = {
       verifier: "Abstract geometric verification symbol",
       neutral: "Abstract geometric symbol for contextual or unresolved preferences",
     },
+    /** What the card's badge stands for. */
+    badge: {
+      planner: "Plans before building",
+      explorer: "Explores before deciding",
+      coordinator: "Coordinates and delegates",
+      verifier: "Checks against criteria",
+      neutral: "Both ways, by context",
+    },
   },
   "zh-TW": {
     alt: {
@@ -1271,6 +1283,13 @@ export const AVATAR_MESSAGES = {
       coordinator: "抽象幾何協調圖像",
       verifier: "抽象幾何驗證圖像",
       neutral: "代表情境差異或尚未確定偏好的抽象幾何圖像",
+    },
+    badge: {
+      planner: "先規劃再動手",
+      explorer: "先探索再決定",
+      coordinator: "協調與委派",
+      verifier: "依標準驗收",
+      neutral: "兩種都有 · 依情境切換",
     },
   },
 } as const

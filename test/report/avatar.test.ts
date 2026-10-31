@@ -38,8 +38,9 @@ it("preserves the square symbol proportions on every PNG layout", async () => {
   }
   for (const look of LOOK_IDS) {
     const art = images(cardTree(profile, { look, cardHide: [] }))
-    expect(art.length).toBe(1)
-    expect({ look, width: art[0]!.width }).toEqual({ look, width: art[0]!.height })
+    // the classic card has the radar and the symbol's badge; the others the symbol only
+    expect(art.length).toBe(look === "classic" ? 2 : 1)
+    for (const a of art) expect({ look, width: a.width }).toEqual({ look, width: a.height })
     expect(images(cardTree(profile, { look, cardHide: ["graphic"] }))).toEqual([])
   }
 })

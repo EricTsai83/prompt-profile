@@ -1,4 +1,5 @@
-import { avatarFor, type avatarSvg } from "./avatar.ts"
+import { AVATAR_PALETTE, avatarFor, type avatarSvg } from "./avatar.ts"
+import { cardRadar } from "./card-radar.ts"
 import { Effect } from "effect"
 import { Resvg, initWasm } from "@resvg/resvg-wasm"
 import satori from "satori"
@@ -6,14 +7,14 @@ import { createRequire } from "node:module"
 import { readAsset } from "../platform/index.ts"
 import type { Profile, Language } from "../domain/index.ts"
 import type { FontData } from "./fonts.ts"
-import { clockSvg, graphicSvg, svgDataUrl } from "./graphic.ts"
+import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
 import { lookOf, type CardTokens, type Theme } from "./theme.ts"
 import { contentIn, signatureNames } from "./content.ts"
 import { cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
-import { CARD_MESSAGES, MESSAGES } from "./messages.ts"
+import { AVATAR_MESSAGES, CARD_MESSAGES, MESSAGES } from "./messages.ts"
 
 export const CARD_WIDTH = 1200
 export const CARD_HEIGHT = 630
@@ -58,6 +59,18 @@ export const clip = (s: string, max: number): string => {
 const titleSize = (card: CardTokens, name: string) =>
   card.size.title[name.length > 44 ? 2 : name.length > 26 ? 1 : 0]
 
+/** Width of a title in ems per character, roughly: CJK glyphs are about twice a Latin one. */
+const WIDE = /[\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe30-\ufe4f\uff00-\uff60]/u
+
+/**
+ * The title size that fits `name` in two lines of `width` pixels, never above the theme's step
+ * (a Latin glyph is about 0.55em of display type; word wrapping wastes about 15%).
+ */
+const fittedTitleSize = (card: CardTokens, name: string, width: number) => {
+  const units = Array.from(name).reduce((n, ch) => n + (WIDE.test(ch) ? 1.8 : 1), 0)
+  return Math.floor(Math.min(titleSize(card, name), (width * 2 * 0.85) / (units * 0.55)))
+}
+
 /** The card's font families, from the theme. */
 const fontsOf = (theme: Theme) => {
   const { body, display } = theme.type.card
@@ -75,22 +88,26 @@ const identityCopy = (
   lang: Language,
   showGraphic: boolean,
   colors: { readonly muted: string; readonly chip: Record<string, unknown> },
+  badge: Node | null = null,
+  width?: number,
 ): Node => {
   const c = contentIn(profile, lang)
   const card = theme.card
   const font = fontsOf(theme)
   const name = clip(c.archetype.name, 56)
+  const size = width === undefined ? titleSize(card, name) : fittedTitleSize(card, name, width)
   return h(
     "div",
-    { display: "flex", flexDirection: "column", maxWidth: showGraphic ? 700 : 1000 },
+    { display: "flex", flexDirection: "column", maxWidth: width ?? (showGraphic ? 700 : 1000) },
     [
+      badge,
       h(
         "div",
         {
           fontFamily: font.title,
           fontWeight: 800,
-          fontSize: titleSize(card, name),
-          maxHeight: titleSize(card, name) * card.title.lineHeight * 2,
+          fontSize: size,
+          maxHeight: size * card.title.lineHeight * 2,
           overflow: "hidden",
           lineClamp: 2,
           wordBreak: "normal",
@@ -178,6 +195,7 @@ const cardFooter = (
   muted: string,
   showUsage: boolean,
   exactDates: boolean,
+  extra: string | null = null,
 ): Node =>
   h(
     "div",
@@ -192,7 +210,9 @@ const cardFooter = (
       h(
         "div",
         { maxWidth: 740, flex: 1, marginRight: 20 },
-        hide.includes("stats") ? "" : cardSummary(p, lang, showUsage, exactDates).note,
+        [hide.includes("stats") ? "" : cardSummary(p, lang, showUsage, exactDates).note, extra]
+          .filter((x) => x)
+          .join(" · "),
       ),
       h("div", { flexShrink: 0 }, CARD_MESSAGES[lang].attribution),
     ],
@@ -218,10 +238,70 @@ const copyLayer = (theme: Theme, children: Array<Node | null>): Node =>
     children,
   )
 
+/** The role symbol as a round badge with what it stands for (the card's illustration). */
+const roleBadge = (
+  avatar: ReturnType<typeof avatarSvg>,
+  lang: Language,
+  colors: { readonly fg: string; readonly border: string },
+): Node =>
+  h("div", { display: "flex", alignItems: "center", gap: 18, marginBottom: 20 }, [
+    h(
+      "div",
+      {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 92,
+        height: 92,
+        borderRadius: 999,
+        backgroundColor: AVATAR_PALETTE.paper,
+        border: `3px solid ${AVATAR_PALETTE.ink}`,
+        boxShadow: `6px 6px 0 ${AVATAR_PALETTE.warm}`,
+        flexShrink: 0,
+      },
+      [{ type: "img", props: { src: svgDataUrl(avatar.svg), width: 74, height: 74 } }],
+    ),
+    h(
+      "div",
+      {
+        display: "flex",
+        fontSize: 17,
+        fontWeight: 600,
+        color: colors.fg,
+        border: `1.5px solid ${colors.border}`,
+        borderRadius: 999,
+        padding: "5px 14px",
+      },
+      AVATAR_MESSAGES[lang].badge[avatar.kind],
+    ),
+  ])
+
+/** Soft dots in the symbols' palette behind the copy (decoration only). */
+const cardDecor = (): Array<Node> =>
+  [
+    { size: 300, left: 1010, top: -120, color: AVATAR_PALETTE.jade, opacity: 0.12 },
+    { size: 120, left: 1090, top: 560, color: AVATAR_PALETTE.warm, opacity: 0.18 },
+    { size: 46, left: 640, top: 44, color: AVATAR_PALETTE.rose, opacity: 0.3 },
+  ].map((d) =>
+    h("div", {
+      position: "absolute",
+      left: d.left,
+      top: d.top,
+      width: d.size,
+      height: d.size,
+      borderRadius: 999,
+      backgroundColor: d.color,
+      opacity: d.opacity,
+    }),
+  )
+
+/** Where the classic card's radar sits: the right half, between the header and the numbers. */
+const CLASSIC_RADAR = { cx: 905, cy: 285, r: 128 } as const
+
 /**
- * The classic card: the classic report's hero edge to edge, like the looks, in its dark colors,
- * with the same hour clock (`card.graphic`: its size and distance from the right edge). The hour
- * labels are text nodes over the drawing (SVG images get no fonts).
+ * The classic card: the classic report's hero edge to edge, in its dark colors. The right half
+ * is always the trait radar (`--card-hide graphic` leaves it out); the role symbol is a badge
+ * above the name, and the traits live on the radar instead of chips.
  */
 const classicTree = (
   profile: Profile,
@@ -235,29 +315,8 @@ const classicTree = (
   const t = MESSAGES[lang]
   const k = schemeOf(theme)
   const card = theme.card
-  const size = card.graphic.width
   const showGraphic = !hide.includes("graphic")
-  const clock = clockSvg(profile.stats.hourHistogram, k.accent)
-  const left = CARD_WIDTH - card.graphic.right - size
-  const top = (CARD_HEIGHT - size) / 2
-  const scale = size / clock.width
-  const ticks = (avatar ? [] : [0, 6, 12, 18]).map((hour) => {
-    const a = (hour / 24) * Math.PI * 2 - Math.PI / 2
-    return h(
-      "div",
-      {
-        position: "absolute",
-        left: left + (130 + Math.cos(a) * 46) * scale - 20,
-        top: top + (130 + Math.sin(a) * 46) * scale - 10,
-        width: 40,
-        display: "flex",
-        justifyContent: "center",
-        fontSize: 14,
-        color: k.muted,
-      },
-      String(hour).padStart(2, "0"),
-    )
-  })
+  const model = profile.engine.model
   return h(
     "div",
     {
@@ -271,19 +330,21 @@ const classicTree = (
       fontFamily: fontsOf(theme).body,
     },
     [
+      ...cardDecor(),
       ...(showGraphic
-        ? [
+        ? cardRadar(
+            profile,
+            lang,
+            CLASSIC_RADAR,
             {
-              type: "img",
-              props: {
-                src: svgDataUrl(avatar?.svg ?? clock.svg),
-                width: size,
-                height: size,
-                style: { position: "absolute", left, top },
-              },
+              line: k.border,
+              fg: k.fg,
+              muted: k.muted,
+              value: k.accent,
+              card: k.card,
             },
-            ...ticks,
-          ]
+            !hide.includes("traits"),
+          )
         : []),
       copyLayer(theme, [
         h("div", { display: "flex", justifyContent: "space-between", alignItems: "center" }, [
@@ -296,13 +357,29 @@ const classicTree = (
                 cardPeriod(profile, lang, exactDates),
               ),
         ]),
-        identityCopy(profile, theme, hide, lang, showGraphic, {
-          muted: k.muted,
-          chip: { color: k.accent, backgroundColor: k.accentSoft },
-        }),
+        identityCopy(
+          profile,
+          theme,
+          // the traits are on the radar; without it they stay chips
+          showGraphic ? [...hide, "traits"] : hide,
+          lang,
+          showGraphic,
+          { muted: k.muted, chip: { color: k.accent, backgroundColor: k.accentSoft } },
+          avatar && showGraphic ? roleBadge(avatar, lang, { fg: k.fg, border: k.border }) : null,
+          showGraphic ? 520 : undefined,
+        ),
         h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
           metricRow(profile, theme, hide, lang, k.muted, showUsage),
-          cardFooter(profile, theme, hide, lang, k.muted, showUsage, exactDates),
+          cardFooter(
+            profile,
+            theme,
+            hide,
+            lang,
+            k.muted,
+            showUsage,
+            exactDates,
+            model ? CARD_MESSAGES[lang].measuredBy(model) : null,
+          ),
         ]),
       ]),
     ],
