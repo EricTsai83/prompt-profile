@@ -1,4 +1,4 @@
-import type { StoredVoice } from "../domain/Voice.ts"
+import type { Voice } from "../domain/Voice.ts"
 import type { Confidence, DimensionKey, Language } from "../domain/Profile.ts"
 import type { PromptTechnique, ToolTechnique } from "../domain/Techniques.ts"
 
@@ -1323,17 +1323,6 @@ const VOICE_VIEW_COPY = {
       toolsNote:
         "A session is one recorded conversation. Tool records describe agent activity, not ability. Categories overlap; percentages need not add to 100%.",
     },
-    third: {
-      overview: "How they collaborate",
-      overviewTitle: "Their collaboration portrait",
-      overviewNote:
-        "Selected observations describe how this person collaborates with AI. Quotes reproduce source prompts. Measurements, sources and uncertainty are on the Facts & evidence page.",
-      moves: "Featured observations, in their own words",
-      movesNote:
-        "Up to three supported observations, each paired with a source prompt. Confidence and remaining evidence are on the Facts & evidence page.",
-      toolsNote:
-        "A session is one recorded conversation. Tool records describe agent activity, not ability. Categories overlap; percentages need not add to 100%.",
-    },
   },
   "zh-TW": {
     first: {
@@ -1345,32 +1334,21 @@ const VOICE_VIEW_COPY = {
       movesNote:
         "最多三項附有證據的觀察，各搭配一則原始提示。信心程度與其餘證據列在「事實與證據」頁。",
     },
-    third: {
-      overview: "協作方式",
-      overviewTitle: "協作側寫",
-      overviewNote:
-        "精選觀察描述這位使用者與 AI 的協作方式。引述保留原始提示。所有量測、來源與不確定性都在「事實與證據」頁。",
-      moves: "精選觀察與原話",
-      movesNote:
-        "最多三項附有證據的觀察，各搭配一則原始提示。信心程度與其餘證據列在「事實與證據」頁。",
-    },
   },
 }
 
-export const viewMessages = (language: Language, voice?: StoredVoice) => ({
+export const viewMessages = (language: Language, voice?: Voice) => ({
   ...VIEW_MESSAGES[language],
-  ...(voice === "first" || voice === "third" ? VOICE_VIEW_COPY[language][voice] : {}),
+  ...(voice === "first" ? VOICE_VIEW_COPY[language][voice] : {}),
 })
 
 export const NARRATION_MESSAGES = {
   en: {
     first: "Narration: first person (I)",
     second: "Narration: second person (you)",
-    third: "Narration: third person (they)",
   },
   "zh-TW": {
     first: "敘述：第一人稱（我）",
     second: "敘述：第二人稱（你）",
-    third: "敘述：第三人稱（這位使用者）",
   },
 } as const

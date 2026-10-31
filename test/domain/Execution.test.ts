@@ -109,6 +109,17 @@ describe("execution accounting", () => {
   })
 })
 
+it("does not invent generation measurements while migrating a released version 14 profile", async () => {
+  const { readFileSync } = await import("node:fs")
+  const { Effect } = await import("effect")
+  const { decodeProfile } = await import("../../src/domain/Profile.ts")
+  const json = JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))
+  delete json.generation
+  const profile = await Effect.runPromise(decodeProfile({ ...json, schemaVersion: 14 }))
+  expect(profile.schemaVersion).toBe(20)
+  expect(profile.generation).toBeNull()
+})
+
 it("retains partially supplied token categories even when no call has complete token coverage", () => {
   const summary = summarizeExecution(
     [

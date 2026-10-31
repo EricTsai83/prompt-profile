@@ -1,4 +1,5 @@
-import { StoredVoice } from "./Voice.ts"
+import { GenerationMetadata } from "./Execution.ts"
+import { Voice } from "./Voice.ts"
 import { EvidenceOrigin } from "./EvidenceOrigin.ts"
 import { HistoryComparison } from "./History.ts"
 import { NarrativePlan } from "./Narrative.ts"
@@ -14,18 +15,9 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-/**
- * 2: `language` removed. 3: `languages` + `translations` (English text is the base; other
- * languages carry translated generated text only). 4: `stats.activity` (per day and per
- * weekday × hour, by project). 5: `traits[].support` (sessions and weeks behind a trait).
- * 6: `improvements` and `stats.promptHabits`. 7: `stats.techniques`. 8: `previous`.
- * 9: evidence-backed collaboration portrait. 10: `usage` (plan 23). 11: `episodes`, `patterns`
- * and `coverage.episodes` (plan 20 B). 12: preference axes list every characteristic way of
- * working (`sides`) instead of one pole with counter-evidence. 13: `steering` (conversations
- * where the person redirected the AI or asked for repairs). 14: `engine.effort`. 15: structured collaboration moves, understanding signals and axis coverage. 16: verified narrative planning, evidence origins and comparable history. 17: optional collaboration experiments. 18: scoped context provenance. 19: optional narration voice. Versions 2–18
- * are migrated on decode.
- */
-export const PROFILE_SCHEMA_VERSION = 19 as const
+/** Current format plus direct decoding of published schemas: 8 (v0.1.1–v0.1.4), 14 (v0.1.5).
+ * Unreleased intermediate formats are intentionally unsupported; additive fields use defaults. */
+export const PROFILE_SCHEMA_VERSION = 20 as const
 
 /** Report languages; the generated profile text is written in English first. */
 export const LANGUAGES = ["en", "zh-TW"] as const
@@ -255,7 +247,7 @@ export type Translation = typeof Translation.Type
 
 const ProfileFields = Schema.Struct({
   /** Missing in legacy profiles: the original prose perspective was not recorded. */
-  voice: Schema.optionalKey(StoredVoice),
+  voice: Schema.optionalKey(Voice),
   context: Schema.optionalKey(
     Schema.Struct({
       identity: Schema.String,
@@ -293,7 +285,11 @@ const ProfileFields = Schema.Struct({
   /** Steering and repairs per conversation; null before version 13 (the report then shows
    * the rule-based `stats.correctionRate`). */
   steering: Schema.NullOr(Steering).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
-  /** Tokens, plan and API list-price equivalent; null = not measured (before version 10). */
+  /** Generation accounting; null means no saved measurement (before version 20). */
+  generation: Schema.NullOr(GenerationMetadata).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed(null)),
+  ),
+  /** Historical activity tokens, plan and API list-price equivalent (since version 10). */
   usage: Schema.NullOr(Usage).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
   stats: Stats,
 })
@@ -376,106 +372,17 @@ export const decodeProfile = (
   Effect.gen(function* () {
     const probe = Schema.decodeUnknownOption(VersionProbe)(input)
     const found = probe._tag === "Some" ? probe.value.schemaVersion : undefined
-    if (
-      found !== PROFILE_SCHEMA_VERSION &&
-      ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].includes(found as number)
-    ) {
+    if (found !== PROFILE_SCHEMA_VERSION && ![8, 14].includes(found as number)) {
       return yield* new UnsupportedProfileVersion({ found, supported: PROFILE_SCHEMA_VERSION })
     }
-    // Version 2 had English text only; missing newer fields decode to their defaults.
-    const migrated =
-      found === 2
-        ? {
-            ...(input as object),
-            schemaVersion: PROFILE_SCHEMA_VERSION,
-            languages: ["en"],
-            translations: {},
-          }
-        : found !== PROFILE_SCHEMA_VERSION
-          ? { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
-          : input
     const current =
-      typeof found === "number" && found < 12 ? migrateAxes(migrated as Legacy) : migrated
+      found === PROFILE_SCHEMA_VERSION
+        ? input
+        : { ...(input as object), schemaVersion: PROFILE_SCHEMA_VERSION }
     return yield* Schema.decodeUnknownEffect(Profile)(current).pipe(
       Effect.mapError((e) => new InvalidProfile({ message: e.message })),
     )
   })
-
-interface LegacyAxis {
-  readonly key: string
-  readonly pole?: string
-  readonly explanation?: string
-  readonly evidence?: ReadonlyArray<{ readonly promptId: string }>
-  readonly counterEvidence?: ReadonlyArray<{ readonly promptId: string }>
-}
-interface Legacy {
-  readonly portrait?: { readonly axes?: ReadonlyArray<LegacyAxis> } | null
-  readonly translations?: Record<string, { readonly portrait?: { readonly axes?: unknown } | null }>
-}
-
-/** `${source}:${sessionId}:${n}` → `${source}:${sessionId}` (the adapters' id format). */
-const sessionOfPromptId = (id: string): string => id.slice(0, Math.max(0, id.lastIndexOf(":")))
-
-/**
- * Before version 12 an axis had one pole and counter-evidence. A resolved pole becomes a side
- * and its counter-evidence the other side, both without a stated context; an unresolved axis
- * did not say which quotes belonged to which pole, so it keeps only its explanation.
- */
-const migrateAxes = (input: Legacy): Legacy => {
-  const axes = input.portrait?.axes
-  if (!axes) return input
-  const side = (pole: string, evidence: ReadonlyArray<{ readonly promptId: string }>) =>
-    evidence.length === 0
-      ? []
-      : [
-          {
-            pole,
-            context: "",
-            evidence,
-            sessions: new Set(evidence.map((e) => sessionOfPromptId(e.promptId))).size,
-          },
-        ]
-  const sides = axes.map((a) =>
-    a.pole === "first" || a.pole === "second"
-      ? [
-          ...side(a.pole, a.evidence ?? []),
-          ...side(a.pole === "first" ? "second" : "first", a.counterEvidence ?? []),
-        ].toSorted((x, y) => (x.pole === y.pole ? 0 : x.pole === "first" ? -1 : 1))
-      : [],
-  )
-  const translations = Object.fromEntries(
-    Object.entries(input.translations ?? {}).map(([lang, t]) => {
-      const tAxes = t.portrait?.axes
-      return [
-        lang,
-        !Array.isArray(tAxes)
-          ? t
-          : {
-              ...t,
-              portrait: {
-                ...t.portrait,
-                axes: tAxes.map((a: object, i: number) => ({
-                  ...a,
-                  sides: (sides[i] ?? []).map(() => ({ context: "" })),
-                })),
-              },
-            },
-      ]
-    }),
-  )
-  return {
-    ...input,
-    portrait: {
-      ...input.portrait,
-      axes: axes.map(({ key, explanation }, i) => ({
-        key,
-        explanation: explanation ?? "",
-        sides: sides[i]!,
-      })),
-    },
-    ...(input.translations ? { translations } : {}),
-  }
-}
 
 export const encodeProfile = (profile: Profile): ProfileEncoded =>
   Schema.encodeSync(Profile)(profile)

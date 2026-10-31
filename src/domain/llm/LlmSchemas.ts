@@ -245,6 +245,7 @@ export interface ProfileExtras {
  */
 export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtras): Profile => ({
   schemaVersion: PROFILE_SCHEMA_VERSION,
+  generation: null,
   ...(extras.voice ? { voice: extras.voice } : {}),
   narrative: null,
   historyComparison: null,

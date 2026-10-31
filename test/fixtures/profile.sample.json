@@ -1,5 +1,6 @@
 {
-  "schemaVersion": 19,
+  "schemaVersion": 20,
+  "generation": null,
   "languages": [
     "en",
     "zh-TW"

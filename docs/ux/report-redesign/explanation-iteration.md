@@ -165,3 +165,11 @@ The rejection regression failed before the CLI choices were narrowed. Cache-reus
 now switches between first and second person; existing third-person rendering coverage is
 retained explicitly for legacy compatibility. No profile format or generation instruction
 change was needed.
+
+## Released-profile compatibility baseline — 2026-10-31
+
+The owner limited compatibility to published profile formats. Releases v0.1.1–v0.1.4 used
+schema 8, and v0.1.5 used schema 14, before stored narration settings existed. This supersedes
+the development-only third-person compatibility path described above. Current files accept
+only first or second person; released files without a stored voice keep their original prose
+and do not acquire a narration label. Intermediate development schemas are unsupported.

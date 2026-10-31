@@ -33,9 +33,9 @@ it("keeps coverage available under project exclusions without disclosing project
   expect(html).not.toContain("drawstuff")
 })
 
-it("migrates version 17 without inventing selection provenance", async () => {
+it("migrates released version 14 without inventing selection provenance", async () => {
   const json = JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))
-  const legacy = await Effect.runPromise(decodeProfile({ ...json, schemaVersion: 17 }))
-  expect(legacy.schemaVersion).toBe(19)
+  const legacy = await Effect.runPromise(decodeProfile({ ...json, schemaVersion: 14 }))
+  expect(legacy.schemaVersion).toBe(20)
   expect(legacy.context).toBeUndefined()
 })

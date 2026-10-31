@@ -91,10 +91,11 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 19 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 20 | The `profile.json` format changes (`render` must be able to reject versions it does not understand; older versions are migrated) |
 | `ANALYSIS_VERSION` | `analysis/version.ts` | 26 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key) |
 | `PIPELINE_VERSION` | `pipeline/version.ts` | 5 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
 | `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 19, others 25 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `EXECUTION_VERSION` | `domain/Execution.ts` | 1 | Execution records and summaries change |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
 
 ## Open plans
@@ -110,7 +111,7 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | # | Plan | Output | Depends on | Status |
 |---|---|---|---|---|
-| 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | Planned; source review complete |
+| 33 | [Command experience and run accounting](33-command-experience-and-run-accounting.md) | Deepsec-inspired command lifecycle, per-execution usage/cost summaries, recovery records and an optional cost stop threshold | Existing Effect runners, progress, pricing and report library; coordinates with plan 22 | In progress; invocation accounting and profile metadata implemented; command/report integration pending |
 | 34 | [Report interactions](34-report-interactions.md) | Clear, accessible optional interactions with distinct open/closed states | Existing offline report | Planned |
 
 ## Shared rules for every plan
