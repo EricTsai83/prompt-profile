@@ -17,7 +17,7 @@ import { Progress } from "./progress.ts"
 import { draftProfile, evidenceOriginsOf, reduceInput, verifyProfile } from "./reduce.ts"
 import { measureSteering } from "./steering.ts"
 import { measureAxisBalance } from "./axes.ts"
-import { labelTraits, measureTraitFrequency } from "./label.ts"
+import { keepCharacteristicTraits, labelTraits, measureTraitFrequency } from "./label.ts"
 import { addTranslations } from "./translate.ts"
 import { verifyObservations, type EvidenceCounts } from "./verify.ts"
 
@@ -140,7 +140,9 @@ const measureTraits = (
     yield* progress.onLabelled?.(m.chunksLabelled, outcomes.length) ?? Effect.void
     return {
       ...profile,
-      traits: profile.traits.map((t, i) => ({ ...t, frequency: m.frequencies[i] ?? null })),
+      traits: keepCharacteristicTraits(
+        profile.traits.map((t, i) => ({ ...t, frequency: m.frequencies[i] ?? null })),
+      ),
       coverage: {
         ...profile.coverage,
         traitLabels: {

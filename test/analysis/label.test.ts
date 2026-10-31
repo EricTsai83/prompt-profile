@@ -1,7 +1,11 @@
 import { describe, expect, it } from "@effect/vitest"
 import { DateTime, Effect } from "effect"
 import { buildChunks, type Chunk } from "../../src/analysis/chunk.ts"
-import { labelTraits, measureTraitFrequency } from "../../src/analysis/label.ts"
+import {
+  keepCharacteristicTraits,
+  labelTraits,
+  measureTraitFrequency,
+} from "../../src/analysis/label.ts"
 import { withCallBudget } from "../../src/llm/budget.ts"
 import { makeFakeLlmRunner } from "../../src/llm/fake.ts"
 import { LlmRunner } from "../../src/llm/LlmRunner.ts"
@@ -134,4 +138,37 @@ describe("labelTraits", () => {
       expect(outcomes.map((o) => o.labels)).toEqual([[], null])
     }),
   )
+})
+
+describe("keepCharacteristicTraits", () => {
+  const trait = (name: string, sessions: number | null) => ({
+    name,
+    frequency: sessions === null ? null : { sessions, analysedSessions: 200, byProject: [] },
+  })
+
+  it("drops traits seen in under 5% of the analysed conversations", () => {
+    const kept = keepCharacteristicTraits([
+      trait("common", 60),
+      trait("frequent", 30),
+      trait("regular", 20),
+      trait("rare", 9),
+      trait("once in a while", 4),
+    ])
+    expect(kept.map((t) => t.name)).toEqual(["common", "frequent", "regular"])
+  })
+
+  it("keeps the three most frequent, in their order, so the radar still has its axes", () => {
+    const kept = keepCharacteristicTraits([
+      trait("common", 60),
+      trait("rare", 9),
+      trait("rarer", 4),
+      trait("rarest", 2),
+    ])
+    expect(kept.map((t) => t.name)).toEqual(["common", "rare", "rarer"])
+  })
+
+  it("keeps every trait when nothing was measured", () => {
+    const unmeasured = [trait("a", null), trait("b", null)]
+    expect(keepCharacteristicTraits(unmeasured)).toEqual(unmeasured)
+  })
 })

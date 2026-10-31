@@ -18,7 +18,9 @@ Keep it short: the report is read at a glance, and charts show the numbers.
 - `dimensions`: exactly five, one per key — `work_style`, `communication`, `tech_profile`,
   `interests`, `growth` — each with a short `title` (2–4 words), a `summary` of 1–2 sentences
   and evidence.
-- `traits`: 4–6 of the most distinctive traits (3 only when the observations support no more),
+- `traits`: 4–6 of the most distinctive traits (3 only when the observations support no more)
+  that recur across many conversations, not a few memorable prompts (the application measures
+  each trait afterwards and drops those seen in under 1 in 20 analysed conversations),
   each with a `name` of 1–4 words, a one-sentence
   `description`, `confidence` and at least 2 pieces of evidence.
 - `funFacts`: 3–5 fun facts, each at most 15 words.
@@ -69,6 +71,8 @@ user-reported misunderstandings without assuming the initial request lacked info
   partly contradictory.
 - Evidence must be copied **exactly** from the input observations (same `promptId`, same
   `quote`). Never create new quotes.
+- Name a project by its exact name from `stats` (e.g. `topProjects`), never a description or a
+  translation of it ("recordstuff", not "your recording project").
 - Write times in `funFacts` the way a person says them in their own time zone ("at 3 a.m.",
   "at 04:59"), never with a time zone identifier such as "Asia/Taipei".
 - Every verb a trait or dimension uses for the person ("questions", "pushes", "rejects") must

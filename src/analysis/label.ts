@@ -100,6 +100,28 @@ export const measureTraitFrequency = (
   }
 }
 
+/** Share of analysed conversations a trait needs to count as characteristic. */
+export const MIN_TRAIT_SHARE = 0.05
+/** Traits always kept, the most frequent ones, so the radar keeps its axes. */
+export const MIN_TRAITS_KEPT = 3
+
+/**
+ * Drop traits measured in under MIN_TRAIT_SHARE of the analysed conversations: a few memorable
+ * prompts are not a characteristic. The MIN_TRAITS_KEPT most frequent stay regardless, in their
+ * original order; unmeasured traits are kept as they are.
+ */
+export const keepCharacteristicTraits = <T extends { readonly frequency: TraitFrequency | null }>(
+  traits: ReadonlyArray<T>,
+): ReadonlyArray<T> => {
+  const share = (t: T) =>
+    t.frequency && t.frequency.analysedSessions > 0
+      ? t.frequency.sessions / t.frequency.analysedSessions
+      : null
+  if (traits.some((t) => share(t) === null)) return traits
+  const top = new Set(traits.toSorted((a, b) => share(b)! - share(a)!).slice(0, MIN_TRAITS_KEPT))
+  return traits.filter((t) => top.has(t) || share(t)! >= MIN_TRAIT_SHARE)
+}
+
 /** The trait list the labelling prompt receives. */
 const traitList = (
   traits: ReadonlyArray<{ readonly name: string; readonly description: string }>,
