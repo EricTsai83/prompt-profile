@@ -1,11 +1,12 @@
+import { writePrivateFile } from "../../src/platform/files.ts"
 import { NodeServices } from "@effect/platform-node"
 import { describe, expect, it } from "@effect/vitest"
-import { Effect, Schema } from "effect"
+import { Effect, FileSystem, Path, Schema } from "effect"
 import { randomUUID } from "node:crypto"
 import { join } from "node:path"
 import { LlmChunkAnalysis, LlmProfileDraft } from "../../src/domain/llm/LlmSchemas.ts"
 import { makeRunner } from "../../src/llm/detect.ts"
-import { makeLlmSchema, type RunnerId } from "../../src/llm/LlmRunner.ts"
+import { makeLlmSchema, type CallMeasurement, type RunnerId } from "../../src/llm/LlmRunner.ts"
 import { claudeHome, codexHome, filesContaining, hasBinary } from "./helpers.ts"
 
 const OK = makeLlmSchema("Ok", Schema.Struct({ ok: Schema.Boolean }))
@@ -34,13 +35,37 @@ for (const [id, bin] of [
         const nonce = `nonce-${randomUUID()}`
         const start = Date.now()
         const runner = yield* makeRunner(id, {})
+        const measurements: CallMeasurement[] = []
         const result = yield* runner.generate({
+          onMeasurement: (m) => measurements.push(m),
           system: "Answer with ok = true.",
           prompt: `Reply ok=true. (${nonce})`,
           schema: OK,
         })
         expect(result.value).toEqual({ ok: true })
-        console.log(`[smoke] ${id}: model=${result.model} durationMs=${result.durationMs}`)
+        expect(measurements).toHaveLength(1)
+        expect(measurements[0]!.costUsd).toBe(result.usage.costUsd)
+        expect(measurements[0]!.tokens?.output).toBe(result.usage.outputTokens)
+        console.log(
+          `[smoke] ${id}: attempts=1 model=${result.model} modelSource=${result.modelSource} durationMs=${result.durationMs} costUsd=${result.usage.costUsd} inputTokens=${result.usage.inputTokens} outputTokens=${result.usage.outputTokens}`,
+        )
+        yield* writePrivateFile(
+          yield* FileSystem.FileSystem,
+          yield* Path.Path,
+          `tmp/plan33-smoke/${id}.json`,
+          JSON.stringify(
+            {
+              attempts: 1,
+              engine: id,
+              model: result.model,
+              modelSource: result.modelSource,
+              usage: result.usage,
+              measurements,
+            },
+            null,
+            2,
+          ),
+        )
         expect(filesContaining(historyPaths(id), start, nonce)).toEqual([])
       }).pipe(Effect.provide(NodeServices.layer)),
     )

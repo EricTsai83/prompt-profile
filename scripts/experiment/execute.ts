@@ -1,3 +1,4 @@
+import { completeAmount as sum } from "../../src/domain/Execution.ts"
 /**
  * Run the experiment matrix safely and keep provenance (plan 22 §3). Cases run one after
  * another; every CLI attempt, including retries and translations, counts against one cap.
@@ -257,9 +258,6 @@ const IN_FLIGHT: Attempt = {
   usage: null,
 }
 
-const sum = (xs: ReadonlyArray<number | null>): number | null =>
-  xs.some((x) => x === null) ? null : xs.reduce<number>((a, b) => a + (b ?? 0), 0)
-
 export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =>
   Effect.gen(function* () {
     const path = yield* Path.Path
@@ -327,24 +325,53 @@ export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =
           shared.used++
           // Logged when admitted, so a call cancelled in flight still counts for its case.
           const index = log.push(IN_FLIGHT) - 1
-          return runner.generate(g).pipe(
-            Effect.tap((r) =>
-              Effect.sync(() => {
+          return runner
+            .generate({
+              ...g,
+              onMeasurement: (m) => {
+                const t = m.tokens
+                const inputCount =
+                  t &&
+                  [t.input, t.cacheRead, t.cacheWrite5m, t.cacheWrite1h, t.cacheWriteUnknown].every(
+                    (v) => v !== undefined,
+                  )
+                    ? t.input! +
+                      t.cacheRead! +
+                      t.cacheWrite5m! +
+                      t.cacheWrite1h! +
+                      t.cacheWriteUnknown!
+                    : null
                 log[index] = {
-                  ok: true,
-                  error: null,
-                  model: r.model,
-                  modelSource: r.modelSource,
-                  usage: r.usage,
+                  ...log[index]!,
+                  model: m.model,
+                  modelSource: m.modelSource,
+                  usage: {
+                    inputTokens: inputCount,
+                    outputTokens: t?.output ?? null,
+                    costUsd: m.costUsd,
+                  },
                 }
-              }),
-            ),
-            Effect.tapError((e) =>
-              Effect.sync(() => {
-                log[index] = { ...IN_FLIGHT, error: e._tag }
-              }),
-            ),
-          )
+                g.onMeasurement?.(m)
+              },
+            })
+            .pipe(
+              Effect.tap((r) =>
+                Effect.sync(() => {
+                  log[index] = {
+                    ok: true,
+                    error: null,
+                    model: r.model,
+                    modelSource: r.modelSource,
+                    usage: r.usage,
+                  }
+                }),
+              ),
+              Effect.tapError((e) =>
+                Effect.sync(() => {
+                  log[index] = { ...log[index]!, error: e._tag }
+                }),
+              ),
+            )
         })) as LlmRunnerShape["generate"],
     })
 
@@ -383,7 +410,9 @@ export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =
           if (a.error) errorCategories[a.error] = (errorCategories[a.error] ?? 0) + 1
         const ok = attempts.filter((a) => a.ok)
         const names = (source: string) => [
-          ...new Set(ok.flatMap((a) => (a.modelSource === source && a.model ? [a.model] : []))),
+          ...new Set(
+            attempts.flatMap((a) => (a.modelSource === source && a.model ? [a.model] : [])),
+          ),
         ]
         return {
           ...base,
@@ -397,10 +426,14 @@ export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =
             errorCategories,
           },
           usage: {
-            inputTokens: ok.length === 0 ? null : sum(ok.map((a) => a.usage?.inputTokens ?? null)),
+            inputTokens:
+              attempts.length === 0 ? null : sum(attempts.map((a) => a.usage?.inputTokens ?? null)),
             outputTokens:
-              ok.length === 0 ? null : sum(ok.map((a) => a.usage?.outputTokens ?? null)),
-            costUsd: ok.length === 0 ? null : sum(ok.map((a) => a.usage?.costUsd ?? null)),
+              attempts.length === 0
+                ? null
+                : sum(attempts.map((a) => a.usage?.outputTokens ?? null)),
+            costUsd:
+              attempts.length === 0 ? null : sum(attempts.map((a) => a.usage?.costUsd ?? null)),
           },
           model: {
             requested: c.variant.options.model,

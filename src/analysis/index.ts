@@ -111,6 +111,8 @@ const FATAL: ReadonlySet<LlmError["_tag"]> = new Set([
   "NotLoggedIn",
   "Interrupted",
   "CallBudgetExceeded",
+  "CostBudgetExceeded",
+  "AccountingUnavailable",
 ])
 
 // ---------------------------------------------------------------------------------------
@@ -179,7 +181,12 @@ export const analyze = (input: {
         }
         yield* progress.onChunkStart(index, total)
         const result = yield* runner
-          .generate({ system: mapSystem, prompt: chunk.text, schema: ANALYSIS_SCHEMA })
+          .generate({
+            stage: "map",
+            system: mapSystem,
+            prompt: chunk.text,
+            schema: ANALYSIS_SCHEMA,
+          })
           .pipe(Effect.result)
         if (result._tag === "Failure") {
           const error = result.failure
@@ -297,11 +304,13 @@ export const analyze = (input: {
         const text = observationsText(group)
         const parts = keyParts("merge", sha256(text, String(budget)), runner.id, options)
         const cached = options.noCache ? Option.none() : yield* cache.get(parts)
+        if (Option.isSome(cached)) yield* progress.onMergeCacheHit ?? Effect.void
         // The cache stores raw LLM output: verify on every path, cached or not.
         const value = Option.isSome(cached)
           ? cached.value.value
           : yield* runner
               .generate({
+                stage: "merge",
                 system: `${loadPrompt("merge")}\n\nReturn at most ${budget} observations.`,
                 prompt: text,
                 schema: OBSERVATIONS_SCHEMA,
@@ -366,6 +375,7 @@ export const analyze = (input: {
     const reducePrompt = `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(episodes))}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
     const initialDraft = yield* runner
       .generate({
+        stage: "draft",
         system: narrationPrompt("reduce", options.voice),
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
@@ -373,8 +383,10 @@ export const analyze = (input: {
       .pipe(Effect.mapError(stageError("reduce-failed")))
     // Keep original source context available: reviewing only the draft cannot recover omissions.
     // A failed review fails the stage; never publish the unreviewed draft as a fallback.
+    yield* progress.onReviewStart ?? Effect.void
     const draft = yield* runner
       .generate({
+        stage: "review",
         system: `${narrationPrompt("reduce", options.voice)}\n\n${narrationPrompt("review", options.voice)}`,
         prompt: `draft:\n${JSON.stringify(initialDraft.value)}\n\n${reducePrompt}`,
         schema: DRAFT_SCHEMA,

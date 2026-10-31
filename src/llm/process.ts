@@ -4,6 +4,7 @@ import type { Scope } from "effect"
 import { NotInstalled, ProcessFailed, type RunnerId } from "./LlmRunner.ts"
 
 export interface ProcessSpec {
+  readonly onInvocation?: (() => void) | undefined
   readonly runner: RunnerId
   readonly command: string
   readonly args: ReadonlyArray<string>
@@ -52,6 +53,7 @@ export const runProcess = (
             }),
       ),
     )
+    spec.onInvocation?.()
     const [stdout, stderr, exitCode] = yield* Effect.all(
       [
         Stream.mkString(Stream.decodeText(handle.stdout)),

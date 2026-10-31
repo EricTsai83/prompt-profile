@@ -61,8 +61,11 @@ const CodexEvent = Schema.Struct({
   error: Schema.optional(Schema.Struct({ message: Schema.optional(Schema.String) })),
   usage: Schema.optional(
     Schema.Struct({
-      input_tokens: Schema.optional(Schema.Number),
-      output_tokens: Schema.optional(Schema.Number),
+      input_tokens: Schema.optional(Schema.Unknown),
+      output_tokens: Schema.optional(Schema.Unknown),
+      cached_input_tokens: Schema.optional(Schema.Unknown),
+      reasoning_output_tokens: Schema.optional(Schema.Unknown),
+      service_tier: Schema.optional(Schema.Unknown),
     }),
   ),
 })
@@ -119,6 +122,7 @@ export const makeCodexRunner = (
           .pipe(Effect.orDie)
         const stdin = codexStdin(input.system, input.prompt)
         const proc = yield* runProcess({
+          onInvocation: input.onInvocation,
           runner: RUNNER,
           command: "codex",
           args: codexArgs({ schemaPath, outputPath }, options),
@@ -126,6 +130,43 @@ export const makeCodexRunner = (
           stdin,
         })
         const events = parseCodexEvents(proc.stdout)
+        const usageMeasurement = events.findLast((e) => e.usage !== undefined)?.usage
+        const count = (n: unknown): n is number =>
+          typeof n === "number" && Number.isSafeInteger(n) && n >= 0
+        const cached = usageMeasurement?.cached_input_tokens
+        const totalInput = usageMeasurement?.input_tokens
+        input.onMeasurement?.({
+          model: options.model ?? null,
+          modelSource: options.model ? "requested" : null,
+          tokens: usageMeasurement
+            ? {
+                ...(count(totalInput) && count(cached) && cached <= totalInput
+                  ? { input: totalInput - cached, cacheRead: cached }
+                  : {}),
+                ...(count(usageMeasurement.output_tokens)
+                  ? { output: usageMeasurement.output_tokens }
+                  : {}),
+                ...(count(usageMeasurement.reasoning_output_tokens) &&
+                count(usageMeasurement.output_tokens) &&
+                usageMeasurement.reasoning_output_tokens <= usageMeasurement.output_tokens
+                  ? { reasoning: usageMeasurement.reasoning_output_tokens }
+                  : {}),
+                cacheWrite5m: 0,
+                cacheWrite1h: 0,
+                cacheWriteUnknown: 0,
+              }
+            : null,
+          costUsd: null,
+          tier:
+            usageMeasurement?.service_tier === "standard"
+              ? "standard"
+              : usageMeasurement?.service_tier === "priority" ||
+                  usageMeasurement?.service_tier === "fast"
+                ? "fast"
+                : usageMeasurement?.service_tier
+                  ? "other"
+                  : null,
+        })
         const failed = events.some((e) => e.type === "turn.failed")
         if (proc.exitCode === 130 || proc.exitCode === 143) {
           return yield* new Interrupted({ runner: RUNNER })
@@ -157,8 +198,8 @@ export const makeCodexRunner = (
           model: options.model ?? null,
           modelSource,
           usage: {
-            inputTokens: usage?.input_tokens ?? null,
-            outputTokens: usage?.output_tokens ?? null,
+            inputTokens: count(usage?.input_tokens) ? usage.input_tokens : null,
+            outputTokens: count(usage?.output_tokens) ? usage.output_tokens : null,
             costUsd: null,
           },
           durationMs: end - start,
@@ -170,5 +211,5 @@ export const makeCodexRunner = (
         Effect.provideService(FileSystem.FileSystem, fs),
       )
 
-    return { id: RUNNER, displayName: DISPLAY_NAMES[RUNNER], generate }
+    return { id: RUNNER, displayName: DISPLAY_NAMES[RUNNER], tracksInvocation: true, generate }
   })

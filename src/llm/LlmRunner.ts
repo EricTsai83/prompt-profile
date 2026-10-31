@@ -1,3 +1,5 @@
+import type { TokenCounts, ServiceTier } from "../domain/Usage.ts"
+import type { ExecutionStage } from "../domain/Execution.ts"
 import { Context, Data, type Effect, type Schema } from "effect"
 import { toLlmJsonSchema, type JsonSchemaNode } from "../domain/llm/toLlmJsonSchema.ts"
 
@@ -30,7 +32,20 @@ export const makeLlmSchema = <A, I>(name: string, schema: Schema.Codec<A, I>): L
   jsonSchema: toLlmJsonSchema(schema),
 })
 
+export interface CallMeasurement {
+  readonly model: string | null
+  readonly modelSource: ModelSource
+  readonly tokens: Partial<TokenCounts> | null
+  readonly costUsd: number | null
+  readonly tier: ServiceTier | null
+}
+
 export interface GenerateInput<A> {
+  readonly onInvocation?: () => void
+  readonly stage?: ExecutionStage
+  readonly executionCallId?: number
+  /** Operational metadata only, captured before validating generated content. */
+  readonly onMeasurement?: (measurement: CallMeasurement) => void
   /** Fixed instructions (map.md / reduce.md). */
   readonly system: string
   /** The data to analyse this time. Sent through stdin, never as an argument. */
@@ -101,7 +116,21 @@ export class CallBudgetExceeded extends Data.TaggedError("CallBudgetExceeded")<{
   readonly limit: number
 }> {}
 
+export class AccountingUnavailable extends Data.TaggedError("AccountingUnavailable")<{
+  readonly reason: "checkpoint" | "capacity"
+  readonly runner: RunnerId
+}> {}
+
+export class CostBudgetExceeded extends Data.TaggedError("CostBudgetExceeded")<{
+  readonly runner: RunnerId
+  readonly limit: number
+  readonly measuredUsd: number
+  readonly reason: "threshold" | "unavailable"
+}> {}
+
 export type LlmError =
+  | AccountingUnavailable
+  | CostBudgetExceeded
   | CallBudgetExceeded
   | NotInstalled
   | NotLoggedIn
@@ -112,6 +141,8 @@ export type LlmError =
   | Interrupted
 
 export interface LlmRunnerShape {
+  /** Real process runners notify only after a successful spawn; test runners may count generate. */
+  readonly tracksInvocation?: boolean
   readonly id: RunnerId
   readonly displayName: string
   readonly generate: <A>(input: GenerateInput<A>) => Effect.Effect<GenerateResult<A>, LlmError>

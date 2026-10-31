@@ -85,6 +85,7 @@ export const addTranslations = (
       yield* progress.onTranslateStart(language)
       const result = yield* runner
         .generate({
+          stage: "translation",
           system: narrationPrompt("translate", profile.voice),
           prompt: `language: ${language} (${LANGUAGE_NAMES[language]})\n\nprofile:\n${input}`,
           schema: TRANSLATION_SCHEMA,
@@ -92,7 +93,11 @@ export const addTranslations = (
         .pipe(
           Effect.map((r) => aligned(profile, r.value)),
           Effect.catchIf(
-            (e: LlmError) => e._tag !== "Interrupted",
+            (e: LlmError) =>
+              e._tag !== "Interrupted" &&
+              e._tag !== "CallBudgetExceeded" &&
+              e._tag !== "CostBudgetExceeded" &&
+              e._tag !== "AccountingUnavailable",
             () => Effect.succeed(null),
           ),
         )

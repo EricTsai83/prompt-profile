@@ -22,6 +22,27 @@ import {
 } from "./LlmRunner.ts"
 import { runProcess } from "./process.ts"
 
+const validAmount = (n: unknown): n is number =>
+  typeof n === "number" && Number.isFinite(n) && n >= 0
+const validCount = (n: unknown): n is number => validAmount(n) && Number.isSafeInteger(n)
+
+const cacheWrites = (
+  total: number,
+  durations:
+    | { ephemeral_5m_input_tokens?: unknown; ephemeral_1h_input_tokens?: unknown }
+    | undefined,
+) => {
+  const short = validCount(durations?.ephemeral_5m_input_tokens)
+    ? durations.ephemeral_5m_input_tokens
+    : 0
+  const long = validCount(durations?.ephemeral_1h_input_tokens)
+    ? durations.ephemeral_1h_input_tokens
+    : 0
+  return short + long <= total
+    ? { cacheWrite5m: short, cacheWrite1h: long, cacheWriteUnknown: total - short - long }
+    : { cacheWrite5m: 0, cacheWrite1h: 0, cacheWriteUnknown: total }
+}
+
 const RUNNER = "claude-code" as const
 
 /** Build the `claude -p` argument list. The prompt itself is sent on stdin. */
@@ -55,13 +76,20 @@ const ClaudeOutput = Schema.Struct({
   result: Schema.optional(Schema.Unknown),
   structured_output: Schema.optional(Schema.Unknown),
   api_error_status: Schema.optional(Schema.NullOr(Schema.Number)),
-  total_cost_usd: Schema.optional(Schema.Number),
+  total_cost_usd: Schema.optional(Schema.Unknown),
   usage: Schema.optional(
     Schema.Struct({
-      input_tokens: Schema.optional(Schema.Number),
-      cache_creation_input_tokens: Schema.optional(Schema.Number),
-      cache_read_input_tokens: Schema.optional(Schema.Number),
-      output_tokens: Schema.optional(Schema.Number),
+      input_tokens: Schema.optional(Schema.Unknown),
+      cache_creation_input_tokens: Schema.optional(Schema.Unknown),
+      cache_read_input_tokens: Schema.optional(Schema.Unknown),
+      output_tokens: Schema.optional(Schema.Unknown),
+      service_tier: Schema.optional(Schema.Unknown),
+      cache_creation: Schema.optional(
+        Schema.Struct({
+          ephemeral_5m_input_tokens: Schema.optional(Schema.Unknown),
+          ephemeral_1h_input_tokens: Schema.optional(Schema.Unknown),
+        }),
+      ),
     }),
   ),
   modelUsage: Schema.optional(
@@ -87,9 +115,11 @@ export const mainModel = (out: ClaudeOutput): string | null => {
 }
 
 const sumTokens = (u: ClaudeOutput["usage"]): number | null =>
-  u?.input_tokens === undefined
+  !validCount(u?.input_tokens)
     ? null
-    : u.input_tokens + (u.cache_creation_input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0)
+    : u.input_tokens +
+      (validCount(u?.cache_creation_input_tokens) ? u.cache_creation_input_tokens : 0) +
+      (validCount(u?.cache_read_input_tokens) ? u.cache_read_input_tokens : 0)
 
 export const makeClaudeCodeRunner = (
   options: RunnerOptions = {},
@@ -109,6 +139,7 @@ export const makeClaudeCodeRunner = (
         const stdin = withMarker(input.prompt)
         const cwd = yield* scopedWorkdir
         const proc = yield* runProcess({
+          onInvocation: input.onInvocation,
           runner: RUNNER,
           command: "claude",
           args: claudeArgs({ system: input.system, jsonSchema: input.schema.jsonSchema }, options),
@@ -118,6 +149,40 @@ export const makeClaudeCodeRunner = (
         const parsed = Option.getOrUndefined(
           Schema.decodeUnknownOption(ClaudeOutput)(tryParseJson(proc.stdout.trim())),
         )
+        if (parsed)
+          input.onMeasurement?.({
+            model: mainModel(parsed) ?? options.model ?? null,
+            modelSource:
+              mainModel(parsed) !== null ? "reported" : options.model ? "requested" : null,
+            tokens: parsed.usage
+              ? {
+                  ...(validCount(parsed.usage.input_tokens)
+                    ? { input: parsed.usage.input_tokens }
+                    : {}),
+                  ...(validCount(parsed.usage.output_tokens)
+                    ? { output: parsed.usage.output_tokens }
+                    : {}),
+                  ...(validCount(parsed.usage.cache_read_input_tokens)
+                    ? { cacheRead: parsed.usage.cache_read_input_tokens }
+                    : {}),
+                  ...(validCount(parsed.usage.cache_creation_input_tokens)
+                    ? {
+                        ...cacheWrites(
+                          parsed.usage.cache_creation_input_tokens,
+                          parsed.usage.cache_creation,
+                        ),
+                      }
+                    : {}),
+                }
+              : null,
+            costUsd: validAmount(parsed.total_cost_usd) ? parsed.total_cost_usd : null,
+            tier:
+              parsed.usage?.service_tier === "standard"
+                ? "standard"
+                : parsed.usage?.service_tier
+                  ? "other"
+                  : null,
+          })
         if (proc.exitCode === 130 || proc.exitCode === 143) {
           return yield* new Interrupted({ runner: RUNNER })
         }
@@ -156,8 +221,10 @@ export const makeClaudeCodeRunner = (
           modelSource,
           usage: {
             inputTokens: sumTokens(parsed.usage),
-            outputTokens: parsed.usage?.output_tokens ?? null,
-            costUsd: parsed.total_cost_usd ?? null,
+            outputTokens: validCount(parsed.usage?.output_tokens)
+              ? parsed.usage.output_tokens
+              : null,
+            costUsd: validAmount(parsed.total_cost_usd) ? parsed.total_cost_usd : null,
           },
           durationMs: end - start,
         }
@@ -168,5 +235,5 @@ export const makeClaudeCodeRunner = (
         Effect.provideService(FileSystem.FileSystem, fs),
       )
 
-    return { id: RUNNER, displayName: DISPLAY_NAMES[RUNNER], generate }
+    return { id: RUNNER, displayName: DISPLAY_NAMES[RUNNER], tracksInvocation: true, generate }
   })

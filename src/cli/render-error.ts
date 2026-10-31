@@ -28,6 +28,8 @@ const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
   "--since": "--since accepts 1m, 3m, 6m, 1y or all.",
   "--effort": "--effort accepts low, medium, high, xhigh or max.",
   "--max-calls": "Use a positive safe integer.",
+  "--max-cost-usd":
+    "Use a positive finite USD amount with Claude Code. Codex cannot reliably report cost and service tier. This is a local stop threshold, with possible overshoot from in-flight calls, not a billing cap.",
   "--card-hide": "Use a comma list of traits, stats, graphic.",
   "--allow":
     "Use a comma list of email, home-path, username, internal-url, tw-national-id, credit-card, phone. Secrets cannot be allowed.",
@@ -77,6 +79,14 @@ const FREE_ROUTES =
  * Messages say what happened and what to do next; details only with --verbose.
  */
 const RENDERERS: Renderers = {
+  AccountingUnavailable: (e, rerun) => ({
+    code: EXIT.error,
+    message: `${e.reason === "capacity" ? "Execution reached its 10,000-attempt record capacity." : "Execution checkpoint could not be saved; check output-folder permissions."} Stopped further model calls.\n${recovery(rerun)}`,
+  }),
+  CostBudgetExceeded: (e, rerun) => ({
+    code: EXIT.error,
+    message: `Stopped at the local cost threshold: USD ${e.measuredUsd.toFixed(6)} measured; ${e.reason === "unavailable" ? "cost coverage became unavailable" : `threshold USD ${e.limit}`}. In-flight calls can overshoot. This is not a provider billing cap.\n${recovery(rerun)}`,
+  }),
   CallBudgetExceeded: (e, rerun) => ({
     code: EXIT.error,
     message: `Stopped at the call budget of ${e.limit} CLI calls (retries count toward it). ${t.saved}\n${t.reuse} Cached results do not use the budget again; raise --max-calls if it stops again.\n${t.rerun(rerun)}`,
