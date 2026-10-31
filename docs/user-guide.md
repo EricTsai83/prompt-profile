@@ -210,3 +210,28 @@ Use `prompt-profile history --executions --out <directory>` to find its JSON pat
 and unknown cost stops further work. Codex rejects this monetary setting before model calls.
 See [execution accounting and recovery](execution-accounting.md) for the versioned record,
 coverage states, free operations, privacy exclusions and restart behavior.
+
+## Updating and unreadable profile formats
+
+For an npm global installation, run `npm i -g prompt-profile@latest`. For a standalone
+installation, replace the executable with the matching download from
+[the latest release](https://github.com/EricTsai83/prompt-profile/releases/latest).
+Updating does not regenerate a report or call a model.
+
+When `render` cannot read a profile format, its guidance distinguishes three cases:
+
+- **Newer format:** try the latest released tool. With Node.js, the printed
+  `npx prompt-profile@latest render ...` command retains the selected JSON file, explicit output
+  folder, appearance and privacy options. Rendering makes no model calls. If the latest release
+  still cannot read the file, use the version that originally created it.
+- **Unsupported older format:** updating alone does not regenerate the report. The CLI provides
+  a free `--dry-run` preview and a separate analysis command, without `--yes`. Select the intended
+  window, languages, destination and privacy options. Analysis requires the original local history
+  and uses subscription quota after confirmation. Existing HTML and PNG files remain usable.
+- **Missing or invalid version:** select the original `profile.json`. Do not edit its version
+  number to bypass validation. If it is lost, regeneration has the same history and quota
+  requirements as above.
+
+A rejected render leaves the input profile and existing artifacts untouched. It does not start
+analysis or automatically execute an update. Currently, released schemas 8 and 14 remain readable;
+the unsupported older-format guidance also covers unreleased development formats.

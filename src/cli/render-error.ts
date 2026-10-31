@@ -57,10 +57,16 @@ const CLI_NAME = { "claude-code": "Claude Code (claude)", codex: "Codex (codex)"
 const INSTALL =
   "Claude Code: https://claude.com/claude-code · Codex: https://github.com/openai/codex"
 
+export interface ErrorContext {
+  readonly latestRenderCommand?: string | undefined
+  readonly analysisLauncher?: string | undefined
+}
+
 type Renderers = {
   readonly [K in AppError["_tag"]]: (
     error: Extract<AppError, { _tag: K }>,
     rerun: string,
+    context: ErrorContext,
   ) => Rendered
 }
 
@@ -167,10 +173,22 @@ const RENDERERS: Renderers = {
     code: EXIT.error,
     message: `Cannot read or write ${e.path}: ${e.detail}`,
   }),
-  UnsupportedProfileVersion: (e) => ({
-    code: EXIT.error,
-    message: `This profile.json has format version ${String(e.found)}, which this prompt-profile cannot read (supports ${e.supported}). Update prompt-profile or re-run the analysis.`,
-  }),
+  UnsupportedProfileVersion: (e, _rerun, context) => {
+    const launcher = context.analysisLauncher ?? "prompt-profile"
+    const validVersion = typeof e.found === "number" && Number.isSafeInteger(e.found) && e.found > 0
+    return {
+      code: EXIT.error,
+      message: !validVersion
+        ? t.profileVersionInvalid(launcher)
+        : (e.found as number) > e.supported
+          ? t.profileNewer(
+              e.found as number,
+              e.supported,
+              context.latestRenderCommand ?? "npx prompt-profile@latest render profile.json",
+            )
+          : t.profileOlder(e.found as number, launcher),
+    }
+  },
   InvalidProfile: (e) => ({
     code: EXIT.error,
     message: `profile.json is invalid: ${e.message}`,
@@ -178,8 +196,16 @@ const RENDERERS: Renderers = {
 }
 
 /** `rerun`: the command that repeats the run with the cache read (main command only). */
-export const renderError = (error: AppError, rerun: string = SAME_COMMAND): Rendered =>
-  (RENDERERS[error._tag] as (e: AppError, rerun: string) => Rendered)(error, rerun)
+export const renderError = (
+  error: AppError,
+  rerun: string = SAME_COMMAND,
+  context: ErrorContext = {},
+): Rendered =>
+  (RENDERERS[error._tag] as (e: AppError, rerun: string, context: ErrorContext) => Rendered)(
+    error,
+    rerun,
+    context,
+  )
 
 const ISSUES = "https://github.com/EricTsai83/prompt-profile/issues"
 

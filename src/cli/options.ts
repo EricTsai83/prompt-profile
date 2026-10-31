@@ -191,25 +191,36 @@ export const rerunCommand = (f: RunFlags): string =>
     ...(f.yes ? ["--yes"] : []),
   ].join(" ")
 
-/**
- * `render` for a written profile with the same render choices and folder: re-creates the report
- * and cards without analysis (e.g. a card whose font was unavailable).
- */
-export const renderRetryCommand = (profileJson: string, outDir: string, f: RunFlags): string => {
-  const options = [
-    ...flag("--look", f.look, "classic"),
-    ...flag("--avatar", f.avatar, "auto"),
-    ...flag("--card-hide", f.cardHide),
-    ...flag("--exclude", f.exclude),
-    ...flag("--name", f.name),
-    ...flag("--check", f.check, "mask"),
-    ...flag("--allow", f.allow),
-  ]
-  // Non-default render options would otherwise go to variants/<name>/.
-  return [
-    `${f.launcher ?? "prompt-profile"} render`,
+/** Render-only choices shared by update and artifact-recovery commands. */
+type RenderFlags = Pick<
+  RunFlags,
+  "launcher" | "look" | "avatar" | "cardHide" | "exclude" | "name" | "check" | "allow"
+>
+
+const renderFlagsOf = (f: RenderFlags): Array<string> => [
+  ...flag("--look", f.look, "classic"),
+  ...flag("--avatar", f.avatar, "auto"),
+  ...flag("--card-hide", f.cardHide),
+  ...flag("--exclude", f.exclude),
+  ...flag("--name", f.name),
+  ...flag("--check", f.check, "mask"),
+  ...flag("--allow", f.allow),
+]
+
+/** A render recovery command preserves the original file, destination and privacy choices. */
+export const renderCommand = (
+  profileJson: string,
+  outDir: string | undefined,
+  f: RenderFlags,
+): string =>
+  [
+    f.launcher ?? "prompt-profile",
+    "render",
     shellWord(profileJson),
-    ...(options.length > 0 ? ["--out", shellWord(outDir)] : []),
-    ...options,
+    ...flag("--out", outDir),
+    ...renderFlagsOf(f),
   ].join(" ")
-}
+
+/** Re-create artifacts beside the saved profile, preserving variant-directory behavior. */
+export const renderRetryCommand = (profileJson: string, outDir: string, f: RunFlags): string =>
+  renderCommand(profileJson, renderFlagsOf(f).length > 0 ? outDir : undefined, f)

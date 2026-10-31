@@ -22,7 +22,12 @@ import { runRender } from "./commands/render.ts"
 import { runStats } from "./commands/stats.ts"
 import { CHECK_MODES } from "../pipeline/audit.ts"
 import { LOOK_IDS } from "../report/looks.ts"
-import { DEFAULT_OUT, launcherOf, rerunCommand } from "./options.ts"
+import {
+  DEFAULT_OUT,
+  launcherOf,
+  rerunCommand,
+  renderCommand as renderRecoveryCommand,
+} from "./options.ts"
 import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
 
@@ -97,6 +102,7 @@ const handle = <R>(
   body: Effect.Effect<void, AppError, R>,
   flags: { readonly verbose: boolean },
   rerun?: (launcher: string) => string,
+  latestRenderCommand?: string,
 ) =>
   Effect.gen(function* () {
     const env = yield* Environment
@@ -105,7 +111,11 @@ const handle = <R>(
       Effect.provideService(Output, output),
       Effect.catch((error: AppError) =>
         Effect.gen(function* () {
-          const { message, code } = renderError(error, rerun?.(launcherOf(env.env, VERSION)))
+          const launcher = launcherOf(env.env, VERSION)
+          const { message, code } = renderError(error, rerun?.(launcher), {
+            analysisLauncher: launcher,
+            latestRenderCommand,
+          })
           yield* output.error(`\n✖ ${message}`)
           yield* output.debug(verboseDetail(error))
           return yield* new Exit({ code })
@@ -171,6 +181,17 @@ const renderCommand = Command.make(
         allow: optional(f.allow),
       }),
       f,
+      undefined,
+      renderRecoveryCommand(f.file, optional(f.out), {
+        launcher: "npx prompt-profile@latest",
+        look: f.look,
+        avatar: f.avatar,
+        cardHide: optional(f.cardHide),
+        exclude: optional(f.exclude),
+        name: optional(f.name),
+        check: f.check,
+        allow: optional(f.allow),
+      }),
     ),
 ).pipe(Command.withDescription("Re-create report.html and card.png from an existing profile.json"))
 
