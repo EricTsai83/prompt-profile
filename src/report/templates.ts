@@ -2,7 +2,7 @@ import { structuredMoves } from "./collaboration.ts"
 import type { Profile } from "../domain/Profile.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
+import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, viewMessages } from "./messages.ts"
 import type { Scrub } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -42,7 +42,7 @@ export const identityMoves = (
   if (p.patterns.length > 0) {
     return html`<section class="identity-moves">
       ${defined(
-        html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].moves)}</h2>`,
+        html`<h2>${loc.text((_m, _c, l) => viewMessages(l, p.voice).moves)}</h2>`,
         definition(
           loc,
           loc.text((_m, _c, l) => EPISODE_MESSAGES[l].userOnly),
@@ -73,13 +73,13 @@ export const identityMoves = (
   const selected = signatureTraits(p)
   return html`<section class="identity-moves">
     ${defined(
-      html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].moves)}</h2>`,
+      html`<h2>${loc.text((_m, _c, l) => viewMessages(l, p.voice).moves)}</h2>`,
       definition(
         loc,
-        loc.text((_m, _c, l) => VIEW_MESSAGES[l].movesNote),
+        loc.text((_m, _c, l) => viewMessages(l, p.voice).movesNote),
       ),
     )}
-    ${selected.length === 0 ? html`<p class="note">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].noMoves)}</p>` : ""}
+    ${selected.length === 0 ? html`<p class="note">${loc.text((_m, _c, l) => viewMessages(l, p.voice).noMoves)}</p>` : ""}
     ${
       selected.length === 0
         ? ""

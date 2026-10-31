@@ -1,3 +1,4 @@
+import { NARRATION_MESSAGES } from "./messages.ts"
 import { EXPERIMENT_MESSAGES } from "./messages.ts"
 import { avatarFor, avatarPortrait, avatarStyle } from "./avatar.ts"
 import { AVATAR_MESSAGES } from "./messages.ts"
@@ -9,7 +10,7 @@ import { contentIn } from "./content.ts"
 import { documentLayoutStyle } from "./document-layout.ts"
 import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
 import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
-import { VIEW_MESSAGES } from "./messages.ts"
+import { viewMessages } from "./messages.ts"
 import { preferenceMap, workflowCharts, viewStyle } from "./overview.ts"
 import { DateTime } from "effect"
 import type { DimensionKey, Evidence, Language, Profile, Trait } from "../domain/Profile.ts"
@@ -677,9 +678,10 @@ export const renderHtml = (
                     def((m) => m.analyzed),
                   )}</dt>
                   <dd>
-                    ${loc.text((m) =>
+                    ${loc.text((m, _c, l) =>
                       [
                         m.coverage(c.promptsAnalyzed, c.sessionsAnalyzed),
+                        profile.voice ? NARRATION_MESSAGES[l][profile.voice] : null,
                         profile.context
                           ? m.contextCoverage(
                               profile.context.selected,
@@ -706,7 +708,7 @@ export const renderHtml = (
           http-equiv="Content-Security-Policy"
           content="default-src 'none'; style-src 'unsafe-inline'; img-src data:${theme.type.display ? "; font-src data:" : ""}"
         />
-        <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${VIEW_MESSAGES[loc.langs[0]!].brand(options.name ?? null)}</title>
+        <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${viewMessages(loc.langs[0]!, profile.voice).brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${raw(BASE_STYLE)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
         ${raw(definitionStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
@@ -715,8 +717,8 @@ export const renderHtml = (
 </style>
       </head>
       <body>
-        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}" checked />
-        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}" />
+        <input type="radio" name="report-view" id="report-overview" class="view-input" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).overview)}" checked />
+        <input type="radio" name="report-view" id="report-detail" class="view-input" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).detail)}" />
         ${
           multi
             ? loc.langs.map(
@@ -733,7 +735,7 @@ export const renderHtml = (
         }
         <div class="page">
           <header class="topbar">
-            <span class="brand">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].brand(options.name ?? null))}</span>
+            <span class="brand">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).brand(options.name ?? null))}</span>
             ${
               multi
                 ? html`<nav class="switch" aria-label="${loc.attr((m) => m.switchLabel)}">
@@ -748,12 +750,12 @@ export const renderHtml = (
             }
           </header>
           ${options.libraryHref && /^(?:\.\.\/)+index\.html$/u.test(options.libraryHref) ? html`<p class="library-back"><a href="${options.libraryHref}">${loc.text((_m, _c, l) => LIBRARY_MESSAGES[l].back)}</a></p>` : ""}
-          <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].navigation)}">
-            <label for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overview)}</label>
-            <label for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detail)}</label>
+          <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).navigation)}">
+            <label for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overview)}</label>
+            <label for="report-detail">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detail)}</label>
           </nav>
           <main>
-          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].overview)}">
+          <section id="overview" class="report-view report-view-overview" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).overview)}">
           <section class="hero">
             ${identity.split ? html`<div class="split"></div>` : ""}
             <div class="copy">
@@ -777,7 +779,7 @@ export const renderHtml = (
           </section>
 
 
-          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].overviewNote)}</p></header>
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewNote)}</p></header>
           ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
           ${preferenceMap(profile, loc, scrub)}
           ${story ?? ""}
@@ -795,10 +797,10 @@ export const renderHtml = (
               : ""
           }
 
-          <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].next)}</label>
+          <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).next)}</label>
           </section>
-          <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => VIEW_MESSAGES[l].detail)}">
-          <header class="view-heading"><h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailTitle)}</h2><p>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].detailNote)}</p></header>
+          <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).detail)}">
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detailTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detailNote)}</p></header>
           <section class="sigs" aria-label="${loc.attr((m) => m.signature)}">
             ${signatureTile(
               html`${percent(nightShare(s))}%`,
@@ -1114,7 +1116,7 @@ export const renderHtml = (
                   ${excluded.length > 0 ? html`<p>${loc.text((m) => m.leftOut(excluded.join(", ")))}</p>` : ""}
                   <p>${loc.text((m) => m.privacy)}</p>
                 </section>
-          <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => VIEW_MESSAGES[l].back)}</label>
+          <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).back)}</label>
           </section>
           </main>
           <footer class="foot">prompt-profile · npx prompt-profile</footer>

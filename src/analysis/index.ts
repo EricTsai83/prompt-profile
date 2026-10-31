@@ -1,3 +1,5 @@
+import { narrationPrompt } from "./voice.ts"
+import { DEFAULT_VOICE } from "../domain/Voice.ts"
 import { verifyNarrative } from "./narrative.ts"
 import { verifyCollaboration } from "./collaboration.ts"
 import { factsFromStats } from "./facts.ts"
@@ -364,7 +366,7 @@ export const analyze = (input: {
     const reducePrompt = `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}\n\nepisodes:\n${JSON.stringify(episodesForReduce(episodes))}\n\nobservations:\n${observationsText(observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
     const initialDraft = yield* runner
       .generate({
-        system: loadPrompt("reduce"),
+        system: narrationPrompt("reduce", options.voice),
         prompt: reducePrompt,
         schema: DRAFT_SCHEMA,
       })
@@ -373,7 +375,7 @@ export const analyze = (input: {
     // A failed review fails the stage; never publish the unreviewed draft as a fallback.
     const draft = yield* runner
       .generate({
-        system: `${loadPrompt("reduce")}\n\n${loadPrompt("review")}`,
+        system: `${narrationPrompt("reduce", options.voice)}\n\n${narrationPrompt("review", options.voice)}`,
         prompt: `draft:\n${JSON.stringify(initialDraft.value)}\n\n${reducePrompt}`,
         schema: DRAFT_SCHEMA,
       })
@@ -389,6 +391,7 @@ export const analyze = (input: {
       .flatMap((o) => o.chunk.prompts)
     const profile = fromLlmProfileDraft(draft.value, {
       generatedAt,
+      voice: options.voice ?? DEFAULT_VOICE,
       engine: {
         runner: runner.id,
         model: draft.model ?? outcomes.find((o) => o.model !== null)?.model ?? options.model,

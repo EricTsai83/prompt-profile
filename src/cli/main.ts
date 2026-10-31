@@ -1,3 +1,4 @@
+import { VOICES, DEFAULT_VOICE } from "../domain/Voice.ts"
 import { AVATAR_CHOICES } from "../report/avatar.ts"
 import { runHistory } from "./commands/history.ts"
 import { Effect, Option } from "effect"
@@ -190,6 +191,12 @@ export const command = Command.make(
   "prompt-profile",
   {
     since,
+    voice: Flag.Literals("voice", VOICES).pipe(
+      Flag.withDescription(
+        "Generated narration: first (I/我), second (you/你); default: second; quotes stay unchanged",
+      ),
+      Flag.withDefault(DEFAULT_VOICE),
+    ),
     project: Flag.String("project").pipe(
       Flag.withDescription(
         "One project: label:NAME or path:/absolute/path; ambiguous labels are rejected",
@@ -250,6 +257,7 @@ export const command = Command.make(
     const options: MainOptions = {
       since: f.since,
       project: optional(f.project),
+      voice: f.voice,
       engine: ((e) => (e === undefined ? undefined : e === "claude" ? "claude-code" : "codex"))(
         optional(f.engine),
       ) as RunnerId | undefined,

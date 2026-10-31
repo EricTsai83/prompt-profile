@@ -228,3 +228,14 @@ it.effect(
       ).toBe("[EMAIL]")
     }),
 )
+
+it.effect("treats a validated narration voice as a code rather than an OS username", () =>
+  Effect.gen(function* () {
+    const p = yield* sample()
+    const result = checkOutput(
+      { ...p, voice: "first" },
+      { mode: "mask", allow: [], username: "first" },
+    )
+    expect(result.profile.voice).toBe("first")
+  }),
+)

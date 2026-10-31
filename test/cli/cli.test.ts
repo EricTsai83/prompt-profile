@@ -514,3 +514,66 @@ it.effect.each(["0", "-1", "1.5", "NaN"])("rejects invalid call budget %s", (val
     expect(h.fakes).toHaveLength(0)
   }),
 )
+
+it.effect.each(["first", "second"] as const)(
+  "--voice %s reaches generation, review, translation and saved provenance",
+  (voice) =>
+    Effect.gen(function* () {
+      const h = makeHarness()
+      const out = join(h.root, `voice-${voice}`)
+      const r = yield* h.run([
+        "--yes",
+        "--since",
+        "all",
+        "--voice",
+        voice,
+        "--lang",
+        "zh-TW,en",
+        "--out",
+        out,
+      ])
+      expect(r.code).toBe(0)
+      const profile = JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8"))
+      expect(profile.voice).toBe(voice)
+      const calls = h.fakes
+        .at(-1)!
+        .log.filter((c) => c.schema === "LlmProfileDraft" || c.schema === "LlmTranslation")
+      expect(calls.length).toBeGreaterThanOrEqual(3)
+      for (const call of calls) expect(call.system).toContain(`Narration voice: ${voice}`)
+    }),
+)
+
+it.effect("rejects an unsupported narration voice before calling the LLM", () =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const r = yield* h.run(["--yes", "--voice", "robot"])
+    expect(r.code).not.toBe(0)
+    expect(h.fakes).toHaveLength(0)
+  }),
+)
+
+it.effect("render preserves narration without another model call", () =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const out = join(h.root, "voice-source")
+    expect((yield* h.run(["--yes", "--since", "all", "--voice", "first", "--out", out])).code).toBe(
+      0,
+    )
+    const source = reportPath(out, "profile.json")
+    const profile = JSON.parse(readFileSync(source, "utf8"))
+    const calls = h.fakes.reduce((n, f) => n + f.calls(), 0)
+    const rendered = join(h.root, "voice-rendered")
+    expect((yield* h.run(["render", source, "--out", rendered])).code).toBe(0)
+    expect(JSON.parse(readFileSync(join(rendered, "profile.json"), "utf8"))).toEqual(profile)
+    expect(h.fakes.reduce((n, f) => n + f.calls(), 0)).toBe(calls)
+  }),
+)
+
+it.effect("rejects the removed third-person setting before analysis", () =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const result = yield* h.run(["--yes", "--voice", "third"])
+    expect(result.code).not.toBe(0)
+    expect(h.fakes).toHaveLength(0)
+  }),
+)

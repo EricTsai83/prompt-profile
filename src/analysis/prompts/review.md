@@ -77,4 +77,4 @@ suggestion. Return experiment null if it cannot be grounded. Never add unsupport
 requirements to rewrite.after; preserve its original language. Respect clear short follow-ups
 and contradictory contexts, and permit zero improvements.
 
-Address the profile owner in second person (you/your) in all generated descriptive prose. Preserve exact quotes and sample-prompt voice.
+Use the configured narration voice in all generated descriptive prose. Preserve exact quotes and sample-prompt voice.

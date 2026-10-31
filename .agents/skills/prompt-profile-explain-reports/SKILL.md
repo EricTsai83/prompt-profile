@@ -39,7 +39,7 @@ The official reference is https://www.asd-ste100.org/assets/files/ASD-STE100_ISS
   paragraph. Prefer short active sentences and stable terms; explain unfamiliar technical names
   at first use. Aim for roughly 25 words or fewer in English descriptive sentences when useful,
   but preserve meaning and qualifiers over mechanical word limits.
-- Write connected descriptions of observed collaboration in second person addressed to the profile owner (you/your; 你/你的). Prefer specific verbs
+- Write connected descriptions of observed collaboration in the requested narration voice (`--voice`): first or second person. Default to second person (you/your; 你/你的). Prefer specific verbs
   over abstract personality adjectives. Keep the person recognizable without hype or diagnosis.
 - Distinguish a request from an action, a completed outcome and expertise. A request to test
   is not proof that tests passed. A tool event is not proof of user mastery.

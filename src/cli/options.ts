@@ -1,3 +1,4 @@
+import type { Voice } from "../domain/Voice.ts"
 import { AVATAR_CHOICES, type AvatarChoice } from "../report/avatar.ts"
 import { DateTime, Effect } from "effect"
 import { LANGUAGES, type Language } from "../domain/Profile.ts"
@@ -124,6 +125,7 @@ export interface RunFlags {
   /** How prompt-profile was started (`launcherOf`); default `prompt-profile`. */
   readonly launcher?: string | undefined
   readonly since: string
+  readonly voice?: Voice | undefined
   readonly project?: string | undefined
   /** As typed: `claude` / `codex`. */
   readonly engine?: string | undefined
@@ -169,6 +171,7 @@ export const rerunCommand = (f: RunFlags): string =>
     f.launcher ?? "prompt-profile",
     ...flag("--since", f.since),
     ...flag("--project", f.project),
+    ...flag("--voice", f.voice, "second"),
     ...flag("--engine", f.engine),
     ...flag("--model", f.model),
     ...flag("--effort", f.effort),

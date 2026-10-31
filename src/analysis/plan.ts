@@ -1,3 +1,4 @@
+import type { Voice } from "../domain/Voice.ts"
 import { Effect, Option } from "effect"
 import type { Effort } from "../domain/Effort.ts"
 import type { Language } from "../domain/Profile.ts"
@@ -11,6 +12,7 @@ import { ANALYSIS_VERSION } from "./version.ts"
 export const DEFAULT_CONCURRENCY = 3
 
 export interface AnalyzeOptions {
+  readonly voice?: Voice | undefined
   readonly contextIdentity?: string | undefined
   readonly timezone: string
   /** `--full`: no chunk limit. */

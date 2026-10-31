@@ -127,3 +127,41 @@ same string in prose and malformed identity values remain subject to privacy che
 The follow-up local-data smoke run also exited 0 (4 files, 4 tests). The final local artifact
 was checked for absence of visible episode IDs, the restored scope hash, second-person
 narrative and hover styles. Its original analysis archive was retained separately.
+
+## Configurable narration — 2026-10-31
+
+The owner approved a generation-time `--voice first|second|third` setting, defaulting to second
+person. This replaces the fixed second-person requirement above with a configurable policy.
+The choice is assigned by the application as `profile.voice`, passed to final generation,
+evidence review and translation, and shown in offline report metadata. Descriptive navigation
+and introduction labels follow the recorded perspective. Interface instructions may still
+address the reader. Source quotes and sample-prompt speakers are not rewritten.
+
+Profile schema 19 makes the voice optional for legacy decoding; missing metadata stays unknown.
+Analysis version 25 carries the configured instructions. Voice-independent map/merge evidence
+caches are reused across narration choices; final prose and translations are regenerated.
+Offline render preserves stored prose and has no voice override. Full usage is in the
+[README](../../../README.md#narration-voice).
+
+Before implementation, the CLI regression failed for all three requested voices. Separate
+render regressions failed for all three voice labels. Final typecheck, lint, format check and
+unit tests exited 0 (89 files, 825 tests); local-data smoke also exited 0 (4 files, 4 tests).
+Tests cover stage routing, default/selected provenance, invalid values, cache reuse, recovery
+commands, bilingual labels, legacy fallback, quote integrity and render without another model
+call. A synthetic desktop HTML report was inspected for the first-person labels and metadata.
+The synthetic fixture's original generated prose was preserved, rather than relabeled by string
+replacement; this is layout/routing evidence, not a live LLM evaluation of narration quality.
+No additional subscription calls were made for this feature's verification.
+
+## Narration options simplified — 2026-10-31
+
+The owner removed third person from generation settings. `--voice` now accepts only `first`
+and `second` (default). This supersedes the three-option configuration above. The CLI rejects
+`--voice third` before making any LLM calls, and recovery commands and current documentation
+only advertise supported choices. Previously stored third-person profiles remain decodable
+and render unchanged; this compatibility path is not a generation option.
+
+The rejection regression failed before the CLI choices were narrowed. Cache-reuse coverage
+now switches between first and second person; existing third-person rendering coverage is
+retained explicitly for legacy compatibility. No profile format or generation instruction
+change was needed.

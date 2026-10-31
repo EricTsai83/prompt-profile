@@ -77,6 +77,7 @@ prompt-profile --engine codex        # default: auto, Claude Code first
 prompt-profile --model <name>        # choose the analysis model
 prompt-profile --max-calls 40        # cap CLI calls, not tokens or money
 prompt-profile --lang zh-TW,en       # first language is the default
+prompt-profile --voice first         # I/我; second (you/你) is the default
 prompt-profile --out <dir>           # choose the output folder
 
 prompt-profile render profile.json --look prism  # change the look without LLM calls
@@ -137,3 +138,18 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks and releases, and
 ## License
 
 MIT. Not affiliated with or endorsed by Anthropic or OpenAI.
+
+### Narration voice
+
+`--voice first|second` controls generated descriptive prose in every report language
+and card. It is independent of `--look`. Second person (`you` / `你`) is the default; first
+person uses `I` / `我`.
+Quotes retain their original wording, and suggested sample prompts keep their intended speaker.
+
+The selected voice is stored as `profile.voice` and shown in the report. First-person text is
+an AI-authored draft; review it before presenting its claims as your own. Rerun the analysis
+with another `--voice` to generate a coherent version; source-evidence map caches can be reused.
+Changing voice does not add analysis stages or subscription calls beyond the normal run.
+`render` preserves stored prose and voice without calling an LLM; it does not offer a voice
+override or replace pronouns. Legacy profiles without voice metadata retain their original text
+and do not receive an inferred voice label. Interface instructions still address the reader.

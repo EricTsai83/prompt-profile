@@ -1,3 +1,4 @@
+import { DEFAULT_VOICE, type Voice } from "../../domain/Voice.ts"
 import type { Profile } from "../../domain/Profile.ts"
 import type { AvatarChoice } from "../../report/avatar.ts"
 import { variantName } from "../../report/looks.ts"
@@ -64,7 +65,12 @@ export interface MainOptions extends Omit<RunFlags, "engine"> {
 }
 
 /** `--dry-run`: the chunks that would be sent, plus plan.json. Never calls an LLM. */
-const writeDryRun = (p: AnalysisPlan, outDir: string, context?: Profile["context"]) =>
+const writeDryRun = (
+  p: AnalysisPlan,
+  outDir: string,
+  context?: Profile["context"],
+  voice: Voice = DEFAULT_VOICE,
+) =>
   Effect.gen(function* () {
     const path = yield* Path.Path
     for (const [i, c] of p.chunks.entries()) {
@@ -74,6 +80,7 @@ const writeDryRun = (p: AnalysisPlan, outDir: string, context?: Profile["context
       )
     }
     const summary = {
+      voice,
       ...(context ? { context } : {}),
       chunksTotal: p.chunksTotal,
       chunksSelected: p.chunks.length,
@@ -246,6 +253,7 @@ export const runMain = (options: MainOptions) =>
 
     const analyzeOptions: AnalyzeOptions = {
       contextIdentity: context?.identity,
+      voice: options.voice,
       timezone: env.timezone,
       full: options.full,
       noCache: !options.cache,
@@ -276,7 +284,7 @@ export const runMain = (options: MainOptions) =>
         maxCalls,
         dryRun: true,
       })
-      yield* writeDryRun(p, outDir, context)
+      yield* writeDryRun(p, outDir, context, options.voice)
       yield* out.line(t.dryRun(outDir, p.chunks.length, p.charsToSend))
       return
     }

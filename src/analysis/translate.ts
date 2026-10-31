@@ -1,3 +1,4 @@
+import { narrationPrompt } from "./voice.ts"
 import { Effect } from "effect"
 import {
   LlmTranslation,
@@ -8,7 +9,6 @@ import {
 } from "../domain/Profile.ts"
 import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/LlmRunner.ts"
 import { Progress } from "./progress.ts"
-import { loadPrompt } from "./prompts.ts"
 
 const TRANSLATION_SCHEMA = makeLlmSchema("LlmTranslation", LlmTranslation)
 
@@ -85,7 +85,7 @@ export const addTranslations = (
       yield* progress.onTranslateStart(language)
       const result = yield* runner
         .generate({
-          system: loadPrompt("translate"),
+          system: narrationPrompt("translate", profile.voice),
           prompt: `language: ${language} (${LANGUAGE_NAMES[language]})\n\nprofile:\n${input}`,
           schema: TRANSLATION_SCHEMA,
         })

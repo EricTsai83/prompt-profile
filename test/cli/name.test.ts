@@ -60,3 +60,9 @@ describe("--effort", () => {
     expect(rerunCommand({ ...flags, effort: "medium" })).toContain("--effort medium")
   })
 })
+
+it("preserves non-default narration in recovery commands", () => {
+  const flags = { since: "all", out: "prompt-profile-report", full: false, yes: true } as const
+  expect(rerunCommand({ ...flags, voice: "first" })).toContain("--voice first")
+  expect(rerunCommand({ ...flags, voice: "second" })).not.toContain("--voice")
+})

@@ -86,7 +86,7 @@ describe("Profile", () => {
       const sample = loadSample() as { stats: Record<string, unknown> }
       const { activity: _activity, ...stats } = sample.stats
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 3, stats })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.stats.activity).toEqual({ projects: [], days: [], gridByProject: [] })
     }),
   )
@@ -95,7 +95,7 @@ describe("Profile", () => {
     Effect.gen(function* () {
       const { usage: _usage, ...v9 } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v9, schemaVersion: 9 })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.usage).toBeNull()
     }),
   )
@@ -112,7 +112,7 @@ describe("Profile", () => {
         coverage,
         translations: { "zh-TW": zh },
       })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.episodes).toEqual([])
       expect(profile.patterns).toEqual([])
       expect(profile.coverage.episodes).toBeNull()
@@ -186,7 +186,7 @@ describe("Profile", () => {
     Effect.gen(function* () {
       const { steering: _s, ...v12 } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v12, schemaVersion: 12 })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.steering).toBeNull()
     }),
   )
@@ -196,7 +196,7 @@ describe("Profile", () => {
       const sample = loadSample() as Record<string, any>
       const { effort: _e, ...engine } = sample["engine"]
       const profile = yield* decodeProfile({ ...sample, schemaVersion: 13, engine })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.engine.effort).toBeNull()
     }),
   )
@@ -241,7 +241,7 @@ describe("Profile", () => {
         ...v2
       } = loadSample() as Record<string, unknown>
       const profile = yield* decodeProfile({ ...v2, schemaVersion: 2 })
-      expect(profile.schemaVersion).toBe(18)
+      expect(profile.schemaVersion).toBe(19)
       expect(profile.languages).toEqual(["en"])
       expect(profile.translations).toEqual({})
     }),
@@ -280,7 +280,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 19, undefined])(
+  it.effect.each([1, "3", 20, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {

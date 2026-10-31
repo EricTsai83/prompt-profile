@@ -232,6 +232,7 @@ export const fromLlmChunkObservations = (
 })
 
 export interface ProfileExtras {
+  readonly voice?: Profile["voice"]
   readonly generatedAt: DateTime.Utc
   readonly engine: Engine
   readonly coverage: Coverage
@@ -244,6 +245,7 @@ export interface ProfileExtras {
  */
 export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtras): Profile => ({
   schemaVersion: PROFILE_SCHEMA_VERSION,
+  ...(extras.voice ? { voice: extras.voice } : {}),
   narrative: null,
   historyComparison: null,
   evidenceOrigins: [],

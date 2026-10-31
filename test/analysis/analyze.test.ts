@@ -360,7 +360,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "24",
+        analysisVersion: "25",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -1004,3 +1004,23 @@ describe("interaction episodes", () => {
     }),
   )
 })
+
+it.effect(
+  "changing narration reuses source evidence maps but regenerates the final narrative",
+  () =>
+    Effect.gen(function* () {
+      const cache = makeMemoryCache()
+      const firstRunner = makeFakeLlmRunner({ respond })
+      const first = yield* run(firstRunner, cache, { ...options, voice: "first" })
+      const secondRunner = makeFakeLlmRunner({ respond })
+      const second = yield* run(secondRunner, cache, { ...options, voice: "second" })
+      expect(first.voice).toBe("first")
+      expect(second.voice).toBe("second")
+      expect(secondRunner.calls()).toBe(2)
+      expect(secondRunner.log.every((c) => c.system.includes("Narration voice: second"))).toBe(true)
+      expect(second.stats).toEqual(first.stats)
+      expect(second.traits.flatMap((t) => t.evidence)).toEqual(
+        first.traits.flatMap((t) => t.evidence),
+      )
+    }),
+)

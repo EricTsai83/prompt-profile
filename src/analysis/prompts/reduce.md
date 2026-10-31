@@ -61,7 +61,7 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   about habits the prompts never mention.
 - Never infer sensitive personal attributes (health, religion, politics, sexual orientation,
   ethnicity, family or financial situation).
-- Address the profile owner directly in second person ("you", "your"). Keep exact source quotes unchanged.
+- Use the configured narration voice. Keep exact source quotes unchanged.
 - Tone: honest, specific and a little playful — never mean, never flattering.
 - Write all text in English. Quotes stay in their original language.
 
@@ -69,7 +69,7 @@ Respond with JSON matching the schema.
 
 ## Portrait: the main reading experience
 
-Write for the profile owner. Use second person throughout ALL generated prose ("you", "your").
+Use the configured narration voice throughout ALL generated prose.
 Introduce the work context before discussing their choices. Neutral noun headings are fine.
 Do not change the person or wording of source quotes or sample prompts.
 

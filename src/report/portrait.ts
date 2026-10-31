@@ -3,7 +3,7 @@ import { axisState, INTERACTION_AXES, MIN_SIDE_SESSIONS, roleCode } from "../dom
 import type { Language, Profile } from "../domain/Profile.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, VIEW_MESSAGES } from "./messages.ts"
+import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, viewMessages } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -66,7 +66,7 @@ export const preferenceEvidence = (
   const code = roleCode(portrait.axes)
   return html`<section class="preference-evidence">
     ${defined(
-      html`<h2>${loc.text((_m, _c, l) => VIEW_MESSAGES[l].preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>`,
+      html`<h2>${loc.text((_m, _c, l) => viewMessages(l, p.voice).preferenceEvidence)} ${code ? html`<small>${code}</small>` : ""}</h2>`,
       definition(
         loc,
         loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].note),
