@@ -30,7 +30,7 @@ import {
   type SelectedEpisode,
 } from "./episodes.ts"
 import type { AnalyzeError } from "./errors.ts"
-import { factsFromStats } from "./facts.ts"
+import { verifyFunFacts } from "./facts.ts"
 import type { AnalyzedChunk, MapOutcome } from "./map.ts"
 import { observationsText } from "./merge.ts"
 import { verifyNarrative } from "./narrative.ts"
@@ -257,7 +257,7 @@ export const verifyProfile = (input: {
       traits,
       collaboration,
       narrative: summariesUnsafe ? null : narrative,
-      funFacts: factsFromStats(input.stats),
+      funFacts: verifyFunFacts(profile.funFacts, input.stats),
       dimensions,
       improvements,
       episodes: episodes.map(toProfileEpisode),

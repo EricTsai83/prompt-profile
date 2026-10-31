@@ -351,11 +351,8 @@ describe("analyze", () => {
       expect(profile.improvements.map((i) => [i.title, i.rewrite !== null])).toEqual([
         ["Say the goal first", true],
       ])
-      expect(profile.funFacts).toEqual([
-        "Selected history: 0 recorded prompts across 0 conversations.",
-        "Recorded prompts appear on 0 days in this history.",
-        "Longest streak in this history: 0 consecutive days with recorded prompts.",
-      ])
+      // the model's "3 days" is not in these empty stats, and they offer no fact of their own
+      expect(profile.funFacts).toEqual([])
       expect(profile.engine).toEqual({
         runner: "claude-code",
         model: "fake-model",
