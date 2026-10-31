@@ -580,7 +580,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
             </div>
                           <dl class="report-facts">
                 <div>
-                  <dt><span data-l="en" lang="en">Data period</span><span data-l="zh-TW" lang="zh-Hant-TW">資料區間</span> <details class="def"><summary><span aria-hidden="true">i</span><span class="def-label"><span data-l="en" lang="en">About</span><span data-l="zh-TW" lang="zh-Hant-TW">說明</span></span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。</span></p></div></details></dt>
+                  <dt><span data-l="en" lang="en">Data period</span><span data-l="zh-TW" lang="zh-Hant-TW">資料區間</span> <details class="def"><summary><span aria-hidden="true">i</span><span class="def-label"><span data-l="en" lang="en">About</span><span data-l="zh-TW" lang="zh-Hant-TW">說明</span></span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">The first and last prompt in the selected range (--since; by default the last 2 months), in your time zone.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選範圍（--since，預設為最近 2 個月）內第一則與最後一則提示的日期，以你的時區計算。</span></p></div></details></dt>
                   <dd>
                     <span data-l="en" lang="en">Apr 25, 2026 – Oct 23, 2026 · 182 days</span><span data-l="zh-TW" lang="zh-Hant-TW">2026年4月25日 – 2026年10月23日 · 182 天</span>
                   </dd>

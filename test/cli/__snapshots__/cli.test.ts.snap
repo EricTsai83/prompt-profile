@@ -48,7 +48,7 @@ Execution metadata: <tmp>/out/executions/<execution>/summary.json"
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > bad --since > stderr 1`] = `
 "
-✖ Unrecognised value "soon" for --since. --since accepts 1m, 3m, 6m, 1y or all."
+✖ Unrecognised value "soon" for --since. --since accepts 1m, 2m, 3m, 6m, 1y or all."
 `;
 
 exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > login expired during analysis > stderr 1`] = `

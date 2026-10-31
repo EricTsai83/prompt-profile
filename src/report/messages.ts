@@ -947,7 +947,7 @@ export const DEFINITION_MESSAGES = {
   en: {
     label: "About",
     dataPeriod:
-      "The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.",
+      "The first and last prompt in the selected range (--since; by default the last 2 months), in your time zone.",
     analyzed:
       "Prompts and conversations the analysing model read. With a large history, analysis chunks spread over the range are sampled. A week can span several chunks, and a chunk can combine nearby weeks. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.",
     nightShare:
@@ -981,7 +981,7 @@ export const DEFINITION_MESSAGES = {
   "zh-TW": {
     label: "說明",
     dataPeriod:
-      "所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。",
+      "所選範圍（--since，預設為最近 2 個月）內第一則與最後一則提示的日期，以你的時區計算。",
     analyzed:
       "分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內抽樣分析區塊。同一週可能拆成多個區塊，區塊也可能合併相鄰的週。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。",
     nightShare: "範圍內所有清理後的提示中，在當地時間 22:00 到 04:59 送出的比例。",

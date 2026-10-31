@@ -24,7 +24,7 @@ npx prompt-profile@latest
 ```
 
 The CLI shows the selected history and estimated calls, then asks for confirmation before
-sending anything. By default it analyses the last three months and opens the finished report
+sending anything. By default it analyses the last two months and opens the finished report
 in your browser. Files are saved under `./prompt-profile-report/`.
 
 To inspect your history without calling an LLM (no login required):
@@ -73,7 +73,7 @@ These are observations about your prompts, not a psychological assessment or an 
 ## Usage
 
 ```bash
-prompt-profile --since 6m            # 1m / 3m (default) / 6m / 1y / all
+prompt-profile --since 6m            # 1m / 2m (default) / 3m / 6m / 1y / all
 prompt-profile --engine codex        # default: auto, Claude Code first
 prompt-profile --model <name>        # choose the analysis model
 prompt-profile --max-calls 40        # cap CLI calls, including retries

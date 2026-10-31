@@ -42,14 +42,14 @@ describe("parseSince", () => {
 })
 
 describe("default range", () => {
-  it.effect("is the last 3 months when --since is not given", () =>
+  it.effect("is the last 2 months when --since is not given", () =>
     Effect.gen(function* () {
       const h = makeHarness({ statuses: [] })
       const r = yield* h.run(["stats", "--out", join(h.root, "s")])
       expect(r.code).toBe(0)
       const { window } = JSON.parse(readFileSync(join(h.root, "s", "stats.json"), "utf8"))
       const until = new Date(window.until)
-      until.setUTCMonth(until.getUTCMonth() - 3)
+      until.setUTCMonth(until.getUTCMonth() - 2)
       expect(window.since).toBe(until.toISOString())
     }),
   )

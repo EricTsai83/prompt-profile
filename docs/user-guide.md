@@ -23,8 +23,8 @@ folder. Move the executable to a folder on your `PATH` to run it as `prompt-prof
 ## Usage
 
 ```bash
-prompt-profile                 # analyse the last 3 months and write the report
-prompt-profile --since 3m      # 1m / 3m / 6m / 1y / all (also <n>d, <n>w)
+prompt-profile                 # analyse the last 2 months and write the report
+prompt-profile --since 3m      # 1m / 2m (default) / 3m / 6m / 1y / all (also <n>d, <n>w)
 prompt-profile --engine codex  # which CLI analyses your prompts (default: auto, Claude Code first)
 prompt-profile --model <name>  # model passed to claude / codex
 prompt-profile --effort medium # reasoning effort: low / medium / high / xhigh / max (default: the CLI's)

@@ -31,8 +31,8 @@ import { cacheDirOf } from "./steps.ts"
 import { makeOutput, Output } from "./services.ts"
 
 const since = Flag.String("since").pipe(
-  Flag.withDescription("Time range: 1m, 3m, 6m, 1y or all"),
-  Flag.withDefault("3m"),
+  Flag.withDescription("Time range: 2m (default), 1m, 3m, 6m, 1y or all"),
+  Flag.withDefault("2m"),
 )
 const out = Flag.String("out").pipe(
   Flag.withDescription("Output folder"),

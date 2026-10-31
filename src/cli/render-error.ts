@@ -19,7 +19,7 @@ export type AppError =
 
 /** How to fix an InvalidArgument, per flag. */
 const ARGUMENT_HINTS: Readonly<Record<string, string>> = {
-  "--since": "--since accepts 1m, 3m, 6m, 1y or all.",
+  "--since": "--since accepts 1m, 2m, 3m, 6m, 1y or all.",
   "--effort": "--effort accepts low, medium, high, xhigh or max.",
   "--max-calls": "Use a positive safe integer.",
   "--max-cost-usd":
