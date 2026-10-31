@@ -276,25 +276,6 @@ const roleBadge = (
     ),
   ])
 
-/** Soft dots in the symbols' palette behind the copy (decoration only). */
-const cardDecor = (): Array<Node> =>
-  [
-    { size: 300, left: 1010, top: -120, color: AVATAR_PALETTE.jade, opacity: 0.12 },
-    { size: 120, left: 1090, top: 560, color: AVATAR_PALETTE.warm, opacity: 0.18 },
-    { size: 46, left: 640, top: 44, color: AVATAR_PALETTE.rose, opacity: 0.3 },
-  ].map((d) =>
-    h("div", {
-      position: "absolute",
-      left: d.left,
-      top: d.top,
-      width: d.size,
-      height: d.size,
-      borderRadius: 999,
-      backgroundColor: d.color,
-      opacity: d.opacity,
-    }),
-  )
-
 /** Where the classic card's radar sits: the right half, between the header and the numbers. */
 const CLASSIC_RADAR = { cx: 905, cy: 285, r: 128 } as const
 
@@ -330,7 +311,6 @@ const classicTree = (
       fontFamily: fontsOf(theme).body,
     },
     [
-      ...cardDecor(),
       ...(showGraphic
         ? cardRadar(
             profile,

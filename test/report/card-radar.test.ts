@@ -92,3 +92,24 @@ describe("classic card radar", () => {
     expect(Array.from(png.slice(1, 4))).toEqual([0x50, 0x4e, 0x47])
   })
 })
+
+it("has no decorative dots behind the copy", async () => {
+  const p = await measured([27, 31, 12])
+  const round = (node: unknown): number => {
+    if (Array.isArray(node)) return node.reduce((n: number, c) => n + round(c), 0)
+    if (!node || typeof node !== "object" || !("props" in node)) return 0
+    const n = node as {
+      type: string
+      props: { style?: Record<string, unknown>; children?: unknown }
+    }
+    const self =
+      n.type === "div" &&
+      n.props.style?.position === "absolute" &&
+      n.props.style?.borderRadius === 999 &&
+      n.props.children === undefined
+        ? 1
+        : 0
+    return self + round(n.props.children)
+  }
+  expect(round(cardTree(p))).toBe(0)
+})
