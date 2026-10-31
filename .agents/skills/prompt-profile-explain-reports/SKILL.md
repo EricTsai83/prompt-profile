@@ -1,6 +1,6 @@
 ---
 name: prompt-profile-explain-reports
-description: Improve prompt-profile reports so readers can understand collaboration patterns, charts, evidence and uncertainty quickly. Use for report copy, analysis writing prompts, charts, explanatory interactions and report templates; not for generic frontend styling or unrelated prose.
+description: Improve prompt-profile reports so readers can understand collaboration patterns, charts, evidence and uncertainty quickly. Use for guided experiment reviews in chat, report copy, analysis writing prompts, charts, explanatory interactions and report templates; not for generic frontend styling or unrelated prose.
 ---
 
 # Explain collaboration reports
@@ -8,6 +8,21 @@ description: Improve prompt-profile reports so readers can understand collaborat
 Use this skill from the prompt-profile repository. Read its AGENTS.md and relevant report,
 profile and analysis contracts before editing. Optimize reader understanding, not the number
 of charts, animations or words. Keep existing template choices and privacy controls.
+
+## Guided experiment review
+
+When asked to interpret experiment results or guide product improvement in chat, follow
+[Guided review in chat](../../../docs/experiments.md#guided-review-in-chat). Use the free
+`pnpm eval:review --from <directory>` command to prepare an evidence packet. Read existing
+`review.md` before choosing an unresolved item. Show a concrete claim, source excerpts and
+missing context before asking one focused question. Save the owner's answer with its item id
+and exact case in `review.md`; preserve uncertainty and earlier notes. An unanswered question
+is not approval or rejection. Resume from those notes in later sessions.
+
+The skill orchestrates the existing coding-agent chat; it does not install a new chat UI or
+make the review command interactive. Match the requested interface and language. Reuse saved
+artifacts before proposing new paid runs. Scope and budget for real model calls remain governed
+by the user's instructions; review preparation itself makes no model calls.
 
 ## Choose the explanation before the medium
 

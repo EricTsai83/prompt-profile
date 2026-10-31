@@ -45,7 +45,8 @@
     "site": "tsx scripts/site.ts",
     "test:package": "pnpm build && node scripts/test-package.mjs",
     "build:binaries": "tsx scripts/build-binaries.ts",
-    "test:binary": "node scripts/test-binary.mjs"
+    "test:binary": "node scripts/test-binary.mjs",
+    "eval:review": "tsx scripts/eval-review.ts"
   },
   "dependencies": {
     "@effect/platform-node": "catalog:",
