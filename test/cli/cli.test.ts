@@ -333,7 +333,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const report = readFileSync(reportPath(out, "report.html"), "utf8")
       expect(report).toMatch(/id="lang-zh-TW"[^>]*checked/)
       expect(report).toContain('id="lang-en"')
-      expect(report).toContain("譯 Collaboration Portrait")
+      expect(report).toContain("譯 The Fixer")
       expect(existsSync(reportPath(out, "card.png"))).toBe(true)
       expect(existsSync(reportPath(out, "card.en.png"))).toBe(true)
       expect(existsSync(join(out, "share.html"))).toBe(false)

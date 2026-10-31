@@ -361,7 +361,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "28",
+        analysisVersion: "29",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -828,6 +828,29 @@ it.effect("cannot keep an unsupported headline when reduce supplies no body evid
     const profile = yield* run(fake)
     expect(profile.headline).toBe("Collaboration observations")
     expect(profile.archetype.description).toBe("")
+  }),
+)
+
+it.effect("keeps the model's own role name for a verified profile without a single role code", () =>
+  Effect.gen(function* () {
+    const fake = makeFakeLlmRunner({
+      respond: (input) => {
+        const value = respond(input) as Record<string, unknown> & {
+          traits: Array<{ name: string }>
+        }
+        return input.schemaName === "LlmProfileDraft"
+          ? {
+              ...value,
+              archetype: { name: "Midnight Plan Runner", description: "Writes every day." },
+              traits: value.traits.filter((t) => t.name === "steady"),
+              improvements: [],
+            }
+          : value
+      },
+    })
+    const profile = yield* run(fake)
+    expect(profile.coverage.evidenceDropped).toBe(0)
+    expect(profile.archetype.name).toBe("Midnight Plan Runner")
   }),
 )
 

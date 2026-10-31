@@ -245,7 +245,13 @@ export const verifyProfile = (input: {
       portrait: summariesUnsafe ? null : portrait,
       archetype: summariesUnsafe
         ? { name: "Collaboration observations", description: "" }
-        : { ...profile.archetype, name: code ? ROLE_NAMES[code]! : "Collaboration Portrait" },
+        : {
+            ...profile.archetype,
+            // the model's synthesized name; the stable names only fill an empty answer
+            name:
+              profile.archetype.name.trim() ||
+              (code ? ROLE_NAMES[code]! : "Collaboration Portrait"),
+          },
       traits,
       collaboration,
       narrative: summariesUnsafe ? null : narrative,

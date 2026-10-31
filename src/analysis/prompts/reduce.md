@@ -120,8 +120,12 @@ quotes. Do not infer AI replies or successful outcomes from user requests. Separ
 technique breadth and understanding: none proves the others. No psychological diagnosis,
 MBTI labels, population ranks, numerical personality scores or claims of validated testing.
 If there is not enough evidence for any narrative, return `portrait: null`.
-The application assigns a stable role name after verification; do not mimic an existing test.
-The archetype description should summarize the person, without introducing new claims.
+Always return `archetype.name`: one specific, memorable role name of 2–4 words that sums up
+this person's whole way of working with AI, including how they switch between ways of
+working on the axes (e.g. "Midnight Plan Runner", "Checklist-First Tinkerer"). Ground it in
+the verified observations, not in a test type: no MBTI-style codes, population ranks or
+generic labels such as "Developer" or "Collaborator". The archetype description should
+summarize the person, without introducing new claims.
 
 ## Clear descriptive writing
 
