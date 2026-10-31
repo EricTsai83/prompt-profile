@@ -84,3 +84,45 @@ it("shows open-ended habits beyond three, without a fixed-axis overview", async 
   expect(identity.includes("How you work with AI")).toBe(true)
   expect(identity.includes("你習慣怎麼和 AI 一起做事")).toBe(true)
 })
+
+it("folds understanding signals seen in one conversation behind their own disclosure", async () => {
+  const base = await Effect.runPromise(
+    decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+  )
+  const signal = (observation: string, sessions: number) => ({
+    kind: "verification" as const,
+    basis: "user_request" as const,
+    observation,
+    context: "patch reviews",
+    evidence: [],
+    support: { sessions, weeks: sessions },
+  })
+  const out = renderHtml({
+    ...base,
+    languages: ["en", "zh-TW"] as const,
+    collaboration: {
+      moves: [],
+      signals: [signal("RECURRING_SIGNAL", 2), signal("ONE_OFF_SIGNAL", 1)],
+      rejected: { moves: 0, signals: 0, effects: 0 },
+    },
+    translations: {
+      "zh-TW": {
+        ...base.translations["zh-TW"]!,
+        collaboration: {
+          moves: [],
+          signals: [
+            { observation: "RECURRING_SIGNAL", context: "c" },
+            { observation: "ONE_OFF_SIGNAL", context: "c" },
+          ],
+        },
+      },
+    },
+  })
+  const section = /<section class="understanding">.*?<\/section>/s.exec(out)![0]
+  const folded = /<details class="signal-once">.*?<\/details>/s.exec(section)?.[0] ?? ""
+  expect(folded).toContain("ONE_OFF_SIGNAL")
+  expect(folded).toContain("Seen in one conversation only (1)")
+  expect(folded).toContain("只在一段對話中看到（1）")
+  expect(folded).not.toContain("RECURRING_SIGNAL")
+  expect(section).toContain("RECURRING_SIGNAL")
+})

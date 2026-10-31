@@ -6,6 +6,10 @@ import { COLLABORATION_MESSAGES, EPISODE_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
+type Signal = NonNullable<Profile["collaboration"]>["signals"][number]
+/** Conversations a signal needs to be shown as recurring rather than folded as a one-off. */
+const MIN_SIGNAL_SESSIONS = 2
+
 export const structuredMoves = (
   p: Profile,
   loc: Loc,
@@ -58,20 +62,21 @@ export const understandingSection = (
       ? html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].legacy)}</p>`
       : UNDERSTANDING_KINDS.map((kind) => {
           const signals = p.collaboration!.signals.filter((s) => s.kind === kind)
-          return html`<article><h3>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].kinds[kind])}</h3>
-      ${
-        signals.length === 0
-          ? html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].none)}</p>`
-          : signals.map((s) => {
-              const index = p.collaboration!.signals.indexOf(s)
-              return html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.signals[index]?.observation ?? s.observation, l))}</p>
+          const signal = (s: Signal) => {
+            const index = p.collaboration!.signals.indexOf(s)
+            return html`<p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.signals[index]?.observation ?? s.observation, l))}</p>
           <p class="note">${loc.text((_m, _c, l) => `${s.basis === "user_request" ? COLLABORATION_MESSAGES[l].requested : COLLABORATION_MESSAGES[l].reported} · ${scrub(p.translations[l]?.collaboration?.signals[index]?.context ?? s.context, l)} · ${EPISODE_MESSAGES[l].spread(s.support.sessions, s.support.weeks)}`)}</p>
           ${v.quotes ? s.evidence.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`) : ""}`
-            })
-      }
+          }
+          // one conversation is an event, not a recurring signal: kept, but folded away
+          const recurring = signals.filter((s) => s.support.sessions >= MIN_SIGNAL_SESSIONS)
+          const once = signals.filter((s) => s.support.sessions < MIN_SIGNAL_SESSIONS)
+          return html`<article><h3>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].kinds[kind])}</h3>
+      ${recurring.length === 0 ? html`<p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].none)}</p>` : recurring.map(signal)}
+      ${once.length === 0 ? "" : html`<details class="signal-once"><summary>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].once(once.length))}</summary>${once.map(signal)}</details>`}
     </article>`
         })
   }
 </section>`
 
-export const collaborationStyle = `.understanding{margin:36px 0}.understanding h2{font-size:var(--text-xl)}.understanding article{border-top:1px solid var(--border);padding:16px 0}.understanding h3{font-size:var(--text-base);margin-bottom:8px}.understanding p{line-height:1.8}.understanding .note,.structured-moves .note{font-size:var(--text-sm);color:var(--muted)}.understanding blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);overflow-wrap:anywhere;line-height:1.8}`
+export const collaborationStyle = `.understanding{margin:36px 0}.understanding h2{font-size:var(--text-xl)}.understanding article{border-top:1px solid var(--border);padding:16px 0}.understanding h3{font-size:var(--text-base);margin-bottom:8px}.understanding p{line-height:1.8}.understanding .note,.structured-moves .note{font-size:var(--text-sm);color:var(--muted)}.understanding blockquote{margin:12px 0;padding-left:16px;border-left:2px solid var(--accent);overflow-wrap:anywhere;line-height:1.8}.signal-once{margin-top:8px;color:var(--muted)}.signal-once summary{cursor:pointer;font-size:var(--text-sm)}`
