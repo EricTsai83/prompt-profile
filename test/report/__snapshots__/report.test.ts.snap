@@ -595,7 +595,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   </dd>
                 </div>
                 <div>
-                  <dt><span data-l="en" lang="en">Analyzed</span><span data-l="zh-TW" lang="zh-Hant-TW">分析內容</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Prompts and conversations the analysing model read. With a large history, week-sized chunks spread over the range are sampled. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內平均抽出以週為單位的區段。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。</span></p></div></details></dt>
+                  <dt><span data-l="en" lang="en">Analyzed</span><span data-l="zh-TW" lang="zh-Hant-TW">分析內容</span> <details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Prompts and conversations the analysing model read. With a large history, analysis chunks spread over the range are sampled. A week can span several chunks, and a chunk can combine nearby weeks. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.</span><span data-l="zh-TW" lang="zh-Hant-TW">分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內抽樣分析區塊。同一週可能拆成多個區塊，區塊也可能合併相鄰的週。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。</span></p></div></details></dt>
                   <dd>
                     <span data-l="en" lang="en">1,290 prompts · 280 sessions · 1 chunk failed and was skipped</span><span data-l="zh-TW" lang="zh-Hant-TW">1,290 則 prompt · 280 個 session · 1 段分析失敗，已略過</span>
                   </dd>
@@ -2855,7 +2855,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
                   </div>
 
           <section>
-            <div class="def-head"><h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Confidence is capped by how widely the verified quotes spread: high needs quotes from 3 conversations over 2 weeks, medium from 2 conversations, otherwise low. Quotes are selected evidence, not full-history frequencies.</span><span data-l="zh-TW" lang="zh-Hant-TW">信心程度受已驗證引述的分布範圍限制：高需要來自 3 段對話、跨 2 週的引述；中需要 2 段對話；其餘為低。引述是挑選出的證據，不代表在全部紀錄中出現的頻率。</span></p></div></details></div>
+            <div class="def-head"><h2><span data-l="en" lang="en">Traits</span><span data-l="zh-TW" lang="zh-Hant-TW">特質</span></h2><details class="def"><summary aria-label="What this means"><span aria-hidden="true">i</span></summary><div class="def-body" role="note"><p><span data-l="en" lang="en">Confidence is capped by how widely the verified quotes spread: high needs quotes from 3 conversations across 2 analysis chunks, medium from 2 conversations, otherwise low. Quotes are selected evidence, not full-history frequencies.</span><span data-l="zh-TW" lang="zh-Hant-TW">信心程度受已驗證引述的分布範圍限制：高需要來自 3 段對話、跨 2 個分析區塊的引述；中需要 2 段對話；其餘為低。引述是挑選出的證據，不代表在全部紀錄中出現的頻率。</span></p></div></details></div>
             <div class="traits">
               <article class="trait">
     <header>
@@ -2884,7 +2884,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
     <p class="support">
-        <span data-l="en" lang="en">Selected evidence: 2 quotes from 2 sessions in 2 weeks; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：2 段引文，來自 2 個對話、2 週；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
+        <span data-l="en" lang="en">Selected evidence: 2 quotes from 2 sessions in 2 analysis chunks; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：2 段引文，來自 2 個對話、2 個分析區塊；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
       </p>
     <details open>
             <summary><span data-l="en" lang="en">2 quotes as evidence</span><span data-l="zh-TW" lang="zh-Hant-TW">2 段引文佐證</span></summary>
@@ -2900,7 +2900,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
     <p><span data-l="en" lang="en">Asks the AI to list steps and risks before coding.</span><span data-l="zh-TW" lang="zh-Hant-TW">寫程式前，先請 AI 列出步驟和風險。</span></p>
     <blockquote class="lead-quote">don&#39;t write code yet, break the plan into small steps</blockquote>
     <p class="support">
-        <span data-l="en" lang="en">Selected evidence: 1 quote from 1 session in 1 week; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：1 段引文，來自 1 個對話、1 週；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
+        <span data-l="en" lang="en">Selected evidence: 1 quote from 1 session in 1 analysis chunk; not full-history frequencies. Context and exceptions are in the quoted prompts.</span><span data-l="zh-TW" lang="zh-Hant-TW">所選證據：1 段引文，來自 1 個對話、1 個分析區塊；不代表完整歷史中的頻率。情境與例外請參照引文。</span>
       </p>
 
   </article>

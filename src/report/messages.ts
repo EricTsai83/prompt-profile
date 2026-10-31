@@ -160,7 +160,7 @@ const en: Messages = {
   leftOut: (parts) => `Left out: ${parts}`,
   months: (n) => plural(n, "month", "months"),
   coverage: (p, s) => `${plural(p, "prompt", "prompts")} · ${plural(s, "session", "sessions")}`,
-  sampled: (a, t) => `${a} of ${t} weeks sampled`,
+  sampled: (a, t) => `${a} of ${t} analysis chunks sampled`,
   totalPrompts: "Prompts",
   activeDays: "Active days",
   longestStreak: "Longest streak",
@@ -249,7 +249,7 @@ const en: Messages = {
   supportUnknown:
     "Session spread is unavailable for these selected quotes; confidence is a model estimate.",
   support: (se, w, q) =>
-    `Selected evidence: ${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "week", "weeks")}; not full-history frequencies. Context and exceptions are in the quoted prompts.`,
+    `Selected evidence: ${plural(q, "quote", "quotes")} from ${plural(se, "session", "sessions")} in ${plural(w, "analysis chunk", "analysis chunks")}; not full-history frequencies. Context and exceptions are in the quoted prompts.`,
   howMeasured: "How this was measured",
   projectAnon: "Project",
   cardActive: "most active",
@@ -372,7 +372,7 @@ const zhTW: Messages = {
   months: (n) => `${n} 個月`,
   coverage: (p, s) =>
     `${p.toLocaleString("zh-TW")} 則 prompt · ${s.toLocaleString("zh-TW")} 個 session`,
-  sampled: (a, t) => `抽樣分析 ${a} / ${t} 週`,
+  sampled: (a, t) => `抽樣分析 ${a} / ${t} 個區塊`,
   totalPrompts: "prompt 數",
   activeDays: "活躍天數",
   longestStreak: "最長連續",
@@ -453,7 +453,7 @@ const zhTW: Messages = {
   moreTraits: "其他特質",
   supportUnknown: "這些所選引文的對話分布未知；信心程度是模型的估計。",
   support: (se, w, q) =>
-    `所選證據：${q} 段引文，來自 ${se} 個對話、${w} 週；不代表完整歷史中的頻率。情境與例外請參照引文。`,
+    `所選證據：${q} 段引文，來自 ${se} 個對話、${w} 個分析區塊；不代表完整歷史中的頻率。情境與例外請參照引文。`,
   howMeasured: "這份報告怎麼量的",
   projectAnon: "專案",
   cardActive: "最活躍時段",
@@ -999,7 +999,7 @@ export const DEFINITION_MESSAGES = {
     dataPeriod:
       "The first and last prompt in the selected range (--since; by default the last 3 months), in your time zone.",
     analyzed:
-      "Prompts and conversations the analysing model read. With a large history, week-sized chunks spread over the range are sampled. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.",
+      "Prompts and conversations the analysing model read. With a large history, analysis chunks spread over the range are sampled. A week can span several chunks, and a chunk can combine nearby weeks. Counts that say “analysed” come from this sample; the other measurements use every prompt in the range.",
     nightShare:
       "Share of all cleaned prompts in the range sent between 22:00 and 04:59, your local time.",
     medianPrompt:
@@ -1024,7 +1024,7 @@ export const DEFINITION_MESSAGES = {
     habits:
       "Share of prompts with an attached image, and prompt length in characters after cleaning: the median (half are shorter) and the 90th percentile (the longest 10% start here).",
     traits:
-      "Confidence is capped by how widely the verified quotes spread: high needs quotes from 3 conversations over 2 weeks, medium from 2 conversations, otherwise low. Quotes are selected evidence, not full-history frequencies.",
+      "Confidence is capped by how widely the verified quotes spread: high needs quotes from 3 conversations across 2 analysis chunks, medium from 2 conversations, otherwise low. Quotes are selected evidence, not full-history frequencies.",
     dimensions:
       "Short summaries written by the analysing model, each backed by verified quotes; without a verified quote a dimension shows insufficient evidence.",
   },
@@ -1033,7 +1033,7 @@ export const DEFINITION_MESSAGES = {
     dataPeriod:
       "所選範圍（--since，預設為最近 3 個月）內第一則與最後一則提示的日期，以你的時區計算。",
     analyzed:
-      "分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內平均抽出以週為單位的區段。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。",
+      "分析模型實際讀過的提示與對話。紀錄很多時，會在範圍內抽樣分析區塊。同一週可能拆成多個區塊，區塊也可能合併相鄰的週。標示「分析過」的數字都來自這份樣本；其他量測則使用範圍內的所有提示。",
     nightShare: "範圍內所有清理後的提示中，在當地時間 22:00 到 04:59 送出的比例。",
     medianPrompt:
       "清理後提示長度（字元數）的中位數：有一半的提示比它短。計算前會先移除貼上的程式碼與自動注入的內容。",
@@ -1054,7 +1054,7 @@ export const DEFINITION_MESSAGES = {
     habits:
       "附有圖片的提示比例，以及清理後的提示長度（字元數）：中位數（一半的提示比它短）與第 90 百分位數（最長的 10% 從這裡開始）。",
     traits:
-      "信心程度受已驗證引述的分布範圍限制：高需要來自 3 段對話、跨 2 週的引述；中需要 2 段對話；其餘為低。引述是挑選出的證據，不代表在全部紀錄中出現的頻率。",
+      "信心程度受已驗證引述的分布範圍限制：高需要來自 3 段對話、跨 2 個分析區塊的引述；中需要 2 段對話；其餘為低。引述是挑選出的證據，不代表在全部紀錄中出現的頻率。",
     dimensions:
       "由分析模型寫的簡短摘要，每項都有已驗證的引述支持；沒有已驗證引述的項目會顯示證據不足。",
   },
