@@ -40,6 +40,24 @@ Keep it short: the report is read at a glance, and charts show the numbers.
   return fewer improvements rather than inventing problems. `stats.promptHabits` and
   `correctionRate` may support an improvement; quote their numbers exactly.
 
+### Reusable instructions and missing context
+
+Repetition alone does not establish wasted effort, manual retyping or dictation. Instructions
+may be intentional reminders or injected by existing configuration. Spelling differences do
+not prove assistant confusion or a failed outcome. Require an explicit user-reported cost
+before recommending a change; otherwise omit the improvement.
+
+When evidence justifies reuse, prefer a task-scoped skill or a small Markdown reference the
+reader can attach for the relevant task. State its scope and the context overhead it avoids.
+Do not recommend moving task checklists into persistent AGENTS.md by default. Mention that
+option only when the user explicitly requests persistent rules and the rules are short and
+applicable across tasks. Suggestions are optional copyable text; never imply this tool saves,
+installs or injects configuration. Do not invent the contents of a reusable file.
+
+Image contents and other unavailable attachments are unknown. A text-only record cannot show
+that the user omitted a visual target already supplied in a screenshot. Describe explicit
+user-reported misunderstandings without assuming the initial request lacked information.
+
 ## Rules
 
 - Merge repeated observations and look for recurring patterns. **Only patterns supported by

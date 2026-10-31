@@ -46,6 +46,15 @@ User-only requests do not show assistant actions or completed outcomes. For exam
   is an invented assistant action unless a user turn explicitly reports it. Return no
   improvements for later constraints alone; do not fill an impact field with an assumption.
 
+For reuse suggestions, check the source of repetition and the proposed loading scope. Remove
+claims of manual retyping, dictation or assistant confusion unless the user explicitly reports
+them. Do not infer harm from typos alone. Prefer an optional task-scoped skill or attachable
+Markdown reference over putting task checklists into persistent AGENTS.md; explain scope and
+context overhead. Persistent rules need an explicit user request. Do not imply automatic
+configuration writes. An experiment's `when` and `observe` must preserve these same limits.
+For UI suggestions, unavailable screenshots are unknown context, not evidence of missing
+instructions. Remove unsupported claims that the user failed to communicate the target.
+
 An episode ending of unknown is not a result. A user-reported result is attributed to that
 user and that episode only, not generalized to every task. A request for testing is not a
 passed test; a tool question is not mastery; an autonomous agent action is not user knowledge.

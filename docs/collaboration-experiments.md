@@ -54,3 +54,21 @@ Do not require a review file, selection, approval, export or agent configuration
 to obtain value from these suggestions. Existing report improvements and suggested rewrites
 already provide the intended surface; this decision adds no new analysis or report fields.
 Suggestions remain proposals, not established user preferences or demonstrated improvements.
+
+## Scoped reusable instructions
+
+Owner clarification, 2026-10-31: repeated instructions alone do not establish wasted effort,
+manual retyping or an agent misunderstanding. They may be intentional reminders or injected
+by existing configuration. An improvement still needs an observed, user-reported cost.
+
+When evidence justifies reuse, propose a task-scoped skill or a small Markdown reference the
+reader can attach when needed. State when it is useful and keep unrelated instructions out
+of the active context. Mention persistent AGENTS.md rules only when explicitly requested and suitable for short rules
+that apply across tasks; discuss their recurring context overhead before recommending them.
+The report offers optional copyable wording. Saving, attaching or installing it remains the
+reader's choice; this adds no automatic configuration writes or dedicated export workflow.
+
+Unavailable screenshots remain unknown context. A text-only record cannot establish that the
+reader omitted a visual target. Describe user-reported misunderstandings without inferring
+that their initial request lacked instructions. Analysis version 26 adds these boundaries to
+the draft and evidence-review prompts; existing saved profiles retain their original wording.
