@@ -47,7 +47,7 @@ describe("portrait report", () => {
     expect(JSON.stringify(input)).not.toContain("UNIQUE_PRIVATE_QUOTE")
   })
 
-  it("uses a fixed bilingual role name instead of a model's translated name", async () => {
+  it("shows the model's own role name and its translation, even with a role code", async () => {
     const base = await sample()
     const p = {
       ...base,
@@ -62,17 +62,24 @@ describe("portrait report", () => {
         })),
       },
       archetype: { name: "MODEL_ROLE", description: "Personal description." },
+      translations: {
+        "zh-TW": {
+          ...base.translations["zh-TW"]!,
+          archetype: { name: "模型角色", description: "個人描述。" },
+        },
+      },
     }
     const out = renderHtml(p)
-    expect(out).toContain("Methodical Director")
-    expect(out).toContain("有序領航者")
-    expect(out).not.toContain("MODEL_ROLE")
+    expect(out).toContain("MODEL_ROLE")
+    expect(out).toContain("模型角色")
+    expect(out).not.toContain("Methodical Director")
+    expect(out).not.toContain("有序領航者")
     expect(out).toContain("Typical working rhythm")
     expect(out).toContain("Independent evidence")
     expect(out).toContain("Personal description.")
   })
 
-  it("covers every role with stable distinct bilingual names and preserves the source", async () => {
+  it("still names a released profile's stored role in every language and preserves the source", async () => {
     const base = await sample()
     const keys = ["framing", "pacing", "control", "closure"] as const
     const first = ["F", "S", "D", "C"]
@@ -96,6 +103,8 @@ describe("portrait report", () => {
             ],
           })),
         },
+        // a released profile stored the stable English role name
+        archetype: { name, description: "Personal description." },
       }
       const before = JSON.stringify(p)
       expect(contentIn(p, "en").archetype.name).toBe(name)

@@ -27,9 +27,12 @@ export const contentIn = (p: Profile, lang: Language): Content => {
   const t = lang === "en" ? undefined : p.translations[lang]
   const code = p.portrait ? roleCode(p.portrait.axes) : null
   const archetype = t?.archetype ?? p.archetype
+  // A released profile stored the stable English role name: name it in every language.
+  // Newer profiles carry the model's own name and its translation.
+  const stableRole = code !== null && p.archetype.name === ROLE_NAMES[code]
   return {
     headline: t?.headline ?? p.headline,
-    archetype: code
+    archetype: stableRole
       ? { ...archetype, name: (lang === "en" ? ROLE_NAMES : ROLE_NAMES_ZH)[code]! }
       : archetype,
     dimension: (key) => {
