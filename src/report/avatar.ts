@@ -1,4 +1,4 @@
-import { roleCode, type Profile } from "../domain/index.ts"
+import { balanceCode, roleCode, type Profile } from "../domain/index.ts"
 /** Original abstract collaboration symbols, with no face, body or inferred human likeness. */
 export const AVATAR_ART_VERSION = 1
 export const AVATAR_STUDIES = ["planner", "explorer", "coordinator", "verifier", "neutral"] as const
@@ -116,7 +116,9 @@ export const avatarFor = (
 ): ReturnType<typeof avatarSvg> | null => {
   if (choice === "none") return null
   if (choice !== "auto") return avatarSvg(choice)
-  const code = profile.portrait ? roleCode(profile.portrait.axes) : null
+  // the cited ways decide first; otherwise the measured balance, when every axis leans
+  const code =
+    (profile.portrait ? roleCode(profile.portrait.axes) : null) ?? balanceCode(profile.axisBalance)
   const art = ROLE_ART.find(([key]) => key === code)
   return art ? avatarSvg(art[1], art[2]) : avatarSvg("neutral")
 }

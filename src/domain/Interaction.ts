@@ -98,3 +98,26 @@ export type AxisBalance = typeof AxisBalance.Type
 
 /** Fewest conversations behind an axis before the report shows its percentages. */
 export const MIN_BALANCE_CONVERSATIONS = 3
+
+/** Share of an axis's conversations one pole needs before the axis leans that way. */
+export const LEANING_SHARE = 0.6
+
+/**
+ * A role code from the measured balance: each axis leans to the pole with at least
+ * LEANING_SHARE of its conversations, given MIN_BALANCE_CONVERSATIONS behind it. Null when
+ * any axis is even or thin.
+ */
+export const balanceCode = (balance: AxisBalance | null | undefined): string | null => {
+  if (!balance) return null
+  let code = ""
+  for (const axis of INTERACTION_AXES) {
+    const found = balance.axes.find((a) => a.key === axis.key)
+    const total = found ? found.first + found.second : 0
+    if (!found || total < MIN_BALANCE_CONVERSATIONS) return null
+    const share = found.first / total
+    if (share >= LEANING_SHARE) code += axis.codes[0]
+    else if (share <= 1 - LEANING_SHARE) code += axis.codes[1]
+    else return null
+  }
+  return code
+}

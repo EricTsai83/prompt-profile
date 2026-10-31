@@ -57,3 +57,56 @@ it("recomposes the same symbol as a taller illustration without stretching its s
     expect(avatarSvg(kind)).toEqual(square)
   }
 })
+
+it("picks the symbol from the measured share when every axis leans one way", async () => {
+  const { readFileSync } = await import("node:fs")
+  const { Effect } = await import("effect")
+  const { decodeProfile } = await import("../../src/domain/Profile.ts")
+  const { avatarFor } = await import("../../src/report/avatar.ts")
+  const base = await Effect.runPromise(
+    decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+  )
+  // both ways cited on every axis: no single role from the quotes
+  const portrait = {
+    introduction: "Intro.",
+    chapters: [],
+    axes: (["framing", "pacing", "control", "closure"] as const).map((key) => ({
+      key,
+      explanation: "Observed.",
+      sides: (["first", "second"] as const).map((pole) => ({
+        pole,
+        context: "c",
+        sessions: 2,
+        evidence: [],
+      })),
+    })),
+  }
+  const balance = (axes: Array<[number, number]>) => ({
+    axes: (["framing", "pacing", "control", "closure"] as const).map((key, i) => ({
+      key,
+      first: axes[i]![0],
+      second: axes[i]![1],
+    })),
+    conversations: 50,
+    rejected: 0,
+  })
+  // F, B (second), L (second), C → FBLC → the coordinator
+  const leaning = balance([
+    [9, 3],
+    [2, 8],
+    [1, 6],
+    [7, 2],
+  ])
+  expect(avatarFor({ ...base, portrait, axisBalance: leaning })).toEqual(
+    avatarSvg("coordinator", 0),
+  )
+  // an even axis leaves the role open: neutral
+  const even = balance([
+    [9, 3],
+    [5, 5],
+    [1, 6],
+    [7, 2],
+  ])
+  expect(avatarFor({ ...base, portrait, axisBalance: even })).toEqual(avatarSvg("neutral"))
+  expect(avatarFor({ ...base, portrait, axisBalance: null })).toEqual(avatarSvg("neutral"))
+})
