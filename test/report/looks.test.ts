@@ -235,7 +235,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 3,
         look: "afterhours",
-        lookVersion: 37,
+        lookVersion: 38,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",
@@ -262,10 +262,13 @@ it.effect(
       for (const look of LOOK_IDS) {
         for (const [language, label] of [
           ["en", "Made with prompt-profile"],
-          ["zh-TW", "由 prompt-profile 產生"],
+          ["zh-TW", "由 prompt-profile 製作"],
         ] as const) {
           const styles = find(cardTree(profile, { look, cardHide: [] }, language), label)
           expect(styles).toHaveLength(1)
+          const page = renderHtml({ ...profile, languages: [language] }, { look, cardHide: [] })
+          expect(page).toContain(`<footer class="foot">${label}</footer>`)
+          expect(page).not.toContain("npx prompt-profile")
           expect(styles[0]).toMatchObject({
             position: "absolute",
             right: 20,

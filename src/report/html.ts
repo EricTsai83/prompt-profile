@@ -32,6 +32,7 @@ import {
 } from "./looks.ts"
 import {
   AVATAR_MESSAGES,
+  CARD_MESSAGES,
   HISTORY_MESSAGES,
   LIBRARY_MESSAGES,
   MESSAGES,
@@ -332,7 +333,7 @@ export const renderHtml = (
           <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).back)}</label>
           </section>
           </main>
-          <footer class="foot">prompt-profile · npx prompt-profile</footer>
+          <footer class="foot">${loc.text((_m, _c, l) => CARD_MESSAGES[l].attribution)}</footer>
         </div>
       </body>
     </html> `

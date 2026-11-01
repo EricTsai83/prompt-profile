@@ -3865,7 +3865,7 @@ html:root .tech-time{overflow:visible;font-size:8pt}
           <label class="page-turn" for="report-overview"><span data-l="en" lang="en">← Back to the introduction</span><span data-l="zh-TW" lang="zh-Hant-TW">← 回到人物介紹</span></label>
           </section>
           </main>
-          <footer class="foot">prompt-profile · npx prompt-profile</footer>
+          <footer class="foot"><span data-l="en" lang="en">Made with prompt-profile</span><span data-l="zh-TW" lang="zh-Hant-TW">由 prompt-profile 製作</span></footer>
         </div>
       </body>
     </html>"

@@ -424,7 +424,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 33,
+  version: 34,
   color: {
     light: {
       bg: "#f6f6f3",
@@ -499,7 +499,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   CLASSIC,
   {
     id: "signal",
-    version: 37,
+    version: 38,
     color: {
       light: {
         bg: "#f5f7ff",
@@ -548,7 +548,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "afterhours",
-    version: 37,
+    version: 38,
     color: {
       light: {
         bg: "#eef3f8",
@@ -597,7 +597,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "studio",
-    version: 37,
+    version: 38,
     color: {
       light: {
         bg: "#fff7f4",
@@ -646,7 +646,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "prism",
-    version: 37,
+    version: 38,
     color: {
       light: { ...PRISM_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#101827"),
@@ -665,7 +665,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "slate",
-    version: 37,
+    version: 38,
     color: {
       light: { ...SLATE_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#141b20"),
@@ -681,7 +681,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "folio",
-    version: 37,
+    version: 38,
     color: {
       light: { ...FOLIO_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#201f1c"),

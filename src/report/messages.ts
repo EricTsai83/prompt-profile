@@ -841,7 +841,7 @@ export const CARD_MESSAGES = {
     partial: "部分用量未計價",
     incomplete: "紀錄不完整",
     notMeasured: "未量測",
-    attribution: "由 prompt-profile 產生",
+    attribution: "由 prompt-profile 製作",
   },
 } as const
 
