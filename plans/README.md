@@ -189,8 +189,8 @@ Mark progress in the owning plan and cross-reference evidence in dependent plans
 competing systems for the completed collaboration foundation.
 All existing privacy, evidence, language and module-boundary rules apply to every batch.
 
-Released: `0.1.5` on npm (Trusted Publisher, provenance) and GitHub Releases
-with standalone binaries, 2026-10-30; how to release is in [CONTRIBUTING.md](../CONTRIBUTING.md).
+Released: `0.2.4` on npm (Trusted Publisher, provenance) and GitHub Releases
+with standalone binaries, 2026-11-01; how to release is in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Ideas, not planned yet:
 
