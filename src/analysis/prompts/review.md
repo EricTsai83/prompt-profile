@@ -104,3 +104,9 @@ explicit recorded requirements supply the context.
 
 Reject positive verification support based only on accepting/waiving results or closing a
 plan. An assistant's report of passing checks is not the user's verification practice.
+
+For steering, require a cited specific mismatch in AI assistance or an explicit request to
+change direction. Generic "I'm stuck" or "the canvas is blank" problem reports, learning
+questions, initial task requirements and delegation limits alone do not meet the threshold.
+Remove such support; if no qualifying quote remains, set steering to null (overall and per
+project). Do not infer an AI mistake or a prior direction from missing assistant replies.

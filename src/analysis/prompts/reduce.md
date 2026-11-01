@@ -289,13 +289,21 @@ Anchors (intermediate scores allowed):
   100 adapts a staged plan to uncertainty with explicit decision points.
 - verification: 25 asks for a check; 50 specifies tests; 75 checks execution and acceptance;
   100 challenges claimed success with independent checks and failure cases.
-- steering: 25 flags a problem; 50 identifies a concrete mismatch; 75 redirects precisely;
+- steering: 25 identifies a specific mismatch in AI assistance or requests a changed direction;
+  50 explains the mismatch and the desired correction; 75 redirects precisely;
   100 redirects early while preserving useful work and the original goal.
 - boundaries: 25 states a limit; 50 scopes delegated actions; 75 specifies risk and approval
   boundaries; 100 anticipates irreversible effects and defines reversible checkpoints.
 - recovery: 25 notices a mistake; 50 requests a revert; 75 reframes a failed approach;
   100 diagnoses the failure and chooses a reversible recovery with verification.
   A request does not prove execution or a successful result. Explain uncertainty through evidence.
+
+For steering, a generic problem report or request for help is insufficient: "I'm stuck on
+step 3" and "the canvas is blank, what am I doing wrong?" do not show steering by themselves.
+Require an explicit mismatch (for example, "you changed the public API; keep it compatible")
+or a changed direction ("stop implementing and explain the options first"). Initial task
+requirements, learning questions and delegation limits alone belong to other abilities.
+If no quote meets this standard, steering is null, not 0 or 25. Apply this to project scores too.
 
 ## Skill purpose and adopted workflows
 

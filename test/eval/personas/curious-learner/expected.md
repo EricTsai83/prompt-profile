@@ -9,3 +9,5 @@ Should be recognised:
 - Irregular hours from morning to evening (local time 10:00–21:30, no late nights); lowercase,
   casual English with enthusiasm ("it compiles now!!").
 - Improvements: the prompts are already explicit about what kind of help is wanted; zero improvements is valid when no evidenced gap or cost is visible. Any suggestions should be small, e.g. say what was tried before asking "why", or state the level of detail wanted.
+
+- Steering is unassessed: reporting a blank canvas or being stuck does not identify a mismatch in AI assistance or request a changed direction. Learning goals and limits on delegated work can support other abilities.

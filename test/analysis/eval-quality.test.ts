@@ -225,3 +225,30 @@ it.effect("allows clear learner prompts to have no actionable improvement", () =
     expect(scoreProfile(profile, learnerRubric).passed).toBe(true)
   }),
 )
+
+it.effect("rejects scored abilities that the fictional input does not demonstrate", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const steering = {
+      key: "steering" as const,
+      score: null,
+      evidence: [],
+      support: { sessions: 0, weeks: 0 },
+      byProject: [],
+    }
+    const checkedRubric = { ...rubric, unassessedAbilities: ["steering" as const] }
+    const profile = { ...sample, abilities: [{ ...steering, score: 25 }] }
+    expect(scoreProfile(profile, checkedRubric).failures).toContain(
+      "Unsupported ability assessment: steering",
+    )
+    expect(
+      scoreProfile({ ...profile, abilities: [{ ...steering, score: null }] }, checkedRubric)
+        .failures,
+    ).not.toContain("Unsupported ability assessment: steering")
+    expect(scoreProfile(profile, rubric).failures).not.toContain(
+      "Unsupported ability assessment: steering",
+    )
+  }),
+)

@@ -9,6 +9,8 @@ export interface QualityRubric {
     readonly patterns: ReadonlyArray<string>
   }>
   readonly forbiddenPatterns: ReadonlyArray<string>
+  /** Abilities the authored fictional input does not demonstrate. */
+  readonly unassessedAbilities?: ReadonlyArray<Profile["abilities"][number]["key"]>
   readonly minTraits: number
   readonly minEvidenceRetention: number
   readonly maxEmptyDimensions: number
@@ -56,6 +58,9 @@ export const scoreProfile = (
     ...profile.improvements.flatMap((i) => [i.title, i.pattern, i.impact, i.suggestion]),
   ].join("\n")
   const failures: Array<string> = []
+  for (const key of rubric.unassessedAbilities ?? [])
+    if (profile.abilities.some((a) => a.key === key && a.score !== null))
+      failures.push(`Unsupported ability assessment: ${key}`)
   for (const concept of rubric.requiredConcepts) {
     if (!concept.patterns.some((p) => new RegExp(p, "im").test(claims))) {
       failures.push(`Missing concept: ${concept.name}`)
