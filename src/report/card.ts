@@ -690,12 +690,18 @@ export const cardTree = (
   }
 }
 
+declare const __BUNDLED_WASM__: boolean
+
 let wasmReady: Promise<void> | null = null
 const ensureWasm = (): Promise<void> => {
   if (wasmReady === null) {
     const require = createRequire(import.meta.url)
     wasmReady = initWasm(
-      readAsset("index_bg.wasm", () => require.resolve("@resvg/resvg-wasm/index_bg.wasm")),
+      readAsset("index_bg.wasm", () =>
+        typeof __BUNDLED_WASM__ !== "undefined" && __BUNDLED_WASM__
+          ? new URL("./index_bg.wasm", import.meta.url)
+          : require.resolve("@resvg/resvg-wasm/index_bg.wasm"),
+      ),
     )
   }
   return wasmReady
