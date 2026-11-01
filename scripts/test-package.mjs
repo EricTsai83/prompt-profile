@@ -37,6 +37,16 @@ try {
   const installed = join(root, "node_modules", "prompt-profile")
   const bin = join(installed, "dist", "bin.js")
   const pkg = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"))
+  assert.equal(
+    Object.keys(pkg.dependencies ?? {}).length,
+    0,
+    "Published CLI must bundle runtime dependencies",
+  )
+  assert.ok(
+    statSync(join(installed, "dist", "index_bg.wasm")).size > 0,
+    "Missing bundled renderer WASM",
+  )
+  assert.match(readFileSync(join(installed, "dist", "THIRD-PARTY-NOTICES.txt"), "utf8"), /satori/)
   if (process.platform !== "win32") {
     // the installed `.bin` shim, as users run it
     const shim = run(join(root, "node_modules", ".bin", "prompt-profile"), ["--version"])

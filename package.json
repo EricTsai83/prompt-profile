@@ -48,19 +48,17 @@
     "test:binary": "node scripts/test-binary.mjs",
     "eval:review": "tsx scripts/eval-review.ts"
   },
-  "dependencies": {
+  "devDependencies": {
     "@effect/platform-node": "catalog:",
     "@effect/platform-node-shared": "catalog:",
-    "@resvg/resvg-wasm": "catalog:",
-    "effect": "catalog:",
-    "satori": "catalog:"
-  },
-  "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@resvg/resvg-wasm": "catalog:",
     "@types/node": "catalog:",
     "axe-core": "catalog:",
+    "effect": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
+    "satori": "catalog:",
     "tsdown": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",

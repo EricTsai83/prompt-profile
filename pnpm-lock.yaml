@@ -52,38 +52,37 @@ catalogs:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@effect/platform-node':
         specifier: 'catalog:'
         version: 4.0.6(effect@4.0.6)(redis@6.3.0)
       '@effect/platform-node-shared':
         specifier: 'catalog:'
         version: 4.0.6(effect@4.0.6)
-      '@resvg/resvg-wasm':
-        specifier: 'catalog:'
-        version: 2.6.2
-      effect:
-        specifier: 'catalog:'
-        version: 4.0.6
-      satori:
-        specifier: 'catalog:'
-        version: 0.63.2
-    devDependencies:
       '@effect/vitest':
         specifier: 'catalog:'
         version: 4.0.6(effect@4.0.6)(vitest@5.0.5(@types/node@24.19.2)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(tsx@4.23.15)))
+      '@resvg/resvg-wasm':
+        specifier: 'catalog:'
+        version: 2.6.2
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.2
       axe-core:
         specifier: 'catalog:'
         version: 4.14.0
+      effect:
+        specifier: 'catalog:'
+        version: 4.0.6
       oxfmt:
         specifier: 'catalog:'
         version: 0.74.0
       oxlint:
         specifier: 'catalog:'
         version: 1.89.0
+      satori:
+        specifier: 'catalog:'
+        version: 0.63.2
       tsdown:
         specifier: 'catalog:'
         version: 0.23.1(tsx@4.23.15)(typescript@7.0.2)
