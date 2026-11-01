@@ -234,7 +234,6 @@ export const renderHtml = (
                 : ""
             }
           </header>
-          ${options.libraryHref && /^(?:\.\.\/)+index\.html$/u.test(options.libraryHref) ? html`<p class="library-back"><a href="${options.libraryHref}">${loc.text((_m, _c, l) => LIBRARY_MESSAGES[l].back)}</a></p>` : ""}
           <nav class="view-nav" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).navigation)}">
             <label for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overview)}</label>
             <label for="report-detail">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detail)}</label>
@@ -333,7 +332,7 @@ export const renderHtml = (
           <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).back)}</label>
           </section>
           </main>
-          <footer class="foot">${loc.text((_m, _c, l) => CARD_MESSAGES[l].attribution)}</footer>
+          <footer class="foot">${loc.text((_m, _c, l) => CARD_MESSAGES[l].attribution)}${options.libraryHref && /^(?:\.\.\/)+index\.html$/u.test(options.libraryHref) ? html`<p class="library-back"><a href="${options.libraryHref}">${loc.text((_m, _c, l) => LIBRARY_MESSAGES[l].back)}</a></p>` : ""}</footer>
         </div>
       </body>
     </html> `

@@ -235,7 +235,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 3,
         look: "afterhours",
-        lookVersion: 38,
+        lookVersion: 39,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",
@@ -278,4 +278,24 @@ it.effect(
         }
       }
     }),
+)
+
+it.effect("puts the local report-library link only in the footer", () =>
+  Effect.gen(function* () {
+    const profile = yield* sample()
+    for (const look of LOOK_IDS) {
+      const page = renderHtml(profile, { look, cardHide: [], libraryHref: "../../index.html" })
+      const footer = /<footer class="foot">([\s\S]*?)<\/footer>/.exec(page)?.[1] ?? ""
+      expect(footer).toContain('href="../../index.html"')
+      expect(footer).toContain("Report library")
+      expect(footer).toContain("歷史報告庫")
+      expect(page.slice(0, page.indexOf('<footer class="foot">'))).not.toContain(
+        'class="library-back"',
+      )
+      expect(renderHtml(profile, { look, cardHide: [] })).not.toContain('class="library-back"')
+      expect(
+        renderHtml(profile, { look, cardHide: [], libraryHref: "javascript:alert(1)" }),
+      ).not.toContain('class="library-back"')
+    }
+  }),
 )

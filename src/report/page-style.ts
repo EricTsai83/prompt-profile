@@ -128,6 +128,8 @@ blockquote{margin:0;padding:6px 12px;border-left:3px solid var(--accent);color:v
 .measured{margin-top:14px}
 .measured .panel{background:var(--bg)}
 .foot{margin-top:28px;text-align:center;font-size:var(--text-xs);color:var(--muted)}
+.foot .library-back{margin:8px 0 0}
+.foot .library-back a{color:inherit;text-underline-offset:3px}
 .about summary{color:var(--fg);font-weight:600}
 .about p{margin-top:8px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px}
