@@ -6,13 +6,19 @@ collaborate with AI. Uses your logged-in `claude` or `codex` CLI: no API key nee
 **Analysis sends selected, redacted prompts to your CLI's model service and uses your
 subscription quota.** Reports and analysis caches stay on your computer.
 
-![Fictional sample share card](https://erictsai83.github.io/prompt-profile/sample-card.png)
+![Maintainer collaboration profile](https://erictsai83.github.io/prompt-profile/owner-example/card.en.png)
 
-[Full report](https://erictsai83.github.io/prompt-profile/sample-report.html)
-· [Shareable report](https://erictsai83.github.io/prompt-profile/demo/without-personal/report.html)
+[My report](https://erictsai83.github.io/prompt-profile/owner-example/report.html)
+· [繁體中文卡片](https://erictsai83.github.io/prompt-profile/owner-example/card.png)
+· [Fictional example](https://erictsai83.github.io/prompt-profile/sample-report.html)
 · [Template gallery](https://erictsai83.github.io/prompt-profile/demo/templates/index.html)
 
-All examples use fictional data.
+The card above is my personal analysis from November 1, 2026, rendered with the current
+code. The public report omits prompt quotes, project names and custom instruction names.
+Ability scores describe supported practice in my conversations, not population ranks;
+the API estimate is not my subscription bill. The separate fictional examples and gallery
+are generated from the latest repository code.
+[View the latest README on GitHub](https://github.com/EricTsai83/prompt-profile#readme).
 
 ## Quick start
 
@@ -70,9 +76,9 @@ A Chinese-only request stops if translation still fails; it does not substitute 
 
 Observations cite verified prompt quotes, but quote matching and model review do not prove an
 interpretation is correct. Small histories may show “Early observations” instead of a role.
-The [radar](docs/ability-scores.md) assesses six AI collaboration abilities from verified quotes in these conversations. Scores describe supported practice, not psychological traits or population ranks; “not assessed” is not a low score.
+The [radar](https://github.com/EricTsai83/prompt-profile/blob/main/docs/ability-scores.md) assesses six AI collaboration abilities from verified quotes in these conversations. Scores describe supported practice, not psychological traits or population ranks; “not assessed” is not a low score.
 
-New analyses also retain [reusable instruction provenance](docs/instruction-provenance.md): what a skill is documented to do, who selected it for the task, and which historical requirements were supplied.
+New analyses also retain [reusable instruction provenance](https://github.com/EricTsai83/prompt-profile/blob/main/docs/instruction-provenance.md): what a skill is documented to do, who selected it for the task, and which historical requirements were supplied.
 
 ## Usage
 
@@ -101,7 +107,7 @@ printed retry command: completed chunks and merges are cached; later steps may u
 
 Each analysis saves calls, retries, cache reuse, token coverage and cost provenance, including
 failed executions. The report shows generation usage separately from historical activity.
-See [execution accounting](docs/execution-accounting.md) for recovery, unknown measurements
+See [execution accounting](https://github.com/EricTsai83/prompt-profile/blob/main/docs/execution-accounting.md) for recovery, unknown measurements
 and cost-threshold limits.
 
 ## How much a run uses
@@ -209,8 +215,8 @@ source prompts can be in any language.
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, checks and releases, and
-[AGENTS.md](AGENTS.md) for architecture and repository rules.
+See [CONTRIBUTING.md](https://github.com/EricTsai83/prompt-profile/blob/main/CONTRIBUTING.md) for setup, checks and releases, and
+[AGENTS.md](https://github.com/EricTsai83/prompt-profile/blob/main/AGENTS.md) for architecture and repository rules.
 
 ## License
 

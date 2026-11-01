@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 import { ABILITY_KEYS, decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { avatarSvg } from "../../src/report/avatar.ts"
 import { cardTree, renderCard } from "../../src/report/card.ts"
+import { cardPeriod } from "../../src/report/card-summary.ts"
 import { embeddedFonts } from "../../src/report/fonts.ts"
 
 const sample = () =>
@@ -130,3 +131,22 @@ it("omits the standalone product name from card headers while retaining footer c
     expect(words).toContain("Made with prompt-profile")
   }
 })
+
+it.each(["en", "zh-TW"] as const)(
+  "places prompt activity below the headline in %s",
+  async (lang) => {
+    const p = await sample()
+    const words = texts(cardTree(p, { look: "classic", cardHide: [] }, lang))
+    const headline = lang === "en" ? p.headline : p.translations[lang]!.headline
+    const period = cardPeriod(p, lang, true)
+    expect(words.indexOf(period)).toBeGreaterThan(words.indexOf(headline))
+    expect(words.filter((word) => word === period)).toHaveLength(1)
+    const hidden = texts(cardTree(p, { look: "classic", cardHide: ["stats"] }, lang))
+    expect(hidden).not.toContain(period)
+    const privateDates = texts(
+      cardTree(p, { look: "classic", cardHide: [], exclude: ["dates"] }, lang),
+    )
+    expect(privateDates).toContain(cardPeriod(p, lang, false))
+    expect(privateDates).not.toContain(period)
+  },
+)

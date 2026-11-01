@@ -9,6 +9,7 @@ on:
     paths:
       - "src/report/**"
       - "src/domain/**"
+      - "test/fixtures/profile.demo.json"
       - "test/fixtures/profile.sample.json"
       - "test/fixtures/portrait.sample.json"
       - "scripts/site.ts"
@@ -18,6 +19,7 @@ on:
     paths:
       - "src/report/**"
       - "src/domain/**"
+      - "test/fixtures/profile.demo.json"
       - "test/fixtures/profile.sample.json"
       - "test/fixtures/portrait.sample.json"
       - "scripts/site.ts"

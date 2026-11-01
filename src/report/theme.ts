@@ -424,7 +424,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 36,
+  version: 37,
   color: {
     light: {
       bg: "#f6f6f3",

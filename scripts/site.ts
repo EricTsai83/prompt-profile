@@ -38,8 +38,12 @@ const home = (): string => {
   ).join("")
   return `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>prompt-profile examples</title><style>body{font:16px/1.6 system-ui;background:#f5f7fa;color:#172338;max-width:860px;margin:40px auto;padding:0 24px}h1{font-size:28px;margin-bottom:4px}h2{font-size:18px;margin-top:32px}img{width:100%;max-width:600px;border-radius:12px;border:1px solid #dfe3e7}a{color:#4055bd}code{background:#e8ecf2;padding:2px 6px;border-radius:4px}ul{padding-left:20px}</style>
 <h1>prompt-profile</h1>
-<p>A CLI that reads your local Claude Code and Codex prompt history, analyses it with the <code>claude</code> or <code>codex</code> CLI you are already logged in to, and writes an evidence-backed report of how you collaborate with AI. Everything below is rendered from hand-written, fictional sample data by the current code.</p>
+<p>A CLI that reads your local Claude Code and Codex prompt history, analyses it with the <code>claude</code> or <code>codex</code> CLI you are already logged in to, and writes an evidence-backed report of how you collaborate with AI. The maintainer example below is an approved snapshot of real personal analysis. The separate fictional examples are rendered by the current code.</p>
 <p><code>npx prompt-profile@latest</code> · <a href="https://github.com/EricTsai83/prompt-profile">Source on GitHub</a></p>
+<h2>Maintainer example</h2>
+<p><a href="owner-example/report.html"><img src="owner-example/card.en.png" alt="Maintainer collaboration profile with six assessed abilities"></a></p>
+<p><a href="owner-example/report.html">Read the maintainer report</a> · <a href="owner-example/card.png">Traditional Chinese card</a>. Personal snapshot from November 1, 2026; prompt quotes, project names and custom instruction names are omitted. Scores describe supported practice in these conversations, not population ranks. API estimates are not a subscription bill.</p>
+<h2>Fictional examples</h2>
 <p><a href="sample-report.html"><img src="sample-card.png" alt="Fictional sample share card"></a></p>
 <h2>Sample report</h2>
 <ul><li><a href="sample-report.html">Full report</a>: what you see on your own machine, with prompt quotes</li><li><a href="demo/without-personal/report.html">Shareable report</a>: the same profile with quotes, project names, exact dates and other personal parts left out</li><li><a href="sample-profile.json">Sample profile.json</a>: the data the report is rendered from</li></ul>

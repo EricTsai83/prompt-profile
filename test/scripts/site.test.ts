@@ -69,6 +69,9 @@ describe("siteFiles", () => {
   it("has a home page at the site root, whose every link points to a published file", () => {
     const home = text("index.html")
     expect(home).toMatch(/^<!doctype html>/i)
+    expect(home).toContain('href="owner-example/report.html"')
+    expect(home).toContain('src="owner-example/card.en.png"')
+    expect(home).toContain("maintainer")
     expect(home).toContain('<img src="sample-card.png"')
     const links = [...home.matchAll(/(?:href|src)="([^"#:]+)"/g)].map((m) => m[1]!)
     expect(links).toEqual(

@@ -90,6 +90,7 @@ const identityCopy = (
   colors: { readonly muted: string; readonly chip: Record<string, unknown> },
   badge: Node | null = null,
   width?: number,
+  period: string | null = null,
 ): Node => {
   const c = contentIn(profile, lang)
   const card = theme.card
@@ -130,6 +131,18 @@ const identityCopy = (
         },
         clip(c.headline, 120),
       ),
+      period === null
+        ? null
+        : h(
+            "div",
+            {
+              fontSize: card.size.header,
+              color: colors.muted,
+              marginTop: card.headline.gap,
+              flexShrink: 0,
+            },
+            period,
+          ),
       hide.includes("traits")
         ? null
         : h(
@@ -293,7 +306,6 @@ const classicTree = (
   avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
   const k = schemeOf(theme)
-  const card = theme.card
   const showGraphic = !hide.includes("graphic")
   return h(
     "div",
@@ -324,26 +336,20 @@ const classicTree = (
           )
         : []),
       copyLayer(theme, [
-        h("div", { display: "flex", justifyContent: "flex-end", alignItems: "center" }, [
-          hide.includes("stats")
-            ? null
-            : h(
-                "div",
-                { fontSize: card.size.header, color: k.muted },
-                cardPeriod(profile, lang, exactDates),
-              ),
+        h("div", { display: "flex", flex: 1, alignItems: "center" }, [
+          identityCopy(
+            profile,
+            theme,
+            // the traits are on the radar; without it they stay chips
+            showGraphic ? [...hide, "traits"] : hide,
+            lang,
+            showGraphic,
+            { muted: k.muted, chip: { color: k.accent, backgroundColor: k.accentSoft } },
+            avatar && showGraphic ? roleBadge(avatar, lang, { fg: k.fg, border: k.border }) : null,
+            showGraphic ? 520 : undefined,
+            hide.includes("stats") ? null : cardPeriod(profile, lang, exactDates),
+          ),
         ]),
-        identityCopy(
-          profile,
-          theme,
-          // the traits are on the radar; without it they stay chips
-          showGraphic ? [...hide, "traits"] : hide,
-          lang,
-          showGraphic,
-          { muted: k.muted, chip: { color: k.accent, backgroundColor: k.accentSoft } },
-          avatar && showGraphic ? roleBadge(avatar, lang, { fg: k.fg, border: k.border }) : null,
-          showGraphic ? 520 : undefined,
-        ),
         h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
           metricRow(profile, theme, hide, lang, k.muted, showUsage),
           cardFooter(profile, theme, hide, lang, k.muted, showUsage, exactDates),
