@@ -14,7 +14,7 @@ import { contentIn, signatureNames } from "./content.ts"
 import { cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
-import { AVATAR_MESSAGES, CARD_MESSAGES, MESSAGES } from "./messages.ts"
+import { AVATAR_MESSAGES, CARD_MESSAGES } from "./messages.ts"
 
 export const CARD_WIDTH = 1200
 export const CARD_HEIGHT = 630
@@ -277,7 +277,7 @@ const roleBadge = (
   ])
 
 /** Where the classic card's radar sits: the right half, between the header and the numbers. */
-const CLASSIC_RADAR = { cx: 905, cy: 285, r: 128 } as const
+const CLASSIC_RADAR = { cx: 905, cy: 275, r: 120 } as const
 
 /**
  * The classic card: the classic report's hero edge to edge, in its dark colors. The right half
@@ -293,7 +293,6 @@ const classicTree = (
   exactDates: boolean,
   avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
-  const t = MESSAGES[lang]
   const k = schemeOf(theme)
   const card = theme.card
   const showGraphic = !hide.includes("graphic")
@@ -326,8 +325,7 @@ const classicTree = (
           )
         : []),
       copyLayer(theme, [
-        h("div", { display: "flex", justifyContent: "space-between", alignItems: "center" }, [
-          h("div", { fontSize: card.size.brand, fontWeight: 700 }, t.project),
+        h("div", { display: "flex", justifyContent: "flex-end", alignItems: "center" }, [
           hide.includes("stats")
             ? null
             : h(
@@ -366,7 +364,6 @@ const identityTree = (
   exactDates: boolean,
   avatar: ReturnType<typeof avatarSvg> | null,
 ): Node => {
-  const t = MESSAGES[lang]
   const id = theme.identity
   const card = theme.card
   const showGraphic = !hide.includes("graphic")
@@ -407,12 +404,7 @@ const identityTree = (
           }
         : null,
       copyLayer(theme, [
-        h("div", { display: "flex", justifyContent: "space-between", fontSize: card.size.header }, [
-          h(
-            "div",
-            { fontFamily: fontsOf(theme).display, fontWeight: 800, fontSize: card.size.brand },
-            t.project,
-          ),
+        h("div", { display: "flex", justifyContent: "flex-end", fontSize: card.size.header }, [
           hide.includes("stats")
             ? null
             : h("div", { color: id.muted }, cardPeriod(profile, lang, exactDates)),
@@ -472,12 +464,11 @@ const productTree = (
         {
           display: "flex",
           width: inner,
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           fontSize: card.size.header,
           color: k.muted,
         },
         [
-          h("div", {}, MESSAGES[lang].project),
           h(
             "div",
             {},

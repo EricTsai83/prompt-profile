@@ -113,3 +113,20 @@ it("has no decorative dots behind the copy", async () => {
   }
   expect(round(cardTree(p))).toBe(0)
 })
+
+it("omits the standalone product name from card headers while retaining footer credit", async () => {
+  const p = await sample()
+  for (const look of [
+    "classic",
+    "signal",
+    "afterhours",
+    "studio",
+    "prism",
+    "slate",
+    "folio",
+  ] as const) {
+    const words = texts(cardTree(p, { look, cardHide: [] }))
+    expect(words).not.toContain("prompt-profile")
+    expect(words).toContain("Made with prompt-profile")
+  }
+})
