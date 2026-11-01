@@ -14,6 +14,12 @@ export const TEMPLATE_MIN_SESSIONS = 3
  */
 export const DELEGATION_PATTERNS: ReadonlyArray<RegExp> = []
 
+/** Explicit SDK review-job templates; SDK transport alone never establishes delegation. */
+const SDK_REVIEW_OPENINGS: ReadonlyArray<RegExp> = [
+  /^Act as (?:the|a) (?:review )?sub[- ]agent(?: for this task)?[.\n]/i,
+  /^Review the uncommitted changes in this repository\b[\s\S]{0,400}This is a read-only review: do not edit files\./i,
+]
+
 /**
  * Session openings confirmed by the owner as automated subtasks, as `openingKey` values
  * (client + hash of the first 30 characters of the session's first prompt). The hash is what
@@ -85,7 +91,14 @@ export const filterRecords = (
     const key = `${r.source}:${r.sessionId}`
     if (firstSeen.has(key)) continue
     firstSeen.add(key)
-    if (patterns.some((p) => p.test(r.text)) || openings.has(openingKey(r))) delegated.add(key)
+    if (
+      patterns.some((p) => p.test(r.text)) ||
+      openings.has(openingKey(r)) ||
+      (r.origin === "sdk" &&
+        r.client === "sdk-ts" &&
+        SDK_REVIEW_OPENINGS.some((p) => p.test(r.text)))
+    )
+      delegated.add(key)
   }
 
   const records = sorted.filter((r) => {

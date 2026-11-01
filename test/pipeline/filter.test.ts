@@ -87,3 +87,31 @@ describe("filter", () => {
     expect(result.excluded).toEqual({ "delegated-subtask": 2 })
   })
 })
+
+it("excludes explicit SDK review-job openings without excluding ordinary SDK or CLI requests", () => {
+  const job = "Act as the review sub-agent for this task.\nFind regressions independently."
+  const reviewJob =
+    "Review the uncommitted changes in this repository. This is a read-only review: do not edit files."
+  const input = [
+    rec(job, "2026-09-01T00:00:00Z", { sessionId: "child", origin: "sdk", client: "sdk-ts" }),
+    rec("Follow-up review instruction.", "2026-09-01T00:01:00Z", {
+      sessionId: "child",
+      origin: "sdk",
+      client: "sdk-ts",
+    }),
+    rec(reviewJob, "2026-09-01T00:00:00Z", {
+      sessionId: "review-job",
+      origin: "sdk",
+      client: "sdk-ts",
+    }),
+    rec("Please review my diff.", "2026-09-01T00:00:00Z", {
+      sessionId: "person",
+      origin: "sdk",
+      client: "sdk-ts",
+    }),
+    rec(job, "2026-09-01T00:00:00Z", { sessionId: "direct", origin: "interactive", client: "cli" }),
+  ]
+  const result = filterRecords(input, { since: null, until })
+  expect(result.records.map((r) => r.sessionId).toSorted()).toEqual(["direct", "person"])
+  expect(result.excluded["delegated-subtask"]).toBe(3)
+})

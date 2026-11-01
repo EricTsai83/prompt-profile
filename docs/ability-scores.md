@@ -85,4 +85,12 @@ the ability description ("redirects"). The owner was asked whether problem repor
 should qualify. This is a semantic distinction, not a missing-data or quotation failure.
 No owner decision has been inferred from the instruction to continue implementation.
 
-Reusable instruction evidence is described in [instruction provenance](./instruction-provenance.md). Schema 26 records purpose, selection and requirements; analysis 37 and pipeline 7 apply it to new analyses without assessing authorship.
+Reusable instruction evidence is described in [instruction provenance](./instruction-provenance.md). Schema 26 records purpose, selection and requirements; analysis 37 and pipeline 8 apply it to new analyses without assessing authorship.
+
+
+## Evidence safeguards from local validation
+
+An explicit SDK review-job opening identifies a delegated review session, so its follow-up
+instructions are excluded from personal evidence as well. SDK transport alone is insufficient:
+ordinary SDK requests and direct CLI prompts remain eligible. This recognizes specific known
+job templates; it does not prove the authorship of every retained message.
