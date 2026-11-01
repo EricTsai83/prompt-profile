@@ -6,8 +6,10 @@ not a fictional fixture or a benchmark of other people.
 - Analysis generated: November 1, 2026 at 17:10 (UTC+08:00).
 - Prompt activity: September 2 to November 1, 2026.
 - Source engine: Codex; analysis version 38; profile schema 26.
+- Exports refreshed with the current renderer; the saved analysis was not rerun.
 - Public exports: bilingual `report.html`, English `card.en.png`, Traditional Chinese `card.png`.
 - Export exclusions: prompt quotes, project names and custom instruction names.
+  Conversation timelines and example excerpts are omitted along with their original prompts.
 - Activity dates, generated observations, ability scores and usage estimates remain visible.
   Scores describe supported practice in these conversations, not population ranks. API
   estimates are not subscription charges and may be partially priced.

@@ -6,7 +6,7 @@ collaborate with AI. Uses your logged-in `claude` or `codex` CLI: no API key nee
 **Analysis sends selected, redacted prompts to your CLI's model service and uses your
 subscription quota.** Reports and analysis caches stay on your computer.
 
-![Maintainer collaboration profile](https://erictsai83.github.io/prompt-profile/owner-example/card.en.png)
+![Maintainer collaboration profile](https://erictsai83.github.io/prompt-profile/owner-example/card.en.png?v=0.2.4)
 
 [My report](https://erictsai83.github.io/prompt-profile/owner-example/report.html)
 · [繁體中文卡片](https://erictsai83.github.io/prompt-profile/owner-example/card.png)
@@ -19,6 +19,22 @@ Ability scores describe supported practice in my conversations, not population r
 the API estimate is not my subscription bill. The separate fictional examples and gallery
 are generated from the latest repository code.
 [View the latest README on GitHub](https://github.com/EricTsai83/prompt-profile#readme).
+
+Reports introduce your collaboration patterns, then let you inspect the original prompts,
+conversation examples, suggestions, activity and usage. Empty or excluded chapters stay out
+of the reading path. Question-mark help and expandable execution details work offline.
+Generation times are readable durations; token counts have separate labels, and missing
+cost data is shown as unavailable rather than zero. API-equivalent costs are not subscription bills.
+
+To apply the latest report and card design to a saved analysis, render it again:
+
+```sh
+npx prompt-profile@latest render path/to/profile.json --out refreshed-report
+```
+
+This rebuilds the HTML report and cards without calling a model or using subscription quota.
+It preserves the analysis; information absent from the saved profile cannot be invented.
+The README shown on npm updates when a new package version is published.
 
 ## Quick start
 
