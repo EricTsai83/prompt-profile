@@ -1,7 +1,7 @@
 import type { Language, Profile } from "../domain/index.ts"
 import { excludedParts, type RenderOptions, type ReportPart } from "./looks.ts"
 import { MESSAGES } from "./messages.ts"
-import { limitedView } from "./evidence.ts"
+import { limitedView, readableEpisodes } from "./evidence.ts"
 
 /**
  * What the report shows, from `--exclude` (plan 18). Everything by default: the report stays
@@ -166,7 +166,7 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
               0,
             )
           : 0) +
-        p.episodes.reduce((n, e) => n + e.turns.length, 0) +
+        readableEpisodes(p).reduce((n, e) => n + e.turns.length, 0) +
         (p.steering ? p.steering.steer.examples.length + p.steering.repair.examples.length : 0)
       : 0,
     projects: v.projects ? names.size : 0,

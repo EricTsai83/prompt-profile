@@ -171,10 +171,12 @@ describe("usage in the report (plan 23)", () => {
 
   it.effect("a legacy profile is 'not measured', which is not zero", () =>
     Effect.gen(function* () {
-      const { usage } = parts({ ...(yield* sample()), usage: null })
-      expect(usage).toContain("Not measured")
-      expect(usage).toContain("未測量")
-      expect(usage).not.toContain("$")
+      const { page, usage } = parts({ ...(yield* sample()), usage: null })
+      expect(usage).toBeNull()
+      const method = page.slice(page.indexOf('<section class="about"'))
+      expect(method).toContain("Not measured")
+      expect(method).toContain("未測量")
+      expect(method).not.toContain("$")
     }),
   )
 

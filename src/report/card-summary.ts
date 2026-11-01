@@ -2,6 +2,60 @@ import { DateTime } from "effect"
 import { type Language, type Profile, totalTokens } from "../domain/index.ts"
 import { CARD_MESSAGES, MESSAGES } from "./messages.ts"
 
+const periodText = (
+  p: Profile,
+  range: Profile["stats"]["dateRange"],
+  lang: Language,
+  exactDates: boolean,
+): string => {
+  if (!range) return CARD_MESSAGES[lang].periodUnknown
+  const date = (d: DateTime.Utc) =>
+    new Intl.DateTimeFormat(MESSAGES[lang].locale, {
+      timeZone: p.stats.timezone,
+      year: "numeric",
+      month: "short",
+      ...(exactDates ? { day: "numeric" as const } : {}),
+    }).format(DateTime.toEpochMillis(d))
+  return `${date(range.from)} – ${date(range.to)}`
+}
+
+const usageQualifiers = (p: Profile, lang: Language): Array<string> => {
+  const sources = p.usage?.sources ?? []
+  const partial = sources.some(
+    (s) => s.totals.unpricedRequests > 0 || (s.totals.requests > 0 && s.totals.cost === null),
+  )
+  return [
+    partial && sources.some((s) => s.totals.cost !== null) ? CARD_MESSAGES[lang].partial : null,
+    sources.some((s) => s.diagnostics.badLines > 0 || s.diagnostics.unreadableFiles > 0)
+      ? CARD_MESSAGES[lang].incomplete
+      : null,
+  ].filter((x) => x !== null)
+}
+
+/** One scope block; equal local calendar ranges share a date line, never two unknown ranges. */
+export const cardContext = (
+  p: Profile,
+  lang: Language,
+  showUsage: boolean,
+  exactDates: boolean,
+): Array<string> => {
+  const t = CARD_MESSAGES[lang]
+  if (!showUsage || !p.usage) return [cardPeriod(p, lang, exactDates)]
+  const notes = usageQualifiers(p, lang)
+  const activity = p.stats.dateRange
+  const usage = p.usage.range
+  const same =
+    activity !== null &&
+    usage !== null &&
+    periodText(p, activity, lang, true) === periodText(p, usage, lang, true)
+  return [
+    ...(same
+      ? [`${t.activityAndUsage}${periodText(p, activity, lang, exactDates)}`]
+      : [cardPeriod(p, lang, exactDates), `${t.usage}: ${periodText(p, usage, lang, exactDates)}`]),
+    ...(notes.length ? [notes.join(" · ")] : []),
+  ]
+}
+
 /** Measured context for a share card. Usage and prompt periods can differ. */
 export const cardSummary = (
   p: Profile,
@@ -45,40 +99,16 @@ export const cardSummary = (
     [t.tokens, number(tokens)],
     [t.cost, requests === 0 ? t.empty : !priced ? t.unknown : `${price}${partial ? "+" : ""}`],
   )
-  const date = (d: DateTime.Utc) =>
-    new Intl.DateTimeFormat(locale, {
-      timeZone: p.stats.timezone,
-      year: "numeric",
-      month: "short",
-      ...(exactDates ? { day: "numeric" as const } : {}),
-    }).format(DateTime.toEpochMillis(d))
-  const period = u.range ? `${date(u.range.from)} – ${date(u.range.to)}` : t.periodUnknown
-  const incomplete = u.sources.some(
-    (s) => s.diagnostics.badLines > 0 || s.diagnostics.unreadableFiles > 0,
-  )
+
   return {
     metrics,
     note: [
-      `${t.usage}: ${period}`,
-      partial && priced ? t.partial : null,
-      incomplete ? t.incomplete : null,
-    ]
-      .filter((x) => x !== null)
-      .join(" · "),
+      `${t.usage}: ${periodText(p, u.range, lang, exactDates)}`,
+      ...usageQualifiers(p, lang),
+    ].join(" · "),
   }
 }
 
 /** Scope for prompt counts; separate from usage response dates. */
-export const cardPeriod = (p: Profile, lang: Language, exactDates: boolean): string => {
-  const t = CARD_MESSAGES[lang]
-  const range = p.stats.dateRange
-  if (!range) return `${t.activity}: ${t.periodUnknown}`
-  const date = (d: DateTime.Utc) =>
-    new Intl.DateTimeFormat(MESSAGES[lang].locale, {
-      timeZone: p.stats.timezone,
-      year: "numeric",
-      month: "short",
-      ...(exactDates ? { day: "numeric" as const } : {}),
-    }).format(DateTime.toEpochMillis(d))
-  return `${t.activity}: ${date(range.from)} – ${date(range.to)}`
-}
+export const cardPeriod = (p: Profile, lang: Language, exactDates: boolean): string =>
+  `${CARD_MESSAGES[lang].activity}: ${periodText(p, p.stats.dateRange, lang, exactDates)}`

@@ -65,7 +65,9 @@ it("keeps an assessed zero distinct from unknown and respects quote exclusions",
   expect(radar).toContain("Not assessed")
   expect(radar.match(/class="radar-point"/g)).toHaveLength(1)
   expect(radar).not.toContain('class="radar-shape"')
-  expect(radar).toContain("&lt;script&gt;synthetic quote&lt;/script&gt;")
+  expect(radar).not.toContain("&lt;script&gt;synthetic quote&lt;/script&gt;")
+  const evidence = /<section class="ability-evidence">[\s\S]*?<\/section>/.exec(html)![0]
+  expect(evidence).toContain("&lt;script&gt;synthetic quote&lt;/script&gt;")
   expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })).not.toContain(
     "synthetic quote",
   )

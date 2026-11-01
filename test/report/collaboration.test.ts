@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { DateTime, Effect } from "effect"
 import { expect, it } from "vitest"
-import { decodeProfile } from "../../src/domain/Profile.ts"
+import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { renderHtml } from "../../src/report/html.ts"
 import { translationInput } from "../../src/analysis/translate.ts"
 
@@ -95,7 +95,7 @@ it("folds understanding signals seen in one conversation behind their own disclo
     basis: "user_request" as const,
     observation,
     context: "patch reviews",
-    evidence: [],
+    evidence: [{ promptId: "fictional-check", quote: "Please check the expected output." }],
     support: { sessions, weeks: sessions },
   })
   const out = renderHtml({
@@ -166,7 +166,7 @@ it("says once that no understanding signal recurred, instead of a row of empty k
     basis: "user_request" as const,
     observation: `ONE_OFF_${kind}`,
     context: "c",
-    evidence: [],
+    evidence: [{ promptId: "fictional-once", quote: "Please check this result." }],
     support: { sessions: 1, weeks: 1 },
   })
   const out = renderHtml({
@@ -186,3 +186,39 @@ it("says once that no understanding signal recurred, instead of a row of empty k
   expect(section.match(/<details class="signal-once">/g)).toHaveLength(1)
   expect(section).toContain("ONE_OFF_verification")
 })
+
+it.each(["structured", "patterns"] as const)(
+  "omits %s example shells when original prompts are excluded",
+  async (kind) => {
+    const base = await Effect.runPromise(
+      decodeProfile(JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))),
+    )
+    const p: Profile = {
+      ...base,
+      languages: ["en"],
+      translations: {},
+      collaboration:
+        kind === "patterns"
+          ? null
+          : {
+              moves: [
+                {
+                  name: "A supported habit",
+                  description: "A description",
+                  episodeIds: [base.episodes[0]!.id],
+                  benefit: null,
+                  cost: null,
+                  support: { sessions: 2, weeks: 2 },
+                },
+              ],
+              signals: [],
+              rejected: { moves: 0, signals: 0, effects: 0 },
+            },
+    }
+    const out = renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })
+    const section = /<section class="identity-moves[^"]*">.*?<\/section>/s.exec(out)![0]
+    expect(section).not.toContain("<article>")
+    expect(section).not.toContain(base.episodes[0]!.task)
+    expect(section).not.toContain("<blockquote")
+  },
+)

@@ -1,3 +1,4 @@
+import { sourceLabel } from "./evidence-origin.ts"
 import type { DimensionKey, Evidence, Profile, Trait } from "../domain/index.ts"
 import { defined, definition, defText } from "./definition.ts"
 import { html, type Raw } from "./html-template.ts"
@@ -5,16 +6,22 @@ import type { Loc } from "./loc.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
 /** Verbatim text (quotes, rewrites): as written, or per language with project names replaced. */
-export type Verbatim = (text: string) => Raw | string
+export type Verbatim = (text: string, promptId?: string) => Raw | string
 
 export const makeVerbatim =
   (loc: Loc, v: Visibility, scrub: Scrub): Verbatim =>
   (text) =>
     v.projects && v.customNames ? text : loc.text((_m, _c, l) => scrub(text, l))
 
+/** Quotes keep their original wording; recorded provenance is added beside the excerpt. */
+export const makeCitedVerbatim = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Verbatim => {
+  const say = makeVerbatim(loc, v, scrub)
+  return (text, promptId) => html`${say(text)}${promptId ? sourceLabel(p, promptId, loc, v) : null}`
+}
+
 export const quotes = (evidence: ReadonlyArray<Evidence>, say: Verbatim): Raw =>
   html`<ul class="evidence">
-    ${evidence.map((e) => html`<li><blockquote>${say(e.quote)}</blockquote></li>`)}
+    ${evidence.map((e) => html`<li><blockquote>${say(e.quote, e.promptId)}</blockquote></li>`)}
   </ul>`
 
 const CONFIDENCE_RANK = { high: 0, medium: 1, low: 2 } as const
@@ -55,13 +62,13 @@ const signatureTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: S
       ${!knownSupport(t) ? meter(t, loc) : ""}
     </header>
     <p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>
-    ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${makeVerbatim(loc, v, scrub)(t.evidence[0].quote)}</blockquote>` : ""}
+    ${v.quotes && t.evidence[0] ? html`<blockquote class="lead-quote">${makeCitedVerbatim(p, loc, v, scrub)(t.evidence[0].quote, t.evidence[0].promptId)}</blockquote>` : ""}
     ${supportLine(t, loc)}
     ${
       v.quotes && t.evidence.length > 1
         ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
-            ${quotes(t.evidence.slice(1), makeVerbatim(loc, v, scrub))}
+            ${quotes(t.evidence.slice(1), makeCitedVerbatim(p, loc, v, scrub))}
           </details>`
         : ""
     }
@@ -80,7 +87,7 @@ const minorTrait = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub
       v.quotes && t.evidence.length > 0
         ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(t.evidence.length))}</summary>
-            ${quotes(t.evidence, makeVerbatim(loc, v, scrub))}
+            ${quotes(t.evidence, makeCitedVerbatim(p, loc, v, scrub))}
           </details>`
         : ""
     }
@@ -112,7 +119,7 @@ const dimensionRow = (
       ${
         d.evidence.length === 0
           ? html`<p class="warning">${loc.text((m) => m.insufficientEvidence)}</p>`
-          : quotes(d.evidence, makeVerbatim(loc, v, scrub))
+          : quotes(d.evidence, makeCitedVerbatim(p, loc, v, scrub))
       }
     </div>
   </details>`
@@ -123,6 +130,7 @@ export const traitsSection = (profile: Profile, loc: Loc, v: Visibility, scrub: 
   const def = defText(loc)
   const order = profile.traits
     .map((t, i) => ({ t, i }))
+    .filter(({ t }) => t.evidence.some((e) => e.quote.trim().length > 0))
     .toSorted((a, b) => CONFIDENCE_RANK[a.t.confidence] - CONFIDENCE_RANK[b.t.confidence])
     .map((x) => x.i)
   const signature = order.slice(0, 3)
@@ -161,7 +169,7 @@ export const dimensionsSection = (profile: Profile, loc: Loc, v: Visibility, scr
               ),
             )}
             <div class="dims">
-              ${profile.dimensions.map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
+              ${profile.dimensions.filter((d) => d.evidence.some((e) => e.quote.trim().length > 0)).map((d) => dimensionRow(profile, d.key, loc, v, scrub))}
             </div>
           </section>`
 }

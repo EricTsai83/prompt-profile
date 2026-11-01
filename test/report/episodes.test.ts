@@ -70,10 +70,10 @@ describe("interaction episodes in the report", () => {
     expect(episodes).toContain("紀錄中看不到結果")
   })
 
-  it("leaves out the quotes, not the structure, when quotes are excluded", async () => {
+  it("omits the whole evidence timeline when prompt quotes are excluded", async () => {
     const p = english(await sample())
     const out = section(renderHtml(p, { ...OPTIONS, exclude: ["quotes"] }))
-    expect(out).toContain("Prompt 5 of 9")
+    expect(out).toBe("")
     expect(out).not.toContain("no, keep the old API")
     const turns = p.episodes.reduce((n, e) => n + e.turns.length, 0)
     const without = { ...p, episodes: [] }
@@ -104,12 +104,10 @@ describe("interaction episodes in the report", () => {
     )
   })
 
-  it("explains an empty selection, and stays silent for profiles from before episodes", async () => {
+  it("omits an empty selection and profiles from before episodes", async () => {
     const p = english(await sample())
     const none = section(renderHtml({ ...p, episodes: [], patterns: [] }))
-    expect(none).toContain(
-      "No conversation in the analysed prompts showed more than a single request",
-    )
+    expect(none).toBe("")
     expect(
       section(
         renderHtml({
@@ -127,4 +125,34 @@ it("uses meaningful episode titles for readers, retaining internal link targets 
   const out = renderHtml(english(await sample()))
   expect(out).toContain('id="episode-E1"')
   expect(out).not.toMatch(/>E\d+<\/|>E\d+ ·/)
+})
+
+it("omits episodes with missing original prompts and their evidence links", async () => {
+  const base = english(await sample())
+  const first = base.episodes[0]!
+  const p: Profile = {
+    ...base,
+    episodes: base.episodes.map((e, i) =>
+      i === 0 ? { ...e, turns: e.turns.map((t, j) => (j === 0 ? { ...t, quote: "  " } : t)) } : e,
+    ),
+  }
+  const out = section(renderHtml(p))
+  expect(out).not.toContain(`id="episode-${first.id}"`)
+  expect(out).not.toContain(`href="#episode-${first.id}"`)
+  expect(out).toContain(`id="episode-${base.episodes[1]!.id}"`)
+  expect(out).toContain(base.episodes[1]!.task)
+  const without = { ...p, episodes: p.episodes.slice(1) }
+  expect(reportContents(p, OPTIONS).quotes).toBe(reportContents(without, OPTIONS).quotes)
+})
+
+it("hides an evidence timeline with no readable original prompts", async () => {
+  const base = english(await sample())
+  const p = {
+    ...base,
+    episodes: base.episodes.map((e) => ({
+      ...e,
+      turns: e.turns.map((t) => ({ ...t, quote: "" })),
+    })),
+  }
+  expect(section(renderHtml(p))).toBe("")
 })

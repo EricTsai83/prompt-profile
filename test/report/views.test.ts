@@ -45,14 +45,14 @@ describe("report views", () => {
     expect(html).toContain("你的協作方式")
     expect(identity).toContain('class="identity-moves"')
     // the copy states the selection rule; it does not claim the strongest or most consistent
-    expect(identity).toContain("medium or high confidence")
+    expect(identity).toContain("connected portrait")
     expect(identity).not.toMatch(/most consistent|best-supported|最一致|證據最充分/)
     expect(identity).toContain("Adds scope and corrections after the first request")
     expect(identity).not.toContain("Type purist")
     expect(identity).not.toContain('class="preference-map panel"')
     expect(identity).toContain("The work starts before the code")
     expect(identity).toContain("Before editing, outline the steps")
-    expect(identity).toContain("Latest prompt: 03:12 AM.")
+    expect(identity).not.toContain("Latest prompt: 03:12 AM.")
     for (const factual of [
       'class="sigs"',
       'class="heat"',
@@ -88,8 +88,9 @@ describe("report views", () => {
     for (const trait of ["Plan first", "Straight talker", "Type purist"])
       expect(facts).toContain(trait)
     expect(facts).toContain("One planning checkpoint does not establish a consistent pace")
-    expect(facts).not.toContain("The work starts before the code")
-    expect(facts).not.toContain("Latest prompt: 03:12 AM.")
+    expect(facts).toContain('class="portrait-sources"')
+    expect(facts).not.toContain('class="portrait"')
+    expect(facts).toContain("Latest prompt: 03:12 AM.")
   })
   it("keeps the identity view intentional without a portrait", async () => {
     const p = await sample()
@@ -98,7 +99,7 @@ describe("report views", () => {
     expect(identity).toContain("Facts &amp; evidence")
     expect(facts).not.toContain('class="preference-evidence"')
   })
-  it("describes featured habits only where the hero does not, and states when none has medium or high confidence", async () => {
+  it("describes featured habits only where the hero does not, and omits the featured-habit section when no observation qualifies", async () => {
     const p = { ...(await sample()), patterns: [] }
     const moves = (page: string) =>
       views(page).identity.split('class="identity-moves"')[1]!.split("</section>")[0]!
@@ -108,9 +109,7 @@ describe("report views", () => {
       description,
     )
     const thin = { ...p, traits: p.traits.map((t) => ({ ...t, confidence: "low" as const })) }
-    const empty = moves(renderHtml(thin))
-    expect(empty).toContain("No observation has medium or high confidence")
-    expect(empty).not.toContain("<blockquote")
+    expect(views(renderHtml(thin)).identity).not.toContain('class="identity-moves"')
   })
   it("preserves visibility choices on both pages", async () => {
     const html = renderHtml(await sample(), {

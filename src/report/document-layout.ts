@@ -63,7 +63,7 @@ html:root .chg{padding:10px 0;border-bottom:1px solid var(--border)}
 html:root .improve-impact{margin-top:8px}
 html:root .about{padding:24px 0;border-top:1px solid var(--border);max-width:var(--reading)}
 html:root .panel{padding-top:var(--panel-top)}
-@media(min-width:900px){html:root .preference-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}html:root .preference-evidence>h2,html:root .preference-evidence>.note{grid-column:1/-1}}
+@media(min-width:900px){html:root .preference-evidence{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:48px}html:root .preference-evidence>h2,html:root .preference-evidence>.def-head,html:root .preference-evidence>.note{grid-column:1/-1}}
 @media(max-width:760px){html:root .caps,html:root .overview-charts{grid-template-columns:1fr}html:root .trait{display:block}html:root .trait>header{display:flex}html:root .trait>header .badge{margin-top:0}html:root .sigs{gap:20px}html:root .panel,html:root .trait,html:root .improve{padding:20px 0}}
 @page{size:A4;margin:16mm 17mm 18mm}
 @media print{

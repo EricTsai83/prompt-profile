@@ -1,4 +1,6 @@
 import { DateTime } from "effect"
+import type { Language } from "../domain/index.ts"
+import { DURATION_MESSAGES } from "./messages.ts"
 
 /** Display names of the analysis runners. */
 export const RUNNER_NAMES = { "claude-code": "Claude Code", codex: "Codex" } as const
@@ -40,3 +42,22 @@ export const formatDateTime = (t: DateTime.Utc, timeZone: string, locale: string
 
 export const percent = (x: number) => Math.round(x * 100)
 export const hh = (h: number) => `${String(h).padStart(2, "0")}:00`
+
+/** Non-negative milliseconds, rounded to seconds; a positive subsecond duration is not zero. */
+export const formatDuration = (milliseconds: number, language: Language): string => {
+  const text = DURATION_MESSAGES[language]
+  if (milliseconds > 0 && milliseconds < 1000) return text.lessThanSecond
+  let remaining = Math.round(milliseconds / 1000)
+  const parts: string[] = []
+  for (const [unit, seconds] of [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+    ["second", 1],
+  ] as const) {
+    const amount = Math.floor(remaining / seconds)
+    remaining %= seconds
+    if (amount > 0) parts.push(`${amount} ${text[unit]}`)
+  }
+  return parts.length ? parts.join(" ") : `0 ${text.second}`
+}

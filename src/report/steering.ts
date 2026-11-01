@@ -1,3 +1,4 @@
+import { sourceLabel } from "./evidence-origin.ts"
 import type { Language, Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
@@ -27,7 +28,7 @@ export const steeringSection = (p: Profile, loc: Loc, v: Visibility, scrub: Scru
           text((m) => m[note]),
         ),
       )}
-      ${v.quotes ? k.examples.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}</blockquote>`) : ""}
+      ${v.quotes ? k.examples.map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`) : ""}
     </div>`
   }
   return html`<section class="steering">

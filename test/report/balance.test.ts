@@ -114,7 +114,7 @@ describe("examples of each way", () => {
         rejected: 0,
       },
     }
-    const out = /<section class="axis-balance">.*?<\/section>/s.exec(renderHtml(p))![0]
+    const out = /<section class="axis-balance-evidence">.*?<\/section>/s.exec(renderHtml(p))![0]
     expect(out).toContain("DEFINE_FIRST_QUOTE")
     expect(out).toContain("EXPLORE_FIRST_QUOTE")
     const hidden = renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })

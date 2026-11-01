@@ -615,9 +615,9 @@ export const VIEW_MESSAGES = {
     overviewTitle: "Your collaboration portrait",
     detailTitle: "What the records show",
     overviewNote:
-      "An introduction built from selected observations with medium or high confidence. Quotes are your own prompts. Every measurement, source and unknown is on the Facts & evidence page.",
+      "Start with the connected portrait and selected observations with medium or high confidence, then read abilities and preferences. Original prompts support the examples; the Facts & evidence page adds the full records, suggestions and activity context.",
     detailNote:
-      "Every measurement with its source and denominator, all observations with their evidence, and what remains unknown. Evidence is expanded by default.",
+      "Check the observations and their source prompts first, then conversations and suggestions. Activity, tools, usage and method follow. Empty and excluded chapters are omitted; evidence starts expanded.",
     next: "See the facts and evidence →",
     back: "← Back to the introduction",
     moves: "Featured observations, in your own words",
@@ -652,9 +652,9 @@ export const VIEW_MESSAGES = {
     overviewTitle: "你的協作側寫",
     detailTitle: "紀錄呈現了什麼",
     overviewNote:
-      "以中或高信心的精選觀察介紹你的協作方式。引述都是你寫下的提示。所有量測、來源與未知項目都在「事實與證據」頁。",
+      "先讀連貫的協作側寫與中、高信心的精選觀察，再看能力與偏好。例子附上原始 Prompt；「事實與證據」頁接續呈現完整紀錄、可選建議與活動背景。",
     detailNote:
-      "每項量測都附來源與分母，每項觀察都附證據，也列出仍然未知的部分。證據預設展開，不必逐一點開。",
+      "先核對觀察與原始 Prompt，再看對話脈絡及可選建議，最後閱讀活動、工具、用量與方法。空白或已排除的章節不會出現；證據預設展開。",
     next: "查看事實與證據 →",
     back: "← 回到人物介紹",
     moves: "精選觀察與你的原話",
@@ -809,6 +809,7 @@ export const USAGE_MESSAGES = {
 export const CARD_MESSAGES = {
   en: {
     activity: "Prompt activity",
+    activityAndUsage: "Prompt activity & usage: ",
     prompts: "Prompts",
     sessions: "Conversations",
     tokens: "Tokens",
@@ -827,6 +828,7 @@ export const CARD_MESSAGES = {
   },
   "zh-TW": {
     activity: "Prompt 活動期間",
+    activityAndUsage: "Prompt 與用量期間：",
     prompts: "Prompt 數",
     sessions: "對話數",
     tokens: "Token 用量",
@@ -1328,7 +1330,7 @@ const VOICE_VIEW_COPY = {
       overview: "How I collaborate",
       overviewTitle: "My collaboration portrait",
       overviewNote:
-        "Selected observations describe my collaboration with AI. Quotes reproduce my source prompts. Measurements, sources and uncertainty are on the Facts & evidence page.",
+        "Selected observations describe my collaboration with AI. Start with the connected portrait and examples, then abilities and preferences. The Facts & evidence page adds full source records, suggestions and activity context.",
       moves: "Featured observations, in my own words",
       movesNote:
         "Up to three supported observations, each paired with a source prompt. Confidence and remaining evidence are on the Facts & evidence page.",
@@ -1341,7 +1343,7 @@ const VOICE_VIEW_COPY = {
       overview: "我的協作方式",
       overviewTitle: "我的協作側寫",
       overviewNote:
-        "精選觀察描述我與 AI 的協作方式。引述保留我原本寫下的提示。所有量測、來源與不確定性都在「事實與證據」頁。",
+        "精選觀察描述我與 AI 的協作方式。先讀連貫的側寫與具體例子，再看能力與偏好；「事實與證據」頁接續呈現完整原始紀錄、可選建議與活動背景。",
       moves: "精選觀察與我的原話",
       movesNote:
         "最多三項附有證據的觀察，各搭配一則原始提示。信心程度與其餘證據列在「事實與證據」頁。",
@@ -1369,6 +1371,47 @@ export const NARRATION_MESSAGES = {
 export const GENERATION_MESSAGES = {
   en: {
     title: "Report generation",
+    details: "Execution details",
+    tokenTitle: "Where the tokens went",
+    tokenUnit:
+      "Tokens are units of text processed by the model, not words or characters. Bars compare the recorded token subtotal; missing counts are excluded.",
+    costUnavailable: "Cost unavailable",
+    costMissing:
+      "The CLI did not report a cost, and the saved model, pricing or usage information is insufficient for a reliable estimate. This does not mean the run was free.",
+    subtotal: "Known subtotal",
+    tokenMissing: "Token counts unavailable",
+    omitted:
+      "Unreported fields and cache-write categories with no recorded usage are omitted. Older reports may not preserve coverage for each token type.",
+    costChart: "Cost by analysis stage",
+    costChartNote:
+      "USD · recorded and estimated amounts only. Missing calls are excluded from the bars and the subtotal.",
+    reportedCost: "CLI-reported cost",
+    estimatedCost: "API list-price estimate",
+    noBreakdown: "This older report did not save a cost breakdown by stage.",
+    partialNote:
+      "Some calls have missing measurements. The recorded subtotal can be lower than the full run.",
+    costCoverage: (known: number, total: number) => `Cost available for ${known} of ${total} calls`,
+    tokenCoverage: (missing: number, total: number) =>
+      `${missing} of ${total} calls have missing token fields`,
+    kindCoverage: (known: number, total: number) => `${known} of ${total} calls`,
+    noCalls: "No model calls; results came from local processing or saved analysis.",
+    tokenKinds: {
+      input: "Input tokens",
+      output: "Output tokens",
+      cacheRead: "Cache-read tokens",
+      cacheWrite5m: "Cache-write tokens · 5 min",
+      cacheWrite1h: "Cache-write tokens · 1 h",
+      cacheWriteUnknown: "Cache-write tokens · duration unknown",
+      reasoning: "Reasoning tokens",
+    },
+    stageNames: {
+      map: "Read prompts",
+      merge: "Combine evidence",
+      draft: "Draft report",
+      review: "Review report",
+      label: "Label preferences",
+      translation: "Translate report",
+    },
     identity: "Execution ID",
     languages: "Requested languages",
     available: "available",
@@ -1378,7 +1421,10 @@ export const GENERATION_MESSAGES = {
     outcome: "Analysis outcome",
     calls: "Model calls / retries",
     cache: "Local analysis cache hits",
-    duration: "Generation elapsed / summed call time (ms)",
+    elapsed: "Generation elapsed time",
+    callDuration: "Total model call time",
+    parallelTime:
+      "Calls may run in parallel, so their total time can exceed generation elapsed time.",
     tokens: "Measured tokens",
     cost: "Measured cost subtotal (USD)",
     models: "Engine and model provenance",
@@ -1408,6 +1454,45 @@ export const GENERATION_MESSAGES = {
   },
   "zh-TW": {
     title: "報告產生用量",
+    details: "執行明細",
+    tokenTitle: "Token 用在哪裡",
+    tokenUnit:
+      "Token 是模型處理文字的文字計量單位，不等於字數或字元數。長條比較已記錄的 token 小計，不包含缺少的數量。",
+    costUnavailable: "成本無法取得",
+    costMissing:
+      "CLI 未回報成本，保存的模型、定價或用量資訊也不足以可靠估算。這不代表本次執行免費。",
+    subtotal: "已知小計",
+    tokenMissing: "Token 數量無法取得",
+    omitted:
+      "未回報的欄位，以及沒有記錄到用量的快取寫入類別，均不列出。舊報告可能沒有保存各 token 類型的資料完整度。",
+    costChart: "各分析階段的成本",
+    costChartNote: "單位：美元（USD）。只包含已回報及可估算的金額；缺資料的呼叫不列入長條及小計。",
+    reportedCost: "CLI 回報成本",
+    estimatedCost: "API 定價估算",
+    noBreakdown: "這份舊報告沒有保存各階段的成本明細。",
+    partialNote: "部分呼叫缺少計量資訊，已記錄的小計可能低於整次執行的實際用量或成本。",
+    costCoverage: (known: number, total: number) => `${total} 次呼叫中，${known} 次有成本資料`,
+    tokenCoverage: (missing: number, total: number) =>
+      `${total} 次呼叫中，${missing} 次缺少部分 token 欄位`,
+    kindCoverage: (known: number, total: number) => `${total} 次呼叫中的 ${known} 次`,
+    noCalls: "沒有呼叫模型；結果來自本機處理或已保存的分析。",
+    tokenKinds: {
+      input: "輸入 token",
+      output: "輸出 token",
+      cacheRead: "快取讀取 token",
+      cacheWrite5m: "快取寫入 token・5 分鐘",
+      cacheWrite1h: "快取寫入 token・1 小時",
+      cacheWriteUnknown: "快取寫入 token・保留時間未知",
+      reasoning: "推理 token",
+    },
+    stageNames: {
+      map: "讀取提示",
+      merge: "彙整證據",
+      draft: "撰寫報告",
+      review: "檢查報告",
+      label: "標示偏好",
+      translation: "翻譯報告",
+    },
     identity: "執行紀錄 ID",
     languages: "要求的報告語言",
     available: "已產生",
@@ -1417,7 +1502,9 @@ export const GENERATION_MESSAGES = {
     outcome: "分析結果",
     calls: "模型呼叫／重試次數",
     cache: "本機分析快取命中次數",
-    duration: "產生經過時間／呼叫時間總和（毫秒）",
+    elapsed: "報告產生耗時",
+    callDuration: "模型呼叫累計時間",
+    parallelTime: "多個呼叫可能同時進行，因此累計時間可能大於實際經過時間。",
     tokens: "已測得的 token",
     cost: "已測得的成本小計（美元）",
     models: "引擎與模型資訊來源",
@@ -1500,4 +1587,104 @@ export const INSTRUCTION_MESSAGES = {
       missing: "沒有內容紀錄",
     },
   },
+} as const
+
+/** Reading order and transitions describe the visible report, not newly generated analysis. */
+export const READING_MESSAGES = {
+  en: {
+    navigation: "On this page",
+    openingPrompts:
+      "Each example shows at most two selected prompts; the full conversation sequences are on the Facts & evidence page.",
+    abilityEvidence: "Sources behind the ability scores",
+    balanceEvidence: "Examples behind the preference shares",
+    portraitEvidence: "Sources behind the collaboration portrait",
+    limited:
+      "This sample supports early observations only. Available records and measurements are shown; missing chapters and coaching are omitted.",
+    noMeasures:
+      "Read the connected portrait and examples below. This profile has no assessed ability or preference measurements; the Facts & evidence page adds the available records and activity context.",
+    publicDetail:
+      "This export omits original prompts. Read the available measurements and method; private evidence chapters are not shown.",
+    omittedEvidence:
+      "Insufficient evidence: observations without a readable verified prompt are omitted from the evidence sections.",
+    quotesOmitted:
+      "Original prompts are omitted in this export. Quote evidence and conversation timelines are not shown.",
+    chapters: {
+      portrait: {
+        title: "The collaboration in context",
+        note: "Start with the connected portrait, then the habits illustrated by selected conversations.",
+      },
+      measures: {
+        title: "Abilities and preferences",
+        note: "Read ability scores as supported practice in these records. Preference shares describe ways of working, not better or worse choices.",
+      },
+      evidence: {
+        title: "Check the observations",
+        note: "Compare each observation with the cited prompts, dates and conversation positions where recorded. Keep contrary examples and uncertainty in view.",
+      },
+      conversations: {
+        title: "Follow the conversations",
+        note: "Read the selected prompts in order to see what changed. Gaps are marked; a request does not establish what the AI did or whether the task succeeded.",
+      },
+      next: {
+        title: "Try one change",
+        note: "Choose an experiment only if its stated pattern fits your next task. These are options, not demonstrated improvements.",
+      },
+      activity: {
+        title: "Activity and working context",
+        note: "Use these measurements to understand the scope of the portrait: when conversations happened, what tools appeared and which patterns were recorded.",
+      },
+      method: {
+        title: "Usage, coverage and method",
+        note: "Finish with the accounting and limits. API estimates are not subscription charges; sampling and missing records constrain the conclusions.",
+      },
+    },
+  },
+  "zh-TW": {
+    navigation: "本頁閱讀順序",
+    openingPrompts: "每個例子先呈現至多兩則選出的 Prompt；完整對話順序列在「事實與證據」頁。",
+    abilityEvidence: "能力評分的原文依據",
+    balanceEvidence: "偏好比例的原文例子",
+    portraitEvidence: "協作側寫的原文依據",
+    limited: "這份樣本只能支持初步觀察。報告呈現現有紀錄與量測，省略缺少內容的章節及協作建議。",
+    noMeasures:
+      "先讀下方連貫的協作側寫與例子。這份資料尚無可呈現的能力或偏好量測；「事實與證據」頁接續呈現現有紀錄與活動背景。",
+    publicDetail: "此版本已省略原始 Prompt。這裡保留現有量測與分析方法，不顯示私人的證據章節。",
+    omittedEvidence: "證據不足：沒有可讀、已驗證原文的觀察，不列入證據章節。",
+    quotesOmitted: "此版本已省略原始 Prompt，因此不顯示原文證據與逐則對話紀錄。",
+    chapters: {
+      portrait: {
+        title: "協作輪廓與慣用方式",
+        note: "先讀連貫的協作側寫，再從具體對話理解哪些做法反覆出現。",
+      },
+      measures: {
+        title: "能力與協作偏好",
+        note: "能力評分反映這批紀錄中有證據支持的做法；偏好比例描述不同工作方式，不代表優劣。",
+      },
+      evidence: {
+        title: "核對觀察與原文",
+        note: "把觀察與原始 Prompt 對照，核對已記錄的日期及對話序號，也保留相反例子與不確定之處。",
+      },
+      conversations: {
+        title: "沿著對話看發生了什麼",
+        note: "依序閱讀選出的 Prompt，理解需求如何改變。省略的提示會標示出來；提出要求不代表 AI 已執行或任務已成功。",
+      },
+      next: {
+        title: "挑一項調整試試看",
+        note: "先確認建議描述的情況是否符合下一項任務，再選擇要不要嘗試。這些是可選的實驗，並非已證實有效的改善。",
+      },
+      activity: {
+        title: "活動與工作背景",
+        note: "再看這份側寫的背景：對話發生的時間、出現的工具，以及紀錄中量測到的使用方式。",
+      },
+      method: {
+        title: "用量、涵蓋範圍與分析方法",
+        note: "最後核對用量與限制。API 估算不是訂閱帳單；抽樣及缺漏紀錄也會限制可下的結論。",
+      },
+    },
+  },
+} as const
+
+export const DURATION_MESSAGES = {
+  en: { lessThanSecond: "Less than 1 s", day: "d", hour: "h", minute: "min", second: "s" },
+  "zh-TW": { lessThanSecond: "不到 1 秒", day: "天", hour: "小時", minute: "分", second: "秒" },
 } as const

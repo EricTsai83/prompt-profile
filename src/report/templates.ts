@@ -1,8 +1,9 @@
+import { readableEpisodes, episodePreview } from "./evidence.ts"
 import { structuredMoves } from "./collaboration.ts"
 import type { Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, viewMessages } from "./messages.ts"
+import { EPISODE_MESSAGES, PORTRAIT_MESSAGES, READING_MESSAGES, viewMessages } from "./messages.ts"
 import type { Scrub } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -35,7 +36,7 @@ export const identityMoves = (
   loc: Loc,
   scrub: Scrub,
   describe: boolean,
-  quote: ((text: string) => Raw | string) | null,
+  quote: ((text: string, promptId?: string) => Raw | string) | null,
 ): Raw => {
   const structured = structuredMoves(p, loc, scrub, quote)
   if (structured) return structured
@@ -49,21 +50,25 @@ export const identityMoves = (
           loc.text((_m, _c, l) => PORTRAIT_MESSAGES[l].selectedMoves),
         ),
       )}
+      ${quote ? html`<p class="note">${loc.text((_m, _c, l) => READING_MESSAGES[l].openingPrompts)}</p>` : ""}
       <ul>${p.patterns.slice(0, 3).map(
         (pattern, i) => html`<li>
         <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.patterns[i]?.claim ?? pattern.claim, l))}</h3>
         <p>${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].spread(pattern.support.sessions, pattern.support.weeks))}</p>
-        ${[
-          p.episodes.find((e) => pattern.episodeIds.includes(e.id)),
-          p.episodes.find((e) => pattern.counterEpisodeIds.includes(e.id)) ??
-            p.episodes.filter((e) => pattern.episodeIds.includes(e.id))[1],
-        ]
+        ${(quote
+          ? [
+              readableEpisodes(p).find((e) => pattern.episodeIds.includes(e.id)),
+              readableEpisodes(p).find((e) => pattern.counterEpisodeIds.includes(e.id)) ??
+                readableEpisodes(p).filter((e) => pattern.episodeIds.includes(e.id))[1],
+            ]
+          : []
+        )
           .filter((e) => e !== undefined)
           .map((e) => {
             const index = p.episodes.indexOf(e)
             return html`<article>
             <p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? e.task, l))}${pattern.counterEpisodeIds.includes(e.id) ? html` · ${loc.text((_m, _c, l) => EPISODE_MESSAGES[l].against)}` : ""}</p>
-            ${quote ? html`<ul>${e.turns.map((t) => html`<li>${quote(t.quote)}</li>`)}</ul>` : ""}
+            ${quote ? html`<ul>${episodePreview(e).map((t) => html`<li>${quote(t.quote, t.promptId)}</li>`)}</ul>` : ""}
           </article>`
           })}
       </li>`,
@@ -87,7 +92,7 @@ export const identityMoves = (
             (i) => html`<li>
         <h3>${loc.text((_m, c, l) => scrub(c.trait(i).name, l))}</h3>
         ${describe ? html`<p>${loc.text((_m, c, l) => scrub(c.trait(i).description, l))}</p>` : ""}
-        ${quote ? html`<blockquote>${quote(p.traits[i]!.evidence[0]!.quote)}</blockquote>` : ""}
+        ${quote ? html`<blockquote>${quote(p.traits[i]!.evidence[0]!.quote, p.traits[i]!.evidence[0]!.promptId)}</blockquote>` : ""}
       </li>`,
           )}</ul>`
     }

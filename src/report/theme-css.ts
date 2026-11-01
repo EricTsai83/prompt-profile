@@ -70,10 +70,27 @@ export const themeAttributes = ({ id, layout }: Theme): string =>
 
 /** Operational facts use rows so long model names do not become narrow columns. */
 export const generationStyle = `
+.generation-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-4);margin:var(--space-6) 0}
+.generation-summary>div{padding:var(--space-3);border:1px solid var(--border);border-radius:var(--radius-sm)}
+.generation-summary dt{font-size:var(--text-sm);color:var(--muted)}
+.generation-summary dd{margin:var(--space-2) 0 0;font-size:var(--text-lg);font-weight:700;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.generation-summary dd.note{font-size:var(--text-sm);font-weight:400}
+.generation-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-6)}
+.generation-bars,.generation-cost-chart{list-style:none;margin:var(--space-3) 0;padding:0}
+.generation-bars li,.generation-cost-chart li{margin:var(--space-3) 0;break-inside:avoid}
+.generation-bar-label{display:flex;justify-content:space-between;gap:var(--space-2);font-size:var(--text-sm)}
+.generation-bar-label b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.generation-track{display:flex;height:var(--space-2);margin:var(--space-2) 0;background:var(--border);overflow:hidden;border-radius:999px}
+.generation-bar{display:block;background:var(--accent)}
+.generation-estimated{opacity:.55}
+.generation-charts small{display:block;color:var(--muted)}
+.generation-details{border-top:1px solid var(--border);padding-top:var(--space-3);margin-top:var(--space-4)}
+.generation-details summary{cursor:pointer;font-weight:700}
 .generation-facts{margin:var(--space-4) 0}
 .generation-facts>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--space-4);padding:var(--space-2) 0;border-bottom:1px solid var(--border);break-inside:avoid}
 .generation-facts dt{color:var(--muted);font-size:var(--text-sm)}
 .generation-facts dd{margin:0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .generation-facts dd p{margin:0 0 var(--space-1)}
-@media(max-width:600px){.generation-facts>div{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}}
+@media(max-width:600px){.generation-summary,.generation-charts{grid-template-columns:minmax(0,1fr)}.generation-facts>div{grid-template-columns:minmax(0,1fr);gap:var(--space-1)}}
+@media print{.generation-details>dl{display:block!important}.generation-charts{grid-template-columns:minmax(0,1fr)}}
 `

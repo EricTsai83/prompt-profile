@@ -1,8 +1,8 @@
-import { makeVerbatim, quotes } from "./traits.ts"
+import { makeCitedVerbatim, quotes } from "./traits.ts"
 import { MIN_PROJECT_CONVERSATIONS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { RADAR_MESSAGES, ABILITY_MESSAGES } from "./messages.ts"
+import { RADAR_MESSAGES, ABILITY_MESSAGES, READING_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
 /** Label font size on the large radar (`.radar-label`), and the room a label needs beside it. */
@@ -70,43 +70,56 @@ const radarSvg = (
 }
 
 /** Six ability scores; missing scores have labeled spokes but no point or filled shape. */
-export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
+export const traitRadar = (
+  p: Profile,
+  loc: Loc,
+  v: Visibility,
+  scrub: Scrub,
+  mode: "full" | "summary" | "evidence" = "full",
+): Raw | null => {
+  if (mode === "evidence" && !v.quotes) return null
   const traits = p.abilities
-  if (traits.length === 0) return null
+  if (!traits.some((t) => t.score !== null)) return null
   const name = (i: number) => (l: Parameters<Scrub>[1]) =>
     scrub(ABILITY_MESSAGES[l][traits[i]!.key], l)
   const overall = traits.map((t) => t.score)
-  const projects = v.projects
-    ? [...new Map(traits.flatMap((t) => t.byProject).map((pr) => [pr.project, pr])).values()]
-        .filter((pr) => pr.analysedSessions >= MIN_PROJECT_CONVERSATIONS)
-        .toSorted((a, b) => b.analysedSessions - a.analysedSessions)
-        .slice(0, MAX_PROJECT_RADARS)
-        .map((pr) => pr.project)
-    : []
+  const projects =
+    v.projects && mode !== "summary"
+      ? [...new Map(traits.flatMap((t) => t.byProject).map((pr) => [pr.project, pr])).values()]
+          .filter((pr) => pr.analysedSessions >= MIN_PROJECT_CONVERSATIONS)
+          .toSorted((a, b) => b.analysedSessions - a.analysedSessions)
+          .slice(0, MAX_PROJECT_RADARS)
+          .map((pr) => pr.project)
+      : []
   const inProject = (project: string) =>
     traits.map((t) => t.byProject.find((pr) => pr.project === project)?.score ?? null)
   const value = (score: number | null, l: Parameters<Scrub>[1]) =>
     score === null ? ABILITY_MESSAGES[l].unknown : `${score}%`
-  return html`<section class="trait-radar">
-    <h2>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].title)}</h2>
+  return html`<section class="${mode === "evidence" ? "ability-evidence" : "trait-radar"}">
+    <h2>${loc.text((_m, _c, l) => (mode === "evidence" ? READING_MESSAGES[l].abilityEvidence : RADAR_MESSAGES[l].title))}</h2>
     <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}</p>
-    <div class="radar-main">${radarSvg(
-      overall,
-      (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${value(overall[i]!, l)}`),
-      (i) => loc.attr((_m, _c, l) => `${name(i)(l)}: ${value(overall[i]!, l)}`),
-      {
-        r: 130,
-        padX: labelRoom(
-          traits
-            .map((_, i) => p.languages.map((l) => `${name(i)(l)} ${value(overall[i]!, l)}`))
-            .flat(),
-        ),
-        padY: 26,
-      },
-    )}</div>
+    ${
+      mode === "evidence"
+        ? ""
+        : html`<div class="radar-main">${radarSvg(
+            overall,
+            (i, attrs) =>
+              loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${value(overall[i]!, l)}`),
+            (i) => loc.attr((_m, _c, l) => `${name(i)(l)}: ${value(overall[i]!, l)}`),
+            {
+              r: 130,
+              padX: labelRoom(
+                traits
+                  .map((_, i) => p.languages.map((l) => `${name(i)(l)} ${value(overall[i]!, l)}`))
+                  .flat(),
+              ),
+              padY: 26,
+            },
+          )}</div>`
+    }
     <ul class="radar-values">${traits.map(
       (t, i) =>
-        html`<li><b>${loc.text((_m, _c, l) => name(i)(l))}</b> <span>${loc.text((_m, _c, l) => value(overall[i]!, l))}</span> <small>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].support(t.support.sessions, t.support.weeks))}</small>${v.quotes ? quotes(t.evidence, makeVerbatim(loc, v, scrub)) : ""}</li>`,
+        html`<li><b>${loc.text((_m, _c, l) => name(i)(l))}</b> <span>${loc.text((_m, _c, l) => value(overall[i]!, l))}</span> <small>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].support(t.support.sessions, t.support.weeks))}</small>${v.quotes && mode !== "summary" ? quotes(t.evidence, makeCitedVerbatim(p, loc, v, scrub)) : ""}</li>`,
     )}</ul>
   </section>${
     projects.length === 0
@@ -133,8 +146,8 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
 }
 
 export const radarStyle = `
-.trait-radar{margin:48px 0 16px}
-.trait-radar>.note,.trait-radar-projects>.note{margin:12px 0 16px;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
+.trait-radar,.ability-evidence{margin:48px 0 16px}
+.trait-radar>.note,.ability-evidence>.note,.trait-radar-projects>.note{margin:12px 0 16px;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
 .radar-main svg{display:block;margin:0 auto;max-width:100%;height:auto}
 .radar-grid{fill:none;stroke:var(--border);stroke-width:1}
 .radar-shape{fill:color-mix(in srgb,var(--accent) 20%,transparent);stroke:var(--accent);stroke-width:2;stroke-linejoin:round}

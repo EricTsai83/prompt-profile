@@ -25,7 +25,7 @@ The terminal, execution record and report share the pure aggregation in
 activity in the selected prompt-history window. `Profile.generation` describes the new
 model work used to produce this report. Rendering an old report does not charge that old
 work again, overwrite archived analysis or fabricate missing generation measurements.
-Released schemas 8 and 14 decode as profile version 20 with `generation: null`.
+Released schemas 8 and 14 decode as the current profile version with `generation: null`.
 
 The generation snapshot closes after analysis and translations, before artifact rendering.
 `accountingFinishedAtMs` records that boundary. `summary.wallDurationMs` measures this
@@ -140,12 +140,13 @@ update progress.
 
 ## Formats and compatibility
 
-- `EXECUTION_VERSION = 1` identifies execution records and their summary contract. Readers
+- `EXECUTION_VERSION = 3` preserves per-token measurement coverage and stage cost subtotals,
+  split into CLI-reported and estimated USD. Versions 1 and 2 remain readable. Readers
   validate the record, ignore extra fields, and recompute summary totals from validated
   attempts instead of trusting externally supplied totals.
-- `Profile.schemaVersion = 20` adds optional generation metadata; released schemas 8 and 14 remain
-  renderable with unavailable generation data.
-- Look versions are classic 20 and other looks 26. Render manifest version remains 3.
+- `Profile.schemaVersion = 27` adds optional coverage and stage breakdowns to generation
+  summaries. Older profiles remain renderable; missing breakdowns are not invented from totals.
+- Look versions are classic 45 and other looks 47. Render manifest version remains 3.
 - Analysis prompts, analysis-cache version, cleaning/redaction rules and pricing data are
   unchanged. The output audit recognizes the new execution ID as a machine identifier;
   displayed model names still pass the existing output audit.

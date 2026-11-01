@@ -20,6 +20,15 @@ excerpt rather than repeating the description. The factual view retains every su
 contrary excerpt. Stored prose can still repeat itself across portrait, traits and dimensions;
 the renderer must not rewrite it or silently remove evidence to force uniqueness.
 
+## Reading order update — 2026-11-01
+
+The [reading flow](../../report-reading-flow.md) now specifies the chapter order and data gates.
+The overview puts the connected story before featured habits, then ability/preference measures.
+The factual view puts observations and original prompts before conversations, optional suggestions,
+activity and accounting. Fun facts belong to activity. Empty chapters and their navigation links
+are omitted; missing accounting and unsupported evidence are summarized under method. This
+updates composition without changing stored analysis or the separation between identity and coaching.
+
 ## Fallbacks and privacy
 
 Legacy profiles retain existing dimensions without invented portrait fields. Mixed and unclear

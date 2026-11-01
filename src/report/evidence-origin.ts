@@ -5,12 +5,30 @@ import type { Loc } from "./loc.ts"
 import { HISTORY_MESSAGES } from "./messages.ts"
 import type { Visibility } from "./visibility.ts"
 
+/** Prefer recorded origins; episode turns supply real dates and positions in older profiles. */
+export const evidenceSources = (p: Profile): ReadonlyArray<EvidenceOrigin> => [
+  ...new Map(
+    [
+      ...p.episodes.flatMap((e) =>
+        e.turns.map((t) => ({
+          promptId: t.promptId,
+          session: e.session,
+          time: t.time,
+          turn: t.turn,
+          of: e.sessionTurns,
+        })),
+      ),
+      ...(p.evidenceOrigins ?? []),
+    ].map((origin) => [origin.promptId, origin]),
+  ).values(),
+]
+
 export const sourceLabel = (
   p: Profile,
   promptId: string,
   loc: Loc,
   v: Visibility,
-  sources: ReadonlyArray<EvidenceOrigin> = p.evidenceOrigins ?? [],
+  sources: ReadonlyArray<EvidenceOrigin> = evidenceSources(p),
 ): Raw | null => {
   const origin = sources.find((s) => s.promptId === promptId)
   if (!origin || !v.quotes) return null

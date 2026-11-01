@@ -86,13 +86,26 @@ repairs the index without analysis. Standalone profiles remain supported.
 See the [collaboration guide](collaboration-experience.md) for original artwork, evidence
 limits, narrative planning and when historical windows can be compared.
 
+## Reading the report
+
+The first view introduces the connected collaboration portrait, then grounded habits, followed
+by available ability scores and preference shares. The Facts & evidence view starts with
+observations and source prompts, then conversation sequences, optional suggestions, activity
+and tools, and finally usage and method. Each page links only to chapters that have content.
+Fun facts are kept with activity rather than interrupting the opening portrait.
+
+Missing chapters do not mean a score of zero. Missing metadata and omitted unsupported
+observations are stated under method. Public exports without quotes explain that limitation
+up front and omit the private evidence chapters. Recorded dates and prompt positions accompany
+source quotes where available. See [the reading flow](report-reading-flow.md) for display rules.
+
 ## Sharing and output checks
 
 `--exclude` (on the main command and on `render`) takes a comma list:
 
 | Part           | Left out                                                                                             |
 | -------------- | ---------------------------------------------------------------------------------------------------- |
-| `quotes`       | Evidence quotes and the before / after rewrites                                                      |
+| `quotes`       | Evidence quotes, conversation timelines, example excerpts and before / after rewrites                |
 | `projects`     | Project names, shown as "Project A, B…", also inside the generated text and on the card              |
 | `dates`        | Exact dates: no daily calendar, the data period by month                                             |
 | `coaching`     | "Improve your prompts" and "since your last report"                                                  |
@@ -221,6 +234,23 @@ Use `prompt-profile history --executions --out <directory>` to find its JSON pat
 and unknown cost stops further work. Codex rejects this monetary setting before model calls.
 See [execution accounting and recovery](execution-accounting.md) for the versioned record,
 coverage states, free operations, privacy exclusions and restart behavior.
+
+The report ends with generation elapsed time, recorded tokens and cost in USD. Tokens are
+units of text processed by the model, not words or characters. Input, output and cache reads
+have separate labels and bars; reasoning is already included in output. Unreported fields
+are omitted rather than displayed as zero. A measured zero remains distinct from missing data.
+Expand **Execution details** for model provenance, retries, cache hits and the execution ID.
+
+Cost charts show the recorded USD subtotal by analysis stage, separating CLI-reported amounts
+from API list-price estimates. Missing calls are excluded and coverage is stated beside the
+chart. These amounts are not subscription bills. Codex may provide tokens without a reported
+model, service tier or cost; Claude can also omit usage fields. When the saved metadata cannot
+support pricing, the report says **Cost unavailable**. Older reports render without another
+model call, but stage costs and per-token coverage cannot be recovered from a legacy subtotal.
+New analyses save those details in profile schema 27 and execution record version 3.
+
+The presentation follows the distinction between API-equivalent cost, token categories and
+unpriced usage described in [T3 Code's usage documentation](https://github.com/pingdotgg/t3code/blob/main/docs/user/usage.md).
 
 ## Updating and unreadable profile formats
 

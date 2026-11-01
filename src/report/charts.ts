@@ -446,7 +446,7 @@ export const chartStyle = (langs: ReadonlyArray<string>): string => `
 :is(.heat-c,.cal-d,.scale i).l3{background:color-mix(in srgb,var(--accent) 76%,var(--empty))}
 :is(.heat-c,.cal-d,.scale i).l4{background:var(--accent)}
 .heat-c:hover,.heat-c:focus,.cal-d:hover,.cal-d:focus{box-shadow:0 0 0 2px var(--fg)}
-.cal{display:flex;gap:3px;margin-top:8px}
+.cal{display:flex;justify-content:center;gap:3px;margin-top:8px}
 .cal-w{display:grid;grid-template-rows:16px repeat(7,auto);gap:3px;flex:1;min-width:0;max-width:30px}
 .cal-m{font-size:10px;color:var(--muted);white-space:nowrap;overflow:visible}
 .cal-d.out{background:transparent}

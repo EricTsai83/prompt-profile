@@ -150,3 +150,47 @@ it.each(["en", "zh-TW"] as const)(
     expect(privateDates).not.toContain(period)
   },
 )
+
+it.each(["en", "zh-TW"] as const)(
+  "combines matching prompt and usage dates in %s",
+  async (lang) => {
+    const base = await sample()
+    const p = { ...base, usage: { ...base.usage!, range: base.stats.dateRange } }
+    const words = texts(cardTree(p, { look: "classic", cardHide: [] }, lang))
+    const label = lang === "en" ? "Prompt activity & usage:" : "Prompt 與用量期間："
+    const period = words.find((word) => word.startsWith(label))
+    expect(period).toBeDefined()
+    expect(words.some((word) => word.startsWith(lang === "en" ? "Usage:" : "用量期間:"))).toBe(
+      false,
+    )
+    expect(words.indexOf(period!)).toBeLessThan(
+      words.indexOf(lang === "en" ? "Prompts" : "Prompt 數"),
+    )
+    const excluded = texts(cardTree(p, { look: "classic", cardHide: [], exclude: ["usage"] }, lang))
+    expect(excluded).toContain(cardPeriod(p, lang, true))
+    expect(excluded.some((word) => word.startsWith(label))).toBe(false)
+  },
+)
+
+it("groups different periods and pricing caveats above the metrics", async () => {
+  const base = await sample()
+  const p = {
+    ...base,
+    usage: {
+      ...base.usage!,
+      sources: base.usage!.sources.map((s) => ({
+        ...s,
+        totals: { ...s.totals, cost: 1, unpricedRequests: 1 },
+        diagnostics: { ...s.diagnostics, badLines: 1 },
+      })),
+    },
+  }
+  const words = texts(cardTree(p))
+  const usage = words.find((word) => word.startsWith("Usage:"))!
+  expect(usage).toBeDefined()
+  expect(words.indexOf(usage)).toBeLessThan(words.indexOf("Prompts"))
+  const caveat = words.find((word) => word.includes("Partial pricing"))!
+  expect(caveat).toContain("Incomplete logs")
+  expect(words.indexOf(caveat)).toBeLessThan(words.indexOf("Prompts"))
+  expect(words.filter((word) => word.includes("Partial pricing"))).toHaveLength(1)
+})

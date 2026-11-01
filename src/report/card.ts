@@ -11,7 +11,7 @@ import { graphicSvg, svgDataUrl } from "./graphic.ts"
 import { DEFAULT_RENDER_OPTIONS, type RenderOptions } from "./looks.ts"
 import { lookOf, type CardTokens, type Theme } from "./theme.ts"
 import { contentIn, signatureNames } from "./content.ts"
-import { cardPeriod, cardSummary } from "./card-summary.ts"
+import { cardContext, cardPeriod, cardSummary } from "./card-summary.ts"
 import { makeScrub, scrubIdentity, visibilityOf } from "./visibility.ts"
 import { isLimitedEvidence, limitedView } from "./evidence.ts"
 import { AVATAR_MESSAGES, CARD_MESSAGES } from "./messages.ts"
@@ -90,7 +90,7 @@ const identityCopy = (
   colors: { readonly muted: string; readonly chip: Record<string, unknown> },
   badge: Node | null = null,
   width?: number,
-  period: string | null = null,
+  context: ReadonlyArray<string> = [],
 ): Node => {
   const c = contentIn(profile, lang)
   const card = theme.card
@@ -131,17 +131,20 @@ const identityCopy = (
         },
         clip(c.headline, 120),
       ),
-      period === null
+      context.length === 0
         ? null
         : h(
             "div",
             {
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
               fontSize: card.size.header,
               color: colors.muted,
               marginTop: card.headline.gap,
               flexShrink: 0,
             },
-            period,
+            context.map((line) => h("div", {}, line)),
           ),
       hide.includes("traits")
         ? null
@@ -347,12 +350,11 @@ const classicTree = (
             { muted: k.muted, chip: { color: k.accent, backgroundColor: k.accentSoft } },
             avatar && showGraphic ? roleBadge(avatar, lang, { fg: k.fg, border: k.border }) : null,
             showGraphic ? 520 : undefined,
-            hide.includes("stats") ? null : cardPeriod(profile, lang, exactDates),
+            hide.includes("stats") ? [] : cardContext(profile, lang, showUsage, exactDates),
           ),
         ]),
         h("div", { display: "flex", flexDirection: "column", gap: 18 }, [
           metricRow(profile, theme, hide, lang, k.muted, showUsage),
-          cardFooter(profile, theme, hide, lang, k.muted, showUsage, exactDates),
         ]),
       ]),
     ],

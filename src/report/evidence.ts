@@ -1,6 +1,14 @@
 import { axisState, type Language, type Profile } from "../domain/index.ts"
 import { LIMITED_MESSAGES } from "./messages.ts"
 
+/** A bounded overview keeps the first and last selected turns; the full sequence stays in detail. */
+export const episodePreview = (episode: Profile["episodes"][number]) =>
+  episode.turns.length > 2 ? [episode.turns[0]!, episode.turns.at(-1)!] : episode.turns
+
+/** Episodes can illustrate a conversation only when every selected prompt has readable text. */
+export const readableEpisodes = (p: Pick<Profile, "episodes">): Profile["episodes"] =>
+  p.episodes.filter((e) => e.turns.length > 0 && e.turns.every((t) => t.quote.trim().length > 0))
+
 /**
  * Limited evidence (plan 24): nothing in the profile has verified support from two or more
  * sessions. This reuses what the analysis verified instead of a prompt or session count: a

@@ -1,8 +1,9 @@
+import { readableEpisodes, episodePreview } from "./evidence.ts"
 import { sourceLabel } from "./evidence-origin.ts"
 import { UNDERSTANDING_KINDS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { COLLABORATION_MESSAGES, EPISODE_MESSAGES } from "./messages.ts"
+import { COLLABORATION_MESSAGES, EPISODE_MESSAGES, READING_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 
@@ -14,7 +15,7 @@ export const structuredMoves = (
   p: Profile,
   loc: Loc,
   scrub: Scrub,
-  quote: ((s: string) => Raw | string) | null,
+  quote: ((s: string, promptId?: string) => Raw | string) | null,
 ): Raw | null => {
   const moves = p.collaboration?.moves
   if (!moves?.length) return null
@@ -23,8 +24,9 @@ export const structuredMoves = (
   return html`<section class="identity-moves structured-moves">
     <h2>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].moveTitle)}</h2>
     <p class="note">${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l].habitIntro)}</p>
+    ${quote ? html`<p class="note">${loc.text((_m, _c, l) => READING_MESSAGES[l].openingPrompts)}</p>` : ""}
     <ul>${moves.map((m, i) => {
-      const supporting = p.episodes.filter((e) => m.episodeIds.includes(e.id))
+      const supporting = quote ? readableEpisodes(p).filter((e) => m.episodeIds.includes(e.id)) : []
       const selected = supporting
         .filter((e, index) => supporting.findIndex((x) => x.session === e.session) === index)
         .filter((e) => !shown.has(e.session))
@@ -38,7 +40,7 @@ export const structuredMoves = (
           (
             e,
           ) => html`<article><h4>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[p.episodes.indexOf(e)]?.task ?? e.task, l))}</h4>
-          ${quote ? html`<ul>${e.turns.map((t) => html`<li>${quote(t.quote)}</li>`)}</ul>` : ""}
+          ${quote ? html`<ul>${episodePreview(e).map((t) => html`<li>${quote(t.quote, t.promptId)}</li>`)}</ul>` : ""}
         </article>`,
         )}
         ${(["benefit", "cost"] as const).map((key) => (m[key] ? html`<p><b>${loc.text((_m, _c, l) => COLLABORATION_MESSAGES[l][key])}</b>: ${loc.text((_m, _c, l) => scrub(p.translations[l]?.collaboration?.moves[i]?.[key]?.claim ?? m[key]!.claim, l))}</p>` : ""))}

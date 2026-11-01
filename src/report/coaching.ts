@@ -5,7 +5,7 @@ import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { EXPERIMENT_MESSAGES, type Messages } from "./messages.ts"
 import { triggeredSignals } from "./signals.ts"
-import { makeVerbatim, quotes } from "./traits.ts"
+import { makeVerbatim, makeCitedVerbatim, quotes } from "./traits.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
 const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
@@ -34,7 +34,7 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
         ? html`<div class="rewrite">
             <div>
               <span class="rw-label">${loc.text((m) => m.before)}</span>
-              <blockquote>${makeVerbatim(loc, v, scrub)(before.quote)}</blockquote>
+              <blockquote>${makeCitedVerbatim(p, loc, v, scrub)(before.quote, before.promptId)}</blockquote>
             </div>
             <div>
               <span class="rw-label">${loc.text((m) => m.after)}</span>
@@ -49,7 +49,7 @@ const improvementCard = (p: Profile, i: number, loc: Loc, v: Visibility, scrub: 
       others.length > 0
         ? html`<details open>
             <summary>${loc.text((m) => m.showEvidence(others.length))}</summary>
-            ${quotes(others, makeVerbatim(loc, v, scrub))}
+            ${quotes(others, makeCitedVerbatim(p, loc, v, scrub))}
           </details>`
         : ""
     }
@@ -80,7 +80,7 @@ const change = (label: Raw, before: number, now: number): Raw => {
 }
 
 /** "Since your last report": habits and the techniques that moved most. */
-const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
+export const progressSection = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
   const prev = p.previous
   if (prev === null || !p.historyComparison?.toolComparable) return null
   const s = p.stats
@@ -140,10 +140,9 @@ const progressBlock = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw |
   </div>`
 }
 
-/** Suggestions to try, the signals behind them and what changed since the last report. */
+/** Suggestions to try and the signals behind them. Comparable history belongs with activity. */
 export const coachingSection = (profile: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw => {
   const signals = signalRow(profile, loc)
-  const progress = progressBlock(profile, loc, v, scrub)
   return html`<section class="coaching">
                   <div class="section-head">
                     ${defined(
@@ -164,6 +163,5 @@ export const coachingSection = (profile: Profile, loc: Loc, v: Visibility, scrub
                           ${signals}`
                       : ""
                   }
-                  ${progress ?? ""}
                 </section>`
 }

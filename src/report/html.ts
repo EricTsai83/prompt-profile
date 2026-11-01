@@ -1,3 +1,4 @@
+import { readingPath, readingStyle } from "./reading-flow.ts"
 import { instructionsSection } from "./instructions.ts"
 import type { DateTime } from "effect"
 import type { Profile } from "../domain/index.ts"
@@ -10,7 +11,7 @@ import {
 } from "./activity.ts"
 import { avatarFor, avatarPortrait, avatarStyle } from "./avatar.ts"
 import { chartStyle, radialClock, type ChartView } from "./charts.ts"
-import { coachingSection } from "./coaching.ts"
+import { coachingSection, progressSection } from "./coaching.ts"
 import { understandingSection, collaborationStyle } from "./collaboration.ts"
 import { contentIn } from "./content.ts"
 import { defined, definition, definitionStyle, disclosureStyle, defText } from "./definition.ts"
@@ -34,15 +35,18 @@ import {
   AVATAR_MESSAGES,
   CARD_MESSAGES,
   HISTORY_MESSAGES,
+  GENERATION_MESSAGES,
+  USAGE_MESSAGES,
   LIBRARY_MESSAGES,
   MESSAGES,
   NARRATION_MESSAGES,
+  READING_MESSAGES,
   viewMessages,
   type Messages,
 } from "./messages.ts"
 import { workflowCharts, viewStyle } from "./overview.ts"
 import { BASE_STYLE, languageStyle } from "./page-style.ts"
-import { portraitStory, portraitStyle, preferenceEvidence } from "./portrait.ts"
+import { portraitStory, portraitSources, portraitStyle, preferenceEvidence } from "./portrait.ts"
 import { axisBalanceSection, balanceStyle } from "./balance.ts"
 import { traitRadar, radarStyle } from "./radar.ts"
 import { steeringSection, steeringStyle } from "./steering.ts"
@@ -50,7 +54,7 @@ import { techniquesSection, techniqueStyle } from "./techniques.ts"
 import { identityMoves, identitySignatures, variantStyle } from "./templates.ts"
 import { lookOf, type Theme } from "./theme.ts"
 import { displayStyle, generationStyle, themeAttributes, themeCss } from "./theme-css.ts"
-import { dimensionsSection, makeVerbatim, traitsSection } from "./traits.ts"
+import { dimensionsSection, makeVerbatim, makeCitedVerbatim, traitsSection } from "./traits.ts"
 import { usageSection, usageStyle } from "./usage.ts"
 import { makeScrub, visibilityOf, type Visibility } from "./visibility.ts"
 
@@ -77,6 +81,9 @@ const aboutSection = (
                         `${m.evidenceVerified(c.evidenceKept, c.evidenceDropped)}${c.chunksFailed > 0 ? ` · ${m.chunksSkipped(c.chunksFailed)}` : ""}`,
                     )}
                   </p>
+                  ${profile.traits.some((t) => !t.evidence.some((e) => e.quote.trim())) || profile.dimensions.some((d) => !d.evidence.some((e) => e.quote.trim())) ? html`<p class="note">${loc.text((_m, _c, l) => READING_MESSAGES[l].omittedEvidence)}</p>` : ""}
+                  ${v.usage && !profile.usage ? html`<p class="note">${loc.text((_m, _c, l) => USAGE_MESSAGES[l].notMeasured)}</p>` : ""}
+                  ${v.usage && !profile.generation ? html`<p class="note">${loc.text((_m, _c, l) => GENERATION_MESSAGES[l].unavailable)}</p>` : ""}
                   ${(c.narrativeRejected ?? 0) > 0 ? html`<p class="note">${loc.text((_m, _c, l) => HISTORY_MESSAGES[l].narrativeLimit)}</p>` : ""}
                   ${excluded.length > 0 ? html`<p>${loc.text((m) => m.leftOut(excluded.join(", ")))}</p>` : ""}
                   <p>${loc.text((m) => m.privacy)}</p>
@@ -121,10 +128,10 @@ export const renderHtml = (
   const def = defText(loc)
   const steering = steeringSection(profile, loc, v, scrub)
   // Coaching, like `--exclude coaching`, is the suggestions, signals and "since your last report".
-  const coaching = v.coaching && !limited
-  const story = portraitStory(profile, loc, v, scrub)
-  const balance = axisBalanceSection(profile, loc, v, scrub)
-  const radar = traitRadar(profile, loc, v, scrub)
+  const coaching = v.coaching && !limited && profile.improvements.length > 0
+  const story = portraitStory(profile, loc, v, scrub, true)
+  const balance = axisBalanceSection(profile, loc, v, scrub, "summary")
+  const radar = traitRadar(profile, loc, v, scrub, "summary")
   const preferences = preferenceEvidence(profile, loc, v, scrub)
   const episodes = episodesSection(profile, loc, v, scrub, (t, l) =>
     v.dates ? formatDate(t, tz, MESSAGES[l].locale) : formatMonth(t, tz, MESSAGES[l].locale),
@@ -132,10 +139,107 @@ export const renderHtml = (
   const tech = techniquesSection(s, loc, v, makeVerbatim(loc, v, scrub))
   // the usage's own period: it is summed over the whole window, not only the prompts' days
   const usagePeriod = periodOf(profile.usage?.range ?? null)
-  const usage = usageSection(profile, loc, v, (l) => usagePeriod(MESSAGES[l]))
+  const usage = profile.usage
+    ? usageSection(profile, loc, v, (l) => usagePeriod(MESSAGES[l]))
+    : null
   const avatar = avatarFor(profile, options.avatar)
   const graphic =
     avatar ?? (!clock ? graphicSvg(identity.graphic, s.hourHistogram, identity) : null)
+
+  const hasHabits = Boolean(
+    profile.collaboration?.moves.length ||
+    profile.patterns.length ||
+    profile.traits.some(
+      (t) => t.confidence !== "low" && t.evidence.some((e) => e.quote.trim().length > 0),
+    ),
+  )
+  const habits = hasHabits
+    ? identityMoves(
+        profile,
+        loc,
+        scrub,
+        theme.layout.signatures === "none",
+        v.quotes ? makeCitedVerbatim(profile, loc, v, scrub) : null,
+      )
+    : null
+  const funFacts =
+    v.funFacts && profile.funFacts.length > 0
+      ? html`<section><h2>${loc.text((m) => m.funFacts)}</h2><ul class="facts">${profile.funFacts.map((_f, i) => html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`)}</ul></section>`
+      : null
+  const techniqueBlock = tech
+    ? html`<section class="techniques"><div class="section-head">${defined(
+        html`<h2>${loc.text((m) => m.techniques)}</h2>`,
+        definition(
+          loc,
+          loc.text((m) => m.techniquesNote),
+          ...(s.techniques ? [loc.text((m) => m.coverageNote(s.techniques!.coveredSessions))] : []),
+        ),
+      )}</div>${tech}</section>`
+    : null
+  const overviewPath = readingPath(
+    [
+      { key: "portrait", parts: [story, habits] },
+      { key: "measures", parts: [radar, balance] },
+    ],
+    loc,
+    "overview",
+  )
+  const detailPath = readingPath(
+    [
+      {
+        key: "evidence",
+        parts: v.quotes
+          ? [
+              profile.traits.some((t) => t.evidence.some((e) => e.quote.trim().length > 0))
+                ? traitsSection(profile, loc, v, scrub)
+                : null,
+              portraitSources(profile, loc, v, scrub),
+              traitRadar(profile, loc, v, scrub, "evidence"),
+              preferences,
+              axisBalanceSection(profile, loc, v, scrub, "evidence"),
+              profile.dimensions.some((d) => d.evidence.some((e) => e.quote.trim().length > 0))
+                ? dimensionsSection(profile, loc, v, scrub)
+                : null,
+              profile.collaboration?.signals.some((signal) => signal.evidence.length > 0)
+                ? understandingSection(profile, loc, v, scrub)
+                : null,
+              steering,
+              historySection(profile, loc, v, scrub),
+            ]
+          : [],
+      },
+      { key: "conversations", parts: [episodes] },
+      { key: "next", parts: [coaching ? coachingSection(profile, loc, v, scrub) : null] },
+      {
+        key: "activity",
+        parts: [
+          signatureTiles(profile, loc),
+          rhythmSection(s, loc, v, view),
+          chaptersSection(s, loc, view),
+          s.techniques && (s.techniques.coveredSessions > 0 || s.analyzedPrompts > 0)
+            ? workflowCharts(profile, loc)
+            : null,
+          techniqueBlock,
+          instructionsSection(profile, loc, v, scrub),
+          !v.quotes ? steering : null,
+          !v.quotes ? historySection(profile, loc, v, scrub) : null,
+          measuredPanels(s, loc),
+          v.coaching && !limited ? progressSection(profile, loc, v, scrub) : null,
+          funFacts,
+        ],
+      },
+      {
+        key: "method",
+        parts: [
+          usage,
+          profile.generation ? generationSection(profile, loc, v) : null,
+          aboutSection(profile, loc, v, excluded),
+        ],
+      },
+    ],
+    loc,
+    "detail",
+  )
 
   const heroFacts = html`              <dl class="report-facts">
                 <div>
@@ -196,7 +300,7 @@ export const renderHtml = (
         <title>${scrub(contentIn(profile, "en").archetype.name, "en")} · ${viewMessages(loc.langs[0]!, profile.voice).brand(options.name ?? null)}</title>
         <style>
           ${raw(themeCss(theme))}${raw(viewStyle)}${story ? raw(portraitStyle) : ""}${balance ? raw(balanceStyle) : ""}${radar ? raw(radarStyle) : ""}${raw(BASE_STYLE)}${raw(generationStyle)}${raw(collaborationStyle)}${raw(historyStyle)}${raw(avatarStyle)}${raw(chartStyle(loc.langs))}${raw(techniqueStyle)}${usage ? raw(usageStyle) : ""}${episodes ? raw(episodesStyle) : ""}${steering ? raw(steeringStyle) : ""}${raw(displayStyle(theme))}${raw(languageStyle(loc.langs))}
-        ${raw(definitionStyle)}${raw(disclosureStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
+        ${raw(readingStyle)}${raw(definitionStyle)}${raw(disclosureStyle)}${raw(variantStyle)}${raw(documentLayoutStyle)}
 .experiment-print-copy{display:none}
 @media print{.experiment-print-copy{display:block;white-space:pre-wrap;overflow-wrap:anywhere}.improve textarea,.experiment-copy-help{display:none!important}}
 </style>
@@ -263,72 +367,15 @@ export const renderHtml = (
           </section>
 
 
-          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewNote)}</p></header>
-          ${identityMoves(profile, loc, scrub, theme.layout.signatures === "none", v.quotes ? makeVerbatim(loc, v, scrub) : null)}
-          ${story ?? ""}${radar ?? ""}${balance ?? ""}
-          ${
-            v.funFacts && profile.funFacts.length > 0
-              ? html`<section>
-                  <h2>${loc.text((m) => m.funFacts)}</h2>
-                  <ul class="facts">
-                    ${profile.funFacts.map(
-                      (_f, i) =>
-                        html`<li class="fact">${loc.text((_m, ct, l) => scrub(ct.funFacts[i]!, l))}</li>`,
-                    )}
-                  </ul>
-                </section>`
-              : ""
-          }
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).overviewTitle)}</h2><p>${loc.text((_m, _c, l) => (limited ? READING_MESSAGES[l].limited : !radar && !balance ? READING_MESSAGES[l].noMeasures : viewMessages(l, profile.voice).overviewNote))}</p></header>
+          ${!v.quotes ? html`<p class="reading-limit">${loc.text((_m, _c, l) => READING_MESSAGES[l].quotesOmitted)}</p>` : ""}
+          ${overviewPath}
 
           <label class="page-turn" for="report-detail">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).next)}</label>
           </section>
           <section id="detail" class="report-view report-view-detail" aria-label="${loc.attr((_m, _c, l) => viewMessages(l, profile.voice).detail)}">
-          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detailTitle)}</h2><p>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detailNote)}</p></header>
-          ${signatureTiles(profile, loc)}
-
-          ${workflowCharts(profile, loc)}
-          ${rhythmSection(profile.stats, loc, v, view)}
-
-          ${chaptersSection(profile.stats, loc, view)}
-
-                  ${measuredPanels(profile.stats, loc)}
-
-          ${traitsSection(profile, loc, v, scrub)}${instructionsSection(profile, loc, v, scrub)}
-
-          ${preferences ?? ""}${historySection(profile, loc, v, scrub)}${understandingSection(profile, loc, v, scrub)}
-
-          ${steering ?? ""}
-
-          ${episodes ?? ""}
-
-          ${dimensionsSection(profile, loc, v, scrub)}
-
-          ${
-            tech
-              ? html`<section class="techniques">
-                  <div class="section-head">
-                    ${defined(
-                      html`<h2>${loc.text((m) => m.techniques)}</h2>`,
-                      definition(
-                        loc,
-                        loc.text((m) => m.techniquesNote),
-                        ...(s.techniques
-                          ? [loc.text((m) => m.coverageNote(s.techniques!.coveredSessions))]
-                          : []),
-                      ),
-                    )}
-                  </div>
-                  ${tech}
-                </section>`
-              : ""
-          }
-
-          ${coaching ? coachingSection(profile, loc, v, scrub) : ""}
-
-          ${usage ?? ""}
-          ${generationSection(profile, loc, v) ?? ""}
-
-          ${aboutSection(profile, loc, v, excluded)}
+          <header class="view-heading"><h2>${loc.text((_m, _c, l) => viewMessages(l, profile.voice).detailTitle)}</h2><p>${loc.text((_m, _c, l) => (v.quotes ? viewMessages(l, profile.voice).detailNote : READING_MESSAGES[l].publicDetail))}</p></header>
+          ${detailPath}
           <label class="page-turn" for="report-overview">${loc.text((_m, _c, l) => viewMessages(l, profile.voice).back)}</label>
           </section>
           </main>

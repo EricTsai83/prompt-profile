@@ -1,9 +1,11 @@
+import { evidenceSources } from "./evidence-origin.ts"
 import type { DateTime } from "effect"
 import type { Episode, Language, Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
 import { EPISODE_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
+import { readableEpisodes } from "./evidence.ts"
 import { defined, definition } from "./definition.ts"
 
 type EpisodeMessages = (typeof EPISODE_MESSAGES)[Language]
@@ -12,7 +14,7 @@ type EpisodeMessages = (typeof EPISODE_MESSAGES)[Language]
 export type When = (t: DateTime.Utc, lang: Language) => string
 
 /** The user's turns in order, with the prompts between and around them marked as not shown. */
-const turnList = (e: Episode, loc: Loc, v: Visibility, scrub: Scrub, when: When): Raw => {
+const turnList = (e: Episode, loc: Loc, scrub: Scrub, when: When): Raw => {
   const gap = (pick: (m: EpisodeMessages) => string) =>
     html`<li class="turn-gap">${loc.text((_m, _c, l) => pick(EPISODE_MESSAGES[l]))}</li>`
   const first = e.turns[0]?.turn ?? 1
@@ -25,7 +27,7 @@ const turnList = (e: Episode, loc: Loc, v: Visibility, scrub: Scrub, when: When)
         i,
       ) => html`${i > 0 && t.turn - e.turns[i - 1]!.turn > 1 ? gap((m) => m.gap(t.turn - e.turns[i - 1]!.turn - 1)) : ""}<li>
         <p class="turn-meta">${loc.text((_m, _c, l) => `${EPISODE_MESSAGES[l].turn(t.turn, e.sessionTurns)} · ${EPISODE_MESSAGES[l].roles[t.role]} · ${when(t.time, l)}`)}</p>
-        ${v.quotes ? html`<blockquote>${loc.text((_m, _c, l) => scrub(t.quote, l))}</blockquote>` : ""}
+        <blockquote>${loc.text((_m, _c, l) => scrub(t.quote, l))}</blockquote>
       </li>`,
     )}
     ${last < e.sessionTurns ? gap((m) => m.later(e.sessionTurns - last)) : ""}
@@ -40,7 +42,7 @@ const endingText = (e: Episode, l: Language): string => {
 
 /**
  * The facts page's record of how selected conversations unfolded, and the habits recurring
- * across them. Null for profiles from before episodes were analysed.
+ * across them. Omit timelines when original prompts are hidden or unavailable.
  */
 export const episodesSection = (
   p: Profile,
@@ -49,24 +51,30 @@ export const episodesSection = (
   scrub: Scrub,
   when: When,
 ): Raw | null => {
+  if (!v.quotes) return null
+  const episodes = readableEpisodes(p)
+  if (episodes.length === 0) return null
+  const visibleIds = new Set(episodes.map((e) => e.id))
+  const patterns = p.patterns
+    .map((pattern, index) => ({ pattern, index }))
+    .filter(
+      ({ pattern }) =>
+        pattern.episodeIds.length > 0 &&
+        [...pattern.episodeIds, ...pattern.counterEpisodeIds].every((id) => visibleIds.has(id)),
+    )
   const coverage = p.coverage.episodes
-  if (coverage === null && p.episodes.length === 0) return null
-  const sessions = [...new Set(p.episodes.map((e) => e.session))]
+  const sessions = [...new Set(evidenceSources(p).map((origin) => origin.session))]
   const rejected = coverage ? Object.values(coverage.rejected).reduce((sum, n) => sum + n, 0) : 0
   const text = (pick: (m: EpisodeMessages, l: Language) => string) =>
     loc.text((_m, _c, l) => pick(EPISODE_MESSAGES[l], l))
   const notes = [
-    ...(p.episodes.length === 0
-      ? []
-      : [
-          (m: EpisodeMessages) =>
-            m.note(
-              p.episodes.length,
-              coverage?.kept ?? p.episodes.length,
-              p.coverage.sessionsAnalyzed,
-              p.stats.totalSessions,
-            ),
-        ]),
+    (m: EpisodeMessages) =>
+      m.note(
+        episodes.length,
+        coverage?.kept ?? episodes.length,
+        p.coverage.sessionsAnalyzed,
+        p.stats.totalSessions,
+      ),
     (m: EpisodeMessages) => m.userOnly,
     ...(rejected > 0 ? [(m: EpisodeMessages) => m.rejected(rejected)] : []),
     ...(coverage && coverage.endingsWithdrawn > 0
@@ -77,7 +85,7 @@ export const episodesSection = (
     ids
       .flatMap((id) => {
         const index = p.episodes.findIndex((e) => e.id === id)
-        if (index < 0) return []
+        if (index < 0 || !visibleIds.has(id)) return []
         return [
           html`<a href="#episode-${id}">${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[index]?.task ?? p.episodes[index]!.task, l))}</a>`,
         ]
@@ -85,13 +93,12 @@ export const episodesSection = (
       .map((link, i) => html`${i > 0 ? ", " : ""}${link}`)
   return html`<section class="episodes">
     ${defined(html`<h2>${text((m) => m.title)}</h2>`, definition(loc, ...notes.map((pick) => text(pick))))}
-    ${p.episodes.length === 0 ? html`<p class="note">${text((m) => m.none)}</p>` : ""}
     ${
-      p.patterns.length > 0
+      patterns.length > 0
         ? html`<h3>${text((m) => m.patterns)}</h3>
           <ul class="episode-patterns">
-            ${p.patterns.map(
-              (pattern, i) => html`<li>
+            ${patterns.map(
+              ({ pattern, index: i }) => html`<li>
                 <p>${loc.text((_m, _c, l) => scrub(p.translations[l]?.patterns[i]?.claim ?? pattern.claim, l))}</p>
                 <p class="note">${text((m) => m.spread(pattern.support.sessions, pattern.support.weeks))} · ${text((m) => m.shownIn)}: ${links(pattern.episodeIds)}${pattern.counterEpisodeIds.length > 0 ? html` · ${text((m) => m.against)}: ${links(pattern.counterEpisodeIds)}` : ""}</p>
               </li>`,
@@ -99,20 +106,17 @@ export const episodesSection = (
           </ul>`
         : ""
     }
-    ${
-      p.episodes.length > 0
-        ? html`<ol class="episode-list">
-          ${p.episodes.map(
-            (e, i) => html`<li class="episode" id="episode-${e.id}">
-              <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[i]?.task ?? e.task, l))}</h3>
-              <p class="episode-meta">${text((m) => [m.taskTypes[e.taskType], m.conversation(sessions.indexOf(e.session) + 1, e.sessionTurns), ...(e.split ? [m.split] : [])].join(" · "))}</p>
-              ${turnList(e, loc, v, scrub, when)}
-              <p class="episode-ending">${text((_m, l) => endingText(e, l))}</p>
-            </li>`,
-          )}
-        </ol>`
-        : ""
-    }
+    <ol class="episode-list">
+      ${episodes.map((e) => {
+        const i = p.episodes.indexOf(e)
+        return html`<li class="episode" id="episode-${e.id}">
+          <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.episodes[i]?.task ?? e.task, l))}</h3>
+          <p class="episode-meta">${text((m) => [m.taskTypes[e.taskType], m.conversation(sessions.indexOf(e.session) + 1, e.sessionTurns), ...(e.split ? [m.split] : [])].join(" · "))}</p>
+          ${turnList(e, loc, scrub, when)}
+          <p class="episode-ending">${text((_m, l) => endingText(e, l))}</p>
+        </li>`
+      })}
+    </ol>
   </section>`
 }
 

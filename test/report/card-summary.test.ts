@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { Effect } from "effect"
 import { describe, expect, it } from "vitest"
 import { decodeProfile } from "../../src/domain/Profile.ts"
-import { cardPeriod, cardSummary } from "../../src/report/card-summary.ts"
+import { cardContext, cardPeriod, cardSummary } from "../../src/report/card-summary.ts"
 
 const sample = () =>
   Effect.runPromise(
@@ -92,4 +92,27 @@ describe("share card measured summary", () => {
     expect(JSON.stringify(summary)).not.toMatch(/USD|Tokens|API|Usage:/)
     expect(summary.note).toBe("")
   })
+})
+
+it("keeps unavailable prompt and usage ranges distinct", async () => {
+  const base = await sample()
+  const p = {
+    ...base,
+    stats: { ...base.stats, dateRange: null },
+    usage: { ...base.usage!, range: null },
+  }
+  const context = cardContext(p, "en", true, true)
+  expect(context).toContain("Prompt activity: period unavailable")
+  expect(context).toContain("Usage: period unavailable")
+  expect(context.join(" ")).not.toContain("Prompt activity & usage")
+})
+
+it("merges matching date ranges while respecting hidden exact dates", async () => {
+  const base = await sample()
+  const p = { ...base, usage: { ...base.usage!, range: base.stats.dateRange } }
+  const context = cardContext(p, "en", true, false)
+  expect(context[0]).toContain("Prompt activity & usage:")
+  expect(context.join(" ")).not.toContain("Apr 25")
+  expect(context.join(" ")).not.toContain("May 3")
+  expect(cardContext(p, "en", false, false)).toEqual([cardPeriod(p, "en", false)])
 })

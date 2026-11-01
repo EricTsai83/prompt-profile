@@ -82,6 +82,13 @@ describe("prompt coaching", () => {
       }
       const out = renderHtml(p)
       expect(out).toContain("Since your last report")
+      const noSuggestions = renderHtml({ ...p, improvements: [] })
+      expect(noSuggestions).not.toContain('id="reading-detail-next"')
+      const activity = noSuggestions.slice(
+        noSuggestions.indexOf('id="reading-detail-activity"'),
+        noSuggestions.indexOf('id="reading-detail-method"'),
+      )
+      expect(activity).toContain("Since your last report")
       // A count difference is shown only with comparable history metadata.
       expect(out).toMatch(
         /class="chg flat">\s*<span>Prompts that correct the AI<\/span>\s*<b>16% → 12%<\/b>/,

@@ -9,7 +9,12 @@ import {
 } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { PORTRAIT_MESSAGES, ROLE_CATALOG_MESSAGES, viewMessages } from "./messages.ts"
+import {
+  PORTRAIT_MESSAGES,
+  ROLE_CATALOG_MESSAGES,
+  READING_MESSAGES,
+  viewMessages,
+} from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 import { defined, definition } from "./definition.ts"
 import { measuredAxes } from "./balance.ts"
@@ -32,7 +37,13 @@ const evidenceList = (
     </details>`
 
 /** The identity view's story: the introduction and chapters, each with its own quotes. */
-export const portraitStory = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
+export const portraitStory = (
+  p: Profile,
+  loc: Loc,
+  v: Visibility,
+  scrub: Scrub,
+  preview = false,
+): Raw | null => {
   const portrait = p.portrait
   if (!portrait || portrait.chapters.length === 0) return null
   const text = (pick: (t: Portrait) => string, index?: number) =>
@@ -52,10 +63,17 @@ export const portraitStory = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub)
       (chapter, i) => html`<article class="portrait-chapter">
       <h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.portrait?.chapters[i]?.title ?? chapter.title, l))}</h3>
       <p>${text(() => chapter.body, i)}</p>
-      ${evidenceList(chapter.evidence, loc, v, scrub, p)}
+      ${evidenceList(preview ? chapter.evidence.slice(0, 1) : chapter.evidence, loc, v, scrub, p)}
     </article>`,
     )}
   </section>`
+}
+
+/** All story excerpts remain available on the evidence page; the overview shows one per chapter. */
+export const portraitSources = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
+  if (!v.quotes || !p.portrait?.chapters.some((c) => c.evidence.length > 0)) return null
+  return html`<section class="portrait-sources"><h2>${loc.text((_m, _c, l) => READING_MESSAGES[l].portraitEvidence)}</h2>
+  ${p.portrait.chapters.map((chapter, i) => (chapter.evidence.length === 0 ? "" : html`<article><h3>${loc.text((_m, _c, l) => scrub(p.translations[l]?.portrait?.chapters[i]?.title ?? chapter.title, l))}</h3>${evidenceList(chapter.evidence, loc, v, scrub, p)}</article>`))}</section>`
 }
 
 /**

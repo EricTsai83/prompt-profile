@@ -38,13 +38,14 @@ it.effect("renders one optional experiment, subordinate alternatives and inert c
   }),
 )
 
-it.effect("preserves an empty experiment state and translates the bounded contract", () =>
+it.effect("omits an empty experiment chapter and translates the bounded contract", () =>
   Effect.gen(function* () {
     const p = yield* decodeProfile(
       JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
     )
     const empty = renderHtml({ ...p, improvements: [], translations: {}, languages: ["en"] })
-    expect(empty).toContain("No supported experiment is offered")
+    expect(empty).not.toContain('class="coaching"')
+    expect(empty).not.toContain('id="reading-detail-next"')
     expect(empty).not.toContain('id="experiment-copy-0"')
     const i = p.improvements[0]!
     const t = p.translations["zh-TW"]!

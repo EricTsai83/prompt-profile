@@ -27,10 +27,11 @@ const definitionOf = (html: string, text: string) => {
 }
 
 describe("measurement definitions", () => {
-  it("are folded behind an ⓘ: closed by default, with a label for screen readers", async () => {
+  it("use a question-mark icon with a localized label for screen readers", async () => {
     const out = renderHtml(english(await sample()))
     expect(out).toContain('<details class="def"><summary>')
     expect(out).toContain('<span class="def-label">About</span>')
+    expect(out).toContain('<span class="def-icon" aria-hidden="true">?</span>')
     expect(out).not.toContain('<details class="def" open')
   })
 
@@ -98,7 +99,7 @@ it("exposes definitions on hover and keyboard focus, with a distinct pinned stat
   const out = renderHtml(english(await sample()))
   expect(out).toContain(".def:hover::details-content")
   expect(out).toContain(".def:focus-within::details-content")
-  expect(out).toContain(".def[open]>summary{color:var(--accent);text-decoration:underline}")
+  expect(out).toContain(".def[open]>summary{color:var(--accent)}")
 })
 
 it("uses text disclosures without filled panels or control borders", async () => {

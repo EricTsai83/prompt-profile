@@ -1,7 +1,8 @@
+import { sourceLabel } from "./evidence-origin.ts"
 import { MIN_BALANCE_CONVERSATIONS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { BALANCE_MESSAGES, PORTRAIT_MESSAGES } from "./messages.ts"
+import { BALANCE_MESSAGES, PORTRAIT_MESSAGES, READING_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
 /**
@@ -18,11 +19,15 @@ export const axisBalanceSection = (
   loc: Loc,
   v: Visibility,
   scrub: Scrub,
+  mode: "full" | "summary" | "evidence" = "full",
 ): Raw | null => {
-  const axes = measuredAxes(p)
+  if (mode === "evidence" && !v.quotes) return null
+  const axes = measuredAxes(p).filter(
+    (a) => mode !== "evidence" || a.examples.first.length + a.examples.second.length > 0,
+  )
   if (axes.length === 0) return null
-  return html`<section class="axis-balance">
-    <h2>${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].title)}</h2>
+  return html`<section class="${mode === "evidence" ? "axis-balance-evidence" : "axis-balance"}">
+    <h2>${loc.text((_m, _c, l) => (mode === "evidence" ? READING_MESSAGES[l].balanceEvidence : BALANCE_MESSAGES[l].title))}</h2>
     <p class="note">${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].note)}</p>
     ${axes.map((a) => {
       const total = a.first + a.second
@@ -30,13 +35,19 @@ export const axisBalanceSection = (
       const labels = (l: keyof typeof PORTRAIT_MESSAGES) => PORTRAIT_MESSAGES[l].axes[a.key]
       return html`<div class="balance-axis">
       <div class="balance-head"><b>${loc.text((_m, _c, l) => labels(l)[0])}</b><small>${loc.text((_m, _c, l) => BALANCE_MESSAGES[l].conversations(total))}</small></div>
-      <div class="balance-bar" role="img" aria-label="${loc.attr((_m, _c, l) => `${labels(l)[1]} ${first}%, ${labels(l)[2]} ${100 - first}%`)}"><span style="width:${first}%"></span></div>
-      <div class="balance-legend"><span>${loc.text((_m, _c, l) => `${labels(l)[1]} ${first}%`)}</span><span>${loc.text((_m, _c, l) => `${labels(l)[2]} ${100 - first}%`)}</span></div>
       ${
-        v.quotes && (a.examples.first.length > 0 || a.examples.second.length > 0)
+        mode === "evidence"
+          ? ""
+          : html`<div class="balance-bar" role="img" aria-label="${loc.attr((_m, _c, l) => `${labels(l)[1]} ${first}%, ${labels(l)[2]} ${100 - first}%`)}"><span style="width:${first}%"></span></div>
+      <div class="balance-legend"><span>${loc.text((_m, _c, l) => `${labels(l)[1]} ${first}%`)}</span><span>${loc.text((_m, _c, l) => `${labels(l)[2]} ${100 - first}%`)}</span></div>`
+      }
+      ${
+        v.quotes &&
+        mode !== "summary" &&
+        (a.examples.first.length > 0 || a.examples.second.length > 0)
           ? html`<div class="balance-examples">${(["first", "second"] as const).map(
               (pole) =>
-                html`<div>${a.examples[pole].map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}</blockquote>`)}</div>`,
+                html`<div>${mode === "evidence" ? html`<h3>${loc.text((_m, _c, l) => labels(l)[pole === "first" ? 1 : 2])}</h3>` : ""}${a.examples[pole].map((e) => html`<blockquote>${loc.text((_m, _c, l) => scrub(e.quote, l))}${sourceLabel(p, e.promptId, loc, v)}</blockquote>`)}</div>`,
             )}</div>`
           : ""
       }
@@ -46,8 +57,8 @@ export const axisBalanceSection = (
 }
 
 export const balanceStyle = `
-.axis-balance{margin:48px 0}
-.axis-balance>.note{margin:12px 0 20px;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
+.axis-balance,.axis-balance-evidence{margin:48px 0}
+.axis-balance>.note,.axis-balance-evidence>.note{margin:12px 0 20px;max-width:var(--reading);color:var(--muted);font-size:var(--text-sm)}
 .balance-axis{padding:14px 0;border-top:1px solid var(--border)}
 .balance-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
 .balance-head small{color:var(--muted);font-size:var(--text-sm)}

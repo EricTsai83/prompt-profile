@@ -4,11 +4,11 @@ import type { Loc } from "./loc.ts"
 import { DEFINITION_MESSAGES } from "./messages.ts"
 
 /**
- * A measurement's definition, folded away so the report stays uncluttered: an ⓘ that opens on
+ * A measurement's definition, folded away so the report stays uncluttered: a question-mark icon that opens on
  * hover or focus; click, tap or Enter pins it open (native `<details>`, no JavaScript). Printed open.
  */
 export const definition = (loc: Loc, ...paragraphs: ReadonlyArray<Raw>): Raw =>
-  html`<details class="def"><summary><span aria-hidden="true">i</span><span class="def-label">${loc.text((_m, _c, l) => DEFINITION_MESSAGES[l].label)}</span></summary><div class="def-body" role="note">${paragraphs.map((p) => html`<p>${p}</p>`)}</div></details>`
+  html`<details class="def"><summary><span class="def-icon" aria-hidden="true">?</span><span class="def-label">${loc.text((_m, _c, l) => DEFINITION_MESSAGES[l].label)}</span></summary><div class="def-body" role="note">${paragraphs.map((p) => html`<p>${p}</p>`)}</div></details>`
 
 /** Definition text in every report language. */
 export const defText =
@@ -24,13 +24,15 @@ export const definitionStyle = `
 .def-head{position:relative;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .def-head>h2,.def-head>h3{margin:0}
 .def{display:inline-block;vertical-align:middle;font-weight:400}
-.def>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:4px 2px;border:0;background:none;color:var(--muted);font:600 var(--text-xs)/1.4 var(--font-body);user-select:none}
+.def>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:32px;padding:4px;border:0;background:none;color:var(--muted);font:600 var(--text-xs)/1.4 var(--font-body);user-select:none}
 .hero .def>summary{color:var(--id-fg)}
 [data-composition=document] .hero .def>summary{color:var(--fg)}
-.def-label{font-style:normal}
+.def-icon{display:flex;align-items:center;justify-content:center;width:20px;height:20px;border:1px solid currentColor;border-radius:50%;font-size:var(--text-xs);line-height:1}
+.def-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 .def>summary::-webkit-details-marker{display:none}
-.def>summary:hover{color:var(--accent);text-decoration:underline}
-.def[open]>summary{color:var(--accent);text-decoration:underline}
+.def>summary:hover{color:var(--accent)}
+.def[open]>summary{color:var(--accent)}
+.def[open] .def-icon{background:var(--accent-soft)}
 .def:hover::details-content,.def:focus-within::details-content{content-visibility:visible;display:block}
 .def:not([open])>.def-body{display:none}
 .def:hover>.def-body,.def:focus-within>.def-body{display:block}
