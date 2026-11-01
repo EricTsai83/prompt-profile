@@ -16,7 +16,7 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-export const PROFILE_SCHEMA_VERSION = 26 as const
+export const PROFILE_SCHEMA_VERSION = 27 as const
 
 /**
  * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,
@@ -29,6 +29,7 @@ export const READABLE_SCHEMA_VERSIONS: ReadonlySet<unknown> = new Set([
   14,
   24, // Existing local ability reports remain renderable.
   25,
+  26,
   PROFILE_SCHEMA_VERSION,
 ])
 

@@ -9,9 +9,9 @@ import {
 } from "./Usage.ts"
 
 /** Generation accounting is separate from the historical activity in Profile.usage. */
-/** 2 added the `label` stage; version 1 records are still read. */
-export const EXECUTION_VERSION = 2
-export const READABLE_EXECUTION_VERSIONS = [1, EXECUTION_VERSION] as const
+/** 3 preserves token coverage and stage costs; older records are reaggregated. */
+export const EXECUTION_VERSION = 3
+export const READABLE_EXECUTION_VERSIONS = [1, 2, EXECUTION_VERSION] as const
 export const EXECUTION_STAGES = ["map", "merge", "draft", "review", "label", "translation"] as const
 export type ExecutionStage = (typeof EXECUTION_STAGES)[number]
 export type MeasurementState = "known-zero" | "complete" | "partial" | "unavailable"
@@ -69,6 +69,7 @@ export interface ExecutionSummary {
     readonly subtotal: TokenCounts
     readonly total: number
     readonly unknownAttempts: number
+    readonly measuredAttempts?: Readonly<Record<keyof TokenCounts, number>> | undefined
   }
   readonly cost: {
     readonly state: MeasurementState
@@ -76,6 +77,14 @@ export interface ExecutionSummary {
     readonly unknownAttempts: number
     readonly reportedAttempts: number
     readonly estimatedAttempts: number
+    readonly breakdown?:
+      | ReadonlyArray<{
+          readonly stage: ExecutionStage
+          readonly reportedUsd: number
+          readonly estimatedUsd: number
+          readonly unknownAttempts: number
+        }>
+      | undefined
   }
 }
 
@@ -182,6 +191,12 @@ export const summarizeExecution = (
       subtotal,
       total,
       unknownAttempts: unknownTokens,
+      measuredAttempts: Object.fromEntries(
+        TOKEN_KINDS.map((kind) => [
+          kind,
+          attempts.filter((a) => a.tokens !== null && !a.unknownTokenKinds?.includes(kind)).length,
+        ]),
+      ) as Record<keyof TokenCounts, number>,
     },
     cost: {
       state: state(attempts.length, unknownCost, usd === 0),
@@ -189,6 +204,25 @@ export const summarizeExecution = (
       unknownAttempts: unknownCost,
       reportedAttempts,
       estimatedAttempts,
+      breakdown: EXECUTION_STAGES.flatMap((stage) => {
+        const selected = attempts.filter((a) => a.stage === stage)
+        return selected.length === 0
+          ? []
+          : [
+              {
+                stage,
+                reportedUsd: selected.reduce(
+                  (sum, a) => sum + (a.cost?.provenance === "reported" ? a.cost.usd : 0),
+                  0,
+                ),
+                estimatedUsd: selected.reduce(
+                  (sum, a) => sum + (a.cost?.provenance === "estimated" ? a.cost.usd : 0),
+                  0,
+                ),
+                unknownAttempts: selected.filter((a) => a.cost === null).length,
+              },
+            ]
+      }),
     },
   }
 }
@@ -226,13 +260,29 @@ export const ExecutionSummarySchema = Schema.Struct({
   localCacheHits: Count,
   wallDurationMs: Amount,
   callDurationMs: Amount,
-  tokens: Schema.Struct({ state: State, subtotal: Tokens, total: Count, unknownAttempts: Count }),
+  tokens: Schema.Struct({
+    state: State,
+    subtotal: Tokens,
+    total: Count,
+    unknownAttempts: Count,
+    measuredAttempts: Schema.optional(Tokens),
+  }),
   cost: Schema.Struct({
     state: State,
     usd: Amount,
     unknownAttempts: Count,
     reportedAttempts: Count,
     estimatedAttempts: Count,
+    breakdown: Schema.optional(
+      Schema.Array(
+        Schema.Struct({
+          stage: Schema.Literals(EXECUTION_STAGES),
+          reportedUsd: Amount,
+          estimatedUsd: Amount,
+          unknownAttempts: Count,
+        }),
+      ),
+    ),
   }),
 })
 export const GenerationMetadata = Schema.Struct({

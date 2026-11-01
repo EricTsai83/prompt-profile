@@ -109,7 +109,7 @@ describe("Profile", () => {
           }
         }
         const profile = yield* decodeProfile({ ...sample, schemaVersion })
-        expect(profile.schemaVersion).toBe(26)
+        expect(profile.schemaVersion).toBe(27)
         expect(profile.headline).toBe(sample["headline"])
         expect(profile.dimensions[0]!.evidence[0]!.quote).toBe(
           sample["dimensions"][0].evidence[0].quote,
@@ -191,7 +191,7 @@ describe("Profile", () => {
   )
 
   // 1: had a `language` field; 2 is migrated (above)
-  it.effect.each([1, "3", 20, 21, 22, 27, undefined])(
+  it.effect.each([1, "3", 20, 21, 22, 28, undefined])(
     "unknown schemaVersion %s → UnsupportedProfileVersion",
     (v) =>
       Effect.gen(function* () {
@@ -365,7 +365,7 @@ it.effect("reads existing local ability reports without inventing instruction pr
     }
     delete input.instructionContexts
     const profile = yield* decodeProfile(input)
-    expect(profile.schemaVersion).toBe(26)
+    expect(profile.schemaVersion).toBe(27)
     expect(profile.instructionContexts).toEqual([])
   }),
 )

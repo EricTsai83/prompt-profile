@@ -2,6 +2,32 @@ import { describe, expect, it } from "vitest"
 import { summarizeExecution, type ExecutionAttempt } from "../../src/domain/Execution.ts"
 import { ZERO_TOKENS } from "../../src/domain/Usage.ts"
 
+it("keeps new coverage and cost charts through profile JSON, and reads version 2 records", async () => {
+  const { Effect } = await import("effect")
+  const { readFileSync } = await import("node:fs")
+  const { decodeProfile, encodeProfile } = await import("../../src/domain/Profile.ts")
+  const { parseExecution, generationOf } = await import("../../src/domain/Execution.ts")
+  const record = parseExecution({
+    ...JSON.parse(readFileSync("test/fixtures/execution.partial.json", "utf8")),
+    version: 2,
+  })!
+  expect(record).not.toBeNull()
+  const generation = generationOf(record)
+  expect(generation.summary.tokens.measuredAttempts).toBeDefined()
+  expect(generation.summary.cost.breakdown).toHaveLength(2)
+  const profile = await Effect.runPromise(
+    decodeProfile({
+      ...JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8")),
+      generation,
+    }),
+  )
+  expect(profile.generation).toEqual(generation)
+  const restored = await Effect.runPromise(
+    decodeProfile(JSON.parse(JSON.stringify(encodeProfile(profile)))),
+  )
+  expect(restored.generation).toEqual(generation)
+})
+
 const attempt = (overrides: Partial<ExecutionAttempt> = {}): ExecutionAttempt => ({
   id: 1,
   callId: 1,
@@ -18,6 +44,31 @@ const attempt = (overrides: Partial<ExecutionAttempt> = {}): ExecutionAttempt =>
 })
 
 describe("execution accounting", () => {
+  it("preserves per-kind coverage and stage cost provenance for report charts", () => {
+    const summary = summarizeExecution(
+      [
+        attempt({ unknownTokenKinds: ["cacheWrite5m", "reasoning"] }),
+        attempt({ id: 2, callId: 2, stage: "review", tokens: null, cost: null }),
+        attempt({
+          id: 3,
+          callId: 3,
+          cost: { provenance: "reported", usd: 0.02, pricingVersion: null, tier: null },
+        }),
+      ],
+      0,
+      100,
+      300,
+    )
+    expect(summary.tokens).toMatchObject({
+      measuredAttempts: { input: 2, cacheWrite5m: 1, reasoning: 1 },
+    })
+    expect(summary.cost).toMatchObject({
+      breakdown: [
+        { stage: "map", reportedUsd: 0.02, estimatedUsd: 0.01, unknownAttempts: 0 },
+        { stage: "review", reportedUsd: 0, estimatedUsd: 0, unknownAttempts: 1 },
+      ],
+    })
+  })
   it("distinguishes no calls from unavailable historic measurements", () => {
     expect(summarizeExecution([], 0, 100, 150)).toMatchObject({
       calls: 0,
@@ -116,7 +167,7 @@ it("does not invent generation measurements while migrating a released version 1
   const json = JSON.parse(readFileSync("test/fixtures/profile.sample.json", "utf8"))
   delete json.generation
   const profile = await Effect.runPromise(decodeProfile({ ...json, schemaVersion: 14 }))
-  expect(profile.schemaVersion).toBe(26)
+  expect(profile.schemaVersion).toBe(27)
   expect(profile.generation).toBeNull()
 })
 
