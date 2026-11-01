@@ -16,10 +16,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { pathToFileURL } from "node:url"
 const require = createRequire(import.meta.url)
-const { chromium } = require(
-  process.env.PLAYWRIGHT_CORE ||
-    "/Users/eric/.npm/_npx/705bc6b22212b352/node_modules/playwright-core",
-)
+import { launchReportBrowser } from "./report-browser.mjs"
 const AXE = require.resolve("axe-core/axe.min.js")
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 /** axe violations as short strings: rule id and the first offending selectors. */
@@ -80,7 +77,7 @@ const PROPERTIES = [
   "gap",
   "grid-template-columns",
 ]
-const browser = await chromium.launch({ channel: "chrome" })
+const browser = await launchReportBrowser()
 const root = resolve(process.env.QA_OUT || "tmp/template-qa")
 mkdirSync(root, { recursive: true })
 const results = []
@@ -113,6 +110,32 @@ for (const look of LOOKS)
                 const pageRect = document.querySelector(".page").getBoundingClientRect()
                 return Math.abs(nav.x + nav.width / 2 - pageRect.x - pageRect.width / 2) < 1
               })(),
+              readingPath: (() => {
+                const readingView = document.querySelector(`.report-view-${selectedView}`)
+                const chapters = [...readingView.querySelectorAll(":scope>.reading-chapter")]
+                const links = [...readingView.querySelectorAll(".reading-nav a")]
+                return (
+                  chapters.length > 0 &&
+                  chapters[0].id ===
+                    `reading-${selectedView}-${selectedView === "overview" ? "portrait" : "evidence"}` &&
+                  links.every((a) =>
+                    chapters.some((chapter) => `#${chapter.id}` === a.getAttribute("href")),
+                  ) &&
+                  (chapters.length <= 1 || links.length === chapters.length)
+                )
+              })(),
+              calendarCentered: [...document.querySelectorAll(".cal")].every((calendar) => {
+                const weeks = [...calendar.querySelectorAll(".cal-w")]
+                  .filter((week) => week.getClientRects().length > 0)
+                  .map((week) => week.getBoundingClientRect())
+                if (!weeks.length) return true
+                const container = calendar.getBoundingClientRect()
+                return (
+                  Math.abs(
+                    (weeks[0].left + weeks.at(-1).right) / 2 - container.left - container.width / 2,
+                  ) < 1
+                )
+              }),
               storyAligned: (() => {
                 if (selectedView !== "overview") return true
                 const story = document.querySelector(".portrait h2")
@@ -138,6 +161,8 @@ for (const look of LOOKS)
             !check.lang ||
             check.collapsed ||
             !check.centered ||
+            !check.calendarCentered ||
+            !check.readingPath ||
             !check.storyAligned ||
             check.hero !== (view === "overview")
           )
@@ -195,7 +220,13 @@ for (const look of LOOKS)
     await page.close()
   }
 for (const look of LOOKS)
-  for (const variant of ["legacy", "unclear", "long-private"]) {
+  for (const variant of [
+    "legacy",
+    "unclear",
+    "long-private",
+    "generation-unavailable",
+    "generation-zero",
+  ]) {
     const page = await browser.newPage({
       viewport: { width: 360, height: 900 },
       reducedMotion: "reduce",
@@ -206,6 +237,17 @@ for (const look of LOOKS)
       await page.locator(`label[for="report-${view}"]`).first().click()
       if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth))
         errors.push(`${view} overflow`)
+      if (view === "detail" && variant.startsWith("generation-")) {
+        const generation = page.locator("#report-generation")
+        const content = await generation.innerText()
+        if (
+          variant === "generation-unavailable" &&
+          (!content.includes("Cost unavailable") || content.includes("$0"))
+        )
+          errors.push("Unavailable usage is presented as a measured zero")
+        if (variant === "generation-zero" && !content.includes("known zero"))
+          errors.push("Confirmed zero lost its distinct state")
+      }
       await page.screenshot({ path: `${root}/${look}-${variant}-${view}.png`, fullPage: true })
     }
     results.push({ look, variant, width: 360, errors })
@@ -213,9 +255,11 @@ for (const look of LOOKS)
   }
 await browser.close()
 writeFileSync(`${root}/computed-styles.json`, `${JSON.stringify(styles, null, 2)}\n`)
-if (process.env.UPDATE_STYLES || !existsSync(STYLE_TABLE)) {
+if (process.env.UPDATE_STYLES) {
   writeFileSync(STYLE_TABLE, `${JSON.stringify(styles, null, 2)}\n`)
 } else {
+  if (!existsSync(STYLE_TABLE))
+    throw new Error("Missing report style baseline; restore it or review UPDATE_STYLES=1 output")
   const recorded = JSON.parse(readFileSync(STYLE_TABLE, "utf8"))
   for (const key of new Set([...Object.keys(recorded), ...Object.keys(styles)]))
     for (const selector of KEY_ELEMENTS) {

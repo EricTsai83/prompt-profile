@@ -9,6 +9,9 @@ permissions:
   contents: read
 
 jobs:
+  report-ui:
+    uses: ./.github/workflows/report-ui.yml
+
   check:
     strategy:
       fail-fast: false

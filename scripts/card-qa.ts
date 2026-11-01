@@ -11,6 +11,7 @@ import { Effect } from "effect"
 import satori from "satori"
 import { decodeProfile } from "../src/domain/Profile.ts"
 import { cardTree, renderCard } from "../src/report/card.ts"
+import { cardSummary } from "../src/report/card-summary.ts"
 import { CJK_FONTS, embeddedFonts } from "../src/report/fonts.ts"
 import { LOOK_IDS, PRODUCT_LOOK_IDS, CARD_PARTS } from "../src/report/looks.ts"
 
@@ -50,6 +51,7 @@ for (const look of selected(PRODUCT_LOOK_IDS)) {
         },
       },
     }
+    const footer = cardSummary(profile, "zh-TW", true, true).note
     for (let mask = 0; mask < 8; mask++) {
       const cardHide = CARD_PARTS.filter((_, i) => mask & (1 << i))
       const options = { look, cardHide }
@@ -61,13 +63,23 @@ for (const look of selected(PRODUCT_LOOK_IDS)) {
         onNodeDetected: (node) => {
           if (
             node.textContent &&
-            node.textContent !== "npx prompt-profile" &&
+            (node.left < 0 ||
+              node.top < 0 ||
+              node.left + node.width > 1201 ||
+              node.top + node.height > 631)
+          )
+            throw new Error(`Text exceeds card canvas: ${look}/${kind}/${mask}`)
+          if (
+            node.textContent &&
+            node.textContent !== footer &&
             node.top >= 120 &&
             node.left < 748
           ) {
             boxes++
             if (node.top + node.height > 518 || node.left + node.width > 748)
-              throw new Error(`Identity exceeds content region: ${look}/${kind}/${mask}`)
+              throw new Error(
+                `Identity exceeds content region: ${look}/${kind}/${mask} ${JSON.stringify({ left: node.left, top: node.top, width: node.width, height: node.height })}`,
+              )
           }
         },
       })

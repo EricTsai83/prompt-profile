@@ -59,13 +59,18 @@ jobs:
           path: prompt-profile.tgz
           if-no-files-found: error
 
+  # Reports must pass the same offline interaction and layout gate as pull requests.
+  report-ui:
+    needs: check
+    uses: ./.github/workflows/report-ui.yml
+
   # Standalone executables (plan 19): cross-compiled, then each run on its own platform
   binaries:
     needs: check
     uses: ./.github/workflows/binaries.yml
 
   github-release:
-    needs: [check, verify, binaries]
+    needs: [check, verify, binaries, report-ui]
     runs-on: ubuntu-latest
     permissions:
       contents: write

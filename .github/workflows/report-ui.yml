@@ -1,0 +1,31 @@
+name: Report UI
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    # The reviewed computed-style baseline uses macOS system fonts. Keep the host fixed;
+    # the normal check matrix still verifies the package on both Linux and macOS.
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium
+      - run: pnpm test:report-ui
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: report-ui-failure
+          path: tmp/template-qa/
+          retention-days: 7
+          if-no-files-found: ignore

@@ -13,11 +13,17 @@ pnpm install --frozen-lockfile
 pnpm test --project analysis  # choose the module you changed
 pnpm typecheck && pnpm lint && pnpm format:check && pnpm test
 pnpm test:package            # builds, packs, installs in a clean folder, and exercises the CLI
+pnpm exec playwright install chromium
+pnpm test:report-ui          # macOS browser baseline, interactions, accessibility and print
 ```
 
 Write a failing behavior test before changing code, and verify that it fails without the fix.
 Use Conventional Commits. Explain the user-visible behavior and validation in pull requests.
 Update `ANALYSIS_VERSION`, `PIPELINE_VERSION` or the profile schema version when applicable.
+
+Report changes must follow the [shared interaction contracts](docs/report-components.md).
+CI and release workflows enforce the browser checks with the lockfile's Chromium; they use
+fictional data and make no model calls. The reviewed style baseline uses macOS system fonts.
 
 ## Privacy and fixtures
 
