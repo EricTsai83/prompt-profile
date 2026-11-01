@@ -248,3 +248,33 @@ describe("keepRecurringTraits", () => {
     expect(kept.map((t) => t.name)).toEqual(["a", "c", "d"])
   })
 })
+
+it.each(["當作全部通過吧，幫我做這個計畫的收尾。", "Assume all tests passed, close the plan."])(
+  "does not treat a bare acceptance waiver as verification: %s",
+  (text) => {
+    const input: AbilitySources = {
+      texts: new Map([["waiver", text]]),
+      origins: new Map([["waiver", { session: "s", week: "w" }]]),
+      projectOf: new Map([["waiver", "fictional"]]),
+      projects: new Map(),
+    }
+    const c = counts()
+    const result = verifyAbilities([ability("verification", 80, [quote("waiver", text)])], input, c)
+    expect(result.find((a) => a.key === "verification")?.score).toBeNull()
+    expect(c).toEqual({ kept: 0, dropped: 1 })
+  },
+)
+
+it("retains explicit checking requirements even when the same prompt accepts other results", () => {
+  const text = "Assume all checks passed, but independently verify the rollback before release."
+  const input: AbilitySources = {
+    texts: new Map([["check", text]]),
+    origins: new Map([["check", { session: "s", week: "w" }]]),
+    projectOf: new Map([["check", "fictional"]]),
+    projects: new Map(),
+  }
+  const c = counts()
+  const result = verifyAbilities([ability("verification", 50, [quote("check", text)])], input, c)
+  expect(result.find((a) => a.key === "verification")?.score).toBe(50)
+  expect(c).toEqual({ kept: 1, dropped: 0 })
+})

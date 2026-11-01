@@ -101,3 +101,6 @@ requirements separately. Do not assess authorship. A description supports intend
 not execution, success or proficiency. Remove unsupported active-choice claims based only on
 automatic/Agent-selected contexts. Do not equate short invocations with low ability when
 explicit recorded requirements supply the context.
+
+Reject positive verification support based only on accepting/waiving results or closing a
+plan. An assistant's report of passing checks is not the user's verification practice.

@@ -28,6 +28,14 @@ export const projectConversations = (
   )
 }
 
+/** Bare waivers/closeout commands do not demonstrate result verification. */
+const VERIFICATION_WAIVERS: ReadonlyArray<RegExp> = [
+  /^(?:當作|視為|算作|當成)(?:全數|全部)(?:都)?通過吧?[，,。.]?(?:幫我做(?:這個)?(?:plan|計畫|計劃)的?(?:收尾|結案)[。.]?)?$/i,
+  /^(?:assume|treat)(?:all)?(?:tests|checks)(?:as)?passed[,!.]?(?:(?:please)?(?:closetheplan|wrapitup)[.!]?)?$/i,
+]
+const isBareWaiver = (quote: string) =>
+  VERIFICATION_WAIVERS.some((p) => p.test(quote.replace(/\s/g, "")))
+
 export const verifyAbilities = (
   drafts: LlmProfileDraft["abilities"],
   sources: AbilitySources,
@@ -36,12 +44,18 @@ export const verifyAbilities = (
   const checked = (
     draft: { score: number | null; evidence: ReadonlyArray<Evidence> } | undefined,
     project?: string,
+    verification = false,
   ) => {
     const texts =
       project === undefined
         ? sources.texts
         : new Map([...sources.texts].filter(([id]) => sources.projectOf.get(id) === project))
-    const evidence = verifyEvidence(draft?.evidence ?? [], texts, counts)
+    const checkedEvidence = verifyEvidence(draft?.evidence ?? [], texts, counts)
+    const evidence = verification
+      ? checkedEvidence.filter((e) => !isBareWaiver(e.quote))
+      : checkedEvidence
+    counts.kept -= checkedEvidence.length - evidence.length
+    counts.dropped += checkedEvidence.length - evidence.length
     const origins = evidence.flatMap((e) => sources.origins.get(e.promptId) ?? [])
     const support = {
       sessions: new Set(origins.map((o) => o.session)).size,
@@ -57,13 +71,14 @@ export const verifyAbilities = (
     const draft = drafts.find((d) => d.key === key)
     return {
       key,
-      ...checked(draft),
+      ...checked(draft, undefined, key === "verification"),
       byProject: [...sources.projects].map(([project, analysedSessions]) => ({
         project,
         analysedSessions,
         ...checked(
           draft?.byProject.find((p) => p.project === project),
           project,
+          key === "verification",
         ),
       })),
     }
