@@ -1,3 +1,4 @@
+import { InstructionTracker } from "../common/instruction-context.ts"
 import { DateTime, Effect, FileSystem, Option, Path, Schema, Stream } from "effect"
 import {
   type Origin,
@@ -336,7 +337,7 @@ export const makeClaudeCodeAdapter = (
         noteSlashCommand(state, line.sessionId, slash)
       }
       const rule = firstMatch(CLAUDE_RULES, candidate)
-      if (rule) {
+      if (rule && rule.name !== "slash-command") {
         diag.exclude(rule.name)
         if (rule.name === "analysis-marker" && line.sessionId !== undefined)
           state.markerSessions.add(line.sessionId)
@@ -359,7 +360,6 @@ export const makeClaudeCodeAdapter = (
         origin: toOrigin(line.entrypoint),
         client: line.entrypoint ?? null,
       }
-      state.sessionsWithPrompts.add(line.sessionId)
       return { uuid: line.uuid, record }
     }
 
@@ -452,14 +452,16 @@ export const makeClaudeCodeAdapter = (
         Stream.mapEffect(
           (file) => {
             diag.filesRead++
+            const instructions = new InstructionTracker()
             const fileState = { lastMs: null as number | null }
             const usage: Array<UsageCandidate> = []
             return readJsonl(fs, file, {
               ...usageCallbacks(diag, state),
               // "usage" last: a line found by it alone carries no technique
-              prefilter: ['"user"', ...TECHNIQUE_NEEDLES, '"usage"'],
+              prefilter: ['"user"', '"tool_use"', ...TECHNIQUE_NEEDLES, '"usage"'],
             }).pipe(
               Stream.map((l) => {
+                instructions.claude(l.value)
                 const decoded = decodeLine(l.value)
                 if (Option.isSome(decoded)) {
                   // only the lines techniques were read from before usage was added
@@ -472,7 +474,28 @@ export const makeClaudeCodeAdapter = (
               }),
               Stream.filter((c) => c !== undefined),
               Stream.runCollect,
-              Effect.map((candidates) => ({ candidates, usage })),
+              Effect.map((candidates) => {
+                for (let i = 0; i < instructions.rejected; i++)
+                  diag.exclude("instruction-context-rejected")
+                return {
+                  candidates: candidates.flatMap((c) => {
+                    if (
+                      c.record.text.trimStart().startsWith("<command-name>") &&
+                      !instructions.hasObserved(c.record.id)
+                    ) {
+                      diag.exclude("slash-command")
+                      return []
+                    }
+                    const contexts = instructions.forPrompt(c.record.id)
+                    return [
+                      contexts.length
+                        ? { ...c, record: { ...c.record, instructionContexts: contexts } }
+                        : c,
+                    ]
+                  }),
+                  usage,
+                }
+              }),
             )
           },
           { concurrency: READ_CONCURRENCY },
@@ -487,6 +510,7 @@ export const makeClaudeCodeAdapter = (
             return undefined
           }
           state.seenUuids.add(uuid)
+          state.sessionsWithPrompts.add(record.sessionId)
           return record
         }),
       )

@@ -276,6 +276,99 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
 {
   "additionalProperties": false,
   "properties": {
+    "abilities": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "byProject": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "evidence": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "promptId": {
+                        "type": "string",
+                      },
+                      "quote": {
+                        "type": "string",
+                      },
+                    },
+                    "required": [
+                      "promptId",
+                      "quote",
+                    ],
+                    "type": "object",
+                  },
+                  "type": "array",
+                },
+                "project": {
+                  "type": "string",
+                },
+                "score": {
+                  "type": [
+                    "number",
+                    "null",
+                  ],
+                },
+              },
+              "required": [
+                "project",
+                "score",
+                "evidence",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "evidence": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "promptId": {
+                  "type": "string",
+                },
+                "quote": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "promptId",
+                "quote",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "key": {
+            "enum": [
+              "context",
+              "planning",
+              "verification",
+              "steering",
+              "boundaries",
+              "recovery",
+            ],
+            "type": "string",
+          },
+          "score": {
+            "type": [
+              "number",
+              "null",
+            ],
+          },
+        },
+        "required": [
+          "key",
+          "score",
+          "evidence",
+          "byProject",
+        ],
+        "type": "object",
+      },
+      "type": "array",
+    },
     "archetype": {
       "additionalProperties": false,
       "properties": {
@@ -997,6 +1090,7 @@ exports[`LLM schemas > LlmProfileDraft produces a subset-compliant JSON Schema 1
     "archetype",
     "dimensions",
     "traits",
+    "abilities",
     "funFacts",
     "patterns",
     "improvements",

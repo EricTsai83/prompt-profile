@@ -365,7 +365,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "34",
+        analysisVersion: "37",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -406,7 +406,7 @@ describe("analyze", () => {
       const third = makeFakeLlmRunner({ respond })
       yield* run(third, cache, { ...options, noCache: true })
       // every chunk again, draft and review, and a label call per chunk
-      expect(third.calls()).toBe(chunkCalls * 2 + 2)
+      expect(third.calls()).toBe(chunkCalls + 2)
     }),
   )
 
@@ -554,8 +554,7 @@ describe("analyze", () => {
         runner: "claude-code",
       }).pipe(Effect.provideService(AnalysisCache, makeMemoryCache()))
       // map + label per chunk, draft, review, one translation
-      expect(p.llmCalls).toBe(p.chunks.length * 2 + 3)
-      expect(p.labelCalls).toBe(p.chunks.length)
+      expect(p.llmCalls).toBe(p.chunks.length + 3)
     }),
   )
 
@@ -566,14 +565,14 @@ describe("analyze", () => {
         Effect.provideService(AnalysisCache, cache),
       )
       expect(before.cacheHits).toBe(0)
-      expect(before.llmCalls).toBe(before.chunks.length * 2 + 2)
+      expect(before.llmCalls).toBe(before.chunks.length + 2)
       yield* run(makeFakeLlmRunner({ respond }), cache)
       const after = yield* plan({ prompts, options, runner: "claude-code" }).pipe(
         Effect.provideService(AnalysisCache, cache),
       )
       expect(after.cacheHits).toBe(after.chunks.length)
       // the trait labels are never cached
-      expect(after.llmCalls).toBe(2 + after.chunks.length)
+      expect(after.llmCalls).toBe(2)
       expect(after.charsToSend).toBe(0)
     }),
   )
@@ -925,25 +924,12 @@ it.effect("gives the draft step the measured share of each way of working", () =
   }),
 )
 
-it.effect("measures how often each verified trait shows by labelling every analysed chunk", () =>
+it.effect("does not call the retired label stage and keeps six ability slots", () =>
   Effect.gen(function* () {
     const fake = makeFakeLlmRunner({ respond })
     const profile = yield* run(fake)
-    const labelCalls = fake.log.filter((c) => c.schema === "LlmTraitLabels")
-    expect(labelCalls).toHaveLength(profile.coverage.chunksAnalyzed)
-    expect(labelCalls[0]!.system).toContain('"name":"steady"')
-    const steady = profile.traits.find((t) => t.name === "steady")!
-    // every chunk labels its first prompt, each in its own conversation
-    expect(steady.frequency).toMatchObject({
-      sessions: profile.coverage.chunksAnalyzed,
-      analysedSessions: profile.coverage.sessionsAnalyzed,
-    })
-    expect(profile.traits.find((t) => t.name === "single source")!.frequency?.sessions).toBe(0)
-    expect(profile.coverage.traitLabels).toEqual({
-      chunksLabelled: profile.coverage.chunksAnalyzed,
-      chunksFailed: 0,
-      rejected: 0,
-    })
+    expect(fake.log.filter((c) => c.schema === "LlmTraitLabels")).toHaveLength(0)
+    expect(profile.abilities).toHaveLength(6)
   }),
 )
 

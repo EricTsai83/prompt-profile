@@ -15,10 +15,6 @@ export interface ProgressShape {
   readonly onMergeCacheHit?: Effect.Effect<void>
   readonly onReduceDone: (durationMs: number) => Effect.Effect<void>
   readonly onVerified: (kept: number, dropped: number) => Effect.Effect<void>
-  /** Before the trait labelling pass, with the number of chunks to label. */
-  readonly onLabelStart?: (chunks: number) => Effect.Effect<void>
-  /** After it: chunks labelled out of those sent. */
-  readonly onLabelled?: (labelled: number, total: number) => Effect.Effect<void>
   /** Before each translation call. */
   readonly onTranslateStart: (language: string) => Effect.Effect<void>
   /** After the bounded attempts for a language; false means no valid translation survived. */

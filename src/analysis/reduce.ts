@@ -1,3 +1,5 @@
+import { instructionEvidence, type SafePrompt } from "../domain/index.ts"
+import { projectConversations, verifyAbilities } from "./abilities.ts"
 import { type DateTime, Effect } from "effect"
 import {
   DEFAULT_VOICE,
@@ -42,6 +44,7 @@ import {
   verifyDimensions,
   verifyImprovements,
   verifyTraits,
+  keepRecurringTraits,
   type EvidenceCounts,
 } from "./verify.ts"
 import { ANALYSIS_VERSION } from "./version.ts"
@@ -103,9 +106,10 @@ export const reduceInput = (input: {
       promptId: p.id,
       session: `${p.source}:${p.sessionId}`,
       time: p.timestamp.toString(),
+      project: p.project,
     }))
   const contextSources = sourceContext(prompts, citedIds)
-  return `sourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}${input.axisBalance ? `\n\naxisBalance:\n${JSON.stringify(input.axisBalance)}` : ""}\n\nepisodes:\n${JSON.stringify(episodesForReduce(input.episodes))}\n\nobservations:\n${observationsText(input.observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
+  return `instructionContexts:\n${JSON.stringify(instructionContextForReduce(prompts))}\n\nprojectConversations:\n${JSON.stringify([...projectConversations(prompts)])}\n\nsourceExcerpts:\n${JSON.stringify(contextSources)}\n\npromptContext:\n${JSON.stringify(promptContext)}${input.axisBalance ? `\n\naxisBalance:\n${JSON.stringify(input.axisBalance)}` : ""}\n\nepisodes:\n${JSON.stringify(episodesForReduce(input.episodes))}\n\nobservations:\n${observationsText(input.observations)}\n\nstats:\n${JSON.stringify(statsForReduce(input.stats))}`
 }
 
 export interface Drafts {
@@ -142,6 +146,20 @@ export const draftProfile = (
     yield* progress.onReduceDone(initial.durationMs + reviewed.durationMs)
     return { initial, reviewed }
   })
+
+const instructionContextForReduce = (prompts: ReadonlyArray<SafePrompt>) => {
+  const all = prompts
+    .flatMap((p) => p.instructionContexts ?? [])
+    .map((c) => (c.selection === "user_explicit" ? c : { ...c, content: null }))
+  let size = 0
+  const included = all.filter((c) => {
+    const length = JSON.stringify(c).length
+    if (size + length > 20_000) return false
+    size += length
+    return true
+  })
+  return { included, eligible: all.length, omitted: all.length - included.length }
+}
 
 const sessionKey = (p: { readonly source: string; readonly sessionId: string }) =>
   `${p.source}:${p.sessionId}`
@@ -237,11 +255,15 @@ export const verifyProfile = (input: {
   const originOf = (chunks: ReadonlyArray<MapOutcome>) =>
     new Map(
       chunks.flatMap((o) =>
-        o.chunk.prompts.map((p) => [p.id, { session: sessionKey(p), week: o.chunk.id }] as const),
+        o.chunk.prompts.flatMap((p) =>
+          instructionEvidence(p).map(
+            ([id]) => [id, { session: sessionKey(p), week: o.chunk.id }] as const,
+          ),
+        ),
       ),
     )
   const origins = originOf(analyzed)
-  const texts = new Map(analyzedPrompts.map((p) => [p.id, p.text]))
+  const texts = new Map(analyzedPrompts.flatMap(instructionEvidence))
   const collaboration = verifyCollaboration(
     draft.value.collaboration,
     episodes,
@@ -266,7 +288,23 @@ export const verifyProfile = (input: {
   }
   const portrait = narrativeRejected ? null : checkedPortrait
   const code = portrait ? roleCode(portrait.axes) : null
-  const traits = verifyTraits(profile.traits, texts, counts, originOf(outcomes))
+  const traits = keepRecurringTraits(
+    verifyTraits(profile.traits, texts, counts, originOf(outcomes)),
+  )
+  const abilities = verifyAbilities(
+    draft.value.abilities,
+    {
+      texts,
+      origins,
+      projectOf: new Map(
+        analyzedPrompts.flatMap((p) =>
+          instructionEvidence(p).map(([id]) => [id, p.project] as const),
+        ),
+      ),
+      projects: projectConversations(analyzedPrompts),
+    },
+    counts,
+  )
   const dimensions = verifyDimensions(profile.dimensions, texts, counts)
   const improvements = verifyImprovements(profile.improvements.slice(0, 2), texts, counts)
   // A fabricated quote drops its own item; only a large share of them, a rejected narrative
@@ -291,6 +329,8 @@ export const verifyProfile = (input: {
               : (traits[0]?.name ?? (code ? ROLE_NAMES[code]! : "Collaboration Portrait")),
           },
       traits,
+      instructionContexts: analyzedPrompts.flatMap((p) => p.instructionContexts ?? []),
+      abilities,
       collaboration,
       narrative: summariesUnsafe ? null : narrative,
       funFacts: verifyFunFacts(profile.funFacts, input.stats),
@@ -317,6 +357,9 @@ export const evidenceOriginsOf = (
   analyzed: ReadonlyArray<AnalyzedChunk>,
 ): Array<EvidenceOrigin> => {
   const cited = new Set([
+    ...profile.abilities.flatMap((a) =>
+      [...a.evidence, ...a.byProject.flatMap((p) => p.evidence)].map((e) => e.promptId),
+    ),
     ...profile.traits.flatMap((t) => t.evidence.map((e) => e.promptId)),
     ...profile.dimensions.flatMap((t) => t.evidence.map((e) => e.promptId)),
     ...profile.improvements.flatMap((t) => t.evidence.map((e) => e.promptId)),
@@ -329,19 +372,19 @@ export const evidenceOriginsOf = (
   ])
   return analyzed.flatMap((o) =>
     o.chunk.prompts
-      .filter((p) => cited.has(p.id))
+      .filter((p) => instructionEvidence(p).some(([id]) => cited.has(id)))
       .flatMap((p) => {
         const position = o.chunk.positions.get(p.id)
         return position
-          ? [
-              {
-                promptId: p.id,
+          ? instructionEvidence(p)
+              .filter(([id]) => cited.has(id))
+              .map(([id]) => ({
+                promptId: id,
                 session: position.session,
                 time: p.timestamp,
                 turn: position.turn,
                 of: position.of,
-              },
-            ]
+              }))
           : []
       }),
   )

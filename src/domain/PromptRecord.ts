@@ -1,3 +1,4 @@
+import { InstructionContext } from "./InstructionContext.ts"
 import { Schema } from "effect"
 import { Origin, SourceId } from "./Source.ts"
 
@@ -5,6 +6,7 @@ import { Origin, SourceId } from "./Source.ts"
 export const PromptRecord = Schema.Struct({
   /** `${source}:${sessionId}:${uuid | ordinal}` — must be stable across runs. */
   id: Schema.String,
+  instructionContexts: Schema.optionalKey(Schema.Array(InstructionContext)),
   source: SourceId,
   sessionId: Schema.String,
   timestamp: Schema.DateTimeUtcFromString,

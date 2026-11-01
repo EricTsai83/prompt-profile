@@ -8,14 +8,14 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   Codex              6 prompts · 4 sessions
 ● Cleaning and redacting (on this computer)
   Skipped 0 noisy prompts (-)
-  Redacted 1 sensitive items (PATH 1)
+  Redacted 3 sensitive items (PATH 3)
 ● Range: all time · 2026-05-29 → 2026-09-05
   In range: Claude Code 9 · Codex 6 prompts
   15 prompts in 7 sessions after cleaning → 15 selected in 2 chunks
   No sampling: every chunk is analysed
   Read, cleaned and redacted on this computer; the report and analysis cache are written only here.
 ● Sent off this computer: the selected, redacted prompts go through your logged-in Claude Code CLI (claude -p) to its model service
-  No API key: uses your subscription quota, base estimate 6 calls (2 chunks + 1 final profile + 1 evidence review + 2 trait labels)
+  No API key: uses your subscription quota, base estimate 4 calls (2 chunks + 1 final profile + 1 evidence review)
   Intermediate merges and retries (up to 2 per call) can add calls.
   No hard limit: add --max-calls <n> to stop after n CLI calls.
   Free first: --dry-run writes what would be sent without calling any LLM; \`prompt-profile stats\` shows statistics.
@@ -27,8 +27,6 @@ Execution: <execution> · model: CLI default (unverified)
 ● Writing the profile…
 Reviewing the draft against source evidence…
 ● Verifying evidence: kept 8 / 8
-● Measuring how often each trait shows (2 chunks)…
-  Traits measured on all 2 chunks
 ● Writing report files…
 
 ✔ Done!
@@ -37,14 +35,14 @@ Reviewing the draft against source evidence…
   Data   <tmp>/out/reports/<run>/profile.json
   Library <tmp>/out/index.html
   Contains  8 quotes · 3 project names · exact dates · 1 improvement · 3 fun facts · plans, usage and API list-price equivalent
-  Check  no secrets or personal data found
+  Check  2 masked: credit-card (instructionContexts › 1)
   Before sharing, skim the quotes yourself: the check is rule-based.
   To leave parts out: prompt-profile render <tmp>/out/reports/<run>/profile.json --exclude personal
 Execution outcome: succeeded · command elapsed: 0 ms · generation elapsed: 0 ms
 Generation models: claude-code/fake-model (reported)
-Model calls: 6 · retries: 0 · local cache hits: 0
-Tokens: 0 measured (unavailable; 6 attempts incomplete). Input 0, output 0, cache read 0, cache write 5m 0, 1h 0, unknown duration 0. Reasoning is included in output.
-Generation cost: USD 0.000000 measured subtotal (unavailable; 0 reported, 0 estimated, 6 unknown). This is not a subscription bill.
+Model calls: 4 · retries: 0 · local cache hits: 0
+Tokens: 0 measured (unavailable; 4 attempts incomplete). Input 0, output 0, cache read 0, cache write 5m 0, 1h 0, unknown duration 0. Reasoning is included in output.
+Generation cost: USD 0.000000 measured subtotal (unavailable; 0 reported, 0 estimated, 4 unknown). This is not a subscription bill.
 Execution metadata: <tmp>/out/executions/<execution>/summary.json"
 `;
 

@@ -1,3 +1,4 @@
+import { InstructionContext } from "./InstructionContext.ts"
 import { Schema } from "effect"
 import { SourceId } from "./Source.ts"
 
@@ -7,6 +8,7 @@ import { SourceId } from "./Source.ts"
  */
 export const SafePrompt = Schema.Struct({
   id: Schema.String,
+  instructionContexts: Schema.optionalKey(Schema.Array(InstructionContext)),
   sessionId: Schema.String,
   source: SourceId,
   timestamp: Schema.DateTimeUtcFromString,

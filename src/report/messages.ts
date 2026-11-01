@@ -567,24 +567,26 @@ export const PORTRAIT_MESSAGES = {
   },
 } as const
 
-/** The trait radar: how often each trait shows (`Trait.frequency`). */
+/** Ability scores and their evidence limits. */
 export const RADAR_MESSAGES = {
   en: {
-    title: "How often each trait shows",
-    note: "Each axis is one trait, from 0% at the center to 100% at the edge: the share of analysed conversations that show it, counted from verified prompts. Each trait is counted on its own, so several can reach 100% at once. A measurement of these conversations, not an ability score.",
-    of: (sessions: number, of: number) => `${sessions} of ${of} conversations`,
+    title: "AI collaboration abilities",
+    note: "Scores assess collaboration skill from verified quotes in these conversations, from 0% to 100%. Above 60 needs two conversations; above 85 needs three across two analysed periods. Not assessed means no supported score, not low ability.",
+    support: (sessions: number, periods: number) =>
+      `Cited evidence: ${sessions} conversations, ${periods} analysed periods`,
     byProject: "By project",
     byProjectNote:
-      "The same traits, counted within each project's analysed conversations. Only projects with 20 or more analysed conversations are listed: with fewer, one conversation moves a share too much.",
+      "The same abilities scored from each project's quotes. Only projects with 20 or more analysed conversations are listed: with fewer, evidence is too limited.",
     conversations: (n: number) => `${n} ${n === 1 ? "conversation" : "conversations"}`,
   },
   "zh-TW": {
-    title: "各特質出現的頻率",
-    note: "每根軸是一個特質，中心是 0%、外圈是 100%：在已分析的對話中，有多少比例展現這個特質，依已驗證的提示計算。每個特質各自計算，所以可以同時有好幾個達到 100%。這是對這些對話的量測，不是能力分數。",
-    of: (sessions: number, of: number) => `${of} 段對話中的 ${sessions} 段`,
+    title: "AI 協作能力",
+    note: "能力分數依這些對話中已驗證的引文評估，範圍為 0% 到 100%。超過 60 分需要兩段對話；超過 85 分需要三段對話、橫跨兩個分析時段。尚未評估表示沒有足夠依據，不代表能力低。",
+    support: (sessions: number, periods: number) =>
+      `引用依據：${sessions} 段對話、${periods} 個分析時段`,
     byProject: "各專案",
     byProjectNote:
-      "同一組特質，分別在每個專案已分析的對話中計算。只列出已分析對話 20 段以上的專案：對話太少時，一段對話就會讓比例變動太多。",
+      "同一組能力，依各專案的引文分別評分。只列出已分析對話 20 段以上的專案：對話太少時，評分依據不足。",
     conversations: (n: number) => `${n} 段對話`,
   },
 } as const
@@ -1440,6 +1442,62 @@ export const GENERATION_MESSAGES = {
       running: "執行中",
       interrupted: "已中斷",
       unknown: "未知",
+    },
+  },
+} as const
+
+export const ABILITY_MESSAGES = {
+  en: {
+    context: "Providing context",
+    planning: "Planning",
+    verification: "Verifying results",
+    steering: "Steering",
+    boundaries: "Risk and boundaries",
+    recovery: "Recovery",
+    unknown: "Not assessed",
+  },
+  "zh-TW": {
+    context: "提供脈絡",
+    planning: "拆解與規劃",
+    verification: "驗證結果",
+    steering: "引導與修正",
+    boundaries: "風險與界線",
+    recovery: "從錯誤中恢復",
+    unknown: "尚未評估",
+  },
+} as const
+
+export const INSTRUCTION_MESSAGES = {
+  en: {
+    title: "Reusable instructions: purpose and selection",
+    note: "Names and recorded descriptions identify purpose. Actual recorded instructions show the requirements supplied. Explicit user selection can support a choice of method; automatic or Agent-selected tools provide workflow context. Descriptions alone do not prove checks ran or establish proficiency. Missing content remains unknown.",
+    selection: {
+      user_explicit: "User explicitly selected",
+      agent_selected: "Agent read; no explicit user selection observed",
+      automatic: "Automatically supplied",
+      unknown: "Selection unknown",
+    },
+    purpose: "Documented purpose",
+    status: {
+      recorded: "Recorded content",
+      truncated: "Recorded excerpt (truncated)",
+      missing: "Content unavailable",
+    },
+  },
+  "zh-TW": {
+    title: "可重用指令的用途與選用來源",
+    note: "名稱與紀錄中的簡介用來辨識用途，實際指令內容則呈現帶入的要求。使用者明確選用可支持協作方法的判斷；自動載入或 Agent 選用則作為流程背景。簡介不代表已完成檢查或具備專業能力；缺少內容時保留未知。",
+    selection: {
+      user_explicit: "使用者明確指定",
+      agent_selected: "Agent 讀取；未觀察到使用者明確指定",
+      automatic: "自動提供",
+      unknown: "選用來源未知",
+    },
+    purpose: "文件所述用途",
+    status: {
+      recorded: "紀錄中的內容",
+      truncated: "紀錄中的片段（已截斷）",
+      missing: "沒有內容紀錄",
     },
   },
 } as const

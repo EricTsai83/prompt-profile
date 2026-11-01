@@ -68,7 +68,9 @@ A Chinese-only request stops if translation still fails; it does not substitute 
 
 Observations cite verified prompt quotes, but quote matching and model review do not prove an
 interpretation is correct. Small histories may show “Early observations” instead of a role.
-These are observations about your prompts, not a psychological assessment or an ability score.
+The [radar](docs/ability-scores.md) assesses six AI collaboration abilities from verified quotes in these conversations. Scores describe supported practice, not psychological traits or population ranks; “not assessed” is not a low score.
+
+New analyses also retain [reusable instruction provenance](docs/instruction-provenance.md): what a skill is documented to do, who selected it for the task, and which historical requirements were supplied.
 
 ## Usage
 
@@ -133,7 +135,9 @@ With a subscription these calls use your plan's quota; the dollar figures are wh
 tokens would cost on the API, not a bill. Another model, `--effort` level or history mix will
 change them.
 
-Where the calls go (both engines):
+The measured costs above include 21 label calls that new runs no longer make. New costs have not yet been measured.
+
+Historical breakdown (before ability scoring; the label stage below has now been removed):
 
 | Stage          | Calls                | What it does                                             | Share of cost (Claude / Codex) |
 | -------------- | -------------------- | -------------------------------------------------------- | ------------------------------ |
@@ -145,20 +149,20 @@ Where the calls go (both engines):
 
 ### Scale reference
 
-Base call estimates for the same history at different `--since` ranges (from `--dry-run`, so
+Current base call estimates for the same history at different `--since` ranges (from `--dry-run`, so
 merges and retries come on top):
 
 | Range              | Prompts after cleaning | Conversations | Chunks analysed / total | Base calls |
 | ------------------ | ---------------------- | ------------- | ----------------------- | ---------- |
-| 2 days             | 392                    | 55            | 10 / 10 (no sampling)   | 23         |
-| 1 week             | 1,278                  | 195           | 16 / 34                 | 35         |
-| 2 weeks            | 1,690                  | 241           | 18 / 40                 | 39         |
-| 1 month            | 3,132                  | 448           | 23 / 60                 | 49         |
-| 2 months (default) | 4,038                  | 611           | 21 / 68                 | 45         |
-| 6 months           | 7,605                  | 1,629         | 26 / 111                | 55         |
-| All (7 months)     | 7,884                  | 1,686         | 25 / 115                | 53         |
+| 2 days             | 392                    | 29            | 10 / 10 (no sampling)   | 13         |
+| 1 week             | 1,278                  | 195           | 16 / 34                 | 19         |
+| 2 weeks            | 1,690                  | 241           | 18 / 40                 | 21         |
+| 1 month            | 3,132                  | 448           | 23 / 60                 | 26         |
+| 2 months (default) | 4,038                  | 611           | 21 / 68                 | 24         |
+| 6 months           | 7,605                  | 1,629         | 26 / 111                | 29         |
+| All (7 months)     | 7,884                  | 1,686         | 25 / 115                | 28         |
 
-As a rule of thumb, a sampled run costs about two calls per analysed chunk plus a handful, and
+As a rule of thumb, a sampled run costs about one call per analysed chunk plus a handful, and
 time and cost follow the number of analysed chunks: a history of a few hundred prompts takes
 about half of the measured run above, and anything past ~1,300 prompts costs about the same.
 `--full` on the 6-month history would analyse 111 chunks, about five times the measured run.

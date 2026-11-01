@@ -1,3 +1,4 @@
+import { InstructionContext } from "./InstructionContext.ts"
 import { GenerationMetadata } from "./Execution.ts"
 import { Voice } from "./Voice.ts"
 import { EvidenceOrigin } from "./EvidenceOrigin.ts"
@@ -15,7 +16,7 @@ import { Snapshot } from "./Progress.ts"
 import { Stats } from "./Stats.ts"
 import { Usage } from "./Usage.ts"
 
-export const PROFILE_SCHEMA_VERSION = 23 as const
+export const PROFILE_SCHEMA_VERSION = 26 as const
 
 /**
  * The `schemaVersion`s `decodeProfile` reads: the current format and the released ones,
@@ -26,6 +27,8 @@ export const PROFILE_SCHEMA_VERSION = 23 as const
 export const READABLE_SCHEMA_VERSIONS: ReadonlySet<unknown> = new Set([
   8,
   14,
+  24, // Existing local ability reports remain renderable.
+  25,
   PROFILE_SCHEMA_VERSION,
 ])
 
@@ -129,24 +132,45 @@ export const Support = Schema.Struct({ sessions: Count, weeks: Count })
 export type Support = typeof Support.Type
 
 /**
- * Fewest analysed conversations a project needs to be stored with its trait counts: fewer make
- * jumpy percentages (one conversation of 11 moves a share by 9 points), and small working
- * folders can carry names the person would not publish.
+ * Fewest analysed conversations a project needs for its own ability scores: fewer give too
+ * little evidence to score, and small working folders can carry names the person would not
+ * publish.
  */
 export const MIN_PROJECT_CONVERSATIONS = 20
 
+/** The fixed AI collaboration abilities the radar scores, in spoke order. */
+export const ABILITY_KEYS = [
+  "context",
+  "planning",
+  "verification",
+  "steering",
+  "boundaries",
+  "recovery",
+] as const
+export const AbilityKey = Schema.Literals(ABILITY_KEYS)
+export type AbilityKey = typeof AbilityKey.Type
+
+const Score = Schema.Int.check(Schema.isBetween({ minimum: 0, maximum: 100 }))
+
 /**
- * How many analysed conversations show a trait, from the labelling pass: overall and per
- * project with at least MIN_PROJECT_CONVERSATIONS. A count over a sample of the history.
+ * One ability score: 0–100 from verified quotes, capped by their spread (`support`); null when
+ * no verified quote supports it ("not assessed", never 0).
  */
-export const TraitFrequency = Schema.Struct({
-  sessions: Count,
-  analysedSessions: Count,
+const AbilityScoreFields = {
+  score: Schema.NullOr(Score),
+  evidence: Schema.Array(Evidence),
+  support: Support,
+}
+
+export const Ability = Schema.Struct({
+  key: AbilityKey,
+  ...AbilityScoreFields,
+  /** The same ability scored from one project's quotes only (projects with enough conversations). */
   byProject: Schema.Array(
-    Schema.Struct({ project: Schema.String, sessions: Count, analysedSessions: Count }),
+    Schema.Struct({ project: Schema.String, analysedSessions: Count, ...AbilityScoreFields }),
   ),
 })
-export type TraitFrequency = typeof TraitFrequency.Type
+export type Ability = typeof Ability.Type
 
 export const Trait = Schema.Struct({
   name: Schema.String,
@@ -155,10 +179,6 @@ export const Trait = Schema.Struct({
   evidence: Schema.Array(Evidence),
   /** Filled by verification; null in profiles before schema version 5. */
   support: Schema.NullOr(Support).pipe(Schema.withDecodingDefaultKey(Effect.succeed(null))),
-  /** Measured by the labelling pass; null when not measured (and before schema version 22). */
-  frequency: Schema.NullOr(TraitFrequency).pipe(
-    Schema.withDecodingDefaultKey(Effect.succeed(null)),
-  ),
 })
 export type Trait = typeof Trait.Type
 
@@ -198,10 +218,6 @@ export const Coverage = Schema.Struct({
   /** Interaction episodes found, rejected and selected; null before schema version 11. */
   episodes: Schema.NullOr(EpisodeCoverage).pipe(
     Schema.withDecodingDefaultKey(Effect.succeed(null)),
-  ),
-  /** The trait labelling pass: chunks labelled and failed, and labels rejected. */
-  traitLabels: Schema.optionalKey(
-    Schema.Struct({ chunksLabelled: Count, chunksFailed: Count, rejected: Count }),
   ),
 })
 export type Coverage = typeof Coverage.Type
@@ -310,7 +326,12 @@ const ProfileFields = Schema.Struct({
   headline: Schema.String,
   archetype: Schema.Struct({ name: Schema.String, description: Schema.String }),
   dimensions: Schema.Array(Dimension).check(hasEachDimensionOnce),
+  instructionContexts: Schema.Array(InstructionContext).pipe(
+    Schema.withDecodingDefaultKey(Effect.succeed([])),
+  ),
   traits: Schema.Array(Trait),
+  /** AI collaboration ability scores, one per ABILITY_KEYS; empty before schema version 24. */
+  abilities: Schema.Array(Ability).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   funFacts: Schema.Array(Schema.String),
   /** Missing in profiles before schema version 6. */
   improvements: Schema.Array(Improvement).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),

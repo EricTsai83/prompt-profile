@@ -71,7 +71,7 @@ describe("render options", () => {
       }
       for (const look of LOOK_IDS) {
         const text = texts(cardTree(profile, { look, cardHide: [] }, "en"))
-        expect(text).toContain("Supported observation")
+        expect(text).toContain(look === "classic" ? "Providing context" : "Supported observation")
         expect(text).not.toContain("Weak observation")
         expect(text).not.toContain("Unsupported observation")
       }
@@ -163,7 +163,11 @@ describe("looks: card", () => {
         expect(text).toContain(p.archetype.name)
         expect({
           variant: variantName(options),
-          traits: text.includes(p.traits[0]!.name),
+          traits: text.includes(
+            options.look === "classic" && !options.cardHide.includes("graphic")
+              ? "Providing context"
+              : p.traits[0]!.name,
+          ),
           stats: text.includes(prompts),
           graphic: types(tree).includes("img"),
         }).toEqual({
@@ -231,7 +235,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 3,
         look: "afterhours",
-        lookVersion: 33,
+        lookVersion: 36,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",

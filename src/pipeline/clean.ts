@@ -189,7 +189,15 @@ export const cleanRecords = (
       preserveFollowups &&
       contextualSessions.has(sessionKey) &&
       ACK_SET.has(stripPunctuation(record.text))
-    if (rule && !followup && !(rule.name === "too-short" && record.hasImage)) {
+    if (
+      rule &&
+      !followup &&
+      !(
+        rule.name === "too-short" &&
+        (record.hasImage ||
+          record.instructionContexts?.some((c) => c.selection === "user_explicit"))
+      )
+    ) {
       increment(excluded, rule.name)
       continue
     }

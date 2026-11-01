@@ -1,7 +1,8 @@
-import { MIN_PROJECT_CONVERSATIONS, type Profile, type TraitFrequency } from "../domain/index.ts"
+import { makeVerbatim, quotes } from "./traits.ts"
+import { MIN_PROJECT_CONVERSATIONS, type Profile } from "../domain/index.ts"
 import { html, type Raw } from "./html-template.ts"
 import type { Loc } from "./loc.ts"
-import { RADAR_MESSAGES } from "./messages.ts"
+import { RADAR_MESSAGES, ABILITY_MESSAGES } from "./messages.ts"
 import type { Scrub, Visibility } from "./visibility.ts"
 
 /** Label font size on the large radar (`.radar-label`), and the room a label needs beside it. */
@@ -26,21 +27,9 @@ export const MIN_RADAR_TRAITS = 3
 /** Most project radars shown, busiest first. */
 export const MAX_PROJECT_RADARS = 3
 
-type Measured = { readonly index: number; readonly frequency: TraitFrequency }
-
-const share = (sessions: number, of: number) => (of === 0 ? 0 : Math.round((sessions / of) * 100))
-
-/** The traits with a measured frequency, or none when fewer than MIN_RADAR_TRAITS have one. */
-const measuredTraits = (p: Profile): ReadonlyArray<Measured> => {
-  const measured = p.traits.flatMap((t, index) =>
-    t.frequency && t.frequency.analysedSessions > 0 ? [{ index, frequency: t.frequency }] : [],
-  )
-  return measured.length >= MIN_RADAR_TRAITS ? measured : []
-}
-
 /** The grid, the shape and its points; axis labels only on the large radar. */
 const radarSvg = (
-  values: ReadonlyArray<number>,
+  values: ReadonlyArray<number | null>,
   label: (i: number, attrs: string) => Raw | null,
   title: (i: number) => string,
   size: { readonly r: number; readonly padX: number; readonly padY: number },
@@ -66,8 +55,9 @@ const radarSvg = (
       const [x, y] = at(i, 100)
       return html`<line class="radar-grid" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" />`
     })}
-    <polygon class="radar-shape" points="${shape(values)}" />
+    ${values.every((v) => v !== null) ? html`<polygon class="radar-shape" points="${shape(values.map((v) => v ?? 0))}" />` : ""}
     ${values.map((v, i) => {
+      if (v === null) return ""
       const [x, y] = at(i, v)
       return html`<circle class="radar-point" cx="${x}" cy="${y}" r="4.5"><title>${title(i)}</title></circle>`
     })}
@@ -79,48 +69,44 @@ const radarSvg = (
   </svg>`
 }
 
-/**
- * How often each trait shows, as a radar: one axis per measured trait, 0% at the center and
- * 100% at the edge. Each trait is a share of the analysed conversations on its own, so several
- * may reach 100%. Projects with enough conversations get their own small radar on the same
- * axes, unless project names are excluded.
- */
+/** Six ability scores; missing scores have labeled spokes but no point or filled shape. */
 export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): Raw | null => {
-  const traits = measuredTraits(p)
+  const traits = p.abilities
   if (traits.length === 0) return null
   const name = (i: number) => (l: Parameters<Scrub>[1]) =>
-    scrub(p.translations[l]?.traits[traits[i]!.index]?.name ?? p.traits[traits[i]!.index]!.name, l)
-  const overall = traits.map((t) => share(t.frequency.sessions, t.frequency.analysedSessions))
+    scrub(ABILITY_MESSAGES[l][traits[i]!.key], l)
+  const overall = traits.map((t) => t.score)
   const projects = v.projects
-    ? (traits[0]!.frequency.byProject ?? [])
+    ? [...new Map(traits.flatMap((t) => t.byProject).map((pr) => [pr.project, pr])).values()]
         .filter((pr) => pr.analysedSessions >= MIN_PROJECT_CONVERSATIONS)
         .toSorted((a, b) => b.analysedSessions - a.analysedSessions)
         .slice(0, MAX_PROJECT_RADARS)
         .map((pr) => pr.project)
     : []
   const inProject = (project: string) =>
-    traits.map((t) => {
-      const pr = t.frequency.byProject.find((x) => x.project === project)
-      return pr ? share(pr.sessions, pr.analysedSessions) : 0
-    })
+    traits.map((t) => t.byProject.find((pr) => pr.project === project)?.score ?? null)
+  const value = (score: number | null, l: Parameters<Scrub>[1]) =>
+    score === null ? ABILITY_MESSAGES[l].unknown : `${score}%`
   return html`<section class="trait-radar">
     <h2>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].title)}</h2>
     <p class="note">${loc.text((_m, _c, l) => RADAR_MESSAGES[l].note)}</p>
     <div class="radar-main">${radarSvg(
       overall,
-      (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${overall[i]}%`),
-      (i) => loc.attr((_m, _c, l) => `${name(i)(l)}: ${overall[i]}%`),
+      (i, attrs) => loc.svgText(attrs, (_m, _c, l) => `${name(i)(l)} ${value(overall[i]!, l)}`),
+      (i) => loc.attr((_m, _c, l) => `${name(i)(l)}: ${value(overall[i]!, l)}`),
       {
         r: 130,
         padX: labelRoom(
-          traits.map((_, i) => p.languages.map((l) => `${name(i)(l)} ${overall[i]}%`)).flat(),
+          traits
+            .map((_, i) => p.languages.map((l) => `${name(i)(l)} ${value(overall[i]!, l)}`))
+            .flat(),
         ),
         padY: 26,
       },
     )}</div>
     <ul class="radar-values">${traits.map(
       (t, i) =>
-        html`<li><b>${loc.text((_m, _c, l) => name(i)(l))}</b> <span>${overall[i]}%</span> <small>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].of(t.frequency.sessions, t.frequency.analysedSessions))}</small></li>`,
+        html`<li><b>${loc.text((_m, _c, l) => name(i)(l))}</b> <span>${loc.text((_m, _c, l) => value(overall[i]!, l))}</span> <small>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].support(t.support.sessions, t.support.weeks))}</small>${v.quotes ? quotes(t.evidence, makeVerbatim(loc, v, scrub)) : ""}</li>`,
     )}</ul>
   </section>${
     projects.length === 0
@@ -131,15 +117,15 @@ export const traitRadar = (p: Profile, loc: Loc, v: Visibility, scrub: Scrub): R
     <div class="radar-grid-list">${projects.map((project) => {
       const values = inProject(project)
       const analysed =
-        traits[0]!.frequency.byProject.find((x) => x.project === project)?.analysedSessions ?? 0
+        traits[0]!.byProject.find((x) => x.project === project)?.analysedSessions ?? 0
       return html`<figure><figcaption>${project} <small>${loc.text((_m, _c, l) => RADAR_MESSAGES[l].conversations(analysed))}</small></figcaption>${radarSvg(
         values,
         () => null,
-        (i) => loc.attr((_m, _c, l) => `${project} · ${name(i)(l)}: ${values[i]}%`),
+        (i) => loc.attr((_m, _c, l) => `${project} · ${name(i)(l)}: ${value(values[i]!, l)}`),
         { r: 60, padX: 10, padY: 10 },
       )}<ul class="radar-mini-values">${traits.map(
         (_, i) =>
-          html`<li><span>${loc.text((_m, _c, l) => name(i)(l))}</span> <b>${values[i]}%</b></li>`,
+          html`<li><span>${loc.text((_m, _c, l) => name(i)(l))}</span> <b>${loc.text((_m, _c, l) => value(values[i]!, l))}</b></li>`,
       )}</ul></figure>`
     })}</div>
   </section>`

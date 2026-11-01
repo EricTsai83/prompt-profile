@@ -5,6 +5,7 @@ import type { ChunkObservations } from "../ChunkObservations.ts"
 import { ENDINGS, TASK_TYPES, TURN_ROLES } from "../Episode.ts"
 import { INTERVENTION_KINDS } from "../Steering.ts"
 import {
+  ABILITY_KEYS,
   CONFIDENCES,
   DIMENSION_KEYS,
   MAX_QUOTE_LENGTH,
@@ -79,14 +80,6 @@ export const LlmChunkAnalysis = Schema.Struct({
   ),
 })
 export type LlmChunkAnalysis = typeof LlmChunkAnalysis.Type
-
-/** What the labelling pass returns for one chunk: each prompt that shows a listed trait. */
-export const LlmTraitLabels = Schema.Struct({
-  labels: Schema.Array(
-    Schema.Struct({ promptId: Schema.String, trait: Schema.String, quote: Schema.String }),
-  ),
-})
-export type LlmTraitLabels = typeof LlmTraitLabels.Type
 
 const LlmPortrait = Schema.Struct({
   introduction: Schema.String,
@@ -181,6 +174,24 @@ export const LlmProfileDraft = Schema.Struct({
       evidence: Schema.Array(LlmEvidence),
     }),
   ),
+  /**
+   * One score per ability (0–100, or null when not assessed), with quotes; `byProject` scores
+   * the same ability from one listed project's quotes only. The program caps and verifies them.
+   */
+  abilities: Schema.Array(
+    Schema.Struct({
+      key: Schema.Literals(ABILITY_KEYS),
+      score: Schema.NullOr(Schema.Finite),
+      evidence: Schema.Array(LlmEvidence),
+      byProject: Schema.Array(
+        Schema.Struct({
+          project: Schema.String,
+          score: Schema.NullOr(Schema.Finite),
+          evidence: Schema.Array(LlmEvidence),
+        }),
+      ),
+    }),
+  ).pipe(Schema.withDecodingDefaultKey(Effect.succeed([]))),
   funFacts: Schema.Array(Schema.String),
   /** Habits recurring across the given episodes, cited by episode id. */
   patterns: Schema.Array(
@@ -311,8 +322,10 @@ export const fromLlmProfileDraft = (draft: LlmProfileDraft, extras: ProfileExtra
     confidence: t.confidence,
     evidence: t.evidence.map(toEvidence),
     support: null,
-    frequency: null,
   })),
+  // scored by the analysis after verifying the draft's quotes
+  abilities: [],
+  instructionContexts: [],
   funFacts: draft.funFacts,
   improvements: draft.improvements.map((i) => ({
     title: i.title,

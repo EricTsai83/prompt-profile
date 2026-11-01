@@ -39,22 +39,38 @@ export type Scrub = (text: string, lang: Language) => string
 
 /** Identity when project names are shown; "Project A"… otherwise, including short names. */
 export const makeScrub = (p: Profile, v: Visibility): Scrub => {
-  if (v.projects) return (text) => text
+  if (v.projects && v.customNames) return (text) => text
   const names = [
     ...new Set([
       ...p.stats.activity.projects,
+      ...p.abilities.flatMap((a) => a.byProject.map((pr) => pr.project)),
       ...p.stats.topProjects.map((x) => x.name),
       ...(p.historyComparison?.previousProjects ?? []),
     ]),
   ].toSorted((a, b) => b.length - a.length)
-  return (text, lang) =>
-    names.reduce((out, name, i) => {
+  const instructionNames = !v.customNames
+    ? [...new Set(p.instructionContexts.map((c) => c.name))]
+        .filter(Boolean)
+        .toSorted((a, b) => b.length - a.length)
+    : []
+  return (text, lang) => {
+    const redacted = instructionNames.reduce(
+      (out, name) =>
+        out.replace(
+          new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"),
+          lang === "en" ? "custom instruction" : "自訂指令",
+        ),
+      text,
+    )
+    if (v.projects) return redacted
+    return names.reduce((out, name, i) => {
       const index = p.stats.activity.projects.indexOf(name)
       const label = `${MESSAGES[lang].projectAnon} ${"ABCDEFGHIJ"[index === -1 ? i : index] ?? "?"}`
       return name.length === 0
         ? out
         : out.replace(new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), label)
-    }, text)
+    }, redacted)
+  }
 }
 
 /** The card's text (identity and traits) with project names scrubbed for one language. */
@@ -134,7 +150,8 @@ export const reportContents = (profile: Profile, options: RenderOptions): Report
   ])
   return {
     quotes: v.quotes
-      ? evidence(p.traits) +
+      ? evidence(p.abilities) +
+        evidence(p.traits) +
         (p.historyComparison?.changes.reduce(
           (n, c) => n + c.previousEvidence.length + c.evidence.length,
           0,

@@ -1,7 +1,7 @@
-import type { Language, Profile } from "../domain/index.ts"
+import { ABILITY_KEYS, type Language, type Profile } from "../domain/index.ts"
 import { AVATAR_PALETTE } from "./avatar.ts"
 import { svgDataUrl } from "./graphic.ts"
-import { CARD_MESSAGES } from "./messages.ts"
+import { ABILITY_MESSAGES } from "./messages.ts"
 
 /** A card radar always has at least this many spokes; shorter trait lists get blank ones. */
 export const CARD_RADAR_MIN_AXES = 3
@@ -20,35 +20,23 @@ const div = (style: Record<string, unknown>, children?: unknown): Node => ({
 interface Axis {
   /** null: a blank spoke that only completes the shape. */
   readonly name: string | null
-  /** 0–100, or null when the trait was not measured. */
+  /** 0–100, or null when the ability was not assessed. */
   readonly share: number | null
 }
 
-/**
- * The card's spokes: one per supported trait (translated), padded to CARD_RADAR_MIN_AXES. A
- * card features only supported observations: low-confidence or uncited traits stay off it.
- * Hidden traits (`--card-hide traits`, limited evidence) leave blank spokes only.
- */
+/** Fixed ability spokes; hidden observations leave only the grid. */
 export const cardRadarAxes = (
   p: Profile,
   lang: Language,
   showTraits = true,
 ): ReadonlyArray<Axis> => {
   const traits = showTraits
-    ? p.traits.flatMap((t, i) =>
-        t.confidence === "low" || t.evidence.length === 0
-          ? []
-          : [
-              {
-                name: p.translations[lang]?.traits[i]?.name ?? t.name,
-                share:
-                  t.frequency && t.frequency.analysedSessions > 0
-                    ? Math.round((t.frequency.sessions / t.frequency.analysedSessions) * 100)
-                    : null,
-              },
-            ],
-      )
+    ? ABILITY_KEYS.map((key) => ({
+        name: ABILITY_MESSAGES[lang][key],
+        share: p.abilities.find((a) => a.key === key)?.score ?? null,
+      }))
     : []
+
   const blanks = Math.max(0, CARD_RADAR_MIN_AXES - traits.length)
   return [...traits, ...Array.from({ length: blanks }, () => ({ name: null, share: null }))]
 }
@@ -69,9 +57,9 @@ const LABEL_WIDTH = 170
 
 /**
  * The card's radar: the drawing (grid, spokes, shape and points) as one image, then each
- * trait's name and share as text nodes around it (SVG images get no fonts). The shape is drawn
- * when every trait is measured; otherwise the measured points stand alone and the others say
- * "Not measured". 0% is the center and 100% the outer ring.
+ * ability's name and score as text nodes around it (SVG images get no fonts). The shape is drawn
+ * when every ability is assessed; otherwise the measured points stand alone and the others say
+ * "Not assessed". 0% is the center and 100% the outer ring.
  */
 export const cardRadar = (
   p: Profile,
@@ -129,7 +117,6 @@ export const cardRadar = (
       return `<line data-radar="spoke" x1="${c}" y1="${c}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`
     })
     .join("")}</g>${shape}${dots}</svg>`
-  const m = CARD_MESSAGES[lang]
   const labels = axes.flatMap((a, i) => {
     if (a.name === null) return []
     const [x, y] = point(i, 100, at.r + 22)
@@ -152,7 +139,7 @@ export const cardRadar = (
         [
           div({ fontSize: 17, fontWeight: 700, color: colors.fg, lineHeight: 1.2 }, a.name),
           a.share === null
-            ? div({ fontSize: 15, color: colors.muted }, m.notMeasured)
+            ? div({ fontSize: 15, color: colors.muted }, ABILITY_MESSAGES[lang].unknown)
             : div({ fontSize: 19, fontWeight: 800, color: colors.value }, `${a.share}%`),
         ],
       ),

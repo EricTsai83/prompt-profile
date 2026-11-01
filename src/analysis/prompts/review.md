@@ -93,3 +93,11 @@ requirements to rewrite.after; preserve its original language. Respect clear sho
 and contradictory contexts, and permit zero improvements.
 
 Use the configured narration voice in all generated descriptive prose. Preserve exact quotes and sample-prompt voice.
+
+Review every ability score against its cited quotes and the ability rubric. Lower unsupported scores; use null without evidence. Check project quotes belong to that project.
+
+Check skill-based claims against documented purpose, selection and actual recorded
+requirements separately. Do not assess authorship. A description supports intended purpose,
+not execution, success or proficiency. Remove unsupported active-choice claims based only on
+automatic/Agent-selected contexts. Do not equate short invocations with low ability when
+explicit recorded requirements supply the context.

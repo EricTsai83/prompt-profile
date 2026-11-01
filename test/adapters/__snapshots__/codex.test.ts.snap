@@ -23,6 +23,23 @@ exports[`Codex adapter (fixture) > parses the fixture directory > records 1`] = 
     "gitBranch": "main",
     "hasImage": false,
     "id": "codex:11111111-1111-4111-8111-111111111111:2",
+    "instructionContexts": [
+      {
+        "content": "# AGENTS.md instructions for /home/dev/alpha
+...
+<environment_context>
+<cwd>/home/dev/alpha</cwd>
+</environment_context>",
+        "contentStatus": "recorded",
+        "description": null,
+        "id": "codex:11111111-1111-4111-8111-111111111111:2:instruction:0",
+        "kind": "rules",
+        "name": "AGENTS.md",
+        "parentPromptId": "codex:11111111-1111-4111-8111-111111111111:2",
+        "selection": "automatic",
+        "selectionEvidence": null,
+      },
+    ],
     "origin": "interactive",
     "project": "/home/dev/alpha",
     "sessionId": "11111111-1111-4111-8111-111111111111",

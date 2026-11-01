@@ -72,7 +72,14 @@ export const buildReviewPacket = (
         sources === null
           ? null
           : sources.has(e.promptId) && quoteMatches(e.quote, sources.get(e.promptId)!),
-      selected: selected.has(e.promptId),
+      selected:
+        selected.has(e.promptId) ||
+        p.instructionContexts.some(
+          (context) =>
+            context.id === e.promptId &&
+            context.selection === "user_explicit" &&
+            selected.has(context.parentPromptId),
+        ),
     })
     // Check all citation locations, including episodes and collaboration, not only review cards.
     const visit = (value: unknown): void => {
@@ -97,6 +104,25 @@ export const buildReviewPacket = (
         missingContext: ["image-contents", "assistant-actions", "owner-intent"],
         evidence: evidence.map(check),
       })
+    p.instructionContexts.forEach((context, n) =>
+      add(
+        `instructionContexts[${n}]`,
+        `${context.name}: ${context.description ?? "Purpose unknown"}; ${context.selection}; content ${context.contentStatus}`,
+        context.content !== null && context.selection === "user_explicit"
+          ? [{ promptId: context.id, quote: context.content }]
+          : [],
+      ),
+    )
+    p.abilities.forEach((a, n) => {
+      add(`abilities[${n}]`, `${a.key}: ${a.score ?? "Not assessed"}`, a.evidence)
+      a.byProject.forEach((pr, j) =>
+        add(
+          `abilities[${n}].byProject[${j}]`,
+          `${a.key} · ${pr.project}: ${pr.score ?? "Not assessed"}`,
+          pr.evidence,
+        ),
+      )
+    })
     p.improvements.forEach((i, n) =>
       add(
         `improvements[${n}]`,

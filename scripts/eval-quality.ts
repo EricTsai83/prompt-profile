@@ -24,7 +24,12 @@ const UNIVERSAL = /\b(?:every|always|never|all of your|none of your|each of your
 export const scoreProfile = (
   profile: Profile,
   rubric: QualityRubric,
-  sources?: ReadonlyArray<{ readonly id: string; readonly session: string; readonly text: string }>,
+  sources?: ReadonlyArray<{
+    readonly id: string
+    readonly session: string
+    readonly text: string
+    readonly parentPromptId?: string
+  }>,
 ) => {
   // Inspect generated claims, not copied quotes or statistics.
   const claims = [
@@ -136,7 +141,12 @@ export const scoreProfile = (
  */
 export const inspectClaimSupport = (
   evidence: ReadonlyArray<Evidence>,
-  prompts: ReadonlyArray<{ readonly id: string; readonly session: string; readonly text: string }>,
+  prompts: ReadonlyArray<{
+    readonly id: string
+    readonly session: string
+    readonly text: string
+    readonly parentPromptId?: string
+  }>,
 ) => {
   const source = new Map(prompts.map((prompt) => [prompt.id, prompt]))
   const counts = { kept: 0, dropped: 0 }
@@ -148,11 +158,13 @@ export const inspectClaimSupport = (
   return {
     quoteValidity: counts,
     selectedEvidence: {
-      prompts: new Set(verified.map((item) => item.promptId)).size,
+      prompts: new Set(
+        verified.map((item) => source.get(item.promptId)?.parentPromptId ?? item.promptId),
+      ).size,
       sessions: new Set(verified.map((item) => source.get(item.promptId)!.session)).size,
     },
     availableSource: {
-      prompts: source.size,
+      prompts: new Set([...source.values()].map((p) => p.parentPromptId ?? p.id)).size,
       sessions: new Set([...source.values()].map((prompt) => prompt.session)).size,
     },
     manualReview: {

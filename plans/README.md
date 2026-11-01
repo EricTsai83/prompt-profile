@@ -99,12 +99,14 @@ These version numbers are independent. Bump them whenever the corresponding thin
 
 | Version | Location | Now | When to bump |
 |---|---|---|---|
-| `Profile.schemaVersion` | `domain/Profile.ts` | 23 | The `profile.json` format changes (`render` rejects versions it does not understand; the released versions it reads are listed in `READABLE_SCHEMA_VERSIONS`) |
-| `ANALYSIS_VERSION` | `analysis/version.ts` | 34 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `label.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key; `test/analysis/version.test.ts` fails when a prompt changes without a bump) |
-| `PIPELINE_VERSION` | `pipeline/version.ts` | 5 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
-| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 29, others 33 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
+| `Profile.schemaVersion` | `domain/Profile.ts` | 26 | The `profile.json` format changes (`render` rejects versions it does not understand; the released versions it reads are listed in `READABLE_SCHEMA_VERSIONS`) |
+| `ANALYSIS_VERSION` | `analysis/version.ts` | 37 | `map.md` / `merge.md` / `reduce.md` / `review.md` / `translate.md`, the chunk format or the LLM Schema change (part of the cache key; `test/analysis/version.test.ts` fails when a prompt changes without a bump) |
+| `PIPELINE_VERSION` | `pipeline/version.ts` | 7 | clean / redact rules change (part of the cache key; chunk content is hashed too, so a filter change alone needs no bump) |
+| `Theme.version` / `RENDER_MANIFEST_VERSION` | `report/theme.ts` / `report/looks.ts` | classic 32, others 36 / 3 | A look's design (its theme entry) or the `render.json` format changes (render only; not part of any cache key) |
 | `EXECUTION_VERSION` | `domain/Execution.ts` | 2 | Execution records and summaries change |
 | `PRICING_VERSION` | `pipeline/pricing.ts` | 2026-10-29 | A list price is added or changed (stored with the costs in `profile.json`; not part of any cache key) |
+
+Plan 35 was superseded by plan 36: trait labeling and frequency measurement were removed; role validation and measured preference balance remain.
 
 ## Open plans
 
@@ -119,7 +121,6 @@ Each plan can be handed to Claude Code / Codex independently, e.g. "Execute
 
 | Plan | Topic |
 | ---- | ----- |
-| [35](./35-measured-support.md) | Measured support for traits and habits: implemented, awaiting a real run |
 | [36](./36-ability-scores.md) | AI collaboration ability scores on the radar, replacing trait frequency |
 
 ## Shared rules for every plan

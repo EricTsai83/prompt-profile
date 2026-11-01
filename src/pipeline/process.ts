@@ -69,6 +69,30 @@ export const processRecords = (
       timestamp: record.timestamp,
       project: record.project === null ? null : (projectNames.get(record.project) ?? null),
       text: cut.text,
+      ...(record.instructionContexts?.length
+        ? {
+            instructionContexts: record.instructionContexts.map((c) => {
+              const body =
+                c.content === null
+                  ? null
+                  : truncateMiddle(redact(c.content, rules, redactions), 6000)
+              return {
+                ...c,
+                name: redact(c.name, rules, redactions),
+                selectionEvidence:
+                  c.selectionEvidence === null
+                    ? null
+                    : truncateMiddle(redact(c.selectionEvidence, rules, redactions)).text,
+                description:
+                  c.description == null
+                    ? null
+                    : truncateMiddle(redact(c.description, rules, redactions), 600).text,
+                content: body?.text ?? null,
+                contentStatus: body?.truncated ? ("truncated" as const) : c.contentStatus,
+              }
+            }),
+          }
+        : {}),
     }
   })
   const stats = computeStats({

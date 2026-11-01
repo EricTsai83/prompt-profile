@@ -25,7 +25,13 @@ export const prepareHistory = (
     qualityPolicy:
       "No authored persona expectations; heuristic measurements only; review manually.",
   }
-  const hash = sha256(JSON.stringify(result.prompts.map((p) => [p.id, p.text])))
+  const hash = sha256(
+    JSON.stringify(
+      result.prompts.map((p) =>
+        p.instructionContexts?.length ? [p.id, p.text, p.instructionContexts] : [p.id, p.text],
+      ),
+    ),
+  )
   const prepared: PreparedPersona = {
     name: "local-history",
     timezone: options.timezone,

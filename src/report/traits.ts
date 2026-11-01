@@ -10,7 +10,7 @@ export type Verbatim = (text: string) => Raw | string
 export const makeVerbatim =
   (loc: Loc, v: Visibility, scrub: Scrub): Verbatim =>
   (text) =>
-    v.projects ? text : loc.text((_m, _c, l) => scrub(text, l))
+    v.projects && v.customNames ? text : loc.text((_m, _c, l) => scrub(text, l))
 
 export const quotes = (evidence: ReadonlyArray<Evidence>, say: Verbatim): Raw =>
   html`<ul class="evidence">

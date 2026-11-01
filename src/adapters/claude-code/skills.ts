@@ -1,6 +1,7 @@
 import { Effect, FileSystem, Path } from "effect"
 import type { SkillOrigin } from "../../domain/index.ts"
-import { clipDescription } from "../common/skills.ts"
+import { clipDescription, frontMatterDescription } from "../common/skills.ts"
+export { frontMatterDescription } from "../common/skills.ts"
 
 export interface SkillInfo {
   readonly description: string | null
@@ -37,25 +38,6 @@ export const parseSkillListing = (content: string): Array<[name: string, descrip
   ])
 
 /** The `description` of a SKILL.md front matter (plain, quoted or folded); null if none. */
-export const frontMatterDescription = (text: string): string | null => {
-  const fm = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1]
-  if (fm === undefined) return null
-  const lines = fm.split(/\r?\n/)
-  const i = lines.findIndex((l) => l.startsWith("description:"))
-  if (i === -1) return null
-  let value = lines[i]!.replace(/^description:\s*/, "")
-  if (value === "" || /^[>|][-+]?$/.test(value)) {
-    const block: Array<string> = []
-    for (const l of lines.slice(i + 1)) {
-      if (!/^\s+\S/.test(l)) break
-      block.push(l.trim())
-    }
-    value = block.join(" ")
-  }
-  value = value.replace(/^["']|["']$/g, "").trim()
-  if (value === "") return null
-  return clipDescription(value)
-}
 
 /**
  * Describe the skills a user ran: their own (`<claudeRoot>/skills`, `<agentsRoot>/skills`),

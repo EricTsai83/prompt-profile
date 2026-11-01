@@ -105,3 +105,39 @@ it("does not claim source verification when no frozen source is available", asyn
   ).toBe(true)
   expect(packet.mechanical.sourceVerification).toBe("unavailable")
 })
+
+it("includes ability scores and project quotes as reviewable claims", async () => {
+  const base = await profile()
+  const evidence = [{ promptId: "p1", quote: "Check the bounds." }]
+  const p = {
+    ...base,
+    abilities: [
+      {
+        key: "verification" as const,
+        score: 60,
+        evidence,
+        support: { sessions: 1, weeks: 1 },
+        byProject: [
+          {
+            project: "fictional",
+            analysedSessions: 20,
+            score: null,
+            evidence: [],
+            support: { sessions: 0, weeks: 0 },
+          },
+        ],
+      },
+    ],
+  }
+  const packet = buildReviewPacket(
+    manifest(),
+    new Map([["person/base/r1", { ok: true, profile: p }]]),
+    new Map([["p1", "Check the bounds."]]),
+  )
+  const item = packet.items.find((i) => i.field === "abilities[0]")!
+  expect(item.claim).toContain("verification: 60")
+  expect(item.evidence[0]).toMatchObject({ valid: true, selected: true })
+  const project = packet.items.find((i) => i.field === "abilities[0].byProject[0]")!
+  expect(project.claim).toContain("Not assessed")
+  expect(project.claim).toContain("fictional")
+})

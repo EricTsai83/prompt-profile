@@ -243,7 +243,7 @@
       }
     ]
   },
-  "schemaVersion": 23,
+  "schemaVersion": 26,
   "languages": [
     "zh-TW",
     "en"
@@ -553,8 +553,7 @@
       "support": {
         "sessions": 2,
         "weeks": 1
-      },
-      "frequency": null
+      }
     },
     {
       "name": "Give a concrete next edit",
@@ -581,8 +580,7 @@
       "support": {
         "sessions": 2,
         "weeks": 1
-      },
-      "frequency": null
+      }
     }
   ],
   "funFacts": [],
@@ -1617,5 +1615,7 @@
         "sessions": 0
       }
     }
-  }
+  },
+  "abilities": [],
+  "instructionContexts": []
 }

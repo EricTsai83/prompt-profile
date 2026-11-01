@@ -1,10 +1,11 @@
+import { instructionEvidence } from "../domain/index.ts"
 import { Clock, DateTime, Effect } from "effect"
 import type { Observation, Profile, SafePrompt, Stats } from "../domain/index.ts"
 import { LlmRunner } from "../llm/index.ts"
 import type { AnalysisCache } from "./cache.ts"
 import { emptyEpisodeCounts, selectEpisodes, verifyEpisodes } from "./episodes.ts"
 import { AnalysisFailed, stageError, type AnalyzeError } from "./errors.ts"
-import { mapChunks, type AnalyzedChunk } from "./map.ts"
+import { mapChunks } from "./map.ts"
 import {
   capEvidence,
   mergeObservations,
@@ -17,7 +18,6 @@ import { Progress } from "./progress.ts"
 import { draftProfile, evidenceOriginsOf, reduceInput, verifyProfile } from "./reduce.ts"
 import { measureSteering } from "./steering.ts"
 import { measureAxisBalance } from "./axes.ts"
-import { keepCharacteristicTraits, labelTraits, measureTraitFrequency } from "./label.ts"
 import { addTranslations } from "./translate.ts"
 import { verifyObservations, type EvidenceCounts } from "./verify.ts"
 
@@ -47,12 +47,16 @@ export const analyze = (input: {
       (o) =>
         verifyObservations(
           o.observations,
-          new Map(o.chunk.prompts.map((p) => [p.id, p.text])),
+          new Map(o.chunk.prompts.flatMap(instructionEvidence)),
           mapCounts,
         ).observations,
     )
     const sessionOf = new Map(
-      outcomes.flatMap((o) => o.chunk.prompts.map((p) => [p.id, `${p.source}:${p.sessionId}`])),
+      outcomes.flatMap((o) =>
+        o.chunk.prompts.flatMap((p) =>
+          instructionEvidence(p).map(([id]) => [id, `${p.source}:${p.sessionId}`] as const),
+        ),
+      ),
     )
     const cap = (obs: ReadonlyArray<Observation>) =>
       capEvidence(obs, undefined, (id) => sessionOf.get(id) ?? id)
@@ -68,7 +72,7 @@ export const analyze = (input: {
     // ---- merge until the observations fit the reduce input --------------------------------
     const observations = yield* mergeObservations({
       observations: retainOmittedEvidence(original, cap(original)),
-      texts: new Map(input.prompts.map((p) => [p.id, p.text])),
+      texts: new Map(input.prompts.flatMap(instructionEvidence)),
       cap,
       options,
       onError: stageError("merge-failed", failed, chunks.length),
@@ -105,51 +109,9 @@ export const analyze = (input: {
     })
     yield* progress.onVerified(counts.kept, counts.dropped)
 
-    // ---- how often each verified trait shows: label every analysed chunk ------------------
-    const measured = yield* measureTraits(profile, analyzed, options)
-
     // ---- translate (verified text only) ---------------------------------------------------
     return yield* addTranslations(
-      { ...measured, evidenceOrigins: evidenceOriginsOf(measured, analyzed) },
+      { ...profile, evidenceOrigins: evidenceOriginsOf(profile, analyzed) },
       options.languages ?? ["en"],
     )
-  })
-
-/**
- * Label every analysed chunk against the verified traits and store each trait's measured
- * frequency. Nothing to label (no traits) leaves the profile unchanged.
- */
-const measureTraits = (
-  profile: Profile,
-  analyzed: ReadonlyArray<AnalyzedChunk>,
-  options: AnalyzeOptions,
-) =>
-  Effect.gen(function* () {
-    if (profile.traits.length === 0) return profile
-    const progress = yield* Progress
-    yield* progress.onLabelStart?.(analyzed.length) ?? Effect.void
-    const outcomes = yield* labelTraits(
-      analyzed.map((o) => o.chunk),
-      profile.traits,
-      options,
-    )
-    const m = measureTraitFrequency(
-      outcomes,
-      profile.traits.map((t) => t.name),
-    )
-    yield* progress.onLabelled?.(m.chunksLabelled, outcomes.length) ?? Effect.void
-    return {
-      ...profile,
-      traits: keepCharacteristicTraits(
-        profile.traits.map((t, i) => ({ ...t, frequency: m.frequencies[i] ?? null })),
-      ),
-      coverage: {
-        ...profile.coverage,
-        traitLabels: {
-          chunksLabelled: m.chunksLabelled,
-          chunksFailed: m.chunksFailed,
-          rejected: m.rejected,
-        },
-      },
-    }
   })

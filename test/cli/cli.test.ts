@@ -102,7 +102,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
       // everything is cached for codex: draft, review and a trait label per chunk are left
       expect(plan.cacheHits).toBe(plan.chunksSelected)
-      expect(plan.llmCalls).toBe(2 + plan.chunksSelected)
+      expect(plan.llmCalls).toBe(2)
       expect(h.fakes).toHaveLength(1)
     }),
   )

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { Effect } from "effect"
 import { describe, expect, it } from "vitest"
-import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
+import { ABILITY_KEYS, decodeProfile, type Profile } from "../../src/domain/Profile.ts"
 import { avatarSvg } from "../../src/report/avatar.ts"
 import { cardTree, renderCard } from "../../src/report/card.ts"
 import { embeddedFonts } from "../../src/report/fonts.ts"
@@ -17,10 +17,12 @@ const measured = async (shares: ReadonlyArray<number>): Promise<Profile> => {
   const base = await sample()
   return {
     ...base,
-    traits: base.traits.slice(0, shares.length).map((t, i) => ({
-      ...t,
-      confidence: "high" as const,
-      frequency: { sessions: shares[i]!, analysedSessions: 100, byProject: [] },
+    abilities: ABILITY_KEYS.map((key, i) => ({
+      key,
+      score: shares[i % shares.length]!,
+      evidence: [],
+      support: { sessions: 3, weeks: 2 },
+      byProject: [],
     })),
   }
 }
@@ -51,10 +53,10 @@ describe("classic card radar", () => {
     const radar = images(tree).find((svg) => svg.includes('data-radar="shape"'))
     expect(radar).toBeDefined()
     const words = texts(tree)
-    for (const t of p.traits) expect(words).toContain(t.name)
+    expect(words).toContain("Providing context")
     for (const share of ["27%", "31%", "12%"]) expect(words).toContain(share)
     // the traits are on the radar now, not repeated as chips
-    expect(words.filter((w) => w === p.traits[0]!.name)).toHaveLength(1)
+    expect(words.filter((w) => w === "Providing context")).toHaveLength(1)
   })
 
   it("keeps the role symbol, now as a badge beside the name, with what it means", async () => {
@@ -77,12 +79,10 @@ describe("classic card radar", () => {
     expect(images(tree).some((svg) => svg.includes('data-radar="grid"'))).toBe(true)
     expect(images(tree).some((svg) => svg.includes('data-radar="shape"'))).toBe(false)
     // the card features supported traits only: the low-confidence one stays off
-    const supported = unmeasured.traits.filter((t) => t.confidence !== "low")
-    expect(texts(tree).filter((w) => w === "Not measured")).toHaveLength(supported.length)
+    expect(texts(tree).filter((w) => w === "Not assessed")).toHaveLength(6)
     const two = await measured([40, 20])
     const grid = images(cardTree(two)).find((svg) => svg.includes('data-radar="grid"'))!
-    // three spokes even with two traits
-    expect(grid.match(/data-radar="spoke"/g)).toHaveLength(3)
+    expect(grid.match(/data-radar="spoke"/g)).toHaveLength(6)
   })
 
   it("leaves the model to the report's engine line and renders a 1200×630 PNG", async () => {

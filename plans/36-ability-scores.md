@@ -1,6 +1,6 @@
 # AI collaboration ability scores
 
-Status: Planned; owner requested on 2026-11-01
+Status: Implementation and same-input calibration complete; owner score review pending
 
 ## Outcome
 
@@ -50,10 +50,17 @@ from these conversations' evidence, and that "not assessed" is not a low score.
 
 ## Acceptance
 
-- [ ] Tests first: score caps by evidence spread, unverified quotes dropped, null for no
+- [x] Tests first: score caps by evidence spread, unverified quotes dropped, null for no
       evidence, per-project scores from that project's quotes only.
-- [ ] `ANALYSIS_VERSION` and `Profile.schemaVersion` bumped; README and docs updated.
+- [x] `ANALYSIS_VERSION` and `Profile.schemaVersion` bumped; README and docs updated.
 - [ ] A Claude and a Codex run on the same input: scores of the two engines within about 15
       points on most abilities; owner reviews the scores and their quotes.
 
 Follow the repository TDD and verification gates.
+
+Implementation and verification: [ability scores](../docs/ability-scores.md).
+
+After quota recovery Claude completed with six calls. Five numerically comparable abilities
+differ from Codex by at most 10 points; steering is unassessed by Claude versus 25 from Codex.
+Both saved profiles pass the corrected learner rubric. Owner review of the steering definition
+and the displayed score/evidence comparison is pending; do not infer approval.

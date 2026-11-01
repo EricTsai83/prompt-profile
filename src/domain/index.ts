@@ -28,3 +28,5 @@ export * from "./llm/toLlmJsonSchema.ts"
 export * from "./markers.ts"
 export * from "./quote.ts"
 export * from "./timezone.ts"
+
+export * from "./InstructionContext.ts"

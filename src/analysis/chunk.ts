@@ -79,7 +79,7 @@ const formatPrompt = (
 ): string => {
   const t = local(p.timestamp)
   const project = p.project === null ? "" : ` project="${escapeAttr(p.project)}"`
-  return `<prompt id="${escapeAttr(p.id)}" session="${escapeAttr(position.session)}" turn="${position.turn}/${position.of}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>`
+  return `<prompt id="${escapeAttr(p.id)}" session="${escapeAttr(position.session)}" turn="${position.turn}/${position.of}" time="${t.date} ${t.time}"${project}>\n${escapeText(p.text)}\n</prompt>${(p.instructionContexts ?? []).map((c) => `\n<instruction-context provenance="${escapeAttr(JSON.stringify({ ...c, content: undefined }))}">\n${escapeText(c.selection === "user_explicit" ? (c.content ?? "") : "")}\n</instruction-context>`).join("")}`
 }
 
 // ---------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ interface Piece {
 const makeChunk = (piece: Piece, positions: ReadonlyMap<string, TurnPosition>): Chunk => {
   const prompts = piece.blocks.map((b) => b.prompt)
   return {
-    id: sha256(...piece.blocks.flatMap((b) => [b.prompt.id, b.prompt.text])),
+    id: sha256(...piece.blocks.flatMap((b) => [b.prompt.id, b.text])),
     label: piece.label,
     prompts,
     sessions: new Set(prompts.map((p) => `${p.source}:${p.sessionId}`)).size,

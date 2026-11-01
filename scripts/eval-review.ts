@@ -1,3 +1,4 @@
+import { instructionEvidence } from "../src/domain/index.ts"
 /** Prepare a private evidence packet for conversational review; never launches a model. */
 import { NodeRuntime, NodeServices } from "@effect/platform-node"
 import { Effect, FileSystem, Path, Schema } from "effect"
@@ -29,13 +30,19 @@ const program = Effect.gen(function* () {
     const prompts = yield* Schema.decodeUnknownEffect(Schema.Array(SafePrompt))(
       snapshot.prepared?.prompts,
     )
-    const hash = sha256(JSON.stringify(prompts.map((p) => [p.id, p.text])))
+    const hash = sha256(
+      JSON.stringify(
+        prompts.map((p) =>
+          p.instructionContexts?.length ? [p.id, p.text, p.instructionContexts] : [p.id, p.text],
+        ),
+      ),
+    )
     if (
       hash !== snapshot.prepared?.preparedSha256 ||
       manifest.cases.some((c) => c.input.preparedSha256 !== hash)
     )
       return yield* Effect.fail(new Error("Frozen input hash does not match the experiment"))
-    sources = new Map(prompts.map((p) => [p.id, p.text]))
+    sources = new Map(prompts.flatMap(instructionEvidence))
   }
   const packet = buildReviewPacket(manifest, profiles, sources)
   const file = path.join(root, "review-packet.json")

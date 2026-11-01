@@ -1,3 +1,4 @@
+import { instructionsSection } from "./instructions.ts"
 import type { DateTime } from "effect"
 import type { Profile } from "../domain/index.ts"
 import {
@@ -292,7 +293,7 @@ export const renderHtml = (
 
                   ${measuredPanels(profile.stats, loc)}
 
-          ${traitsSection(profile, loc, v, scrub)}
+          ${traitsSection(profile, loc, v, scrub)}${instructionsSection(profile, loc, v, scrub)}
 
           ${preferences ?? ""}${historySection(profile, loc, v, scrub)}${understandingSection(profile, loc, v, scrub)}
 

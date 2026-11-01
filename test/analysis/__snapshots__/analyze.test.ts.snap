@@ -2,6 +2,134 @@
 
 exports[`analyze > produces a valid, verified Profile 1`] = `
 {
+  "abilities": [
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "context",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "planning",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "verification",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "steering",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "boundaries",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+    {
+      "byProject": [
+        {
+          "analysedSessions": 80,
+          "evidence": [],
+          "project": "demo",
+          "score": null,
+          "support": {
+            "sessions": 0,
+            "weeks": 0,
+          },
+        },
+      ],
+      "evidence": [],
+      "key": "recovery",
+      "score": null,
+      "support": {
+        "sessions": 0,
+        "weeks": 0,
+      },
+    },
+  ],
   "archetype": {
     "description": "",
     "name": "Collaboration observations",
@@ -73,11 +201,6 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     "promptsAnalyzed": 80,
     "sampled": false,
     "sessionsAnalyzed": 80,
-    "traitLabels": {
-      "chunksFailed": 0,
-      "chunksLabelled": 12,
-      "rejected": 0,
-    },
   },
   "dimensions": [
     {
@@ -121,7 +244,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
     },
   ],
   "engine": {
-    "analysisVersion": "34",
+    "analysisVersion": "37",
     "effort": null,
     "model": "fake-model",
     "modelSource": "reported",
@@ -178,6 +301,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
       "title": "Say the goal first",
     },
   ],
+  "instructionContexts": [],
   "languages": [
     "en",
   ],
@@ -185,7 +309,7 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
   "patterns": [],
   "portrait": null,
   "previous": null,
-  "schemaVersion": 23,
+  "schemaVersion": 26,
   "stats": {
     "activeDays": 0,
     "activity": {
@@ -1070,17 +1194,6 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
           "quote": "prompt d8s0/0 xxxxxxxxxxxxxxxx",
         },
       ],
-      "frequency": {
-        "analysedSessions": 80,
-        "byProject": [
-          {
-            "analysedSessions": 80,
-            "project": "demo",
-            "sessions": 12,
-          },
-        ],
-        "sessions": 12,
-      },
       "name": "steady",
       "support": {
         "sessions": 3,
@@ -1096,17 +1209,6 @@ exports[`analyze > produces a valid, verified Profile 1`] = `
           "quote": "prompt d0s0/0 xxxxxxxxxxxxxxxx",
         },
       ],
-      "frequency": {
-        "analysedSessions": 80,
-        "byProject": [
-          {
-            "analysedSessions": 80,
-            "project": "demo",
-            "sessions": 0,
-          },
-        ],
-        "sessions": 0,
-      },
       "name": "single source",
       "support": {
         "sessions": 1,

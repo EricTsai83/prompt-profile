@@ -1,3 +1,4 @@
+import { InstructionTracker } from "../common/instruction-context.ts"
 import { DateTime, Effect, FileSystem, Option, Path, Schema, Stream } from "effect"
 import {
   type PromptRecord,
@@ -20,11 +21,12 @@ import { clipDescription } from "../common/skills.ts"
 /** `- name: description (file: …/SKILL.md)` lines of the skills section Codex adds. */
 export const parseCodexSkillListing = (
   text: string,
+  clip = true,
 ): Array<{ name: string; description: string; file: string }> =>
   [...text.matchAll(/^- ([\w.:-]{1,80}): (.+?)\s*\(file: ([^)\n]+\/SKILL\.md)\)\s*$/gm)].map(
     (m) => ({
       name: m[1]!,
-      description: clipDescription(m[2]!.trim()),
+      description: clip ? clipDescription(m[2]!.trim()) : m[2]!.trim(),
       file: m[3]!,
     }),
   )
@@ -181,6 +183,7 @@ export const makeCodexAdapter = (
     }> =>
       Effect.gen(function* () {
         diag.filesRead++
+        const instructions = new InstructionTracker()
         let meta: SessionMeta | undefined
         const fileId = idFromFileName(path.basename(file))
         const records: Array<{ dedupKey: string; record: PromptRecord }> = []
@@ -215,6 +218,10 @@ export const makeCodexAdapter = (
                 return
               }
               const { type, payload, timestamp, ordinal } = outer.value
+              instructions.codex(
+                value,
+                `${SOURCE}:${meta?.id ?? meta?.session_id ?? fileId}:${ordinal ?? lineNumber}`,
+              )
               const lineMs = timestamp === undefined ? Number.NaN : Date.parse(timestamp)
               if (type === "session_meta" && meta === undefined) {
                 meta = Option.getOrUndefined(decodeMeta(payload))
@@ -274,7 +281,10 @@ export const makeCodexAdapter = (
                         : "",
                     )
                     .join("\n")
-                  for (const entry of parseCodexSkillListing(text)) listed.push(entry)
+                  for (const entry of parseCodexSkillListing(text, false)) {
+                    listed.push({ ...entry, description: clipDescription(entry.description) })
+                    instructions.describe(entry.name, entry.description)
+                  }
                 }
                 if (
                   (item?.type === "function_call" || item?.type === "custom_tool_call") &&
@@ -365,6 +375,13 @@ export const makeCodexAdapter = (
             dedupKey: `${line.ts}\u0000${candidate.text}`,
             record: {
               id: `${SOURCE}:${sessionId}:${line.ordinal}`,
+              ...(instructions.forPrompt(`${SOURCE}:${sessionId}:${line.ordinal}`).length
+                ? {
+                    instructionContexts: instructions.forPrompt(
+                      `${SOURCE}:${sessionId}:${line.ordinal}`,
+                    ),
+                  }
+                : {}),
               source: SOURCE,
               sessionId,
               timestamp,
@@ -377,6 +394,7 @@ export const makeCodexAdapter = (
             },
           })
         }
+        for (let i = 0; i < instructions.rejected; i++) diag.exclude("instruction-context-rejected")
         const skills = listed.map((entry) => ({
           name: entry.name,
           description: entry.description,

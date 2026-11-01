@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { Effect } from "effect"
-import { describe, expect, it } from "vitest"
-import { decodeProfile, type Profile } from "../../src/domain/Profile.ts"
+import { expect, it } from "vitest"
+import { ABILITY_KEYS, decodeProfile } from "../../src/domain/Profile.ts"
 import { renderHtml } from "../../src/report/html.ts"
 
 const sample = () =>
@@ -10,108 +10,97 @@ const sample = () =>
       JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
     ),
   )
-
-const frequency = (
-  sessions: number,
-  byProject: Array<[string, number, number]> = [],
-  analysedSessions = 200,
-) => ({
-  sessions,
-  analysedSessions,
-  byProject: byProject.map(([project, s, a]) => ({ project, sessions: s, analysedSessions: a })),
+it("renders fixed abilities, unassessed states and project scores in both languages", async () => {
+  const base = await sample()
+  const p = {
+    ...base,
+    abilities: ABILITY_KEYS.map((key, i) => ({
+      key,
+      score: i === 0 ? null : 75,
+      evidence: [],
+      support: { sessions: 2, weeks: 1 },
+      byProject: [
+        {
+          project: "PROJECT_ALPHA",
+          analysedSessions: 20,
+          score: 50,
+          evidence: [],
+          support: { sessions: 1, weeks: 1 },
+        },
+      ],
+    })),
+  }
+  const html = renderHtml(p)
+  expect(html).toContain("Providing context")
+  expect(html).toContain("提供脈絡")
+  expect(html).toContain("Not assessed")
+  expect(html).toContain("尚未評估")
+  expect(html).toContain("75%")
+  expect(html).toContain("50%")
+  expect(html).toContain("PROJECT_ALPHA")
+  expect(html).not.toContain("not an ability score")
+  expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["projects"] })).not.toContain(
+    "PROJECT_ALPHA",
+  )
+})
+it("does not invent scores when rendering a legacy profile", async () => {
+  expect(renderHtml(await sample())).not.toContain('<section class="trait-radar">')
 })
 
-/** The sample's traits, measured: 50%, 100%, 25%, plus project splits. */
-const measured = async (): Promise<Profile> => {
+it("keeps an assessed zero distinct from unknown and respects quote exclusions", async () => {
   const base = await sample()
-  const projects = (a: number, b: number): Array<[string, number, number]> => [
-    ["PROJECT_ALPHA", a, 120],
-    ["PROJECT_BETA", b, 80],
-    ["PROJECT_TINY", 1, 3],
-    // stored by a report from before the threshold: still too few to draw
-    ["PROJECT_SMALL", 5, 12],
-  ]
-  const values = [
-    frequency(100, projects(70, 30)),
-    frequency(200, projects(120, 80)),
-    frequency(50, projects(10, 40)),
-  ]
-  return {
+  const p = {
     ...base,
-    traits: base.traits.slice(0, 3).map((t, i) => ({ ...t, frequency: values[i]! })),
+    abilities: ABILITY_KEYS.map((key, i) => ({
+      key,
+      score: i === 0 ? 0 : null,
+      evidence: [{ promptId: "synthetic", quote: "<script>synthetic quote</script>" }],
+      support: { sessions: 1, weeks: 1 },
+      byProject: [],
+    })),
   }
-}
+  const html = renderHtml(p)
+  const radar = /<section class="trait-radar">[\s\S]*?<\/section>/.exec(html)![0]
+  expect(radar).toContain("0%")
+  expect(radar).toContain("Not assessed")
+  expect(radar.match(/class="radar-point"/g)).toHaveLength(1)
+  expect(radar).not.toContain('class="radar-shape"')
+  expect(radar).toContain("&lt;script&gt;synthetic quote&lt;/script&gt;")
+  expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })).not.toContain(
+    "synthetic quote",
+  )
+})
 
-const section = (html: string, cls: string) =>
-  new RegExp(`<section class="${cls}">.*?</section>`, "s").exec(html)?.[0] ?? ""
-
-describe("trait radar", () => {
-  it("draws every measured trait on its own 0–100% axis, in every language", async () => {
-    const p = await measured()
-    const radar = section(renderHtml(p), "trait-radar")
-    expect(radar).not.toBe("")
-    expect(radar).toContain("<svg")
-    // one point per trait
-    expect(radar.match(/class="radar-point"/g)).toHaveLength(3)
-    // each trait is counted on its own: one at 100% does not shrink the others
-    for (const share of ["50%", "100%", "25%"]) expect(radar).toContain(share)
-    expect(radar).toContain("100 of 200 conversations")
-    expect(radar).toContain("200 段對話中的 100 段")
-    expect(radar).toContain(p.traits[0]!.name)
-    expect(radar).toContain(p.translations["zh-TW"]!.traits[0]!.name)
-    expect(radar).toContain("not an ability score")
-    // the model is named once, on the engine line, not on each chart
-    expect(radar).not.toContain(p.engine.model!)
-    expect(renderHtml(p)).toContain(`Engine: Claude Code (${p.engine.model})`)
-  })
-
-  it("adds one small radar per project with enough conversations, on the same axes", async () => {
-    const p = await measured()
-    const projects = section(renderHtml(p), "trait-radar-projects")
-    expect(projects.match(/<svg/g)).toHaveLength(2)
-    expect(projects).toContain("PROJECT_ALPHA")
-    expect(projects).toContain("PROJECT_BETA")
-    expect(projects).not.toContain("PROJECT_TINY")
-    expect(projects).not.toContain("PROJECT_SMALL")
-    expect(projects).toContain("20 or more analysed conversations")
-    // --exclude projects hides the project radars with their names
-    const hidden = renderHtml(p, { look: "classic", cardHide: [], exclude: ["projects"] })
-    expect(section(hidden, "trait-radar")).not.toBe("")
-    expect(hidden).not.toContain("PROJECT_ALPHA")
-  })
-
-  it("lists each trait's share under every project radar, so its spokes can be read", async () => {
-    const p = await measured()
-    const projects = section(renderHtml(p), "trait-radar-projects")
-    const alpha = /<figure>(?:(?!<\/figure>)[\s\S])*PROJECT_ALPHA[\s\S]*?<\/figure>/
-      .exec(projects)![0]
-      .replace(/<svg[\s\S]*?<\/svg>/, "")
-    // PROJECT_ALPHA: 70 of 120 (58%), 120 of 120 (100%), 10 of 120 (8%)
-    for (const share of ["58%", "100%", "8%"]) expect(alpha).toContain(share)
-    expect(alpha).toContain(p.traits[0]!.name)
-  })
-
-  it("leaves room beside the radar for its longest label", async () => {
-    const p = await measured()
-    const width = (html: string) =>
-      Number(/<section class="trait-radar">[\s\S]*?<svg viewBox="0 0 (\d+)/.exec(html)![1])
-    const long = {
-      ...p,
-      traits: p.traits.map((t, i) =>
-        i === 1 ? { ...t, name: "An unusually long trait name that runs on" } : t,
-      ),
-      translations: {},
-      languages: ["en"] as const,
-    }
-    expect(width(renderHtml(long))).toBeGreaterThan(
-      width(renderHtml({ ...p, translations: {}, languages: ["en"] as const })),
-    )
-  })
-
-  it("is left out with fewer than three measured traits", async () => {
-    const p = await measured()
-    const two = { ...p, traits: p.traits.map((t, i) => (i === 2 ? { ...t, frequency: null } : t)) }
-    expect(section(renderHtml(two), "trait-radar")).toBe("")
-    expect(section(renderHtml(await sample()), "trait-radar")).toBe("")
-  })
+it("shows instruction provenance and honors quote/custom-name exclusions", async () => {
+  const base = await sample()
+  const p = {
+    ...base,
+    headline: "You use PrivateReview",
+    instructionContexts: [
+      {
+        id: "u:instruction:0",
+        parentPromptId: "u",
+        name: "PrivateReview",
+        kind: "skill" as const,
+        selection: "user_explicit" as const,
+        selectionEvidence: "Use PrivateReview",
+        description: "Reviews changes for correctness and acceptance checks.",
+        content: "<script>Verify output</script>",
+        contentStatus: "recorded" as const,
+      },
+    ],
+  }
+  const html = renderHtml(p)
+  expect(html).toContain("Reviews changes for correctness and acceptance checks.")
+  expect(html.includes("Author unknown")).toBe(false)
+  expect(html).toContain("使用者明確指定")
+  expect(html).toContain("&lt;script&gt;Verify output&lt;/script&gt;")
+  expect(renderHtml(p, { look: "classic", cardHide: [], exclude: ["quotes"] })).not.toContain(
+    "Verify output",
+  )
+  expect(
+    renderHtml(p, { look: "classic", cardHide: [], exclude: ["custom-names"] }).includes(
+      "PrivateReview",
+    ),
+  ).toBe(false)
 })

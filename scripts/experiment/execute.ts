@@ -1,3 +1,4 @@
+import { instructionEvidence } from "../../src/domain/index.ts"
 import { completeAmount as sum } from "../../src/domain/Execution.ts"
 /**
  * Run the experiment matrix safely and keep provenance (plan 22 §3). Cases run one after
@@ -532,11 +533,14 @@ export const runExperiment = <R>(input: ExperimentInput, deps: ExecuteDeps<R>) =
         const score = scoreProfile(
           profile,
           persona.rubric,
-          persona.prompts.map((prompt) => ({
-            id: prompt.id,
-            session: `${prompt.source}:${prompt.sessionId}`,
-            text: prompt.text,
-          })),
+          persona.prompts.flatMap((prompt) =>
+            instructionEvidence(prompt).map(([id, text]) => ({
+              id,
+              parentPromptId: prompt.id,
+              session: `${prompt.source}:${prompt.sessionId}`,
+              text,
+            })),
+          ),
         )
         // A requested language that could not be generated is missing content, not a pass.
         const missing = c.variant.options.languages.filter((l) => !profile.languages.includes(l))
