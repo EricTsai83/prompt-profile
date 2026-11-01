@@ -5,7 +5,7 @@ rules. [plans/README.md](plans/README.md) explains the product decisions and cac
 
 ## Setup and checks
 
-Use Node.js 22 or 24 and pnpm (the exact pnpm version is in `package.json`).
+Use Node.js 24 or newer and pnpm (the exact pnpm version is in `package.json`).
 
 ```sh
 corepack enable
@@ -47,7 +47,7 @@ against `expected.md` too: keyword checks cannot establish that a claim follows 
 
 ## Supported environments
 
-CI covers Linux with Node.js 22 and 24, and macOS with Node.js 24. Windows is currently unverified.
+CI covers Linux and macOS with Node.js 24. Windows is currently unverified.
 The borrowed CLIs are independently released; tested versions and isolation limitations are in
 [src/llm/NOTES.md](src/llm/NOTES.md). Include your OS, Node version and CLI versions in bug reports.
 New CLI flags may require a newer version than the minimum Node runtime.

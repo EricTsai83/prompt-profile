@@ -25,6 +25,8 @@ export const definitionStyle = `
 .def-head>h2,.def-head>h3{margin:0}
 .def{display:inline-block;vertical-align:middle;font-weight:400}
 .def>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:4px 2px;border:0;background:none;color:var(--muted);font:600 var(--text-xs)/1.4 var(--font-body);user-select:none}
+.hero .def>summary{color:var(--id-fg)}
+[data-composition=document] .hero .def>summary{color:var(--fg)}
 .def-label{font-style:normal}
 .def>summary::-webkit-details-marker{display:none}
 .def>summary:hover{color:var(--accent);text-decoration:underline}

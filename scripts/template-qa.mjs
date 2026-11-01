@@ -126,8 +126,9 @@ for (const look of LOOKS)
               overflow: document.documentElement.scrollWidth > innerWidth,
               view: document.querySelector(`#report-${selectedView}`).checked,
               lang: document.querySelector(`#lang-${selectedLang}`).checked,
-              collapsed: document.querySelectorAll(".report-view-detail details:not([open])")
-                .length,
+              collapsed: document.querySelectorAll(
+                ".report-view-detail details.dimension:not([open]), .report-view-detail details.portrait-evidence:not([open])",
+              ).length,
             }),
             { view, lang },
           )
