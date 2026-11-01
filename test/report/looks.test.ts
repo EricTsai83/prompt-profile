@@ -235,7 +235,7 @@ describe("looks: writeReport", () => {
       expect(render).toMatchObject({
         renderVersion: 3,
         look: "afterhours",
-        lookVersion: 36,
+        lookVersion: 37,
         cardHidden: ["stats"],
         excluded: [],
         source: "../profile.json",
@@ -246,3 +246,33 @@ describe("looks: writeReport", () => {
     }).pipe(Effect.provide(NodeServices.layer)),
   )
 })
+
+it.effect(
+  "keeps a small attribution at the bottom-right card edge in every look and language",
+  () =>
+    Effect.gen(function* () {
+      const profile = yield* sample()
+      const find = (node: unknown, label: string): Array<Record<string, unknown>> => {
+        if (Array.isArray(node)) return node.flatMap((child) => find(child, label))
+        if (!node || typeof node !== "object" || !("props" in node)) return []
+        const props = (node as { props: { children?: unknown; style?: Record<string, unknown> } })
+          .props
+        return props.children === label ? [props.style ?? {}] : find(props.children, label)
+      }
+      for (const look of LOOK_IDS) {
+        for (const [language, label] of [
+          ["en", "Made with prompt-profile"],
+          ["zh-TW", "由 prompt-profile 產生"],
+        ] as const) {
+          const styles = find(cardTree(profile, { look, cardHide: [] }, language), label)
+          expect(styles).toHaveLength(1)
+          expect(styles[0]).toMatchObject({
+            position: "absolute",
+            right: 20,
+            bottom: 14,
+            fontSize: 12,
+          })
+        }
+      }
+    }),
+)

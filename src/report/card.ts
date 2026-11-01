@@ -214,7 +214,6 @@ const cardFooter = (
           .filter((x) => x)
           .join(" · "),
       ),
-      h("div", { flexShrink: 0 }, CARD_MESSAGES[lang].attribution),
     ],
   )
 
@@ -652,7 +651,7 @@ export const cardTree = (
   const hide: RenderOptions["cardHide"] = isLimitedEvidence(profile)
     ? [...new Set([...options.cardHide, "traits" as const])]
     : options.cardHide
-  return TREES[theme.card.composition](
+  const tree = TREES[theme.card.composition](
     p,
     theme,
     hide,
@@ -661,6 +660,28 @@ export const cardTree = (
     v.dates,
     avatarFor(profile, options.avatar),
   )
+  const attribution = theme.card.attribution
+  const muted = theme.card.composition === "identity" ? theme.identity.muted : schemeOf(theme).muted
+  return {
+    ...tree,
+    props: {
+      ...tree.props,
+      children: [
+        ...(Array.isArray(tree.props.children) ? tree.props.children : [tree.props.children]),
+        h(
+          "div",
+          {
+            position: "absolute",
+            right: attribution.right,
+            bottom: attribution.bottom,
+            fontSize: attribution.size,
+            color: muted,
+          },
+          CARD_MESSAGES[lang].attribution,
+        ),
+      ],
+    },
+  }
 }
 
 let wasmReady: Promise<void> | null = null

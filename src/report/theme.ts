@@ -169,6 +169,8 @@ export interface CardTokens {
   readonly padding: { readonly y: number; readonly x: number }
   /** Accent rule along the top edge; 0 for none. */
   readonly accentRule: number
+  /** Small attribution anchored to the exported card edge. */
+  readonly attribution: { readonly right: number; readonly bottom: number; readonly size: number }
   readonly size: {
     /** The project name; the header line of identity and product cards. */
     readonly brand: number
@@ -326,6 +328,7 @@ const IDENTITY_CARD: CardTokens = {
   titleFont: "display",
   padding: { y: 52, x: 60 },
   accentRule: 0,
+  attribution: { right: 20, bottom: 14, size: 12 },
   size: {
     brand: 24,
     header: 18,
@@ -349,6 +352,7 @@ const PRODUCT_CARD: CardTokens = {
   titleFont: "body",
   padding: { y: 48, x: 48 },
   accentRule: 8,
+  attribution: { right: 20, bottom: 14, size: 12 },
   size: {
     brand: 18,
     header: 18,
@@ -420,7 +424,7 @@ const productDark = (bg: string): ColorTokens => ({
 
 const CLASSIC: Theme = {
   id: "classic",
-  version: 32,
+  version: 33,
   color: {
     light: {
       bg: "#f6f6f3",
@@ -495,7 +499,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   CLASSIC,
   {
     id: "signal",
-    version: 36,
+    version: 37,
     color: {
       light: {
         bg: "#f5f7ff",
@@ -544,7 +548,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "afterhours",
-    version: 36,
+    version: 37,
     color: {
       light: {
         bg: "#eef3f8",
@@ -593,7 +597,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "studio",
-    version: 36,
+    version: 37,
     color: {
       light: {
         bg: "#fff7f4",
@@ -642,7 +646,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "prism",
-    version: 36,
+    version: 37,
     color: {
       light: { ...PRISM_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#101827"),
@@ -661,7 +665,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "slate",
-    version: 36,
+    version: 37,
     color: {
       light: { ...SLATE_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#141b20"),
@@ -677,7 +681,7 @@ export const THEMES: ReadonlyArray<Theme> = [
   },
   {
     id: "folio",
-    version: 36,
+    version: 37,
     color: {
       light: { ...FOLIO_LIGHT, ...LIGHT_DETAILS },
       dark: productDark("#201f1c"),
