@@ -59,7 +59,9 @@ for extraction and macOS setup.
 - **PNG share cards**: a 1200 × 630 card per language, without prompt quotes.
 - **`profile.json`**: the data used to render the report again without another analysis.
 - **Local history**: successful analyses are kept in a report library; open the output folder's
-  `index.html` to browse them.
+  `index.html` to browse them. Generated output includes a `README.md` explaining each file,
+  backups, deletion and index repair; an existing user README is preserved. New report folders use readable local timestamps, for example
+  `2026-11-01_03-12-04+0800-<id>` (`+0800` is the UTC offset). Older report folders remain readable.
 
 Reports support English and Traditional Chinese; quotes stay in their original language.
 The default is English, or both languages on a Chinese system locale. Each extra language

@@ -216,7 +216,7 @@ export const reportPath = (root: string, name: string): string => {
     const index = JSON.parse(readFileSync(join(root, "library.json"), "utf8")) as {
       latest?: string
     }
-    if (index.latest && /^[a-zA-Z0-9-]+$/u.test(index.latest))
+    if (index.latest && /^[a-zA-Z0-9_+-]+$/u.test(index.latest))
       return join(root, "reports", index.latest, name)
   } catch {
     /* No library for a standalone output or a blocked run. */

@@ -22,6 +22,7 @@ it("saves private independent records, labels unfinished records as unknown, cou
   expect(result.records).toHaveLength(2)
   expect(result.skipped).toBe(1)
   expect(result.records.find((r) => r.id === a.id)?.outcome).toBe("unknown")
+  expect(await readFile(join(root, "README.md"), "utf8")).toContain("executions/")
   expect(a.id).not.toBe(b.id)
   expect((await lstat(join(root, "executions"))).mode & 0o777).toBe(0o700)
   expect((await lstat(a.file)).mode & 0o777).toBe(0o600)

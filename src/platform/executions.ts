@@ -6,6 +6,7 @@ import {
   EXECUTION_VERSION,
   type ExecutionRecord,
 } from "../domain/index.ts"
+import { writeOutputGuide } from "./output-guide.ts"
 import { FileError, isNotFound, toFileError, writePrivateFile } from "./files.ts"
 
 const ID = /^[0-9a-f-]{36}$/u
@@ -59,6 +60,7 @@ export const createExecution = (root: string, startedAtMs: number) =>
     const fs = yield* FileSystem.FileSystem
     const path = yield* Path.Path
     const folder = yield* directory(root, true)
+    yield* writeOutputGuide(root)
     const id = randomUUID()
     yield* fs.makeDirectory(path.join(folder, id), { mode: 0o700 })
     const initial: ExecutionRecord = {

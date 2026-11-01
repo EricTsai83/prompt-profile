@@ -14,3 +14,4 @@ export {
   repairLibrary,
   scanLibrary,
 } from "./library.ts"
+export { writeOutputGuide } from "./output-guide.ts"

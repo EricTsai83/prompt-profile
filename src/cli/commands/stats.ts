@@ -1,5 +1,6 @@
 import { Effect, Path } from "effect"
 import { encodeStats, peakHour } from "../../domain/index.ts"
+import { writeOutputGuide } from "../../platform/index.ts"
 import { VERSION } from "../../version.ts"
 import { messages } from "../messages.ts"
 import { Output } from "../services.ts"
@@ -15,8 +16,10 @@ export const runStats = (options: { readonly since: string; readonly out: string
     yield* out.line("")
     const collected = yield* readSources
     const { stats } = yield* runPipelineStep(collected, options.since)
-    const file = path.join(yield* resolveOut(options.out), "stats.json")
+    const root = yield* resolveOut(options.out)
+    const file = path.join(root, "stats.json")
     yield* writeFileOrFail(file, `${JSON.stringify(encodeStats(stats), null, 2)}\n`)
+    yield* writeOutputGuide(root)
     const peak = peakHour(stats)
     const percent = (x: number) => Math.round(x * 100)
     yield* out.line("")

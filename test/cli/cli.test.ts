@@ -12,7 +12,10 @@ const scrub = (s: string, root: string) =>
   s
     .replaceAll(root, "<tmp>")
     .replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gu, "<execution>")
-    .replace(/\d{8}T\d{6}Z-[a-f0-9]{32}/gu, "<run>")
+    .replace(
+      /(?:\d{8}T\d{6}Z|\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}[+-]\d{4})-[a-f0-9]{32}/gu,
+      "<run>",
+    )
     .replaceAll(fixture(""), "<fixtures>/")
     .replaceAll(`v${VERSION}`, "v<version>")
 
@@ -85,6 +88,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       expect(h.fakes).toHaveLength(0)
       const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
       expect(plan.chunksSelected).toBeGreaterThan(0)
+      expect(readFileSync(join(out, "README.md"), "utf8")).toContain("chunks/")
       const chunks = readdirSync(join(out, "chunks"))
       expect(chunks.length).toBe(plan.chunksSelected)
       const text = readFileSync(join(out, "chunks", chunks[0]!), "utf8")
@@ -112,6 +116,7 @@ describe("prompt-profile (E2E with fixtures + FakeLlmRunner)", () => {
       const h = makeHarness({ statuses: [] })
       const r = yield* h.run(["stats", "--since", "all", "--out", join(h.root, "s")])
       expect(r.code).toBe(0)
+      expect(readFileSync(join(h.root, "s", "README.md"), "utf8")).toContain("stats.json")
       const stats = JSON.parse(readFileSync(join(h.root, "s", "stats.json"), "utf8"))
       expect(stats.totalPrompts).toBeGreaterThan(0)
     }),

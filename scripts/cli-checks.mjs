@@ -46,6 +46,7 @@ export const checkCli = ({ repo, root, version, cli }) => {
   cli(["render", input, "--out", output], {
     env: { ...process.env, XDG_CACHE_HOME: join(root, "cache") },
   })
+  assert.match(readFileSync(join(output, "README.md"), "utf8"), /render.json/)
   const html = readFileSync(join(output, "report.html"), "utf8")
   assert.match(html, /Content-Security-Policy/)
   assert.match(html, /Report generation/)
@@ -63,7 +64,7 @@ export const checkCli = ({ repo, root, version, cli }) => {
     JSON.parse(readFileSync(join(output, "profile.json"), "utf8")).languages,
     JSON.parse(readFileSync(input, "utf8")).languages,
   )
-  for (const file of ["report.html", "profile.json", "card.png"]) {
+  for (const file of ["report.html", "profile.json", "card.png", "README.md"]) {
     assert.ok(existsSync(join(output, file)))
     if (process.platform !== "win32") assert.equal(statSync(join(output, file)).mode & 0o777, 0o600)
   }
@@ -100,13 +101,14 @@ const checkDryRun = ({ repo, root, cli }) => {
       XDG_CACHE_HOME: join(root, "cache"),
     },
   })
+  assert.match(readFileSync(join(out, "README.md"), "utf8"), /chunks\//)
   const plan = JSON.parse(readFileSync(join(out, "plan.json"), "utf8"))
   assert.ok(plan.chunksSelected > 0, "The dry run selected no chunk from the fixture history")
   const chunks = readdirSync(join(out, "chunks"))
   assert.equal(chunks.length, plan.chunksSelected)
   assert.match(readFileSync(join(out, "chunks", chunks[0]), "utf8"), /^<prompt id="/)
   if (process.platform !== "win32") {
-    for (const file of ["plan.json", join("chunks", chunks[0])]) {
+    for (const file of ["plan.json", "README.md", join("chunks", chunks[0])]) {
       assert.equal(statSync(join(out, file)).mode & 0o777, 0o600)
     }
   }

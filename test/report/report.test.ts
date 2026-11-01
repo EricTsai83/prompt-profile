@@ -145,7 +145,8 @@ describe("writeReport", () => {
         Effect.provide(NodeServices.layer),
       )
       expect(files.cardError).toBeNull()
-      for (const f of [files.html, files.profileJson, files.card!]) {
+      expect(readFileSync(join(outDir, "README.md"), "utf8")).toContain("render.json")
+      for (const f of [files.html, files.profileJson, files.card!, join(outDir, "README.md")]) {
         expect(statSync(f).mode & 0o777).toBe(0o600)
       }
       expect(JSON.parse(readFileSync(files.profileJson, "utf8"))).toEqual(

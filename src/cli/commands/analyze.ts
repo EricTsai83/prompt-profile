@@ -1,3 +1,4 @@
+import { writeOutputGuide } from "../../platform/index.ts"
 import {
   costOf,
   PRICING_VERSION,
@@ -131,6 +132,7 @@ const writeDryRun = (
       })),
     }
     yield* writeFileOrFail(path.join(outDir, "plan.json"), `${JSON.stringify(summary, null, 2)}\n`)
+    yield* writeOutputGuide(outDir)
   })
 
 /**

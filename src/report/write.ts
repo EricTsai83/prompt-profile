@@ -2,7 +2,7 @@ import { avatarFor, AVATAR_ART_VERSION } from "./avatar.ts"
 import { Effect, FileSystem, Path } from "effect"
 import { createHash } from "node:crypto"
 import { encodeProfile, LANGUAGES, type Language, type Profile } from "../domain/index.ts"
-import { writePrivateFile } from "../platform/index.ts"
+import { writePrivateFile, writeOutputGuide } from "../platform/index.ts"
 import { renderCard } from "./card.ts"
 import { CJK_LANGUAGES, embeddedFonts, FontUnavailable, type FontData } from "./fonts.ts"
 import { renderHtml } from "./html.ts"
@@ -47,7 +47,7 @@ const noCjkFonts: CjkFonts = Effect.fail(new FontUnavailable({ reason: "no CJK f
 
 /**
  * Write `report.html`, `profile.json` and one card per language into `outDir` (overwriting
- * only those files). A card failure never fails the report. Every render also writes
+ * only generated files, including README.md). A card failure never fails the report. Every render also writes
  * `render.json`: its options and the profile it came from (`source`, relative to `outDir`).
  */
 export const writeReport = (
@@ -120,6 +120,7 @@ export const writeReport = (
         ),
       )
     }
+    yield* writeOutputGuide(outDir).pipe(Effect.mapError((e) => new Error(e.detail)))
     const first = cards[0]!
     return { html, profileJson, card: first.file, cardError: first.error, cards }
   })

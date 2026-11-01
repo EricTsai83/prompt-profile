@@ -2,7 +2,8 @@ import { Schema, DateTime } from "effect"
 import type { Profile } from "./Profile.ts"
 import { LANGUAGES } from "./Profile.ts"
 
-export const RUN_ID = /^(?:\d{8}T\d{6}Z-[a-f0-9]{32}|legacy-[a-f0-9]{32})$/u
+export const RUN_ID =
+  /^(?:(?:\d{8}T\d{6}Z|\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}[+-]\d{4})-[a-f0-9]{32}|legacy-[a-f0-9]{32})$/u
 const Count = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0))
 const Iso = Schema.String.check(
   Schema.makeFilter((s: string) => /^\d{4}-\d\d-\d\dT/u.test(s) && Number.isFinite(Date.parse(s))),

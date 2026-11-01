@@ -7,6 +7,7 @@ import {
   type LibraryIndex,
   type RunManifest,
 } from "../domain/index.ts"
+import { writeOutputGuide } from "./output-guide.ts"
 import { FileError, isNotFound, toFileError, writePrivateFile } from "./files.ts"
 
 type Io<A> = Effect.Effect<
@@ -64,10 +65,13 @@ export interface RunStage {
 const createStage = (root: string): Io<RunStage> =>
   Effect.gen(function* () {
     const reports = yield* reportsDirectory(root, true)
-    const stamp = new Date()
-      .toISOString()
-      .replace(/[-:]/gu, "")
-      .replace(/\.\d{3}Z$/u, "Z")
+    const now = new Date()
+    const pad = (value: number) => String(value).padStart(2, "0")
+    const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+    const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`
+    const offset = -now.getTimezoneOffset()
+    const zone = `${offset >= 0 ? "+" : "-"}${pad(Math.floor(Math.abs(offset) / 60))}${pad(Math.abs(offset) % 60)}`
+    const stamp = `${date}_${time}${zone}`
     const id = `${stamp}-${randomUUID().replaceAll("-", "")}`
     const directory = (yield* Path.Path).join(reports, `.pending-${id}`)
     yield* (yield* FileSystem.FileSystem).makeDirectory(directory, { mode: 0o700 })
@@ -118,6 +122,7 @@ const repair = (root: string, render: (index: LibraryIndex) => string): Io<Libra
   Effect.gen(function* () {
     const path = yield* Path.Path
     yield* reportsDirectory(root, true)
+    yield* writeOutputGuide(root)
     for (let attempt = 0; attempt < 32; attempt++) {
       const index = yield* scan(root)
       yield* write(path.join(root, "library.json"), json(index))
