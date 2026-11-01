@@ -12,7 +12,7 @@ import {
 } from "../../src/analysis/cache.ts"
 import { sha256 } from "../../src/analysis/hash.ts"
 
-const parts: CacheKeyParts = {
+const parts = {
   kind: "map",
   inputId: "chunk-1",
   analysisVersion: "1",
@@ -20,7 +20,7 @@ const parts: CacheKeyParts = {
   runner: "claude-code",
   model: null,
   effort: null,
-}
+} satisfies CacheKeyParts
 const entry = {
   ...parts,
   producedBy: "m",
@@ -39,6 +39,33 @@ describe("file cache", () => {
       const file = join(dir, "map", `${cacheKey(parts)}.json`)
       expect(statSync(file).mode & 0o777).toBe(0o600)
       expect(readdirSync(join(dir, "map")).filter((f) => f.endsWith(".tmp"))).toEqual([])
+    }).pipe(Effect.provide(fileCacheLayer(dir)), Effect.provide(NodeServices.layer)),
+  )
+
+  it.effect("round-trips generated checkpoints privately and clears all stages", () =>
+    Effect.gen(function* () {
+      const cache = yield* AnalysisCache
+      for (const kind of ["draft", "review", "translation"] as const) {
+        const generated = {
+          ...parts,
+          kind,
+          producedBy: "fictional-model",
+          producedSource: "reported" as const,
+          value: { text: "Fictional generated text" },
+        }
+        yield* cache.setGenerated(generated)
+        expect(Option.getOrThrow(yield* cache.getGenerated(generated))).toEqual(generated)
+        const file = join(dir, kind, `${cacheKey(generated)}.json`)
+        expect(statSync(join(dir, kind)).mode & 0o777).toBe(0o700)
+        expect(statSync(file).mode & 0o777).toBe(0o600)
+        expect(Option.isNone(yield* cache.getGenerated({ ...generated, model: "different" }))).toBe(
+          true,
+        )
+        writeFileSync(file, "{broken")
+        expect(Option.isNone(yield* cache.getGenerated(generated))).toBe(true)
+      }
+      yield* cache.clear
+      expect(readdirSync(dir)).toEqual([])
     }).pipe(Effect.provide(fileCacheLayer(dir)), Effect.provide(NodeServices.layer)),
   )
 

@@ -427,6 +427,7 @@ export const runMain = (options: MainOptions) =>
     const trackedProgress: ProgressShape = {
       ...progress,
       onMergeCacheHit: Effect.sync(() => accounting.cacheHit()),
+      onGeneratedCacheHit: Effect.sync(() => accounting.cacheHit()),
       onChunkDone: (info) => {
         if (info.fromCache) accounting.cacheHit()
         return progress.onChunkDone(info)

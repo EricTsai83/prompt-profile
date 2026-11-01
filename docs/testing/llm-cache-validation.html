@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="How to validate cache savings in a multi-stage LLM pipeline without confusing fewer calls with lower provider bills or unchanged model quality."
+    />
+    <title>Testing cost optimizations in LLM pipelines</title>
+    <style>
+            :root {
+              color-scheme: light;
+              --clay: #d97757; --slate: #141413; --ivory: #faf9f5; --oat: #e3dacc;
+              --white: #ffffff; --gray-100: #f0eee6; --gray-300: #d1cfc5; --gray-500: #87867f; --gray-700: #3d3d3a;
+              --space-sm: 8px; --space-md: 12px; --space-lg: 16px; --space-xl: 24px;
+              --space-2xl: 32px; --space-3xl: 48px; --radius-sm: 4px; --radius-md: 8px; --content-width: 68ch;
+            }
+            * { box-sizing: border-box; }
+            body { margin: 0; background: var(--ivory); color: var(--slate); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; font-weight: 430; line-height: 1.55; }
+            main { max-width: calc(var(--content-width) + 48px); margin: 0 auto; padding: var(--space-3xl) var(--space-xl); }
+            article { background: transparent; border: 0; padding: 0; }
+            h1 { margin: 0 0 var(--space-lg); font-size: 1.8rem; line-height: 1.18; text-wrap: balance; }
+            h2 { margin: var(--space-3xl) 0 var(--space-lg); font-size: 1.22rem; line-height: 1.25; }
+            h3 { margin: var(--space-xl) 0 var(--space-sm); font-size: 1rem; line-height: 1.35; }
+            p, ul, ol, figure { margin: 0 0 var(--space-lg); }
+            li + li { margin-top: var(--space-sm); }
+            a { color: #a5472d; text-decoration: underline; text-underline-offset: 3px; }
+            a:focus-visible { outline: 2px solid var(--clay); outline-offset: 3px; }
+            .deck { color: var(--gray-700); }
+            code { padding: 1px 4px; border: 1px solid var(--oat); border-radius: var(--radius-sm); background: var(--gray-100); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.88em; overflow-wrap: anywhere; }
+            table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: var(--space-xl) 0; font-size: 0.92rem; }
+            caption { text-align: left; margin-bottom: var(--space-sm); font-weight: 600; }
+            th, td { padding: 10px; border: 1px solid var(--oat); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+            thead th:first-child { width: 30%; }
+            th { background: var(--gray-100); font-weight: 600; }
+            .callout { margin: var(--space-xl) 0; padding: var(--space-lg); background: var(--gray-100); border: 1px solid var(--oat); border-left: 3px solid var(--clay); }
+            .callout p:last-child { margin-bottom: 0; }
+            .chart { margin: var(--space-xl) 0; }
+            .chart-scale { display: flex; justify-content: space-between; margin: 0 28px var(--space-sm) 65px; color: var(--gray-700); font-size: 0.85rem; }
+            .chart-group { margin-bottom: var(--space-lg); }
+            .chart-label { font-weight: 600; margin-bottom: 4px; }
+            .chart-row { display: grid; grid-template-columns: 57px minmax(0, 1fr) 20px; gap: 8px; align-items: center; margin: 3px 0; font-size: 0.88rem; }
+            .track { height: 12px; background: var(--gray-100); }
+            .bar { height: 100%; background: var(--gray-500); }
+            .bar.after { background: var(--clay); }
+            .number { font-variant-numeric: tabular-nums; text-align: right; }
+            figcaption { margin-top: var(--space-md); color: var(--gray-700); font-size: 0.88rem; }
+            .sources { margin-top: var(--space-3xl); padding-top: var(--space-xl); border-top: 1px solid var(--oat); font-size: 0.88rem; }
+            .sources h2 { margin-top: 0; }
+            @media (max-width: 640px) {
+              body { font-size: 15px; }
+              main { padding: var(--space-xl); }
+              h1 { font-size: 1.65rem; }
+              table, .deck, .sources { font-size: 0.875rem; }
+              th, td { padding: 7px; }
+            }
+            @media (max-width: 640px) {
+        table, tbody, tr, th, td { display: block; width: 100%; }
+        caption { display: block; }
+        thead { display: none; }
+        tbody tr { margin-bottom: var(--space-lg); }
+        td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-weight: 600; }
+      }
+      @media print {
+              body { background: var(--white); }
+              main { max-width: none; padding: 0; }
+              h2, h3 { break-after: avoid; }
+              figure, tr, .callout { break-inside: avoid; }
+            }
+    </style>
+  </head>
+  <body>
+    <main>
+      <article>
+        <h1>Testing cost optimizations in LLM pipelines</h1>
+        <p class="deck">
+          Use deterministic tests to prove which work is avoided, integration tests to prove the
+          shipped package behaves correctly, and bounded model evaluations to assess the costs and
+          quality that local substitutes cannot measure.
+        </p>
+
+        <h2>Start with the work the system repeats</h2>
+        <p>
+          A multi-stage language-model pipeline often extracts observations from separate chunks of
+          source material, merges large results, drafts an answer, reviews it against evidence, and
+          translates the accepted text. A failure near the end can cause an expensive restart even
+          when earlier stages succeeded.
+        </p>
+        <p>
+          Consider a local CLI that turns a person's prompt history into an evidence-backed report.
+          In <em>prompt-profile</em>, chunk analysis is called <strong>map</strong>;
+          <strong>merge</strong> compresses observations when needed; <strong>draft</strong> writes
+          the profile; <strong>review</strong> checks it against the original analysis context; and
+          <strong>translation</strong> produces another language. The CLI normally uses the user's
+          logged-in Claude Code or Codex executable.
+        </p>
+        <p>
+          Stage checkpoints save successful intermediate results so a retry can continue without
+          repeating every model call. They fit a system where retries or repeated inputs occur,
+          saved results are acceptable to reuse, and the inputs that determine a result can be
+          identified. If every invocation must produce a fresh independent answer, reuse changes the
+          product's meaning.
+        </p>
+        <p>
+          The simplest implementation caches the whole final report. That can help identical
+          completed runs, but cannot recover a successful draft after review fails. Caching each
+          successful stage addresses that failure boundary. It also creates new obligations: correct
+          invalidation, validated stored output, accurate provenance, private storage, and fresh
+          execution accounting.
+        </p>
+
+        <h2>Separate three claims before choosing tests</h2>
+        <p>
+          “The optimization works” can mean three different things. Each needs a different kind of
+          evidence.
+        </p>
+        <table>
+          <caption>
+            Claims and the evidence that can support them
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Claim</th>
+              <th scope="col">Suitable evidence</th>
+              <th scope="col">What remains unknown</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Less repeated work</th>
+              <td data-label="Suitable evidence">
+                Actual stage-call records under fixed input, injected failures, and cache hits.
+              </td>
+              <td data-label="What remains unknown">
+                Avoided calls do not directly reveal token prices or subscription deductions.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Lower provider consumption</th>
+              <td data-label="Suitable evidence">
+                Real CLI measurements with token categories, failed attempts, model/configuration
+                provenance, and cost coverage.
+              </td>
+              <td data-label="What remains unknown">
+                API list-price equivalents do not establish subscription-quota deductions.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Acceptable output quality</th>
+              <td data-label="Suitable evidence">
+                Source-grounded review of claims, omissions, counterexamples, and translation
+                fidelity on representative cases.
+              </td>
+              <td data-label="What remains unknown">
+                Schema validity, exact quotations, and model agreement do not establish semantic
+                support.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          A deterministic model substitute makes control flow observable: for the same input it
+          returns a predictable JSON response. This removes model randomness from a cache test. It
+          can establish that the program avoids a call or rejects invalid structure; it cannot
+          establish that a real model would reach the same interpretation.
+        </p>
+
+        <h2>Test reuse and invalidation together</h2>
+        <p>
+          A useful test suite checks both sides of the cache contract: unchanged dependencies reuse
+          an accepted result, while changed dependencies cause the affected stage to run again. A
+          test that only checks warm-cache savings can pass even when the cache is dangerously
+          broad.
+        </p>
+        <table>
+          <caption>
+            Mechanisms matched to their failure modes
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Mechanism</th>
+              <th scope="col">Failure it addresses</th>
+              <th scope="col">Behavior to test</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Stage input identity</th>
+              <td data-label="Failure it addresses">
+                Reusing output for different source material or instructions.
+              </td>
+              <td data-label="Behavior to test">
+                Changing the prompt, system instructions, model, or effort causes a miss.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Stage-specific dependencies</th>
+              <td data-label="Failure it addresses">
+                A translation edit unnecessarily evicts source observations.
+              </td>
+              <td data-label="Behavior to test">
+                Changing translation instructions preserves map keys; changing reduce instructions
+                invalidates draft and review keys.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Successful checkpoints</th>
+              <td data-label="Failure it addresses">A late failure repeats completed work.</td>
+              <td data-label="Behavior to test">
+                Inject a failure at review or translation, retain cache, then restart with a new
+                runner.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Validation on read</th>
+              <td data-label="Failure it addresses">
+                Damaged or incompatible cached JSON bypasses normal checks.
+              </td>
+              <td data-label="Behavior to test">
+                Malformed files and wrong field types become misses; cached content still passes
+                evidence or language checks.
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Fresh accounting</th>
+              <td data-label="Failure it addresses">
+                Historical usage appears as new consumption.
+              </td>
+              <td data-label="Behavior to test">
+                A cache hit adds no model attempt, old tokens, old cost, or old call duration; the
+                new report receives a fresh execution identity.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The current implementation hashes stage prompts and schemas independently and retains
+          explicit stage revisions for code changes that those hashes cannot capture. Review depends
+          on both drafting and review instructions. Tests simulate prompt edits through the prompt
+          loader and compare the resulting cache keys. This tests dependency behavior, not the
+          wording quality of the new prompt.
+        </p>
+        <p>
+          Generated checkpoints are decoded against the requesting schema. Translation checkpoints
+          also pass shape alignment and language checks. Tests corrupt stored values, exercise
+          incomplete translations followed by valid replacements, and verify that
+          <code>--no-cache</code> skips reads while still refreshing successful checkpoints.
+        </p>
+        <p>
+          One subtle invalidation source is a changing query clock. If the source history has not
+          changed but the request contains a new “until now” timestamp, a full-input hash will miss
+          on every restart. The report pipeline omits that selection window from the statistics sent
+          to the model, retains the observed data date range and measured statistics, and saves the
+          full selection window in the newly assembled report. A regression test advances only the
+          window and checks both reuse and fresh report metadata. This choice needs separate quality
+          evaluation if the model's interpretation depends on the requested period rather than the
+          observed records.
+        </p>
+
+        <h2>A controlled comparison with a late-stage failure</h2>
+        <p>
+          A local probe ran the same fictional workload against baseline commit
+          <code>2c5feaa</code> and an isolated snapshot containing the checkpoint changes. Both used
+          Node 24.18.0, the same deterministic runner, 80 fictional prompts across 40 days, fixed
+          requested model and effort, and English plus Traditional Chinese output. The selected
+          prompts formed twelve map chunks; this probe did not exercise the merge path.
+        </p>
+        <p>
+          The first run required twelve map calls, one draft, one review, and one translation. After
+          a successful run, a second runner reused the same cache. For review recovery, the probe
+          first allowed the draft to succeed and injected a <code>ProcessFailed</code> error at
+          review. For translation recovery, it injected failures for both bounded translation
+          attempts, retained the successful English stages, and restarted.
+        </p>
+        <figure class="chart" aria-labelledby="comparison-caption">
+          <div class="chart-scale" aria-hidden="true">
+            <span>0</span><span>5</span><span>10</span><span>15 calls</span>
+          </div>
+          <div class="chart-group">
+            <div class="chart-label">First run</div>
+            <div class="chart-row">
+              <span>Before</span>
+              <div class="track" aria-hidden="true"><div class="bar" style="width:100%"></div></div>
+              <span class="number">15</span>
+            </div>
+            <div class="chart-row">
+              <span>After</span>
+              <div class="track" aria-hidden="true">
+                <div class="bar after" style="width:100%"></div>
+              </div>
+              <span class="number">15</span>
+            </div>
+          </div>
+          <div class="chart-group">
+            <div class="chart-label">Identical warm rerun</div>
+            <div class="chart-row">
+              <span>Before</span>
+              <div class="track" aria-hidden="true"><div class="bar" style="width:20%"></div></div>
+              <span class="number">3</span>
+            </div>
+            <div class="chart-row">
+              <span>After</span>
+              <div class="track" aria-hidden="true">
+                <div class="bar after" style="width:0%"></div>
+              </div>
+              <span class="number">0</span>
+            </div>
+          </div>
+          <div class="chart-group">
+            <div class="chart-label">Restart after review failure</div>
+            <div class="chart-row">
+              <span>Before</span>
+              <div class="track" aria-hidden="true"><div class="bar" style="width:20%"></div></div>
+              <span class="number">3</span>
+            </div>
+            <div class="chart-row">
+              <span>After</span>
+              <div class="track" aria-hidden="true">
+                <div class="bar after" style="width:13.3333%"></div>
+              </div>
+              <span class="number">2</span>
+            </div>
+          </div>
+          <div class="chart-group">
+            <div class="chart-label">Restart after translation failure</div>
+            <div class="chart-row">
+              <span>Before</span>
+              <div class="track" aria-hidden="true"><div class="bar" style="width:20%"></div></div>
+              <span class="number">3</span>
+            </div>
+            <div class="chart-row">
+              <span>After</span>
+              <div class="track" aria-hidden="true">
+                <div class="bar after" style="width:6.6667%"></div>
+              </div>
+              <span class="number">1</span>
+            </div>
+          </div>
+          <figcaption id="comparison-caption">
+            Model-substitute calls for this workload. Recovery rows count only the restart,
+            excluding the previous failed execution. The two remaining calls after a review failure
+            are review and translation. These values measure avoided work, not a provider bill.
+          </figcaption>
+        </figure>
+        <p>
+          The full nine-scenario probe also covered advancing the selection clock, bypassing cache,
+          changing model, changing effort, and changing narration voice. Voice changes regenerated
+          draft, review, and translation while reusing observations. Model and effort changes
+          regenerated all stages. These are desired misses: minimizing calls alone would reward an
+          incorrect cache.
+        </p>
+        <aside class="callout">
+          <p>
+            <strong>Scope of the comparison.</strong> The fixture reused simplified empty-data
+            statistics alongside the 80 prompts. It did not represent complete production
+            statistics. The runner returned deterministic prose and did not evaluate narration
+            changes. It did not use the production retry wrapper, measure provider tokens, establish
+            realistic latency, or access real user history. The baseline and candidate snapshots
+            also differed in unrelated report code, which this analysis-only probe did not render.
+          </p>
+        </aside>
+        <p>
+          The probe compared hashes of core content fields, excluding execution metadata that should
+          change. It also checked that a planted nonexistent quotation did not survive into
+          published content. Equal hashes show preservation under this controlled response function.
+          They are not evidence that real models produce equivalent claims, nor proof that every
+          unsupported citation can be detected. The
+          <a href="llm-cache-validation.results.json">committed result snapshot</a> records all nine
+          cases and their scope.
+        </p>
+
+        <h2>Cross the boundaries that a unit test replaces</h2>
+        <p>
+          The controlled comparison used in-memory caches and a fake runner. Disk serialization,
+          process spawning, packaging, and asset resolution can still fail even if that comparison
+          passes. Each additional layer should exercise one of those boundaries.
+        </p>
+        <p>
+          File-cache tests write checkpoints to temporary directories, read them back, corrupt JSON,
+          check new directory and file permissions, and verify clearing stage folders preserves
+          fonts. The CLI accounting tests compare the terminal summary, saved execution record, and
+          report generation metadata. A warm run must create a new execution while recording no new
+          model attempts or historical consumption.
+        </p>
+        <p>
+          The installed-package check builds a tarball, installs it outside the checkout, and
+          exercises version/help, prompt and font assets, dry-run behavior, and offline HTML, JSON,
+          and PNG rendering. This alone does not exercise generated-stage checkpoints, so a second
+          integration probe installs a fake <code>claude</code> executable on a restricted PATH.
+          That executable reports a synthetic login and returns fixed JSON through the real process
+          runner.
+        </p>
+        <p>
+          With that installed package, a cold English-only run invoked two maps, draft, and review.
+          Its warm rerun added no fake generation invocations, recorded four local cache hits, used
+          a fresh execution ID, and retained private generated checkpoint files. Synthetic usage
+          fields are not provider receipts; the useful observation is the absence of additional
+          process invocations.
+        </p>
+        <p>
+          Repository-wide type, lint, formatting, and unit checks add regression coverage. The
+          recorded validation passed 113 test files and 1,013 tests under Node 26.13.0; those are
+          whole-suite totals, not newly authored cache tests. The isolated comparison and installed
+          fake-provider probe used Node 24.18.0 on the same macOS machine. This is not a
+          cross-platform validation claim.
+        </p>
+
+        <h2>When this is a good default</h2>
+        <p>
+          For a resumable pipeline with expensive stages and reusable intermediate results, layered
+          deterministic tests are a strong default. They provide fast, repeatable evidence about
+          call admission, checkpoint boundaries, and invalidation before spending model quota. They
+          optimize diagnosis and regression prevention while accepting the maintenance cost of
+          fixtures and substitutes.
+        </p>
+        <p>
+          The credible simpler alternative is a few end-to-end runs against a real model. That is
+          valuable for provider compatibility and output quality, but randomness and external
+          failures make it harder to isolate a cache bug. Repeated paid runs are also a costly way
+          to test a malformed cache file. Conversely, an elaborate stage-checkpoint system is
+          excessive for a one-shot transformation with negligible cost and no retry requirement.
+        </p>
+        <p>
+          <strong
+            >Do not use a deterministic substitute as the sole acceptance test when the optimization
+            changes model choice, reasoning effort, evidence selection, review instructions, or
+            translation behavior.</strong
+          >
+          These changes can reduce calls while weakening the answer. They require a representative
+          quality evaluation even when every local test passes.
+        </p>
+        <p>
+          Checkpoint design also has limits. A requested default model is not a stable
+          provider-model identity. Persistent results need a privacy and cleanup policy. A timeout
+          does not prove that a provider consumed nothing. A checkpoint write can fail after the
+          model already did the work. Tests should expose these states rather than silently classify
+          them as free or successful.
+        </p>
+
+        <h2>Choose the next evidence by the remaining uncertainty</h2>
+        <p>
+          If the remaining question is whether unchanged inputs trigger avoidable work, inspect
+          stage records with a deterministic runner. If it is whether an installed CLI can load
+          assets and persist results, test the installed package across that boundary. If it is
+          whether the new design preserves useful claims or lowers provider consumption, use a
+          bounded real-model evaluation.
+        </p>
+        <p>
+          For that evaluation, freeze representative, authorized source material and selection
+          rules; record model, effort, versions, every attempt, token categories, and measurement
+          coverage. Evaluate cold runs, warm runs, and failure recovery separately. Count failed
+          attempts in total consumption. Review claim support, omissions, counterexamples, and
+          translation fidelity against the source, with missing context marked unknown. Predeclare a
+          call budget and success criteria; no real-model evaluation is implied by a passing offline
+          suite.
+        </p>
+        <p>
+          Before adopting the pattern, ask whether intermediate results are safe to reuse, whether
+          their dependencies can be identified, and which remaining uncertainty requires a
+          real-model evaluation. When those conditions hold, stage checkpoints and layered tests are
+          a defensible default. When freshness or semantic change dominates, spend the validation
+          budget at that boundary instead.
+        </p>
+
+        <section class="sources" aria-label="Repository references">
+          <h2>Implementation and evidence</h2>
+          <ul>
+            <li>
+              <a href="../execution-accounting.md">Execution accounting and recovery</a>:
+              operational behavior, measurement provenance, limits, and checkpoint invalidation.
+            </li>
+            <li>
+              <a href="../experiments.md">Profile experiments</a>: model comparisons and
+              source-grounded review.
+            </li>
+            <li>
+              <a href="../../src/analysis/generated.ts">Generated-stage cache</a> and
+              <a href="../../src/analysis/stage-version.ts">stage dependencies</a>: reuse and
+              invalidation mechanisms.
+            </li>
+            <li>
+              <a href="../../test/analysis/generated.test.ts">Generated-cache tests</a>,
+              <a href="../../test/analysis/stage-version.test.ts">dependency tests</a>, and
+              <a href="../../test/analysis/translate.test.ts">translation tests</a>: targeted
+              behavior checks.
+            </li>
+            <li>
+              <a href="../../test/cli/execution.test.ts">CLI accounting tests</a> and
+              <a href="../../scripts/test-package.mjs">installed-package checks</a>: fresh metadata
+              and delivery boundaries.
+            </li>
+            <li>
+              <a href="llm-cache-validation.results.json">Offline comparison snapshot</a>: baseline,
+              stage-call sequences, runtimes, and explicit limitations. The one-off probe is not a
+              permanent benchmark command.
+            </li>
+          </ul>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

@@ -113,5 +113,6 @@ export const analyze = (input: {
     return yield* addTranslations(
       { ...profile, evidenceOrigins: evidenceOriginsOf(profile, analyzed) },
       options.languages ?? ["en"],
+      options,
     )
   })

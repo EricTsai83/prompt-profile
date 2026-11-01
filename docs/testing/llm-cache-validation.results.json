@@ -1,0 +1,280 @@
+{
+  "baseline": "2c5feaa29925a7960beb45f247b85e919bae0217",
+  "realModelCalls": 0,
+  "additionalModelCostUsd": 0,
+  "dataset": "80 fictional prompts, 40 days; deterministic runner; en + zh-TW",
+  "method": "Same probe in isolated baseline and candidate source snapshots, Node 24.18.0. Deterministic fictional runner. Recovery rows count only the restart, after a separately injected failure. Submitted characters count system+prompt JS string lengths, excluding JSON schema and runner preamble; they are not token or dollar estimates.",
+  "checks": {
+    "typecheck": {
+      "exitCode": 0
+    },
+    "lint": {
+      "exitCode": 0
+    },
+    "formatCheck": {
+      "exitCode": 0
+    },
+    "unitTests": {
+      "exitCode": 0,
+      "files": 113,
+      "tests": 1013,
+      "node": "v26.13.0"
+    },
+    "installedPackage": {
+      "exitCode": 0,
+      "covers": ["version", "help", "assets", "dry-run", "offline HTML/JSON/PNG rendering"]
+    },
+    "installedFakeProvider": {
+      "node": "v24.18.0",
+      "syntheticProvider": true,
+      "realModelCalls": 0,
+      "coldCalls": 4,
+      "coldStages": ["map", "map", "draft", "review"],
+      "warmCalls": 0,
+      "warmCacheHits": 4,
+      "warmTokensState": "known-zero",
+      "warmCostState": "known-zero",
+      "privateGeneratedCheckpoints": 2
+    }
+  },
+  "comparisons": [
+    {
+      "scenario": "cold",
+      "beforeCalls": 15,
+      "afterCalls": 15,
+      "beforeStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "afterStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "beforeSubmittedChars": 482995,
+      "afterSubmittedChars": 482877,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "warm",
+      "beforeCalls": 3,
+      "afterCalls": 0,
+      "beforeStages": ["draft", "review", "translation"],
+      "afterStages": [],
+      "beforeSubmittedChars": 81791,
+      "afterSubmittedChars": 0,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "clock-only-change",
+      "beforeCalls": 3,
+      "afterCalls": 0,
+      "beforeStages": ["draft", "review", "translation"],
+      "afterStages": [],
+      "beforeSubmittedChars": 81791,
+      "afterSubmittedChars": 0,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "no-cache",
+      "beforeCalls": 15,
+      "afterCalls": 15,
+      "beforeStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "afterStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "beforeSubmittedChars": 482995,
+      "afterSubmittedChars": 482877,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "review-recovery",
+      "beforeCalls": 3,
+      "afterCalls": 2,
+      "beforeStages": ["draft", "review", "translation"],
+      "afterStages": ["review", "translation"],
+      "beforeSubmittedChars": 81791,
+      "afterSubmittedChars": 48682,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "translation-recovery",
+      "beforeCalls": 3,
+      "afterCalls": 1,
+      "beforeStages": ["draft", "review", "translation"],
+      "afterStages": ["translation"],
+      "beforeSubmittedChars": 81791,
+      "afterSubmittedChars": 5195,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "model-change",
+      "beforeCalls": 15,
+      "afterCalls": 15,
+      "beforeStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "afterStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "beforeSubmittedChars": 482995,
+      "afterSubmittedChars": 482877,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "effort-change",
+      "beforeCalls": 15,
+      "afterCalls": 15,
+      "beforeStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "afterStages": [
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "map",
+        "draft",
+        "review",
+        "translation"
+      ],
+      "beforeSubmittedChars": 482995,
+      "afterSubmittedChars": 482877,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    },
+    {
+      "scenario": "voice-change",
+      "beforeCalls": 3,
+      "afterCalls": 3,
+      "beforeStages": ["draft", "review", "translation"],
+      "afterStages": ["draft", "review", "translation"],
+      "beforeSubmittedChars": 81151,
+      "afterSubmittedChars": 81033,
+      "sameContentHash": true,
+      "invalidQuotePublished": false
+    }
+  ],
+  "limits": [
+    "No real provider token, latency or subscription-quota benchmark.",
+    "Identical deterministic output does not establish semantic quality with real models.",
+    "Cold first runs do not save model calls.",
+    "No claim of optimality relative to all alternative designs.",
+    "Only the current macOS environment and the recorded Node versions were executed.",
+    "Comparison snapshots include current unrelated report edits; analysis/domain inputs and probe are identical across the two runs."
+  ],
+  "evidenceKind": "Historical offline validation snapshot, 2026-11-01; no real model calls.",
+  "probeSource": "One-off deterministic analysis probe; not installed as a permanent benchmark command. Permanent regression tests are referenced by the accompanying article.",
+  "limitationsNote": "The fixture used empty-data pipeline statistics alongside 80 prompts; output hashes were compared on core content fields, not the full profile or semantic quality."
+}

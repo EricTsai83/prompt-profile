@@ -16,7 +16,7 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > --yes --out writes
   Read, cleaned and redacted on this computer; the report and analysis cache are written only here.
 ● Sent off this computer: the selected, redacted prompts go through your logged-in Claude Code CLI (claude -p) to its model service
   No API key: uses your subscription quota, base estimate 4 calls (2 chunks + 1 final profile + 1 evidence review)
-  Intermediate merges and retries (up to 2 per call) can add calls.
+  Final-stage cache hits can reduce this estimate; intermediate merges and retries (up to 2 per call) can add calls.
   No hard limit: add --max-calls <n> to stop after n CLI calls.
   Free first: --dry-run writes what would be sent without calling any LLM; \`prompt-profile stats\` shows statistics.
 
@@ -89,7 +89,7 @@ exports[`prompt-profile (E2E with fixtures + FakeLlmRunner) > errors > rate limi
 "
 ✖ Hit your plan's rate limit. Wait until it resets, then re-run.
 Chunk results finished before the stop are saved in the analysis cache. No report was written.
-A re-run with the cache reuses finished chunks and merges; the final profile step and translations always run again. The profile step includes draft generation and evidence review.
+A re-run with the cache reuses matching successful chunks, merges, drafts, evidence reviews and translations; unfinished stages run again.
 Re-run:
   prompt-profile --since all --yes"
 `;

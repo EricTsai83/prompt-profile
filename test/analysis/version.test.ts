@@ -6,11 +6,12 @@ import { ANALYSIS_VERSION } from "../../src/analysis/version.ts"
 const PROMPTS = "src/analysis/prompts"
 
 /**
- * The analysis prompts each `ANALYSIS_VERSION` was released with. Cached map / merge results
- * are keyed by the version: a prompt edit without a bump would reuse results of the old prompts.
+ * The analysis prompts each `ANALYSIS_VERSION` was released with. Stage fingerprints
+ * independently invalidate caches; this guard keeps report provenance up to date.
  * After editing a prompt, bump `ANALYSIS_VERSION` and record the new hash under the new version.
  */
 const PROMPTS_OF_VERSION: Readonly<Record<string, string>> = {
+  "40": "ebc1b0f305fdf63ad0b03e1881e13020c05b84906b260f7a7f5c48fe6dacfc2d",
   "39": "ebc1b0f305fdf63ad0b03e1881e13020c05b84906b260f7a7f5c48fe6dacfc2d",
   "38": "08f657c40cf66b34691eed4dd28b6833810a5387df76183b86e4c052d26d0329",
   "37": "dc0c6a62ea0bc74e1e6bbe54c71cd62b28645cace2ca79222651e58cff741fc5",

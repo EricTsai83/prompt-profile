@@ -103,7 +103,7 @@ measured summary, or `--avatar` to choose its illustration.
 
 See the [user guide](https://github.com/EricTsai83/prompt-profile/blob/main/docs/user-guide.md)
 for all documented options, language behavior, history and recovery. If a run stops, follow the
-printed retry command: completed chunks and merges are cached; later steps may use quota again.
+printed retry command: matching successful analysis stages are cached; unfinished stages may use quota again.
 
 Each analysis saves calls, retries, cache reuse, token coverage and cost provenance, including
 failed executions. The report shows generation usage separately from historical activity.

@@ -119,8 +119,9 @@ const run = (
   fake: ReturnType<typeof makeFakeLlmRunner>,
   cache = makeMemoryCache(),
   opts: AnalyzeOptions = options,
+  inputStats = stats,
 ) =>
-  analyze({ prompts, stats, options: opts }).pipe(
+  analyze({ prompts, stats: inputStats, options: opts }).pipe(
     Effect.provide(
       Layer.mergeAll(
         Layer.succeed(LlmRunner, fake),
@@ -365,7 +366,7 @@ describe("analyze", () => {
         modelSource: "reported",
         modelsUsed: ["fake-model"],
         effort: null,
-        analysisVersion: "39",
+        analysisVersion: "40",
       })
       // the profile is written in English
       expect(fake.log[0]!.system).toContain("in English")
@@ -398,8 +399,8 @@ describe("analyze", () => {
       const second = makeFakeLlmRunner({ respond })
       const profile = yield* run(second, cache)
       expect(second.log.filter((c) => c.schema === "LlmChunkAnalysis")).toHaveLength(0)
-      // draft and evidence review, then labelling each chunk against the new traits
-      expect(second.log.filter((c) => c.schema !== "LlmTraitLabels")).toHaveLength(2)
+      // A warm run reuses the draft and review as well as source observations.
+      expect(second.calls()).toBe(0)
       expect(profile.coverage.chunksFromCache).toBe(chunkCalls)
       expect(profile.engine.modelsUsed).toEqual(["fake-model"])
       // --no-cache skips reads
@@ -407,6 +408,52 @@ describe("analyze", () => {
       yield* run(third, cache, { ...options, noCache: true })
       // every chunk again, draft and review, and a label call per chunk
       expect(third.calls()).toBe(chunkCalls + 2)
+    }),
+  )
+
+  it.effect("a failed review reuses the successful draft on restart", () =>
+    Effect.gen(function* () {
+      const cache = makeMemoryCache()
+      const probe = makeFakeLlmRunner({ respond })
+      yield* run(probe)
+      const reviewCall = probe.calls()
+      const interrupted = makeFakeLlmRunner({
+        respond,
+        failures: new Map([
+          [
+            reviewCall,
+            new ProcessFailed({
+              runner: "claude-code",
+              exitCode: 1,
+              detail: "review failed",
+              stderrTail: "",
+            }),
+          ],
+        ]),
+      })
+      yield* Effect.flip(run(interrupted, cache))
+      const resumed = makeFakeLlmRunner({ respond })
+      yield* run(resumed, cache)
+      expect(resumed.calls()).toBe(1)
+      expect(resumed.log[0]?.prompt).toMatch(/^draft:/)
+    }),
+  )
+
+  it.effect("advancing the selection clock alone does not regenerate unchanged evidence", () =>
+    Effect.gen(function* () {
+      const cache = makeMemoryCache()
+      yield* run(makeFakeLlmRunner({ respond }), cache)
+      const later = {
+        ...stats,
+        window: {
+          since: DateTime.makeUnsafe("2026-07-01T01:00:00Z"),
+          until: DateTime.makeUnsafe("2026-10-25T01:00:00Z"),
+        },
+      }
+      const second = makeFakeLlmRunner({ respond })
+      const profile = yield* run(second, cache, options, later)
+      expect(second.calls()).toBe(0)
+      expect(profile.stats.window).toEqual(later.window)
     }),
   )
 

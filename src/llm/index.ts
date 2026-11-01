@@ -7,6 +7,8 @@ export {
   LlmRunner,
   makeLlmSchema,
   type GenerateResult,
+  type GenerateInput,
+  SYSTEM_PREAMBLE,
   type LlmError,
   type LlmRunnerShape,
   type ModelSource,

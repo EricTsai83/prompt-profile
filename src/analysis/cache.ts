@@ -4,7 +4,9 @@ import { writePrivateFile } from "../platform/index.ts"
 import { sha256 } from "./hash.ts"
 
 /** One sub-folder per kind. These hold prompt excerpts; the cache folder also holds fonts. */
-export const CACHE_KINDS = ["map", "merge"] as const
+export const OBSERVATION_CACHE_KINDS = ["map", "merge"] as const
+export const GENERATED_CACHE_KINDS = ["draft", "review", "translation"] as const
+export const CACHE_KINDS = [...OBSERVATION_CACHE_KINDS, ...GENERATED_CACHE_KINDS] as const
 
 export interface CacheKeyParts {
   readonly kind: (typeof CACHE_KINDS)[number]
@@ -32,7 +34,7 @@ export const cacheKey = (p: CacheKeyParts): string =>
 
 /** The cache file stores the key parts so a mismatch (hash collision, tampering) is a miss. */
 export const CacheEntry = Schema.Struct({
-  kind: Schema.Literals(CACHE_KINDS),
+  kind: Schema.Literals(OBSERVATION_CACHE_KINDS),
   inputId: Schema.String,
   analysisVersion: Schema.String,
   pipelineVersion: Schema.String,
@@ -46,11 +48,21 @@ export const CacheEntry = Schema.Struct({
 })
 export type CacheEntry = typeof CacheEntry.Type
 
+/** Generated values are decoded with the requesting stage's schema before reuse. */
+export const GeneratedCacheEntry = Schema.Struct({
+  ...CacheEntry.fields,
+  kind: Schema.Literals(GENERATED_CACHE_KINDS),
+  value: Schema.Unknown,
+})
+export type GeneratedCacheEntry = typeof GeneratedCacheEntry.Type
+
 export class CacheClearFailed extends Data.TaggedError("CacheClearFailed")<{
   readonly path: string
 }> {}
 
 export interface AnalysisCacheShape {
+  readonly getGenerated: (parts: CacheKeyParts) => Effect.Effect<Option.Option<GeneratedCacheEntry>>
+  readonly setGenerated: (entry: GeneratedCacheEntry) => Effect.Effect<void>
   readonly get: (parts: CacheKeyParts) => Effect.Effect<Option.Option<CacheEntry>>
   readonly set: (entry: CacheEntry) => Effect.Effect<void>
   /** Delete every analysis entry (they contain prompt excerpts). */
@@ -62,7 +74,7 @@ export class AnalysisCache extends Context.Service<AnalysisCache, AnalysisCacheS
   "prompt-profile/AnalysisCache",
 ) {}
 
-const sameParts = (e: CacheEntry, p: CacheKeyParts) =>
+const sameParts = (e: CacheKeyParts, p: CacheKeyParts) =>
   e.kind === p.kind &&
   e.inputId === p.inputId &&
   e.analysisVersion === p.analysisVersion &&
@@ -72,6 +84,8 @@ const sameParts = (e: CacheEntry, p: CacheKeyParts) =>
   e.effort === p.effort
 
 const decodeEntry = Schema.decodeUnknownOption(Schema.fromJsonString(CacheEntry))
+const decodeGenerated = Schema.decodeUnknownOption(Schema.fromJsonString(GeneratedCacheEntry))
+const encodeGenerated = Schema.encodeSync(Schema.fromJsonString(GeneratedCacheEntry))
 const encodeEntry = Schema.encodeSync(Schema.fromJsonString(CacheEntry))
 
 /** File-backed cache. Failures never fail the analysis: a broken entry is a miss. */
@@ -85,6 +99,15 @@ export const fileCacheLayer = (dir: string) =>
         path.join(dir, parts.kind, `${cacheKey(parts)}.json`)
       return {
         location: dir,
+        getGenerated: (parts) =>
+          fs.readFileString(fileFor(parts)).pipe(
+            Effect.map((text) =>
+              decodeGenerated(text).pipe(Option.filter((e) => sameParts(e, parts))),
+            ),
+            Effect.orElseSucceed(() => Option.none()),
+          ),
+        setGenerated: (entry) =>
+          writePrivateFile(fs, path, fileFor(entry), encodeGenerated(entry)).pipe(Effect.ignore),
         get: (parts) =>
           fs.readFileString(fileFor(parts)).pipe(
             Effect.map((text) => decodeEntry(text).pipe(Option.filter((e) => sameParts(e, parts)))),
@@ -104,11 +127,24 @@ export const fileCacheLayer = (dir: string) =>
 
 /** In-memory cache for tests. */
 export const makeMemoryCache = (): AnalysisCacheShape & {
+  readonly generatedEntries: Map<string, GeneratedCacheEntry>
   readonly entries: Map<string, CacheEntry>
 } => {
   const entries = new Map<string, CacheEntry>()
+  const generatedEntries = new Map<string, GeneratedCacheEntry>()
   return {
     entries,
+    generatedEntries,
+    getGenerated: (parts) =>
+      Effect.sync(() =>
+        Option.fromNullishOr(generatedEntries.get(cacheKey(parts))).pipe(
+          Option.filter((e) => sameParts(e, parts)),
+        ),
+      ),
+    setGenerated: (entry) =>
+      Effect.sync(() => {
+        generatedEntries.set(cacheKey(entry), entry)
+      }),
     location: "memory",
     get: (parts) =>
       Effect.sync(() =>
@@ -117,7 +153,10 @@ export const makeMemoryCache = (): AnalysisCacheShape & {
         ),
       ),
     set: (entry) => Effect.sync(() => void entries.set(cacheKey(entry), entry)),
-    clear: Effect.sync(() => entries.clear()),
+    clear: Effect.sync(() => {
+      entries.clear()
+      generatedEntries.clear()
+    }),
   }
 }
 

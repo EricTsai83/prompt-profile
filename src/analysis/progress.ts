@@ -12,6 +12,7 @@ export interface ProgressShape {
   readonly onMergeStart: (groups: number) => Effect.Effect<void>
   readonly onReduceStart: Effect.Effect<void>
   readonly onReviewStart?: Effect.Effect<void>
+  readonly onGeneratedCacheHit?: Effect.Effect<void>
   readonly onMergeCacheHit?: Effect.Effect<void>
   readonly onReduceDone: (durationMs: number) => Effect.Effect<void>
   readonly onVerified: (kept: number, dropped: number) => Effect.Effect<void>

@@ -33,6 +33,33 @@ it.effect(
     }),
 )
 
+it.effect("a warm rerun publishes fresh accounting with zero calls and no historical usage", () =>
+  Effect.gen(function* () {
+    const h = makeHarness()
+    const out = join(h.root, "warm")
+    const args = ["--yes", "--since", "all", "--lang", "en,zh-TW", "--out", out]
+    expect((yield* h.run(args)).code).toBe(0)
+    const firstId = readdirSync(join(out, "executions"))[0]!
+    const result = yield* h.run(args)
+    expect(result.code).toBe(0)
+    const secondId = readdirSync(join(out, "executions")).find((id) => id !== firstId)!
+    const record = parseExecution(
+      JSON.parse(readFileSync(join(out, "executions", secondId, "summary.json"), "utf8")),
+    )!
+    expect(h.fakes[1]!.calls()).toBe(0)
+    expect(record.summary.calls).toBe(0)
+    expect(record.summary.localCacheHits).toBeGreaterThan(2)
+    expect(record.summary.tokens.state).toBe("known-zero")
+    expect(record.summary.cost.state).toBe("known-zero")
+    expect(record.summary.callDurationMs).toBe(0)
+    const profile = JSON.parse(
+      readFileSync(join(out, "reports", record.reportId!, "profile.json"), "utf8"),
+    )
+    expect(profile.generation.executionId).toBe(secondId)
+    expect(profile.generation.summary).toEqual(record.summary)
+  }),
+)
+
 it.effect("retains a failed execution and recovery command without publishing a report", () =>
   Effect.gen(function* () {
     const h = makeHarness()

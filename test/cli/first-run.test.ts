@@ -287,7 +287,7 @@ describe("during and after a run", () => {
       const again = makeHarness({ env: { ...h.environment } })
       const r2 = yield* again.run(["--since", "all", "--out", out, "--lang", "zh-TW,en", "--yes"])
       expect(r2.code).toBe(0)
-      expect(calls(again)).toBe(3)
+      expect(calls(again)).toBe(1)
       expect(JSON.parse(readFileSync(reportPath(out, "profile.json"), "utf8")).languages).toEqual([
         "zh-TW",
         "en",
@@ -343,7 +343,8 @@ describe("recovery", () => {
         "2",
       ])
       expect(resumed.code).toBe(0)
-      expect(calls(again)).toBe(2)
+      // The successful draft is reused; only the unfinished review calls the model.
+      expect(calls(again)).toBe(1)
     }),
   )
 
@@ -357,7 +358,7 @@ describe("recovery", () => {
       expect(r.stderr).toContain("call budget of 2")
       expect(r.stderr).toContain("saved in the analysis cache")
       expect(r.stderr).toContain("No report was written")
-      expect(r.stderr).toContain("the final profile step and translations always run again")
+      expect(r.stderr).toContain("unfinished stages run again")
       const command = `prompt-profile --since all --out ${out} --max-calls 2 --yes`
       expect(r.stderr).toContain(command)
       expect(existsSync(reportPath(out, "report.html"))).toBe(false)

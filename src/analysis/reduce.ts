@@ -1,3 +1,5 @@
+import { generateCached } from "./generated.ts"
+import type { AnalysisCache } from "./cache.ts"
 import { instructionEvidence, type SafePrompt } from "../domain/index.ts"
 import { projectConversations, verifyAbilities } from "./abilities.ts"
 import { type DateTime, Effect } from "effect"
@@ -16,7 +18,7 @@ import {
   type AxisBalance,
 } from "../domain/index.ts"
 import {
-  LlmRunner,
+  type LlmRunner,
   makeLlmSchema,
   type GenerateResult,
   type LlmError,
@@ -69,7 +71,8 @@ const WEEKDAYS = [
 export const statsForReduce = (stats: Stats) => {
   // Per-project activity is for the charts only: it would add project names by day. The
   // monthly technique breakdown is chart data too; the totals stay.
-  const { activity: _activity, techniques, ...encoded } = encodeStats(stats)
+  // Selection-clock metadata changes on every retry; observed dateRange remains evidence.
+  const { activity: _activity, window: _window, techniques, ...encoded } = encodeStats(stats)
   const byDay = <A>(xs: ReadonlyArray<A>) =>
     Object.fromEntries(WEEKDAYS.map((day, i) => [day, xs[i]]))
   return {
@@ -126,23 +129,26 @@ export const draftProfile = (
   prompt: string,
   options: AnalyzeOptions,
   onError: (cause: LlmError) => AnalyzeError,
-): Effect.Effect<Drafts, AnalyzeError, LlmRunner | Progress> =>
+): Effect.Effect<Drafts, AnalyzeError, LlmRunner | AnalysisCache | Progress> =>
   Effect.gen(function* () {
-    const runner = yield* LlmRunner
     const progress = yield* Progress
     const system = narrationPrompt("reduce", options.voice)
-    const initial = yield* runner
-      .generate({ stage: "draft", system, prompt, schema: DRAFT_SCHEMA })
-      .pipe(Effect.mapError(onError))
+    const initial = yield* generateCached(
+      "draft",
+      { stage: "draft", system, prompt, schema: DRAFT_SCHEMA },
+      options,
+    ).pipe(Effect.mapError(onError))
     yield* progress.onReviewStart ?? Effect.void
-    const reviewed = yield* runner
-      .generate({
+    const reviewed = yield* generateCached(
+      "review",
+      {
         stage: "review",
         system: `${system}\n\n${narrationPrompt("review", options.voice)}`,
         prompt: `draft:\n${JSON.stringify(initial.value)}\n\n${prompt}`,
         schema: DRAFT_SCHEMA,
-      })
-      .pipe(Effect.mapError(onError))
+      },
+      options,
+    ).pipe(Effect.mapError(onError))
     yield* progress.onReduceDone(initial.durationMs + reviewed.durationMs)
     return { initial, reviewed }
   })

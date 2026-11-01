@@ -1,3 +1,4 @@
+import { AnalysisCache, makeMemoryCache } from "../../src/analysis/cache.ts"
 import { fakeTranslation } from "../fixtures/fake-translation.ts"
 import { expect, it } from "@effect/vitest"
 import { Effect } from "effect"
@@ -194,8 +195,14 @@ it.effect("preserves authored bilingual claim strength through the translation b
           headline: item.afterZhTW,
         }),
       })
-      const result = yield* addTranslations(profile, ["en", "zh-TW"]).pipe(
+      const result = yield* addTranslations(profile, ["en", "zh-TW"], {
+        timezone: "UTC",
+        full: false,
+        noCache: false,
+        model: null,
+      }).pipe(
         Effect.provideService(LlmRunner, fake),
+        Effect.provideService(AnalysisCache, makeMemoryCache()),
         Effect.provideService(Progress, silentProgress),
       )
       expect(result.translations["zh-TW"]?.headline).toBe(item.afterZhTW)

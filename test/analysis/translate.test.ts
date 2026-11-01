@@ -1,3 +1,4 @@
+import { AnalysisCache, makeMemoryCache } from "../../src/analysis/cache.ts"
 import { readFileSync } from "node:fs"
 import { Effect } from "effect"
 import { expect, it } from "vitest"
@@ -6,6 +7,8 @@ import { addTranslations, translationInput } from "../../src/analysis/translate.
 import { Progress, silentProgress } from "../../src/analysis/progress.ts"
 import { LlmRunner, CallBudgetExceeded } from "../../src/llm/LlmRunner.ts"
 import { makeFakeLlmRunner } from "../../src/llm/fake.ts"
+
+const options = { timezone: "UTC", full: false, noCache: false, model: null }
 
 const setup = async () => {
   const base = await Effect.runPromise(
@@ -37,7 +40,8 @@ it("retries blank or untranslated narrative once and keeps only the complete rep
           : translated,
     })
     const result = await Effect.runPromise(
-      addTranslations(profile, ["zh-TW"]).pipe(
+      addTranslations(profile, ["zh-TW"], options).pipe(
+        Effect.provideService(AnalysisCache, makeMemoryCache()),
         Effect.provideService(LlmRunner, fake),
         Effect.provideService(Progress, silentProgress),
       ),
@@ -52,7 +56,8 @@ it("does not silently replace a failed Chinese-only request with English", async
   const { profile, translated } = await setup()
   const fake = makeFakeLlmRunner({ respond: () => ({ ...translated, portrait: null }) })
   const result = await Effect.runPromise(
-    addTranslations(profile, ["zh-TW"]).pipe(
+    addTranslations(profile, ["zh-TW"], options).pipe(
+      Effect.provideService(AnalysisCache, makeMemoryCache()),
       Effect.provideService(LlmRunner, fake),
       Effect.provideService(Progress, silentProgress),
       Effect.result,
@@ -66,7 +71,8 @@ it("explicitly reports omitted Chinese when English was also requested", async (
   const fake = makeFakeLlmRunner({ respond: () => ({ ...translated, headline: "" }) })
   const events: boolean[] = []
   const result = await Effect.runPromise(
-    addTranslations(profile, ["zh-TW", "en"]).pipe(
+    addTranslations(profile, ["zh-TW", "en"], options).pipe(
+      Effect.provideService(AnalysisCache, makeMemoryCache()),
       Effect.provideService(LlmRunner, fake),
       Effect.provideService(Progress, {
         ...silentProgress,
@@ -87,7 +93,8 @@ it("propagates a translation budget stop without retrying", async () => {
     failures: new Map([[1, new CallBudgetExceeded({ runner: "claude-code", limit: 1 })]]),
   })
   const result = await Effect.runPromise(
-    addTranslations(profile, ["zh-TW"]).pipe(
+    addTranslations(profile, ["zh-TW"], options).pipe(
+      Effect.provideService(AnalysisCache, makeMemoryCache()),
       Effect.provideService(LlmRunner, fake),
       Effect.provideService(Progress, silentProgress),
       Effect.result,
@@ -109,11 +116,39 @@ it("preserves technical names and numeric text without spending a retry", async 
     }),
   })
   const result = await Effect.runPromise(
-    addTranslations(profile, ["zh-TW"]).pipe(
+    addTranslations(profile, ["zh-TW"], options).pipe(
+      Effect.provideService(AnalysisCache, makeMemoryCache()),
       Effect.provideService(LlmRunner, fake),
       Effect.provideService(Progress, silentProgress),
     ),
   )
   expect(result.translations["zh-TW"]?.archetype.name).toBe("Claude Code")
   expect(fake.calls()).toBe(1)
+})
+
+it("reuses a valid replacement translation and invalidates changed text or voice", async () => {
+  const { profile, translated } = await setup()
+  const cache = makeMemoryCache()
+  let count = 0
+  const fake = makeFakeLlmRunner({
+    respond: () => (++count === 1 ? { ...translated, headline: "" } : translated),
+  })
+  const run = (p = profile, opts = options) =>
+    Effect.runPromise(
+      addTranslations(p, ["zh-TW"], opts).pipe(
+        Effect.provideService(AnalysisCache, cache),
+        Effect.provideService(LlmRunner, fake),
+        Effect.provideService(Progress, silentProgress),
+      ),
+    )
+  await run()
+  expect(fake.calls()).toBe(2)
+  await run()
+  expect(fake.calls()).toBe(2)
+  await run({ ...profile, headline: "A changed headline" })
+  expect(fake.calls()).toBe(3)
+  await run({ ...profile, voice: profile.voice === "first" ? "second" : "first" })
+  expect(fake.calls()).toBe(4)
+  await run(profile, { ...options, noCache: true })
+  expect(fake.calls()).toBe(5)
 })

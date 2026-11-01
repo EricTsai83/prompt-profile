@@ -60,7 +60,7 @@ Tokens use the existing domain categories:
   incomplete-attempt coverage in the summary. Available category subtotals are retained.
 - Local analysis-cache hits are counted separately. A cached map or merge adds no new
   invocation and does not charge its old usage to the new execution. Draft, review and
-  translations may still need new calls.
+  translations also reuse validated checkpoints when their complete inputs match.
 
 Tokens and cost independently have four states:
 
@@ -97,9 +97,9 @@ ID and artifact paths. If publication fails after writing files, the execution r
 use `history` to repair the completed-report index if publication had already finished.
 
 Follow the exact printed rerun command. Completed chunks and merges with matching input,
-model/configuration and version provenance are reusable. Draft, evidence review and
-translations run again. Each rerun gets its own execution ID and accounts only for its new
-calls. The rerun command retains both limits; increase a threshold if it stops again.
+model/configuration and version provenance are reusable. Successful draft, evidence review and
+translation checkpoints are reused too; a failed stage runs again. Each rerun gets its own
+execution ID and accounts only for its new calls. The rerun command retains both limits; increase a threshold if it stops again.
 There is no separate resume command or persistent feedback workflow.
 
 Records are created before model work and checkpointed after attempts, then finalized on
@@ -200,3 +200,36 @@ formats 2–7, 9–13 and 15–19 are rejected. Supporting released profiles onl
 changing their schema version and applying current additive-field defaults. The old
 pre-version-12 axis conversion and unreleased stored third-person voice path were removed.
 Released prose and source quotations remain unchanged; missing new measurements stay unknown.
+
+## Stage checkpoints and invalidation
+
+Map, merge, draft, evidence review and translation results are cached locally. Generated
+checkpoints retain output and source-model provenance, not historical tokens, cost or timing.
+Each new execution assembles fresh profile metadata and accounting; a fully matching warm
+run can make zero model calls. Cached drafts still pass the normal profile/evidence checks,
+and translations pass schema, alignment and language checks before reuse. Invalid cache
+entries are misses. Only successful, accepted translations are saved, including replacements
+from a second attempt. `--no-cache` skips all reads but refreshes successful checkpoints.
+
+Cache keys include runner, requested model and effort, pipeline version, context identity
+and input identity. Generated stages additionally hash the actual system instructions,
+complete input and JSON schema (translations use the canonical input without retry feedback).
+The LLM statistics omit the selection window, whose cutoff moves with each run; observed
+`dateRange` and measured statistics remain in the input. The complete selection window is
+still saved in the fresh profile. Changes in selected data or measured statistics invalidate
+the relevant checkpoint.
+Each stage hashes its relevant prompt files, schema and common system preamble independently.
+Review depends on both reduce and review instructions. Changing translation or review rules
+does not invalidate map results. `STAGE_REVISIONS` in `src/analysis/stage-version.ts` must be
+bumped for stage code/format changes not captured by these hashes; `ANALYSIS_VERSION` remains
+report provenance. Defaults remain defaults: an unspecified model is not proof of a fixed
+provider model. Use an explicit model or `--no-cache` when a fresh analysis is wanted.
+
+This cache-key transition causes a one-time miss for old observation caches. Existing files
+are not migrated. The cache-clear command removes all five stage folders and preserves fonts.
+New folders remain private (`0700`) and checkpoint files are atomically replaced (`0600`).
+Preflight counts only look up map entries: final-stage hits can lower the estimate, while
+merges and retries can raise it.
+
+For the testing rationale, controlled comparison and its limits, see
+[Testing cost optimizations in LLM pipelines](testing/llm-cache-validation.html).

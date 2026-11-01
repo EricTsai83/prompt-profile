@@ -3,7 +3,7 @@ import { Effect, Option } from "effect"
 import { PIPELINE_VERSION } from "../pipeline/index.ts"
 import { AnalysisCache, type CacheKeyParts } from "./cache.ts"
 import { buildChunks, DEFAULT_MAX_CHUNKS, sampleChunks, type Chunk } from "./chunk.ts"
-import { ANALYSIS_VERSION } from "./version.ts"
+import { stageVersion } from "./stage-version.ts"
 
 /** LLM calls in flight, to stay clear of subscription rate limits. */
 export const DEFAULT_CONCURRENCY = 3
@@ -34,8 +34,8 @@ export interface AnalysisPlan {
   readonly chunks: ReadonlyArray<Chunk>
   readonly sampled: boolean
   readonly cacheHits: number
-  /** Base estimate: uncached map calls + final reduce + evidence review +
-   * translations; merges and retries are additional. */
+  /** Estimate before final-stage cache lookup: uncached map calls + draft + review +
+   * translations. Downstream hits can reduce it; merges and retries can add calls. */
   readonly llmCalls: number
   /** Of `llmCalls`: one per uncached chunk. */
   readonly mapCalls: number
@@ -51,15 +51,15 @@ export interface AnalysisPlan {
 export const translationCalls = (options: AnalyzeOptions): number =>
   new Set((options.languages ?? []).filter((l) => l !== "en")).size
 
-export const keyParts = (
-  kind: CacheKeyParts["kind"],
+export const keyParts = <K extends CacheKeyParts["kind"]>(
+  kind: K,
   inputId: string,
   runner: string,
   options: AnalyzeOptions,
-): CacheKeyParts => ({
+): CacheKeyParts & { readonly kind: K } => ({
   kind,
   inputId: options.contextIdentity ? `${options.contextIdentity}:${inputId}` : inputId,
-  analysisVersion: ANALYSIS_VERSION,
+  analysisVersion: stageVersion(kind),
   pipelineVersion: PIPELINE_VERSION,
   runner,
   model: options.model,

@@ -1,3 +1,6 @@
+import { generateCached } from "./generated.ts"
+import type { AnalysisCache } from "./cache.ts"
+import type { AnalyzeOptions } from "./plan.ts"
 import { narrationPrompt } from "./voice.ts"
 import { Effect } from "effect"
 import {
@@ -7,7 +10,7 @@ import {
   type Profile,
   type Translation as TranslationType,
 } from "../domain/index.ts"
-import { LlmRunner, makeLlmSchema, type LlmError } from "../llm/index.ts"
+import { type LlmRunner, makeLlmSchema, type LlmError } from "../llm/index.ts"
 import { TranslationFailed } from "./errors.ts"
 import { Progress } from "./progress.ts"
 
@@ -111,35 +114,40 @@ const aligned = (p: Profile, t: TranslationType, language: Language): Translatio
 export const addTranslations = (
   profile: Profile,
   requested: ReadonlyArray<Language>,
-): Effect.Effect<Profile, LlmError | TranslationFailed, LlmRunner | Progress> =>
+  options: AnalyzeOptions,
+): Effect.Effect<Profile, LlmError | TranslationFailed, LlmRunner | AnalysisCache | Progress> =>
   Effect.gen(function* () {
-    const runner = yield* LlmRunner
     const progress = yield* Progress
     const input = JSON.stringify(translationInput(profile))
     const translations: Record<string, TranslationType> = {}
     for (const language of requested) {
       if (language === "en" || translations[language] !== undefined) continue
+      const cachePrompt = `language: ${language} (${LANGUAGE_NAMES[language]})\n\nprofile:\n${input}`
       let result: TranslationType | null = null
       for (let attempt = 0; attempt < 2 && result === null; attempt++) {
         yield* progress.onTranslateStart(language)
-        result = yield* runner
-          .generate({
+        result = yield* generateCached(
+          "translation",
+          {
             stage: "translation",
             system: narrationPrompt("translate", profile.voice),
             prompt: `language: ${language} (${LANGUAGE_NAMES[language]})${attempt > 0 ? "\nThe previous translation was incomplete or invalid. Translate every nonempty field, including all narrative paragraphs. Return the complete object." : ""}\n\nprofile:\n${input}`,
             schema: TRANSLATION_SCHEMA,
-          })
-          .pipe(
-            Effect.map((r) => aligned(profile, r.value, language)),
-            Effect.catchIf(
-              (e: LlmError) =>
-                e._tag !== "Interrupted" &&
-                e._tag !== "CallBudgetExceeded" &&
-                e._tag !== "CostBudgetExceeded" &&
-                e._tag !== "AccountingUnavailable",
-              () => Effect.succeed(null),
-            ),
-          )
+          },
+          options,
+          (value) => aligned(profile, value, language) !== null,
+          cachePrompt,
+        ).pipe(
+          Effect.map((r) => aligned(profile, r.value, language)),
+          Effect.catchIf(
+            (e: LlmError) =>
+              e._tag !== "Interrupted" &&
+              e._tag !== "CallBudgetExceeded" &&
+              e._tag !== "CostBudgetExceeded" &&
+              e._tag !== "AccountingUnavailable",
+            () => Effect.succeed(null),
+          ),
+        )
       }
       yield* progress.onTranslated(language, result !== null)
       if (result !== null) translations[language] = result
