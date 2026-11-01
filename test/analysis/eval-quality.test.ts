@@ -205,3 +205,23 @@ it.effect("preserves authored bilingual claim strength through the translation b
     }
   }),
 )
+
+it.effect("allows clear learner prompts to have no actionable improvement", () =>
+  Effect.gen(function* () {
+    const sample = yield* decodeProfile(
+      JSON.parse(readFileSync(new URL("../fixtures/profile.sample.json", import.meta.url), "utf8")),
+    )
+    const learnerRubric = JSON.parse(
+      readFileSync(
+        new URL("../eval/personas/curious-learner/rubric.json", import.meta.url),
+        "utf8",
+      ),
+    )
+    const profile = {
+      ...sample,
+      headline: "You learn Rust ownership through explanations.",
+      improvements: [],
+    }
+    expect(scoreProfile(profile, learnerRubric).passed).toBe(true)
+  }),
+)
